@@ -1,5 +1,5 @@
 == Product Page Customizer for WooCommerce ==
-Contributors: wooxperto
+Contributors: wooxperto,antor9732
 Tags: Single Product Page Customizer, Product Customizer, WooCommerce, Customize Single Product Page, Customize WooCommerce Single Product
 Requires at least: 4.0
 Tested up to: 6.9
