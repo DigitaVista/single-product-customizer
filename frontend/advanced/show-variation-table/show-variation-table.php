@@ -7,7 +7,11 @@ if( ! class_exists('Sppcfw_Frontend_Variation_Table')){
         }
 
         public function initialization(){
-
+            // Only for single product page
+            if( ! is_product() ) {
+                return;
+            }
+            
             if($this->is_enabled()===1){
                 
                 $this->hook=$this->sppcfw_get_variation_table_show_hook();
@@ -27,17 +31,13 @@ if( ! class_exists('Sppcfw_Frontend_Variation_Table')){
                     if(isset($SPPCFW_INDIVIDUAL['variation_table_display_hook'])){
                         if(!empty($SPPCFW_INDIVIDUAL['enable_varition_table'])){
                             $hook=$SPPCFW_INDIVIDUAL['variation_table_display_hook'];  
-                            
                         }                       
                     }
                    return $hook;
-                    
                 }
 
                 // check in category level
-                
                 if(sppcfw_if_category_based_customization_enabled()===1){
-
                     $product_cat=sppcfw_get_product_category_id();
                     if($product_cat>0){
                         $sppcfw_cat = get_term_meta($product_cat, 'sppcfw_category_based_settings', true);
@@ -45,23 +45,17 @@ if( ! class_exists('Sppcfw_Frontend_Variation_Table')){
                         if(isset($sppcfw_cat['variation_table_display_hook'])){
                             if(!empty($sppcfw_cat['enable_varition_table'])){
                                 $hook=$sppcfw_cat['variation_table_display_hook'];
-                                
                             }                       
                         }
                     }
-
                     return $hook;
                 }
 
                 if(isset(SPPCFW_ADVANCED['variation_table_display_hook'])){
-
                     if(!empty(SPPCFW_ADVANCED['enable_varition_table'])){
                         $hook=SPPCFW_ADVANCED['variation_table_display_hook'];
                     }
-
-                    
                 }
-
             }
             return $hook;
         }
@@ -82,7 +76,6 @@ if( ! class_exists('Sppcfw_Frontend_Variation_Table')){
         }
 
         public function sppcfw_show_variation_table(){
-
             global $post;
 
             $product = wc_get_product($post->ID);
@@ -98,7 +91,6 @@ if( ! class_exists('Sppcfw_Frontend_Variation_Table')){
                         <th><?php echo esc_html_e("SKU","single-product-customizer");?></th>
                         <?php
                             foreach($attrs as $attr){
-                                
                                 echo '<th>'.wp_kses_post(wc_attribute_label( $attr->get_name() )).'</th>';
                             }
                         ?>
@@ -110,7 +102,6 @@ if( ! class_exists('Sppcfw_Frontend_Variation_Table')){
                         foreach($variations as $var){
                             $variation=wc_get_product($var);
                             $vattrs=$variation->get_attributes();
-                            // print_r($vattrs);
                             echo'<tr>
                             <td>'.wp_kses_post($variation->get_sku()).'</td>';
                             foreach($vattrs as $key=>$vattr){
@@ -130,7 +121,6 @@ if( ! class_exists('Sppcfw_Frontend_Variation_Table')){
                         </tr>';
                         }
                     ?>
-                    
                 </tbody>
             </table>
             
@@ -141,8 +131,6 @@ if( ! class_exists('Sppcfw_Frontend_Variation_Table')){
         public function is_enabled(){
             $enabled=0;
             if(SPPCFW_PRO_ACTIVE){
-
-
                 if(isset(SPPCFW_ADVANCED['enable_varition_table'])){
                     if(SPPCFW_ADVANCED['enable_varition_table']==='on'){
                         $enabled=1;
@@ -177,16 +165,10 @@ if( ! class_exists('Sppcfw_Frontend_Variation_Table')){
                             }
                         }
                     }
-
                     return $enabled;
                 }
-
-
-
             }
             return $enabled;
-
-            
         }
     }
 

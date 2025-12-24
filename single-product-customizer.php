@@ -1,12 +1,12 @@
 <?php 
 /**
 * Plugin Name:       Product Page Customizer for WooCommerce
-* Plugin URI:        http://www.webcartisan.com/single-product-page-customizer/
+* Plugin URI:        http://webcartisan.com/single-product-page-customizer/
 * Description:       An esential helper tool for woocommerce single product page. Borderless freedom to customize single product page. 
 * Version:           1.0.0
 * Requires at least: 4.0
 * Author:            WebCartisan
-* Author URI:        http://www.webcartisan.com/
+* Author URI:        http://webcartisan.com/
 * License:           GPL-2.0+
 * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
 * Text Domain:       single-product-customizer

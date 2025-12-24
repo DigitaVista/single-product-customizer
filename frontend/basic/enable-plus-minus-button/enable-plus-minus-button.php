@@ -17,10 +17,16 @@ if( !class_exists("Sppcfw_Frontend_Enable_Plus_Minus_Button")){
                 wp_enqueue_script(
                     'sppcfw-enable-plus-minus-button-js',
                     plugin_dir_url(__FILE__).'enable-plus-minus-button.js',
-                    array( 'jquery'),
-                    true,
-                    SPPCFW_VERION
+                    array('jquery'),
+                    (defined('SPPCFW_VERION') ? SPPCFW_VERION : false),
+                    true
                 );
+
+                // Add small inline style to ensure quantity wrapper displays as flex
+                wp_register_style('sppcfw-plus-minus-inline', false);
+                wp_enqueue_style('sppcfw-plus-minus-inline');
+                $css = '.quantity{display:flex !important; align-items:center; gap:0.25rem;} .quantity .button, .sppcfw_minus_button, .sppcfw_plus_button{margin-bottom:0 !important;}';
+                wp_add_inline_style('sppcfw-plus-minus-inline', $css);
             }
         }
 

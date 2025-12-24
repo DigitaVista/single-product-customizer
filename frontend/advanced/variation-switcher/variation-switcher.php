@@ -120,62 +120,70 @@ if( !class_exists("Sppcfw_Variation_Switcher")){
             return $value;
         }
 
-        public function sppcfw_display_variation_switcher( $html, $args ){
-            if($this->is_enabled()===1){
+        public function sppcfw_display_variation_switcher($html, $args)
+        {
+            if ($this->is_enabled() === 1) {
                 $options = $args['options'];
-            
+                $product = $args['product'];
                 $attribute = $args['attribute']; // pa_size, pa_color,pa_....
-                
-            
-                $attribute_name=ltrim($attribute, 'pa_');
-                //$attribute_name=substr($attribute, 3);
-            
+
+                // Check if options array is empty
+                if (empty($options) && $product && taxonomy_exists($attribute)) {
+                    $terms = wc_get_product_terms($product->get_id(), $attribute, array('fields' => 'slugs'));
+                    $options = $terms;
+                }
+
+                // Return original HTML if no options
+                if (empty($options)) {
+                    return $html;
+                }
+
+                $attribute_name = ltrim($attribute, 'pa_');
                 $attributes_type =  $this->sppcfw_get_attribute_type($attribute_name);
-            
-                $attribute_name = 'attribute_'.$attribute ;
-                $select='<select id="'.$attribute.'" class="vairation_select" data-attribute_name="'.$attribute_name.'" name="'.$attribute_name.'">';
-                $select.='<option value="">__("Chose one", "single-product-customizer")</option>';
-                $button='';
-            
-            
-                foreach($options as $option){
-            
-                    $select.='<option value="'.$option.'">'.$option.'</option>';
-                    $option_meta=$this->sppcfw_get_attribute_type_meta_value($option,$attribute);
-            
+
+                $attribute_name = 'attribute_' . $attribute;
+                $select = '<select id="' . $attribute . '" class="vairation_select" data-attribute_name="' . $attribute_name . '" name="' . $attribute_name . '">';
+                $select .= '<option value="">' . __("Choose one", "single-product-customizer") . '</option>';
+                $button = '';
+
+                foreach ($options as $option) {
+                    // Ensure option is a string
+                    $option = is_object($option) ? $option->slug : $option;
+                    $option_label = is_object($option) ? $option->name : $option;
+
+                    $select .= '<option value="' . $option . '">' . $option_label . '</option>';
+                    $option_meta = $this->sppcfw_get_attribute_type_meta_value($option, $attribute);
+
                     switch ($attributes_type) {
                         case 'color':
-                            $button.='<button data-val="'.$option.'" class="webfwc_variation_button color" data-bg-color="'.$option_meta.'" type="button" data-attr="'.$attribute.'"></button>';
-                            break;
-                        
-                        case 'icon':
-                            $button.='<button data-val="'.$option.'" class="webfwc_variation_button icon" type="button" data-attr="'.$attribute.'">
-                                <i class="'.$option_meta.'"></i>
-                            </button>';
-                            break;
-                        case 'button':
-                            $button.='<button data-val="'.$option.'" class="webfwc_variation_button button" type="button" data-attr="'.$attribute.'">'.$option.'</button>';
-                            break;
-                        case 'image':
-                            $img='';
-                            if($option_meta>0){
-                                $img=wp_get_attachment_image($option_meta,'thumbnail');
-                            }
-                            $button.='<button data-val="'.$option.'" class="webfwc_variation_button image" type="button" data-attr="'.$attribute.'">
-                            '.$img.'
-                            </button>';
+                            $button .= '<button data-val="' . $option . '" class="webfwc_variation_button color" data-bg-color="' . $option_meta . '" type="button" data-attr="' . $attribute . '" title="' . $option_label . '"></button>';
                             break;
 
-                            default :
-                            $button.='<button data-val="'.$option.'" class="webfwc_variation_button button" type="button" data-attr="'.$attribute.'">'.$option.'</button>';
+                        case 'icon':
+                            $button .= '<button data-val="' . $option . '" class="webfwc_variation_button icon" type="button" data-attr="' . $attribute . '" title="' . $option_label . '">
+                        <i class="' . $option_meta . '"></i>
+                    </button>';
+                            break;
+                        case 'button':
+                            $button .= '<button data-val="' . $option . '" class="webfwc_variation_button button" type="button" data-attr="' . $attribute . '">' . $option_label . '</button>';
+                            break;
+                        case 'image':
+                            $img = '';
+                            if ($option_meta > 0) {
+                                $img = wp_get_attachment_image($option_meta, 'thumbnail');
+                            }
+                            $button .= '<button data-val="' . $option . '" class="webfwc_variation_button image" type="button" data-attr="' . $attribute . '" title="' . $option_label . '">
+                    ' . $img . '
+                    </button>';
+                            break;
+                        default:
+                            $button .= '<button data-val="' . $option . '" class="webfwc_variation_button button" type="button" data-attr="' . $attribute . '">' . $option_label . '</button>';
                     }
-            
-                    
                 }
-            
-                $select.='</select>';
-            
-                return '<div class="cu_button_el">'.$select.$button.'</div>';
+
+                $select .= '</select>';
+
+                return '<div class="cu_button_el" data-attribute="' . $attribute . '">' . $select . $button . '</div>';
             }
 
             return $html;
