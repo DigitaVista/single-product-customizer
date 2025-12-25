@@ -1,10 +1,10 @@
 == Product Page Customizer for WooCommerce ==
-Contributors: wooxperto,antor9732
+Contributors: wooxperto
 Tags: Single Product Page Customizer, Product Customizer, WooCommerce, Customize Single Product Page, Customize WooCommerce Single Product
 Requires at least: 4.0
 Tested up to: 6.9
 Requires PHP: 7.2
-Stable tag: 1.0.0
+Stable tag: 1.0.1
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
