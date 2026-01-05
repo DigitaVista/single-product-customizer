@@ -886,7 +886,7 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
 
             <div class="tab-container-sppcfw">
                 <div class="tab-sppcfw">
-                    <div id="logo-container-spc"></div>
+                    <div id="logo-container-spc" style="font-size: 20px; font-weight: bold;"><h2>Single Product Customizer</h2></div>
                     <button style="padding: 8px" class="tablinks-sppcfw" onclick="opensppcfw(event, 'basic')" id="defaultOpen"><span class="dashicons dashicons-admin-generic"></span><?php esc_html_e(' Basic Settings', 'single-product-customizer'); ?></button>
                     <button style="padding: 8px" class="tablinks-sppcfw" onclick="opensppcfw(event, 'advance')"><span class="dashicons dashicons-admin-settings"></span><?php esc_html_e(' Advance Settings', 'single-product-customizer'); ?></button>
                     <button style="padding: 8px" class="tablinks-sppcfw" onclick="opensppcfw(event, 'support')"><span class="dashicons dashicons-admin-site"></span><?php esc_html_e(' Support', 'single-product-customizer'); ?></button>

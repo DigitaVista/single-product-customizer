@@ -32,17 +32,17 @@ jQuery(document).ready(function($) {
 });
 
 
-document.addEventListener('DOMContentLoaded', function () {
-    var img = document.createElement('img');
-    img.src = sppcfw_settings.logoUrl;
-    img.alt = "Site Logo";
-    img.style.width = "100%";
+// document.addEventListener('DOMContentLoaded', function () {
+//     var img = document.createElement('img');
+//     img.src = sppcfw_settings.logoUrl;
+//     img.alt = "Site Logo";
+//     img.style.width = "100%";
 
-    // Append it wherever you want, e.g., inside a div with ID "logo-container"
-    if (document.getElementById('logo-container-spc')){
-        document.getElementById('logo-container-spc').appendChild(img);
-    }
-});
+//     // Append it wherever you want, e.g., inside a div with ID "logo-container"
+//     if (document.getElementById('logo-container-spc')){
+//         document.getElementById('logo-container-spc').appendChild(img);
+//     }
+// });
 
 
 jQuery(document).ready(function(){

@@ -18,6 +18,14 @@ if( ! defined( 'ABSPATH' ) ){
     exit();
 } 
 
+/**
+ * Load translations on init to avoid early textdomain loading warnings.
+ */
+add_action( 'init', 'sppcfw_load_textdomain' );
+function sppcfw_load_textdomain() {
+    load_plugin_textdomain( 'single-product-customizer', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+}
+
 
 add_filter( 'plugin_action_links_' . plugin_basename(__FILE__), 'sppcfw_plugin_action_links' );
 function sppcfw_plugin_action_links( $links ) {
@@ -75,10 +83,19 @@ add_action('wp',function(){
 });
 
 
-include(SPPCFW_DIR_PATH.'/backend/resources/hook-list.php');
-include(SPPCFW_DIR_PATH.'/common/util.php');
-include(SPPCFW_DIR_PATH.'/backend/backend-master.php');
-include(SPPCFW_DIR_PATH.'/frontend/frontend-master.php');
+/**
+ * Include plugin files after translations are loaded to avoid early __() calls.
+ * We load translations on init with default priority (10), so include files
+ * on a later init priority to ensure any file-scope translation calls happen
+ * after textdomain is available.
+ */
+add_action( 'init', 'sppcfw_load_includes', 20 );
+function sppcfw_load_includes() {
+    include_once SPPCFW_DIR_PATH . 'backend/resources/hook-list.php';
+    include_once SPPCFW_DIR_PATH . 'common/util.php';
+    include_once SPPCFW_DIR_PATH . 'backend/backend-master.php';
+    include_once SPPCFW_DIR_PATH . 'frontend/frontend-master.php';
+}
 
 register_activation_hook(__FILE__, 'sppcfw_plugin_activate');
 function sppcfw_plugin_activate(){
