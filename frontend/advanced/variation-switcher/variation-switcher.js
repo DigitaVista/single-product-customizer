@@ -91,15 +91,26 @@ jQuery(function ($) {
           if (thisName) candidate[thisName] = btnVal.toString();
 
           let matchExists = variations.some(
-            (v) =>
-              v.attributes &&
-              Object.keys(candidate).every((key) => {
-                let val = candidate[key];
-                if (!val) return true;
-                return (
-                  v.attributes[key] &&
-                  v.attributes[key].toString() === val.toString()
-                );
+            (variation) =>
+              variation.attributes &&
+              Object.keys(candidate).every((attributeKey) => {
+                let candidateValue = candidate[attributeKey];
+                if (!candidateValue) return true;
+
+                let variationValue = variation.attributes[attributeKey];
+                if (typeof variationValue === "undefined") {
+                  variationValue =
+                    variation.attributes[attributeKey.replace(/-/g, "_")];
+                }
+                if (typeof variationValue === "undefined") {
+                  variationValue =
+                    variation.attributes[attributeKey.replace(/_/g, "-")];
+                }
+
+                // If variation's attribute is an empty string, treat it as a wildcard (doesn't restrict this attribute)
+                if (variationValue === "") return true;
+
+                return variationValue.toString() === candidateValue.toString();
               })
           );
 
