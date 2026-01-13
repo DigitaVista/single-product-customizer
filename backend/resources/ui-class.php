@@ -242,6 +242,7 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
 					$args = array(
 						'id'                => $id,
 						'class'                => $class,
+						'help_link'            => isset( $field['help_link'] ) ? $field['help_link'] : '',
 						'type'              => $type,
 						'name'              => $name,
 						'label_for'         => $label_for,
@@ -353,13 +354,34 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
 		 * @param array $args settings field args
 		 */
 		public function get_field_description( $args ) {
+			$desc_text = '';
+
 			if ( ! empty( $args['desc'] ) ) {
-				$desc = sprintf( '<p class="description">%s</p>', $args['desc'] );
-			} else {
-				$desc = '';
+				$desc_text = $args['desc'];
 			}
 
-			return $desc;
+			// Append help link/icon if provided via 'help_link' (or legacy 'link')
+			$link = '';
+			if ( isset( $args['help_link'] ) && ! empty( $args['help_link'] ) ) {
+				$link = $args['help_link'];
+			} elseif ( isset( $args['link'] ) && ! empty( $args['link'] ) ) {
+				$link = $args['link'];
+			}
+
+			if ( ! empty( $link ) ) {
+				if ( function_exists( 'wodgc_help_youtube_link' ) ) {
+					ob_start();
+					wodgc_help_youtube_link( $link );
+					$icon = ob_get_clean();
+					$desc_text .= ' ' . $icon;
+				} 
+			}
+
+			if ( ! empty( $desc_text ) ) {
+				return sprintf( '<p >%s</p>', $desc_text );
+			}
+
+			return '';
 		}
 
 
@@ -419,6 +441,16 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
 				'p' => array(
 					'class' => array(),
 				),
+				'a' => array(
+					'href' => array(),
+					'target' => array(),
+					'rel' => array(),
+					'class' => array(),
+				),
+				'span' => array(
+					'class' => array(),
+					'style' => array(),
+				),
 			);
 		
 			// Sanitize and output the HTML
@@ -471,7 +503,18 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
 				);
 			}
 		
-			$html .= sprintf( '%1$s</label>', $args['desc'] );
+			// Build label text and append YouTube help link/icon if provided
+			$label_text = $args['desc'];
+			if ( isset( $args['help_link'] ) && ! empty( $args['help_link'] ) ) {
+				if ( function_exists( 'wodgc_help_youtube_link' ) ) {
+					ob_start();
+					wodgc_help_youtube_link( $args['help_link'] );
+					$label_text .= ob_get_clean();
+				} else {
+					$label_text .= ' <span class="wwodgc_youtube-link"><a href="' . esc_url( $args['help_link'] ) . '" target="_blank" rel="noopener noreferrer" style="text-decoration: none;"><span class="dashicons dashicons-video-alt3" style="color: #FF0000;"></span></a></span>';
+				}
+			}
+			$html .= sprintf( '%1$s</label>', $label_text );
 			$html .= '</fieldset>';
 		
 			// Define allowed HTML tags and attributes
@@ -487,6 +530,17 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
 					'name' => array(),
 					'value' => array(),
 					'checked' => array(),
+				),
+				'a' => array(
+					'href' => array(),
+					'target' => array(),
+					'rel' => array(),
+					'style' => array(),
+					'class' => array(),
+				),
+				'span' => array(
+					'class' => array(),
+					'style' => array(),
 				),
 				'p' => array(
 					'class' => array(),

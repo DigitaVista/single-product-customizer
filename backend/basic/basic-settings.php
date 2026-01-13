@@ -16,11 +16,12 @@ $sppcfw_back_ui_obj->add_section(
 $sppcfw_back_ui_obj->add_field(
     'sppcfw_basic',
     array(
-        'id'   => 'enable_plus_minus_button',
-        'type' => 'checkbox',
-        'name' => __( 'Enable plus/minus button for quantity change', 'single-product-customizer' ),
-        'desc' => '',
-        'class'=>'sppcfw_basic_enable_plus_minus_button'
+        'id'        => 'enable_plus_minus_button',
+        'type'      => 'checkbox',
+        'name'      => __( 'Enable plus/minus button for quantity change', 'single-product-customizer' ),
+        'desc'      => '',
+        'class'     =>'sppcfw_basic_enable_plus_minus_button',
+        'help_link' =>'https://www.youtube.com/watch?v=T_fbESRC2uw'
     )
 );
 
@@ -36,7 +37,8 @@ $sppcfw_back_ui_obj->add_field(
         'name'    => __( 'Out of stock text', 'single-product-customizer' ),
         'desc'    => '',
         'default' => __('Out of stock','single-product-customizer'),
-        'class'=>'sppcfw_basic_out_of_stock_text'
+        'class'   =>'sppcfw_basic_out_of_stock_text',
+        'help_link' =>'https://www.youtube.com/watch?v=T_fbESRC2uw'
     )
 );
 
@@ -49,6 +51,7 @@ $sppcfw_back_ui_obj->add_field(
         'name'              => __( 'Change sales badge text', 'single-product-customizer' ),
         'desc'              => '',
         'default'           => __( 'Sale!', 'single-product-customizer' ),
+        'help_link' =>'https://www.youtube.com/watch?v=T_fbESRC2uw'
     )
 );
 $sppcfw_back_ui_obj->add_field(
@@ -69,7 +72,8 @@ $sppcfw_back_ui_obj->add_field(
         'type' => 'checkbox',
         'name' => __( 'Remove product meta', 'single-product-customizer' ),
         'desc' => '',
-        'class'=>'sppcfw_basic_product_meta'
+        'class'=>'sppcfw_basic_product_meta',
+        'help_link' =>'https://www.youtube.com/watch?v=T_fbESRC2uw'
     )
 );
 

@@ -267,6 +267,22 @@ function sppcfw_send_admin_notification_callback() {
 }
 
 
+/*******************
+ * Start Add YouTube help link Function
+ *******************/
 
+function wodgc_help_youtube_link($link){
+    ?>
+    <span class="wwodgc_youtube-link">
+        <a href="<?php echo esc_attr($link); ?>"
+           target="_blank"
+           style="text-decoration: none;">
+            <span class="dashicons dashicons-youtube" style="color: #FF0000;"></span>
+        </a>
+    </span>
+    <?php
+}
 
-
+/*******************
+ * End Add YouTube help link Function
+ *******************/
