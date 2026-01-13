@@ -1,6 +1,7 @@
 /* Variation switcher Frontend section */
 jQuery(function ($) {
   initVariationSwitcher();
+  setTimeout(setVariationsFromURL, 50);
 
   $(document)
     .on("found_variation reset_data", "form.variations_form", function () {
@@ -141,5 +142,31 @@ jQuery(function ($) {
       });
     });
   }
+
+
+  function setVariationsFromURL() {
+  const params = new URLSearchParams(window.location.search);
+
+  if (!params.toString()) return;
+
+  let hasSet = false;
+
+  params.forEach(function (value, key) {
+    if (!key.startsWith("attribute_")) return;
+
+    const $select = $('select[name="' + key + '"]');
+    if ($select.length) {
+      $select.val(value);
+      hasSet = true;
+    }
+  });
+
+  if (hasSet) {
+    // Let WooCommerce handle variation matching
+    $('form.variations_form').trigger('check_variations');
+    $('form.variations_form select').trigger('change');
+  }
+}
+
 });
 /* Variation switcher Frontend section end*/
