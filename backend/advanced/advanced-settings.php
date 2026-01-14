@@ -330,7 +330,7 @@
 
     $sppcfw_is_block_theme = sppcfw_is_block_theme_active();
     $related_products_disabled = $sppcfw_is_block_theme ? 'disabled' : '';
-    $related_products_desc = $sppcfw_is_block_theme ? __( 'This feature is not available in block theme', 'single-product-customizer' ) : '';
+    $related_products_desc = $sppcfw_is_block_theme ? '<span style="color: red; font-weight: bold;">' . __( 'This feature is not available in block theme', 'single-product-customizer' ) . '</span>' : '';
     
     $sppcfw_back_ui_obj->add_field(
         'sppcfw_advanced',
