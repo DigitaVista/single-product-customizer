@@ -71,6 +71,10 @@ content:'\f509';
   display: flex;
   justify-content: space-between;
 }
+/*===================youtube icon style============*/
+.wwodgc_youtube-link a {
+    text-decoration: none;
+}
 
 /*===================vertical tab============*/
 tr.sppcfw_additional_content td{

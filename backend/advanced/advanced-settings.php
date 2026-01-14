@@ -173,7 +173,8 @@
 			'type' => 'checkbox',
 			'name' => __( 'Enable custom message', 'single-product-customizer' ),
 			'desc' => '',
-            'class'=>'sppcfw_advanced_enable_custom_message'
+            'class'=>'sppcfw_advanced_enable_custom_message',
+			'help_link' =>'https://youtu.be/0znk5Jpwpr0'
 		)
 	);
 	$sppcfw_back_ui_obj->add_field(
@@ -215,7 +216,8 @@
 			'type' => 'checkbox',
 			'name' => __( 'Show variation table', 'single-product-customizer' ),
 			'desc' => '',
-            'class'=>'sppcfw_advanced_enable_varition_table'
+            'class'=>'sppcfw_advanced_enable_varition_table',
+			'help_link' =>'https://youtu.be/YjcxUb6kaIM'
 		)
 	);
 
@@ -321,7 +323,8 @@
 			'type' => 'checkbox',
 			'name' => __( 'Enable variation switcher', 'single-product-customizer' ),
 			'desc' => '',
-            'class'=>'sppcfw_advanced_enable_variation_switcher'
+            'class'=>'sppcfw_advanced_enable_variation_switcher',
+			'help_link' =>'https://youtu.be/PpKSdsaOMeg'
 		)
 	);
 
@@ -333,6 +336,7 @@
             'name'              => __( 'Related products title', 'single-product-customizer' ),
             'desc'              => '',
             'default'           => __( 'Related products', 'single-product-customizer' ),
+			'help_link' 		=>'https://youtu.be/eOsk7buqgmI'
         )
     );
     
@@ -344,6 +348,7 @@
             'name'              => __( 'Upsell products title', 'single-product-customizer' ),
             'desc'              => '',
             'default'           => __( 'You may also like…', 'single-product-customizer' ),
+			'help_link' 		=>'https://youtu.be/lrXgTynjQ9E'
         )
     );
 
@@ -355,18 +360,20 @@
             'name' => __( 'Variation reset text', 'single-product-customizer' ),
             'desc'=>'',
             'default' => __( 'Clear', 'single-product-customizer' ),
-            'class'=>'sppcfw_global_change_clear_text'
+            'class'=>'sppcfw_global_change_clear_text',
+			'help_link' =>'https://youtu.be/JLfqhSXl70I'
         )
     );
     $sppcfw_back_ui_obj->add_field(
         'sppcfw_advanced',
         array(
-            'id'   => 'change_backorder_text',
-            'type' => 'text',
-            'name' => __( 'On backorder text', 'single-product-customizer' ),
-            'desc'=>'',
-            'default' => __( 'Available on backorder', 'single-product-customizer' ),
-            'class'=>'sppcfw_global_change_backorder_text'
+            'id'   		=> 'change_backorder_text',
+            'type' 		=> 'text',
+            'name' 		=> __( 'On backorder text', 'single-product-customizer' ),
+            'desc'		=>'',
+            'default' 	=> __( 'Available on backorder', 'single-product-customizer' ),
+            'class'		=>'sppcfw_global_change_backorder_text',
+			'help_link' =>'https://youtu.be/CXFJX_3RNXk'
         )
     );
 
