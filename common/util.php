@@ -189,6 +189,13 @@ function sppcfw_min_max_is_enabled($product_id){
     return $enabled;
 }
 
+// Check if block theme is installed
+function sppcfw_is_block_theme_active(){
+    $theme = wp_get_theme();
+    // Check if the theme supports block-based templates
+    return $theme->is_block_theme();
+}
+
 // action hooks select options html
 function sppcfw_wc_action_hooks_select_html($args=array()){
     global $sppcfw_available_hooks;

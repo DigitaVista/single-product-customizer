@@ -328,15 +328,21 @@
 		)
 	);
 
+    $sppcfw_is_block_theme = sppcfw_is_block_theme_active();
+    $related_products_disabled = $sppcfw_is_block_theme ? 'disabled' : '';
+    $related_products_desc = $sppcfw_is_block_theme ? __( 'This feature is not available in block theme', 'single-product-customizer' ) : '';
+    
     $sppcfw_back_ui_obj->add_field(
         'sppcfw_advanced',
         array(
             'id'                => 'related_products_title',
             'type'              => 'text',
             'name'              => __( 'Related products title', 'single-product-customizer' ),
-            'desc'              => '',
+            'desc'              => $related_products_desc,
             'default'           => __( 'Related products', 'single-product-customizer' ),
-			'help_link' 		=>'https://youtu.be/eOsk7buqgmI'
+			'help_link' 		=>'https://youtu.be/eOsk7buqgmI',
+            'disabled'          => $related_products_disabled,
+            'class'             => $related_products_disabled ? 'sppcfw_disabled_field' : ''
         )
     );
     
