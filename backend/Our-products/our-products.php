@@ -12,6 +12,29 @@ if (!defined('ABSPATH')) {
 // Define products with their details (WordPress.org free plugins)
 $products = [
     [
+        'id' => 'giveaway-lottery',
+        'name' => __('Giveaway Lottery for WooCommerce', 'single-product-customizer'),
+        'description' => __('Run engaging giveaways, contests, and lotteries on your WooCommerce store. Increase customer engagement and grow your email list with powerful giveaway tools.', 'single-product-customizer'),
+        'features' => [
+            __('Multiple entry methods (purchase, social share, email signup)', 'single-product-customizer'),
+            __('Free ticket and reward points system', 'single-product-customizer'),
+            __('Automated random winner selection', 'single-product-customizer'),
+            __('Email notifications for participants and winners', 'single-product-customizer'),
+            __('Shortcode support for easy placement', 'single-product-customizer'),
+            __('Fully responsive design', 'single-product-customizer')
+        ],
+        'icon' => 'dashicons-admin-customizer',
+        'badge' => __('Popular', 'single-product-customizer'),
+        'color' => '#9b59b6',
+        'link' => 'https://wordpress.org/plugins/giveaway-lottery/',
+        'install_link' => admin_url('plugin-install.php?s=Giveaway%2520Lottery%2520for%2520WooCommerce%2520webcartisan&tab=search&type=term'),
+        'price' => __('Free', 'single-product-customizer'),
+        'rating' => 5,
+        'installs' => '70+',
+        'wporg_slug' => 'giveaway-lottery',
+        'is_woocommerce' => true
+    ],
+    [
         'id' => 'variation-monster',
         'name' => __('Variation Monster for WooCommerce', 'single-product-customizer'),
         'description' => __('Transform your WooCommerce variable products with beautiful swatches, galleries, and quick-view features. Enhance user experience and boost conversions.', 'single-product-customizer'),
@@ -26,7 +49,7 @@ $products = [
             __('Easy setup and configuration', 'single-product-customizer')
         ],
         'icon' => 'dashicons-format-gallery',
-        'badge' => __('Popular', 'single-product-customizer'),
+        'badge' => __('Essential', 'single-product-customizer'),
         'color' => '#3498db',
         'link' => 'https://wordpress.org/plugins/variation-monster/',
         'install_link' => admin_url('plugin-install.php?s=variation%20monster%20for%20WooCommerce%20webcartisan&tab=search&type=term'),
@@ -34,29 +57,6 @@ $products = [
         'rating' => 5,
         'installs' => '10+',
         'wporg_slug' => 'variation-monster',
-        'is_woocommerce' => true
-    ],
-    [
-        'id' => 'giveaway-lottery',
-        'name' => __('Giveaway Lottery for WooCommerce', 'single-product-customizer'),
-        'description' => __('Run engaging giveaways, contests, and lotteries on your WooCommerce store. Increase customer engagement and grow your email list with powerful giveaway tools.', 'single-product-customizer'),
-        'features' => [
-            __('Multiple entry methods (purchase, social share, email signup)', 'single-product-customizer'),
-            __('Free ticket and reward points system', 'single-product-customizer'),
-            __('Automated random winner selection', 'single-product-customizer'),
-            __('Email notifications for participants and winners', 'single-product-customizer'),
-            __('Shortcode support for easy placement', 'single-product-customizer'),
-            __('Fully responsive design', 'single-product-customizer')
-        ],
-        'icon' => 'dashicons-admin-customizer',
-        'badge' => __('Essential', 'single-product-customizer'),
-        'color' => '#9b59b6',
-        'link' => 'https://wordpress.org/plugins/giveaway-lottery/',
-        'install_link' => admin_url('plugin-install.php?s=Giveaway%2520Lottery%2520for%2520WooCommerce%2520webcartisan&tab=search&type=term'),
-        'price' => __('Free', 'single-product-customizer'),
-        'rating' => 5,
-        'installs' => '70+',
-        'wporg_slug' => 'giveaway-lottery',
         'is_woocommerce' => true
     ],
     [
@@ -103,7 +103,7 @@ $products = [
         'rating' => 5,
         'installs' => '300+',
         'wporg_slug' => 'epasscard',
-        'is_woocommerce' => false
+        'is_woocommerce' => true
     ]
 ];
 
@@ -228,7 +228,6 @@ $products = [
         display: flex;
         align-items: center;
         gap: 8px;
-        flex: 1;
     }
 
     .wx-plugin-tag {
@@ -455,6 +454,9 @@ $products = [
                             <?php if (isset($product['is_woocommerce']) && $product['is_woocommerce']): ?>
                                 <span class="wx-plugin-tag wc">WooCommerce</span>
                             <?php endif; ?>
+                        </div>
+                        <div class="wx-installs-count">
+                            <?php echo esc_html($product['installs'] . ' ' . __('installs', 'single-product-customizer')); ?>
                         </div>
                         <div class="wx-product-rating">
                         <span class="wx-product-stars">
