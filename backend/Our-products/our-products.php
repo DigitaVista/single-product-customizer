@@ -37,27 +37,26 @@ $products = [
         'is_woocommerce' => true
     ],
     [
-        'id' => 'single-product-page',
-        'name' => __('Single Product Page Customizer for WooCommerce', 'single-product-customizer'),
-        'description' => __('Customize and enhance your WooCommerce single product pages with advanced features. Improve user experience and increase add-to-cart rates.', 'single-product-customizer'),
+        'id' => 'giveaway-lottery',
+        'name' => __('Giveaway Lottery for WooCommerce', 'single-product-customizer'),
+        'description' => __('Run engaging giveaways, contests, and lotteries on your WooCommerce store. Increase customer engagement and grow your email list with powerful giveaway tools.', 'single-product-customizer'),
         'features' => [
-            __('Ajax add to cart without page reload', 'single-product-customizer'),
-            __('Beautiful variation swatches', 'single-product-customizer'),
-            __('Minimum and maximum quantity limits', 'single-product-customizer'),
-            __('Custom messages for products', 'single-product-customizer'),
-            __('New Tab attach', 'single-product-customizer'),
-            __('Related products customization', 'single-product-customizer'),
-            __('Breadcrumb customization', 'single-product-customizer')
+            __('Multiple entry methods (purchase, social share, email signup)', 'single-product-customizer'),
+            __('Free ticket and reward points system', 'single-product-customizer'),
+            __('Automated random winner selection', 'single-product-customizer'),
+            __('Email notifications for participants and winners', 'single-product-customizer'),
+            __('Shortcode support for easy placement', 'single-product-customizer'),
+            __('Fully responsive design', 'single-product-customizer')
         ],
         'icon' => 'dashicons-admin-customizer',
         'badge' => __('Essential', 'single-product-customizer'),
         'color' => '#9b59b6',
-        'link' => 'https://wordpress.org/plugins/single-product-customizer/',
-        'install_link' => admin_url('plugin-install.php?s=Single%20Product%20Page%20Customizer%20for%20WooCommerce%20webcartisan&tab=search&type=term'),
+        'link' => 'https://wordpress.org/plugins/giveaway-lottery/',
+        'install_link' => admin_url('plugin-install.php?s=Giveaway%2520Lottery%2520for%2520WooCommerce%2520webcartisan&tab=search&type=term'),
         'price' => __('Free', 'single-product-customizer'),
         'rating' => 5,
         'installs' => '70+',
-        'wporg_slug' => 'single-product-customizer',
+        'wporg_slug' => 'giveaway-lottery',
         'is_woocommerce' => true
     ],
     [
@@ -113,10 +112,6 @@ $products = [
 <style>
     .wx-products-section {
         padding: 20px;
-        background: linear-gradient(135deg, #fdf6e3 0%, #f5e6ca 100%);
-        border-radius: 12px;
-        box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-        margin: 20px 0;
     }
 
     .wx-products-header {
@@ -152,7 +147,7 @@ $products = [
         background: white;
         border-radius: 12px;
         overflow: hidden;
-        box-shadow: 0 6px 15px rgba(0,0,0,0.1);
+        box-shadow: 0 6px 15px rgba(199, 199, 199, 0.1);
         transition: all 0.3s ease;
         border: 1px solid rgba(230, 126, 34, 0.1);
         position: relative;
@@ -162,7 +157,7 @@ $products = [
 
     .wx-product-card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+        box-shadow: 0 12px 25px rgba(158, 158, 158, 0.15);
     }
 
     .wx-product-badge {
@@ -345,13 +340,13 @@ $products = [
         text-align: center;
         margin-top: 50px;
         padding: 25px;
-        background: rgba(255, 243, 205, 0.5);
+        background: rgba(255, 255, 255, 0.9);
         border-radius: 10px;
-        border: 1px solid rgba(230, 126, 34, 0.2);
+        border: 1px solid rgba(139, 139, 139, 0.2);
     }
 
     .wx-products-footer h3 {
-        color: #FFFFFF;
+        color: #000000;
         margin-bottom: 15px;
     }
 
@@ -513,7 +508,7 @@ $products = [
         <p><?php esc_html_e('Visit our WordPress.org profile to see all our plugins, read reviews, and get support.', 'single-product-customizer'); ?></p>
 
         <div class="wx-button-group">
-            <a href="https://profiles.wordpress.org/wooxperto/#content-plugins" target="_blank" class="wx-org-button">
+            <a href="<?php echo admin_url('plugin-install.php?s=Webcartisan&tab=search&type=term'); ?>"  class="wx-org-button">
                 <span class="dashicons dashicons-wordpress"></span>
                 <?php esc_html_e('View All Plugins', 'single-product-customizer'); ?>
             </a>

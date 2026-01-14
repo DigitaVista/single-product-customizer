@@ -975,6 +975,23 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
                     </div>
                 </div>
 
+				<div id="our_products" class="tabcontent-sppcfw">
+					<div class="metabox-holder">
+						<div id="sppcfw_our_products" class="sppcfw-group">
+							<?php
+							// Include the Our Products admin page content.
+							// Path is relative to this file: backend/resources -> ../Our-products/our-products.php
+							$our_products_file = dirname( __FILE__ ) . '/../Our-products/our-products.php';
+							if ( file_exists( $our_products_file ) ) {
+								include_once $our_products_file;
+							} else {
+								echo '<p>' . esc_html__( 'Our Products file not found.', 'single-product-customizer' ) . '</p>';
+							}
+							?>
+						</div>
+					</div>
+				</div>
+
                 <div id="support" class="tabcontent-sppcfw">
                     <div class="grid-support">
                         <div class="support-item">
