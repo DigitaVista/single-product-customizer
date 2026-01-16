@@ -455,9 +455,7 @@ $products = [
                                 <span class="wx-plugin-tag wc">WooCommerce</span>
                             <?php endif; ?>
                         </div>
-                        <div class="wx-installs-count">
-                            <?php echo esc_html($product['installs'] . ' ' . __('installs', 'single-product-customizer')); ?>
-                        </div>
+                        
                         <div class="wx-product-rating">
                         <span class="wx-product-stars">
                             <?php
