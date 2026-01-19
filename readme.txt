@@ -324,6 +324,24 @@ A Pro (paid) version is available with advanced customization options. In additi
 = Is the plugin actively maintained and where can I get support? =
 Yes, it is actively maintained: according to the plugin page it was updated recently (tested with latest version). The developer provides documentation on their site and you can ask questions or get help through the WordPress.org support forum for the plugin. Being open-source, any issues can also be tracked in the plugin's development log on WordPress.org.
 
+== Compatible Themes ==
+
+Our plugin is tested and fully compatible with these popular WordPress themes:
+
+[Twenty Twenty-Four](https://wordpress.org/themes/twentytwentyfour/) - Latest default WordPress theme
+
+[Twenty Twenty-Five](https://wordpress.org/themes/twentytwentyfive/) - Modern default WordPress theme
+
+[Astra](https://wordpress.org/themes/astra/) - Fast, lightweight WooCommerce theme
+
+[Futurio Storefront](https://wordpress.org/themes/futurio-storefront/) - Official WooCommerce theme
+
+[Hello Elementor](https://wordpress.org/themes/hello-elementor/) - Minimal theme for Elementor
+
+[Kadence](https://wordpress.org/themes/kadence/) - Modern customizable theme
+
+[OceanWP](https://wordpress.org/themes/oceanwp/) - Feature-rich eCommerce theme
+
 == Screenshots ==
 
 1. Hide price.
