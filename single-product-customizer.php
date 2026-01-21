@@ -3,7 +3,7 @@
 * Plugin Name:       Product Page Customizer for WooCommerce
 * Plugin URI:        http://webcartisan.com/single-product-page-customizer/
 * Description:       An esential helper tool for woocommerce single product page. Borderless freedom to customize single product page. 
-* Version:           1.0.1
+* Version:           1.0.2
 * Requires at least: 4.0
 * Author:            WebCartisan
 * Author URI:        http://webcartisan.com/
@@ -55,7 +55,7 @@ function sppcfw_plugin_support_link($links, $file) {
 }
 
 define("SPPCFW_DEV", 1);
-define("SPPCFW_VERION", '1.0.0');
+define("SPPCFW_VERSION", '1.0.2');
 define("SPPCFW_DIR_URL", plugin_dir_url(__FILE__) );
 define("SPPCFW_DIR_PATH", plugin_dir_path(__FILE__) );
 $sppcfw_basic=get_option('sppcfw_basic');
