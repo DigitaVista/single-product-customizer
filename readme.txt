@@ -277,31 +277,25 @@ The free version includes a robust set of basic features that are sufficient for
 
 == Changelog ==
 
-= 1.0.2 (January 21, 2026) =
-* Fix: Added block theme condition for improved compatibility.
-* Fix: Rating remove fields are now compatible with all themes.
-* Update: Modified Our Products section in the plugin dashboard.
-* New: Added Helping YouTube tutorial link to the plugin dashboard.
-* Fix: Fixed issue where clicking product links from the cart page did not select variations correctly.
-* Update: Improved Match All condition logic in filters.
-* Update: Updated variation switcher filter logic.
-* Update: Added sppcfw_load_textdomain() function.
+### 1.0.2 (January 21, 2026)
+- **Fix:**    Added block theme condition for improved compatibility.
+- **Fix:**    Rating remove fields are now compatible with all themes.
+- **Update:** Modified Our Products section in the plugin dashboard.
+- **New:**    Added Helping YouTube tutorial link to the plugin dashboard.
+- **Fix:**    Fixed issue where clicking product links from the cart page did not select variations correctly.
+- **Update:** Improved Match All condition logic in filters.
+- **Update:** Updated variation switcher filter logic.
+- **Update:** Added sppcfw_load_textdomain() function.
 
-= 1.0.1 (December 24, 2025) =
-* Initial release.
-* New: WooCommerce single product page customization options.
-* New: Variation swatches for colors, images, and buttons.
-* New: Plus/Minus quantity buttons.
-* New: Product meta visibility controls (SKU, category, tags).
-* New: Related products section toggle.
-* New: Price and description visibility controls.
-* New: Custom text and label customization options.
-* New: Basic plugin dashboard and settings page.
+### 1.0.1 (July 11, 2025)
+- **New:** WooCommerce single product page customization options.
+- **New:** Variation swatches for colors, images, and buttons.
+- **New:** Plus/Minus quantity buttons.
+- **New:** Product meta visibility controls (SKU, category, tags).
+- **New:** Related products section toggle.
+- **New:** Price and description visibility controls.
+- **New:** Custom text and label customization options.
+- **New:** Basic plugin dashboard and settings page.
 
-== Upgrade Notice ==
-
-= 1.0.1 =
-Initial release of Single Product Page Customizer with Variation Swatches for WooCommerce. Enjoy enhanced product page customization.
-
-= 1.0.2 =
-Improved block theme compatibility, fixed rating removal issues, enhanced filter logic, and updated dashboard features.
+### 1.0.0 (March 03, 2025)
+- Initial release.
