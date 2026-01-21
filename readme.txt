@@ -1,9 +1,9 @@
 == Single Product Page Customizer with Variation Swatches for WooCommerce ==
 Contributors: wooxperto
 Tags: customize woocommerce, woocommerce, product tab, product customizer, variation swatches
-Requires at least: 4.0
+Requires at least: 4.5
 Tested up to: 6.9
-Requires PHP: 7.2
+Requires PHP: 7.4
 Stable tag: 1.0.2
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
