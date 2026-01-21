@@ -18,13 +18,24 @@ Customize WooCommerce product page with Single Product Page Customizer. Add vari
 
 No more boring designs on your store's product page. With our responsive WooCommerce plugin, now you have the freedom to do whatever amazing you want to do to your product display. Our product page customizer offers a simplified approach for editing WooCommerce product pages with responsive functionality.
 
-> Your suggestions are the most important factors that will make this plugin even better. So, please [let us know](https://wordpress.org/support/plugin/single-product-customizer) your valuable opinion on our plugin.
-
 Apart from tons of custom product options, the key component of our WordPress plugin is the advanced WooCommerce Variation Swatches feature. It enables custom product fields and product variations to be displayed using radio buttons, images, colors, or buttons. Variation swatches on WooCommerce also streamlines the purchasing process with features like Ajax add-to-cart functionality to make the pages lightning fast.
 
 Whether the goal is to improve user experience, create stunning product fields to increase sales, or integrate custom elements, this plugin acts as an effortless WooCommerce product customizer.
 
 [youtube https://youtu.be/FXdw43rSpwU]
+
+== Compatible Themes ==
+
+Our plugin is tested and fully compatible with these popular WordPress themes:
+
+[Twenty Twenty-Four](https://wordpress.org/themes/twentytwentyfour/) - Latest default WordPress theme
+[Twenty Twenty-Five](https://wordpress.org/themes/twentytwentyfive/) - Modern default WordPress theme
+[Astra](https://wordpress.org/themes/astra/) - Fast, lightweight WooCommerce theme
+[Futurio Storefront](https://wordpress.org/themes/futurio-storefront/) - Official WooCommerce theme
+[Hello Elementor](https://wordpress.org/themes/hello-elementor/) - Minimal theme for Elementor
+[Kadence](https://wordpress.org/themes/kadence/) - Modern customizable theme
+[OceanWP](https://wordpress.org/themes/oceanwp/) - Feature-rich eCommerce theme
+
 
 == Useful Links ==
 * [Single Product Page Customizer Features](https://www.webcartisan.com/products/woocommerce-single-product-page-customizer/)
@@ -133,12 +144,6 @@ Instead of simply showing individual related products, you may want to encourage
 
 [Live Demo](https://wsppc.webcartisan.com/product/display-related-product-categories-grid/) | [Documentation](https://webcartisan.com/docs/single-product-customizer-for-woocommerce/advance-plugin-configuration/display-related-product-categories-grid/)
 
-**Useful Links**
-* [Single Product Page Customizer Features](https://www.webcartisan.com/products/woocommerce-single-product-page-customizer/)
-* [Live Demo of Single Product Customizer](https://wsppc.webcartisan.com/shop/)
-* [How to Use (video) the Single Page Customizer on WooCommerce](https://www.youtube.com/watch?v=nA5u9ToN4QU)
-* [How to Use (documentation) the Single Page Customizer on WooCommerce](https://www.webcartisan.com/docs/single-product-customizer-for-woocommerce/)
-* [Get Help & Free Support 24/7](https://wordpress.org/support/plugin/single-product-customizer/)
 
 = Text & Label Customization =
 
@@ -245,18 +250,6 @@ Imagine dramatically speeding up your shopping flow with instant **Ajax Add-to-C
 
 The key features of the most effective WooCommerce single product page editor empower store owners to optimize product pages for higher engagement and conversions. Thus, your product will be displayed in a way that customers can't move without completing the checkout!
 
-== Compatible Themes ==
-
-Our plugin is tested and fully compatible with these popular WordPress themes:
-
-[Twenty Twenty-Four](https://wordpress.org/themes/twentytwentyfour/) - Latest default WordPress theme
-[Twenty Twenty-Five](https://wordpress.org/themes/twentytwentyfive/) - Modern default WordPress theme
-[Astra](https://wordpress.org/themes/astra/) - Fast, lightweight WooCommerce theme
-[Futurio Storefront](https://wordpress.org/themes/futurio-storefront/) - Official WooCommerce theme
-[Hello Elementor](https://wordpress.org/themes/hello-elementor/) - Minimal theme for Elementor
-[Kadence](https://wordpress.org/themes/kadence/) - Modern customizable theme
-[OceanWP](https://wordpress.org/themes/oceanwp/) - Feature-rich eCommerce theme
-
 == Installation ==
 Before you install this single product page customizer plugin, make sure you have:
 
@@ -284,10 +277,31 @@ The free version includes a robust set of basic features that are sufficient for
 
 == Changelog ==
 
-= 1.0.1 =
+= 1.0.2 (January 21, 2026) =
+* Fix: Added block theme condition for improved compatibility.
+* Fix: Rating remove fields are now compatible with all themes.
+* Update: Modified Our Products section in the plugin dashboard.
+* New: Added Helping YouTube tutorial link to the plugin dashboard.
+* Fix: Fixed issue where clicking product links from the cart page did not select variations correctly.
+* Update: Improved Match All condition logic in filters.
+* Update: Updated variation switcher filter logic.
+* Update: Added sppcfw_load_textdomain() function.
+
+= 1.0.1 (December 24, 2025) =
 * Initial release.
+* New: WooCommerce single product page customization options.
+* New: Variation swatches for colors, images, and buttons.
+* New: Plus/Minus quantity buttons.
+* New: Product meta visibility controls (SKU, category, tags).
+* New: Related products section toggle.
+* New: Price and description visibility controls.
+* New: Custom text and label customization options.
+* New: Basic plugin dashboard and settings page.
 
 == Upgrade Notice ==
 
 = 1.0.1 =
 Initial release of Single Product Page Customizer with Variation Swatches for WooCommerce. Enjoy enhanced product page customization.
+
+= 1.0.2 =
+Improved block theme compatibility, fixed rating removal issues, enhanced filter logic, and updated dashboard features.
