@@ -286,3 +286,27 @@ function wodgc_help_youtube_link($link){
 /*******************
  * End Add YouTube help link Function
  *******************/
+
+
+require __DIR__ . '/vendor/autoload.php';
+
+
+/**
+ * Initialize the plugin tracker
+ *
+ * @return void
+ */
+function appsero_init_tracker_single_product_customizer() {
+
+    if ( ! class_exists( 'Appsero\Client' ) ) {
+      require_once __DIR__ . '/appsero/src/Client.php';
+    }
+
+    $client = new Appsero\Client( '62476434-948c-4350-9373-3de33a87152b', 'Single Product Page Customizer with Variation Swatches for WooCommerce', __FILE__ );
+
+    // Active insights
+    $client->insights()->init();
+
+}
+
+appsero_init_tracker_single_product_customizer();

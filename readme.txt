@@ -250,6 +250,16 @@ Imagine dramatically speeding up your shopping flow with instant **Ajax Add-to-C
 
 The key features of the most effective WooCommerce single product page editor empower store owners to optimize product pages for higher engagement and conversions. Thus, your product will be displayed in a way that customers can't move without completing the checkout!
 
+## Privacy Policy 
+Single Product Page Customizer with Variation Swatches for WooCommerce uses [Appsero](https://appsero.com) SDK to collect some telemetry data upon user's confirmation. This helps us to troubleshoot problems faster & make product improvements.
+
+Appsero SDK **does not gather any data by default.** The SDK only starts gathering basic telemetry data **when a user allows it via the admin notice**. We collect the data to ensure a great user experience for all our users. 
+
+Integrating Appsero SDK **DOES NOT IMMEDIATELY** start gathering data, **without confirmation from users in any case.**
+
+Learn more about how [Appsero collects and uses this data](https://appsero.com/privacy-policy/).
+
+
 == Installation ==
 Before you install this single product page customizer plugin, make sure you have:
 
