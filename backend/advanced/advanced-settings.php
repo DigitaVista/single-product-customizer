@@ -217,7 +217,7 @@
 			'name' => __( 'Show variation table', 'single-product-customizer' ),
 			'desc' => '',
             'class'=>'sppcfw_advanced_enable_varition_table',
-			'help_link' =>'https://youtu.be/YjcxUb6kaIM'
+			'help_link' =>'https://youtu.be/pwRVObgvxSI'
 		)
 	);
 

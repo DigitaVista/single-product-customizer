@@ -38,9 +38,9 @@ Our plugin is tested and fully compatible with these popular WordPress themes:
 
 
 == Useful Links ==
-* [Single Product Page Customizer Features](https://www.webcartisan.com/products/woocommerce-single-product-page-customizer/)
+* [Single Product Page Customizer Features](https://www.webcartisan.com/products/woocommerce-product-page-customizer/)
 * [Live Demo of Single Product Customizer](https://wsppc.webcartisan.com/shop/)
-* [How to Use (video) the Single Page Customizer on WooCommerce](https://www.youtube.com/watch?v=nA5u9ToN4QU)
+* [How to Use (video) the Single Page Customizer on WooCommerce](https://youtu.be/FXdw43rSpwU?list=PLQirwD8sME-4AgesAkzxZOkTk5v5fphdx)
 * [How to Use (documentation) the Single Page Customizer on WooCommerce](https://www.webcartisan.com/docs/single-product-customizer-for-woocommerce/)
 * [Get Help & Free Support 24/7](https://wordpress.org/support/plugin/single-product-customizer/)
 
