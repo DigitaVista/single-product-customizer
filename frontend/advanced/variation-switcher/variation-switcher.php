@@ -15,7 +15,7 @@ if( !class_exists("Sppcfw_Variation_Switcher")){
                     'sppcfw-variation-switcher-js',
                     plugin_dir_url(__FILE__).'variation-switcher.js',
                     array( 'jquery'),
-                    SPPCFW_VERION,
+                    SPPCFW_VERSION,
                     true
                 );
 
@@ -23,7 +23,7 @@ if( !class_exists("Sppcfw_Variation_Switcher")){
                     'variation-switcher-css',
                     plugin_dir_url(__FILE__).'variation-switcher.css',
                     null,
-                    SPPCFW_VERION,
+                    SPPCFW_VERSION,
                     'all'
                 );
 

@@ -18,7 +18,7 @@ if( !class_exists("Sppcfw_Frontend_Enable_Plus_Minus_Button")){
                     'sppcfw-enable-plus-minus-button-js',
                     plugin_dir_url(__FILE__).'enable-plus-minus-button.js',
                     array('jquery'),
-                    (defined('SPPCFW_VERION') ? SPPCFW_VERION : false),
+                    (defined('SPPCFW_VERSION') ? SPPCFW_VERSION : false),
                     true
                 );
 

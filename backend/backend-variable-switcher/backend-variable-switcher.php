@@ -27,7 +27,7 @@ if( !class_exists("Sppcfw_Backend_Variation_Switcher")){
                 'backend-fontawesome-css',
                 plugin_dir_url(__FILE__).'fontawesome.min.css',
                 null,
-                SPPCFW_VERION,
+                SPPCFW_VERSION,
                 'all'
             );
 
@@ -35,7 +35,7 @@ if( !class_exists("Sppcfw_Backend_Variation_Switcher")){
                 'backend-iconsmind-css',
                 plugin_dir_url(__FILE__).'./assets/css/iconsmind.css',
                 null,
-                SPPCFW_VERION,
+                SPPCFW_VERSION,
                 'all'
             );
 
@@ -43,21 +43,21 @@ if( !class_exists("Sppcfw_Backend_Variation_Switcher")){
                 'backend-linea-css',
                 plugin_dir_url(__FILE__).'./assets/css/fonts/svg/font/style.css',
                 null,
-                SPPCFW_VERION,
+                SPPCFW_VERSION,
                 'all'
             );
             wp_enqueue_style(
                 'backend-linecon-css',
                 plugin_dir_url(__FILE__).'./assets/css/linecon.css',
                 null,
-                SPPCFW_VERION,
+                SPPCFW_VERSION,
                 'all'
             );
             wp_enqueue_style(
                 'backend-steadysets-css',
                 plugin_dir_url(__FILE__).'./assets/css/steadysets.css',
                 null,
-                SPPCFW_VERION,
+                SPPCFW_VERSION,
                 'all'
             );
 
@@ -65,7 +65,7 @@ if( !class_exists("Sppcfw_Backend_Variation_Switcher")){
                 'backend-variable-switcher-css',
                 plugin_dir_url(__FILE__).'backend-variable-switcher.css',
                 null,
-                SPPCFW_VERION,
+                SPPCFW_VERSION,
                 'all'
             );
 
@@ -77,7 +77,7 @@ if( !class_exists("Sppcfw_Backend_Variation_Switcher")){
                 plugin_dir_url(__FILE__).'backend-variable-switcher.js',
                 array( 'jquery'),
                 true,
-                SPPCFW_VERION
+                SPPCFW_VERSION
             );
 
             wp_enqueue_script(
@@ -85,7 +85,7 @@ if( !class_exists("Sppcfw_Backend_Variation_Switcher")){
                 plugin_dir_url(__FILE__).'backend-variable-switcher-modal.js',
                 array( 'jquery'),
                 true,
-                SPPCFW_VERION
+                SPPCFW_VERSION
             );
 
             wp_localize_script('backend-variable-switcher-modal-js', 'iconDoxAjax', [

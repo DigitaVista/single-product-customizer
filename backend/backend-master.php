@@ -21,14 +21,14 @@ if( !class_exists( 'Sppcfw_backend_master' )){
 				'sppcfw_backend-deparam-js',
 				plugin_dir_url(__FILE__).'resources/js/jquery-deparam.js',
 				array('jquery' ),
-				SPPCFW_VERION,
+				SPPCFW_VERSION,
 				1
 			);
 			wp_enqueue_script(
 				'sppcfw_backend-resource-js',
 				plugin_dir_url(__FILE__).'resources/js/backend.js',
 				array('jquery' ),
-				(SPPCFW_DEV?time():SPPCFW_VERION),
+				(SPPCFW_DEV?time():SPPCFW_VERSION),
 				1
 			);
             $sppcfw_custom_message_saved = isset(SPPCFW_ADVANCED['custom_message_display_hook'])
@@ -55,7 +55,7 @@ if( !class_exists( 'Sppcfw_backend_master' )){
 				'sppcfw_backend-resource-css',
 				plugin_dir_url(__FILE__).'resources/css/backend.css',
 				null,
-				(SPPCFW_DEV?time():SPPCFW_VERION),
+				(SPPCFW_DEV?time():SPPCFW_VERSION),
 				'all'
 			);
         }
