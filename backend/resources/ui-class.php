@@ -489,7 +489,7 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
 			$html .= sprintf( '<input type="hidden" name="%1$s[%2$s]" value="off" />', $args['section'], $args['id'] );
 		
 			// Conditional Replacement for 'enable_min_max_qty' field
-			if ($args['type'] === 'checkbox' && ($args['id'] === 'enable_customizer_for_category' || $args['id'] === 'enable_customizer_for_product' || $args['id'] === 'enable_ajax_add_to_cart' || $args['id'] === 'enable_min_max_qty' || $args['id'] === 'enable_custom_tab' || $args['id'] === 'enable_additional_content' || $args['id'] === 'enable_change_tab_default_label' || $args['id'] === 'related_product_categories')) {
+			if ($args['type'] === 'checkbox' && ($args['id'] === 'enable_customizer_for_category' || $args['id'] === 'enable_customizer_for_product' || $args['id'] === 'enable_min_max_qty' || $args['id'] === 'enable_custom_tab' || $args['id'] === 'enable_additional_content' || $args['id'] === 'related_product_categories')) {
 				// Replace the input field with a notice for the PRO version
 				$html .= sprintf('<p class="pro-notice">%s</p>', __('PRO Feature', 'single-product-customizer'));
 			} else {

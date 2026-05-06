@@ -22,6 +22,8 @@ include('advanced/upsell-product-title/upsell-product-title.php'); // ok
 include('advanced/backorder-text/backorder-text.php'); // ok
 include('advanced/variation-reset-text/variation-reset-text.php'); // ok
 include('advanced/enable-custom-message/enable-custom-message.php'); // ok
+include('advanced/ajax-add-to-cart/ajax-add-to-cart.php'); // ok
+include('advanced/change-tab-default-label/change-tab-default-label.php'); // ok
 include('advanced/variation-switcher/variation-switcher.php'); // ok
 include('advanced/show-variation-table/show-variation-table.php'); // ok
 
