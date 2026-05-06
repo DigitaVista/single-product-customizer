@@ -8,6 +8,7 @@ if( !class_exists( 'Sppcfw_backend_master' )){
         public function __construct(){
             
             add_action("admin_enqueue_scripts",[$this,"sppcfw_add_admin_assets"],10,1);
+			add_action( 'wp_enqueue_scripts', array( $this, 'sppcfw_quick_checkout_frontend_assets' ) );
         }
 
         /* Register Admin assets*/
@@ -60,6 +61,18 @@ if( !class_exists( 'Sppcfw_backend_master' )){
 			);
         }
 
+		public function sppcfw_quick_checkout_frontend_assets (){
+
+			wp_enqueue_script(
+				'sppcfw_template_quick_checkout_js',
+				SPPCFW_DIR_URL.'frontend/Enable-Quick-Checkout/assets/js/quick-checkout.js',
+				array('jquery' ),
+				(SPPCFW_DEV?time():SPPCFW_VERSION),
+				1
+			);
+
+		}
+
     } // Sppcfw_backend_master class end
 } // Sppcfw_backend_master class checking end
 
@@ -69,3 +82,4 @@ new Sppcfw_backend_master();
 
 include('backend-settings-page.php');
 include('backend-variable-switcher/backend-variable-switcher.php');
+include('ajax-handlers.php');

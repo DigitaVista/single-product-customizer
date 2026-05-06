@@ -943,7 +943,8 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
                     <div id="logo-container-spc" style="font-size: 20px; font-weight: bold;"><h2>Single Product Customizer</h2></div>
                     <button style="padding: 8px" class="tablinks-sppcfw" onclick="opensppcfw(event, 'basic')" id="defaultOpen"><span class="dashicons dashicons-admin-generic"></span><?php esc_html_e(' Basic Settings', 'single-product-customizer'); ?></button>
                     <button style="padding: 8px" class="tablinks-sppcfw" onclick="opensppcfw(event, 'advance')"><span class="dashicons dashicons-admin-settings"></span><?php esc_html_e(' Advance Settings', 'single-product-customizer'); ?></button>
-                    <button style="padding: 8px" class="tablinks-sppcfw" onclick="opensppcfw(event, 'our_products')"><span class="dashicons dashicons-cart"></span><?php esc_html_e(' Our Products', 'single-product-customizer'); ?></button>
+                    <button style="padding: 8px" class="tablinks-sppcfw" onclick="opensppcfw(event, 'our_products')"><span class="dashicons dashicons-products"></span><?php esc_html_e(' Our Products', 'single-product-customizer'); ?></button>
+					<button style="padding: 8px" class="tablinks-sppcfw" onclick="opensppcfw(event, 'quick_checkout')"><span class="dashicons dashicons-cart"></span><?php esc_html_e(' Enable Quick Checkout', 'single-product-customizer'); ?></button>
                     <button style="padding: 8px" class="tablinks-sppcfw" onclick="opensppcfw(event, 'support')"><span class="dashicons dashicons-admin-site"></span><?php esc_html_e(' Support', 'single-product-customizer'); ?></button>
                 </div>
 
@@ -986,6 +987,21 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
 								include_once $our_products_file;
 							} else {
 								echo '<p>' . esc_html__( 'Our Products file not found.', 'single-product-customizer' ) . '</p>';
+							}
+							?>
+						</div>
+					</div>
+				</div>
+
+				<div id="quick_checkout" class="tabcontent-sppcfw">
+					<div class="metabox-holder">
+						<div id="sppcfw_quick_checkout" class="sppcfw-group">
+							<?php
+							$quick_checkout_file = dirname( __FILE__ ) . '/../Enable-Quick-Checkout/quick-checkout.php';
+							if ( file_exists( $quick_checkout_file ) ) {
+								include_once $quick_checkout_file;
+							} else {
+								echo '<p>' . esc_html__( 'Quick Checkout file not found.', 'single-product-customizer' ) . '</p>';
 							}
 							?>
 						</div>

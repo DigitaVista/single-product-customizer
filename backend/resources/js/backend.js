@@ -23,6 +23,119 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 });
 
+// ============ AJAX Form Submission Handlers ============
+jQuery(document).ready(function(){
+
+
+    // Quick Checkout AJAX Handler
+    jQuery("#sppcfw_quick_checkout form").on("submit", function (e) {
+        e.preventDefault();
+        sppcfw_submit_quick_checkout_ajax(jQuery(this));
+    });
+
+    // Toggle Quick Checkout template selector visibility
+    jQuery('#sppcfw_enable_quick_checkout').on('change', function() {
+    jQuery('.sppcfw_quick_checkout_template_row').slideToggle();
+    jQuery('.sppcfw_product_options_row').slideToggle();
+});
+
+
+    // Preview picker: clicking an image updates the right-side preview only.
+    jQuery(document).on('click', '#sppcfw_quick_checkout .sppcfw-template-preview-picker .sppcfw-template-item', function() {
+        var selectedTemplateImg = jQuery(this).find('.sppcfw-template-thumb img');
+        var previewImg = jQuery('#sppcfw-selected-template-preview-img');
+
+        jQuery(this)
+            .closest('.sppcfw-template-preview-picker')
+            .find('.sppcfw-template-item')
+            .removeClass('is-active');
+        jQuery(this).addClass('is-active');
+
+        if (selectedTemplateImg.length && previewImg.length) {
+            previewImg.attr('src', selectedTemplateImg.attr('src'));
+            previewImg.attr('alt', selectedTemplateImg.attr('alt'));
+        }
+    });
+
+    // Keyboard accessibility for the preview picker.
+    jQuery(document).on('keydown', '#sppcfw_quick_checkout .sppcfw-template-preview-picker .sppcfw-template-item', function(e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            jQuery(this).trigger('click');
+        }
+    });
+});
+
+
+// Submit Quick Checkout form via AJAX
+function sppcfw_submit_quick_checkout_ajax(form) {
+    var submitBtn = form.find('button[type="submit"], input[type="submit"]').first();
+    var originalText = submitBtn.is('input') ? submitBtn.val() : submitBtn.text();
+
+    submitBtn.prop('disabled', true);
+    if (submitBtn.is('input')) {
+        submitBtn.val('Saving...');
+    } else {
+        submitBtn.text('Saving...');
+    }
+    
+    jQuery.ajax({
+        url: sppcfw_settings.ajaxurl,
+        type: 'POST',
+        data: form.serialize() + '&action=sppcfw_save_quick_checkout',
+        success: function(response) {
+            // admin-ajax.php can return plain "0" (string) when action handler isn't registered.
+            // Also guard against unexpected response shapes.
+            var isValidObject = response && typeof response === 'object';
+            var isSuccess = isValidObject && response.success === true;
+            var message =
+                (isValidObject && response.data && response.data.message)
+                    ? response.data.message
+                    : 'An error occurred. Please try again.';
+
+            if (isSuccess) {
+                sppcfw_show_notice(message, 'success', form);
+            } else {
+                sppcfw_show_notice(message, 'error', form);
+            }
+
+            submitBtn.prop('disabled', false);
+            if (submitBtn.is('input')) {
+                submitBtn.val(originalText);
+            } else {
+                submitBtn.text(originalText);
+            }
+            submitBtn.prop('disabled', false).text(originalText);
+            submitBtn.prop('disabled', false).text(originalText);
+            submitBtn.prop('disabled', false).text(originalText);
+            submitBtn.prop('disabled', false).text(originalText);
+            submitBtn.prop('disabled', false).text(originalText);
+            submitBtn.prop('disabled', false).text(originalText);
+            submitBtn.prop('disabled', false).text(originalText);
+        },
+        error: function() {
+            sppcfw_show_notice('An error occurred. Please try again.', 'error', form);
+            submitBtn.prop('disabled', false).text(originalText);
+        }
+    });
+}
+
+// Display notice message
+function sppcfw_show_notice(message, type, form) {
+    var noticeClass = type === 'success' ? 'notice-success' : 'notice-error';
+    var noticeHtml = '<div class="notice ' + noticeClass + ' is-dismissible" style="margin: 15px 0;"><p>' + message + '</p><button type="button" class="notice-dismiss"></button></div>';
+    
+    form.find('.notice').remove();
+    form.before(noticeHtml);
+    
+    if (type === 'success') {
+        setTimeout(function() {
+            form.prev('.notice').fadeOut(300);
+        }, 2000);
+    }
+}
+// ============ End AJAX Handlers ============
+
 jQuery(document).ready(function ($) {
   $('select[name="sppcfw_advanced[custom_message_display_hook]"]').val(
     sppcfw_settings.custom_message_display_hook_dashboard
@@ -48,11 +161,11 @@ jQuery(document).ready(function ($) {
 // });
 
 jQuery(document).ready(function () {
-  jQuery("#sppcfw_advanced_license form").on("submit", function (e) {
-    e.preventDefault();
-    alert(jQuery(this).serialize());
-    return false;
-  });
+  // jQuery("#sppcfw_advanced_license form").on("submit", function (e) {
+  //   e.preventDefault();
+  //   alert(jQuery(this).serialize());
+  //   return false;
+  // });
 
   // Even better - create a mapping for cleaner code
   const checkboxHandlers = {

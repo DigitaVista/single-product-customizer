@@ -27,3 +27,5 @@ include('advanced/change-tab-default-label/change-tab-default-label.php'); // ok
 include('advanced/variation-switcher/variation-switcher.php'); // ok
 include('advanced/show-variation-table/show-variation-table.php'); // ok
 
+// Quick Checkout
+include('Enable-Quick-Checkout/quick-checkout-frontend.php'); // ok
