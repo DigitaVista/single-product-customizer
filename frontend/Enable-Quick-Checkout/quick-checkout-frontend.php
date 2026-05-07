@@ -50,12 +50,7 @@ if (!class_exists('Sppcfw_Frontend_Quick_Checkout')) {
 
             // Hook into update_order_review to handle empty cart gracefully
             add_action('woocommerce_checkout_update_order_review', array($this, 'sppcfw_handle_empty_cart_order_review'), 5, 1);
-
-            // Product details visibility controls from quick checkout settings.
-            add_filter('sppcfw_show_product_title', array($this, 'sppcfw_show_product_title_filter'));
-            add_filter('sppcfw_show_review', array($this, 'sppcfw_show_review_filter'));
-            add_filter('sppcfw_show_product_short_description', array($this, 'sppcfw_show_product_short_description_filter'));
-
+ 
             // Render quick checkout product details from a dedicated template.
             add_action('woocommerce_checkout_before_customer_details', array($this, 'sppcfw_render_product_details_before_customer_details'));
         }
