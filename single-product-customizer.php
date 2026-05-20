@@ -288,7 +288,9 @@ function wodgc_help_youtube_link($link){
  *******************/
 
 
-require __DIR__ . '/vendor/autoload.php';
+if ( ! class_exists( 'Appsero\Client' ) ) {
+    require_once __DIR__ . '/vendor/appsero/client/src/Client.php';
+}
 
 
 /**
