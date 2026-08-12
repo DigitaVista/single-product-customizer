@@ -18,7 +18,10 @@ function opensppcfw(evt, cityName) {
   evt.currentTarget.classList.add("active");
 }
 document.addEventListener("DOMContentLoaded", function () {
-  if (document.getElementById("defaultOpen")) {
+  var activeBtn = document.querySelector(".tablinks-sppcfw.active");
+  if (activeBtn) {
+    activeBtn.click();
+  } else if (document.getElementById("defaultOpen")) {
     document.getElementById("defaultOpen").click();
   }
 });

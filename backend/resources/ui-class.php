@@ -488,8 +488,8 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
 			$html .= sprintf( '<label for="wxspc-%1$s[%2$s]">', $args['section'], $args['id'] );
 			$html .= sprintf( '<input type="hidden" name="%1$s[%2$s]" value="off" />', $args['section'], $args['id'] );
 		
-			// Conditional Replacement for 'enable_min_max_qty' field
-			if ($args['type'] === 'checkbox' && ($args['id'] === 'enable_customizer_for_category' || $args['id'] === 'enable_customizer_for_product' || $args['id'] === 'enable_min_max_qty' || $args['id'] === 'enable_custom_tab' || $args['id'] === 'enable_additional_content' || $args['id'] === 'related_product_categories')) {
+			// Conditional Replacement for PRO fields when Pro is not active
+			if ( ! sppcfw_is_pro_active() && $args['type'] === 'checkbox' && in_array( $args['id'], array( 'enable_customizer_for_category', 'enable_customizer_for_product', 'enable_min_max_qty', 'enable_custom_tab', 'enable_additional_content', 'related_product_categories', 'move_image_section_to_right' ), true ) ) {
 				// Replace the input field with a notice for the PRO version
 				$html .= sprintf('<p class="pro-notice">%s</p>', __('PRO Feature', 'single-product-customizer'));
 			} else {
@@ -923,32 +923,97 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
 
         // register admin menu
         public function sppcfw_register_admin_menu(){
+            $parent_slug = 'sppcfw-single-product-customizer';
+            $menu_title  = __( 'Single Product Customizer', 'single-product-customizer' );
+            $capability  = 'manage_options';
+
+            add_menu_page(
+                $menu_title,
+                $menu_title,
+                $capability,
+                $parent_slug,
+                array( $this, 'plugin_page' ),
+                'dashicons-admin-customizer',
+                56
+            );
+
+            // Submenu 1: Basic Settings (slug matches parent so clicking main menu opens Basic Settings)
             add_submenu_page(
-                'edit.php?post_type=product',
-                __( 'Single Product Customizer', 'single-product-customizer' ),
-                __( 'Single Product Customizer', 'single-product-customizer' ),
-                'manage_options',
-                'sppcfw-single-product-customizer',
-                array($this,'plugin_page'),
-                5
+                $parent_slug,
+                __( 'Basic Settings', 'single-product-customizer' ),
+                __( 'Basic Settings', 'single-product-customizer' ),
+                $capability,
+                $parent_slug,
+                array( $this, 'plugin_page' )
+            );
+
+            // Submenu 2: Advance Settings
+            add_submenu_page(
+                $parent_slug,
+                __( 'Advance Settings', 'single-product-customizer' ),
+                __( 'Advance Settings', 'single-product-customizer' ),
+                $capability,
+                'sppcfw-advance-settings',
+                array( $this, 'plugin_page' )
+            );
+
+            // Submenu 3: Our Products
+            add_submenu_page(
+                $parent_slug,
+                __( 'Our Products', 'single-product-customizer' ),
+                __( 'Our Products', 'single-product-customizer' ),
+                $capability,
+                'sppcfw-our-products',
+                array( $this, 'plugin_page' )
+            );
+
+            // Submenu 4: Enable Quick Checkout
+            add_submenu_page(
+                $parent_slug,
+                __( 'Enable Quick Checkout', 'single-product-customizer' ),
+                __( 'Enable Quick Checkout', 'single-product-customizer' ),
+                $capability,
+                'sppcfw-quick-checkout',
+                array( $this, 'plugin_page' )
+            );
+
+            // Submenu 5: Support
+            add_submenu_page(
+                $parent_slug,
+                __( 'Support', 'single-product-customizer' ),
+                __( 'Support', 'single-product-customizer' ),
+                $capability,
+                'sppcfw-support',
+                array( $this, 'plugin_page' )
             );
         }
 
 		public function plugin_page() {
+			$current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : 'sppcfw-single-product-customizer';
 
+			$active_tab = 'basic';
+			if ( 'sppcfw-advance-settings' === $current_page ) {
+				$active_tab = 'advance';
+			} elseif ( 'sppcfw-our-products' === $current_page ) {
+				$active_tab = 'our_products';
+			} elseif ( 'sppcfw-quick-checkout' === $current_page ) {
+				$active_tab = 'quick_checkout';
+			} elseif ( 'sppcfw-support' === $current_page ) {
+				$active_tab = 'support';
+			}
             ?>
 
             <div class="tab-container-sppcfw">
                 <div class="tab-sppcfw">
                     <div id="logo-container-spc" style="font-size: 20px; font-weight: bold;"><h2>Single Product Customizer</h2></div>
-                    <button style="padding: 8px" class="tablinks-sppcfw" onclick="opensppcfw(event, 'basic')" id="defaultOpen"><span class="dashicons dashicons-admin-generic"></span><?php esc_html_e(' Basic Settings', 'single-product-customizer'); ?></button>
-                    <button style="padding: 8px" class="tablinks-sppcfw" onclick="opensppcfw(event, 'advance')"><span class="dashicons dashicons-admin-settings"></span><?php esc_html_e(' Advance Settings', 'single-product-customizer'); ?></button>
-                    <button style="padding: 8px" class="tablinks-sppcfw" onclick="opensppcfw(event, 'our_products')"><span class="dashicons dashicons-products"></span><?php esc_html_e(' Our Products', 'single-product-customizer'); ?></button>
-					<button style="padding: 8px" class="tablinks-sppcfw" onclick="opensppcfw(event, 'quick_checkout')"><span class="dashicons dashicons-cart"></span><?php esc_html_e(' Enable Quick Checkout', 'single-product-customizer'); ?></button>
-                    <button style="padding: 8px" class="tablinks-sppcfw" onclick="opensppcfw(event, 'support')"><span class="dashicons dashicons-admin-site"></span><?php esc_html_e(' Support', 'single-product-customizer'); ?></button>
+                    <button style="padding: 8px" class="tablinks-sppcfw <?php echo 'basic' === $active_tab ? 'active' : ''; ?>" onclick="opensppcfw(event, 'basic')" <?php echo 'basic' === $active_tab ? 'id="defaultOpen"' : ''; ?>><span class="dashicons dashicons-admin-generic"></span><?php esc_html_e(' Basic Settings', 'single-product-customizer'); ?></button>
+                    <button style="padding: 8px" class="tablinks-sppcfw <?php echo 'advance' === $active_tab ? 'active' : ''; ?>" onclick="opensppcfw(event, 'advance')" <?php echo 'advance' === $active_tab ? 'id="defaultOpen"' : ''; ?>><span class="dashicons dashicons-admin-settings"></span><?php esc_html_e(' Advance Settings', 'single-product-customizer'); ?></button>
+                    <button style="padding: 8px" class="tablinks-sppcfw <?php echo 'our_products' === $active_tab ? 'active' : ''; ?>" onclick="opensppcfw(event, 'our_products')" <?php echo 'our_products' === $active_tab ? 'id="defaultOpen"' : ''; ?>><span class="dashicons dashicons-products"></span><?php esc_html_e(' Our Products', 'single-product-customizer'); ?></button>
+					<button style="padding: 8px" class="tablinks-sppcfw <?php echo 'quick_checkout' === $active_tab ? 'active' : ''; ?>" onclick="opensppcfw(event, 'quick_checkout')" <?php echo 'quick_checkout' === $active_tab ? 'id="defaultOpen"' : ''; ?>><span class="dashicons dashicons-cart"></span><?php esc_html_e(' Enable Quick Checkout', 'single-product-customizer'); ?></button>
+                    <button style="padding: 8px" class="tablinks-sppcfw <?php echo 'support' === $active_tab ? 'active' : ''; ?>" onclick="opensppcfw(event, 'support')" <?php echo 'support' === $active_tab ? 'id="defaultOpen"' : ''; ?>><span class="dashicons dashicons-admin-site"></span><?php esc_html_e(' Support', 'single-product-customizer'); ?></button>
                 </div>
 
-                <div id="basic" class="tabcontent-sppcfw active">
+                <div id="basic" class="tabcontent-sppcfw <?php echo 'basic' === $active_tab ? 'active' : ''; ?>">
                     <div class="metabox-holder">
                         <div id="sppcfw_basic" class="sppcfw-group">
                             <form method="post" action="options.php">
