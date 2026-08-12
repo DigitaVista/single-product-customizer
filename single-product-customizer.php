@@ -36,20 +36,7 @@ function sppcfw_plugin_action_links( $links ) {
     return array_merge( $action_links, $links );
 }
 
-/**
- * Redirect legacy URLs (Products -> Single Product Customizer) to top-level menu URL.
- */
-function sppcfw_redirect_legacy_admin_url() {
-	if ( ! is_admin() || ! isset( $_GET['post_type'], $_GET['page'] ) ) {
-		return;
-	}
-	if ( 'product' === $_GET['post_type'] && 'sppcfw-single-product-customizer' === $_GET['page'] ) {
-		$target = admin_url( 'admin.php?page=sppcfw-single-product-customizer' );
-		wp_safe_redirect( $target );
-		exit;
-	}
-}
-add_action( 'admin_init', 'sppcfw_redirect_legacy_admin_url', 1 );
+
 
 add_filter('plugin_row_meta', 'sppcfw_plugin_support_link', 10, 2);
 
@@ -126,7 +113,10 @@ add_action('wp',function(){
 });
 
 
+require_once plugin_dir_path( __FILE__ ) . 'includes/sppcfw-admin-menu.php';
 require_once plugin_dir_path( __FILE__ ) . 'backend/sppcfw-welcome/sppcfw-welcome.php';
+require_once plugin_dir_path( __FILE__ ) . 'backend/sppcfw-welcome/single-product-customizer-notice.php';
+require_once plugin_dir_path( __FILE__ ) . 'backend/sppcfw-welcome/sppcfw-setup-notice.php';
 
 /**
  * Check if WooCommerce is active (single-site + multisite).

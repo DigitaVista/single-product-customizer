@@ -1001,7 +1001,12 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
 			} elseif ( 'sppcfw-support' === $current_page ) {
 				$active_tab = 'support';
 			}
-            ?>
+			?>
+            <?php if ( class_exists( 'SPPCFW_Setup_Help_Notice' ) && ! SPPCFW_Setup_Help_Notice::is_dismissed() ) : ?>
+                <div style="margin-bottom: 20px;">
+                    <?php SPPCFW_Setup_Help_Notice::render_card( true ); ?>
+                </div>
+            <?php endif; ?>
 
             <div class="tab-container-sppcfw">
                 <div class="tab-sppcfw">
@@ -1011,6 +1016,13 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
                     <button style="padding: 8px" class="tablinks-sppcfw <?php echo 'our_products' === $active_tab ? 'active' : ''; ?>" onclick="opensppcfw(event, 'our_products')" <?php echo 'our_products' === $active_tab ? 'id="defaultOpen"' : ''; ?>><span class="dashicons dashicons-products"></span><?php esc_html_e(' Our Products', 'single-product-customizer'); ?></button>
 					<button style="padding: 8px" class="tablinks-sppcfw <?php echo 'quick_checkout' === $active_tab ? 'active' : ''; ?>" onclick="opensppcfw(event, 'quick_checkout')" <?php echo 'quick_checkout' === $active_tab ? 'id="defaultOpen"' : ''; ?>><span class="dashicons dashicons-cart"></span><?php esc_html_e(' Enable Quick Checkout', 'single-product-customizer'); ?></button>
                     <button style="padding: 8px" class="tablinks-sppcfw <?php echo 'support' === $active_tab ? 'active' : ''; ?>" onclick="opensppcfw(event, 'support')" <?php echo 'support' === $active_tab ? 'id="defaultOpen"' : ''; ?>><span class="dashicons dashicons-admin-site"></span><?php esc_html_e(' Support', 'single-product-customizer'); ?></button>
+                    <a style="padding: 8px; text-decoration: none; display: flex; align-items: center; gap: 5px;" class="tablinks-sppcfw <?php echo 'sppcfw-pro-license' === $current_page ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=sppcfw-pro-license' ) ); ?>">
+                        <span class="dashicons dashicons-key"></span>
+                        <?php esc_html_e( 'Pro License', 'single-product-customizer' ); ?>
+                        <?php if ( class_exists( 'SPPCFW_Pro_Admin_Placeholders' ) && SPPCFW_Pro_Admin_Placeholders::sppcfw_should_show_placeholders() ) : ?>
+                            <span class="sppcfw-pro-menu-badge"><?php esc_html_e( 'Pro', 'single-product-customizer' ); ?></span>
+                        <?php endif; ?>
+                    </a>
                 </div>
 
                 <div id="basic" class="tabcontent-sppcfw <?php echo 'basic' === $active_tab ? 'active' : ''; ?>">

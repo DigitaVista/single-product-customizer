@@ -50,6 +50,12 @@ function sppcfw_enqueue_welcome_page_assets( $hook_suffix ) {
 		SPPCFW_VERSION,
 		'all'
 	);
+	wp_enqueue_style(
+		'sppcfw-setup-notice-style',
+		SPPCFW_DIR_URL . 'backend/assets/css/sppcfw-setup-notice.css',
+		array(),
+		SPPCFW_VERSION
+	);
 
 	wp_enqueue_script( 'jquery' );
 	wp_enqueue_script(
@@ -119,6 +125,11 @@ function sppcfw_welcome_content() {
 				</div>
 			</form>
 		</div>
+		<?php if ( class_exists( 'SPPCFW_Setup_Help_Notice' ) && ! SPPCFW_Setup_Help_Notice::is_dismissed() ) : ?>
+			<div class="sppcfw-content sppcfw-notice-warning" style="margin-top: 30px;">
+				<?php SPPCFW_Setup_Help_Notice::render_card( false ); ?>
+			</div>
+		<?php endif; ?>
 
 		<div class="sppcfw-content webcartisan-another-plugins">
 			<h2 class="sppcfw-section-title"><?php esc_html_e( 'Our Other Products', 'single-product-customizer' ); ?></h2>
