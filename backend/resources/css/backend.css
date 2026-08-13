@@ -410,8 +410,8 @@ div#sppcfw_single_product_additional_content_main {
 #submit_sppcfw_advanced,
 #submit_sppcfw_basic {
   position: fixed;
-  bottom: 20px;
-  right: 20px;
+  bottom: 50px;
+  right: 100px;
   display: flex;
   justify-content: center;
 }
@@ -664,4 +664,4 @@ li.submenu-item.active-submenu-item {
 .sppcfw_panel_sidebar.collapsed .sppcfw-sidebar-setup-content,
 .sppcfw_panel_sidebar.collapsed .sppcfw-sidebar-badge {
     display: none !important;
-}
+}
