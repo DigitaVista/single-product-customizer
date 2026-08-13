@@ -30,9 +30,9 @@ $show_template_selector = ! $sppcfw_is_block_theme && ! empty($sppcfw_enable_qui
 $sppcfw_qc_disabled_attr = $sppcfw_is_block_theme ? ' disabled="disabled"' : '';
 ?>
 
-<div class="wrap">
-    <h1 class="wp-heading-inline"><?php _e('Enable Quick Checkout', 'single-product-customizer'); ?></h1>
-    <hr class="wp-header-end">
+<div>
+    <h1 class="sppcfw-heading-inline"><?php _e('Enable Quick Checkout', 'single-product-customizer'); ?></h1>
+    <hr class="sppcfw-header-devider">
     <div class="sppcfw-quick-checkout-settings">
         <form method="post" action="">
             <?php wp_nonce_field('sppcfw_qc_nonce', 'nonce'); ?>

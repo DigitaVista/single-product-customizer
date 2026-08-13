@@ -965,13 +965,7 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
 				$active_tab = 'support';
 			}
 			?>
-            <?php if ( class_exists( 'SPPCFW_Setup_Help_Notice' ) && ! SPPCFW_Setup_Help_Notice::is_dismissed() ) : ?>
-                <div style="margin-bottom: 20px;">
-                    <?php SPPCFW_Setup_Help_Notice::render_card( true ); ?>
-                </div>
-            <?php endif; ?>
-
-            <div class="wrap">
+            <div>
                 <div class="sppcfw-dashboard">
                     <div class="sppcfw__panel">
                         <?php include SPPCFW_DIR_PATH . 'backend/templates/sidebar/sidebar-menu.php'; ?>

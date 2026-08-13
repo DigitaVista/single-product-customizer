@@ -27,12 +27,24 @@ function sppcfw_set_welcome_page_title() {
 	}
 }
 
+/**
+ * Disable all admin notices on the Single Product Customizer Welcome page.
+ */
+function sppcfw_disable_welcome_page_notices() {
+
+	if ( isset( $_GET['page'] ) && 'sppcfw-welcome' === sanitize_key( wp_unslash( $_GET['page'] ) ) ) {
+		remove_all_actions( 'admin_notices' );
+		remove_all_actions( 'all_admin_notices' );
+	}
+}
+add_action( 'admin_head', 'sppcfw_disable_welcome_page_notices', 1 );
+
 function sppcfw_welcome_page_callback() {
 	if ( ! current_user_can( 'manage_options' ) ) {
 		wp_die( esc_html__( 'You do not have permission to access this page.', 'single-product-customizer' ) );
 	}
 
-	echo '<div class="wrap">';
+	echo '<div>';
 	sppcfw_welcome_content();
 	echo '</div>';
 }
