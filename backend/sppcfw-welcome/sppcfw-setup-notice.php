@@ -143,7 +143,7 @@ if ( ! class_exists( 'SPPCFW_Setup_Help_Notice' ) ) {
 				$days_text = esc_html__( '0 days left', 'single-product-customizer' );
 			}
 
-			$whatsapp_url = 'https://wa.me/01926167151';
+			$whatsapp_url = 'https://www.webcartisan.com/onboard-chat-single-product-page-customizer';
 			$nonce        = wp_create_nonce( 'sppcfw_dismiss_setup_notice_nonce' );
 
 			if ( $with_wrapper ) {

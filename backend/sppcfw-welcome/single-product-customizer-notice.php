@@ -75,7 +75,7 @@ if ( ! class_exists( 'SPPCFW_Campaign_Notice' ) ) {
 				return;
 			}
 
-			$icon_url = 'https://ps.w.org/wallet-ready-gift-cards-for-woocommerce/assets/icon-128X128.png?rev=3534403';
+			$icon_url = 'https://ps.w.org/single-product-customizer/assets/icon-256x256.gif?rev=3395660';
 			$deal_url = 'http://webcartisan.com/single-product-page-customizer/';
 			?>
 			<div class="notice sppcfw-campaign-notice is-dismissible">

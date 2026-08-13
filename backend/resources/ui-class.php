@@ -937,53 +937,13 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
                 56
             );
 
-            // Submenu 1: Basic Settings (slug matches parent so clicking main menu opens Basic Settings)
+            // Submenu: Dashboard_Settings
             add_submenu_page(
                 $parent_slug,
-                __( 'Basic Settings', 'single-product-customizer' ),
-                __( 'Basic Settings', 'single-product-customizer' ),
+                __( 'Dashboard_Settings', 'single-product-customizer' ),
+                __( 'Dashboard_Settings', 'single-product-customizer' ),
                 $capability,
                 $parent_slug,
-                array( $this, 'plugin_page' )
-            );
-
-            // Submenu 2: Advance Settings
-            add_submenu_page(
-                $parent_slug,
-                __( 'Advance Settings', 'single-product-customizer' ),
-                __( 'Advance Settings', 'single-product-customizer' ),
-                $capability,
-                'sppcfw-advance-settings',
-                array( $this, 'plugin_page' )
-            );
-
-            // Submenu 3: Our Products
-            add_submenu_page(
-                $parent_slug,
-                __( 'Our Products', 'single-product-customizer' ),
-                __( 'Our Products', 'single-product-customizer' ),
-                $capability,
-                'sppcfw-our-products',
-                array( $this, 'plugin_page' )
-            );
-
-            // Submenu 4: Enable Quick Checkout
-            add_submenu_page(
-                $parent_slug,
-                __( 'Enable Quick Checkout', 'single-product-customizer' ),
-                __( 'Enable Quick Checkout', 'single-product-customizer' ),
-                $capability,
-                'sppcfw-quick-checkout',
-                array( $this, 'plugin_page' )
-            );
-
-            // Submenu 5: Support
-            add_submenu_page(
-                $parent_slug,
-                __( 'Support', 'single-product-customizer' ),
-                __( 'Support', 'single-product-customizer' ),
-                $capability,
-                'sppcfw-support',
                 array( $this, 'plugin_page' )
             );
         }
