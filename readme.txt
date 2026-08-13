@@ -4,7 +4,7 @@ Tags: customize woocommerce, woocommerce, product tab, product customizer, varia
 Requires at least: 4.5
 Tested up to: 7.0
 Requires PHP: 8.2
-Stable tag: 1.0.5
+Stable tag: 1.0.6
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
