@@ -990,9 +990,12 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
 
 		public function plugin_page() {
 			$current_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : 'sppcfw-single-product-customizer';
+			$tab_param    = isset( $_GET['tab'] ) ? sanitize_key( wp_unslash( $_GET['tab'] ) ) : '';
 
 			$active_tab = 'basic';
-			if ( 'sppcfw-advance-settings' === $current_page ) {
+			if ( ! empty( $tab_param ) ) {
+				$active_tab = $tab_param;
+			} elseif ( 'sppcfw-advance-settings' === $current_page ) {
 				$active_tab = 'advance';
 			} elseif ( 'sppcfw-our-products' === $current_page ) {
 				$active_tab = 'our_products';
@@ -1008,122 +1011,112 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
                 </div>
             <?php endif; ?>
 
-            <div class="tab-container-sppcfw">
-                <div class="tab-sppcfw">
-                    <div id="logo-container-spc" style="font-size: 20px; font-weight: bold;"><h2>Single Product Customizer</h2></div>
-                    <button style="padding: 8px" class="tablinks-sppcfw <?php echo 'basic' === $active_tab ? 'active' : ''; ?>" onclick="opensppcfw(event, 'basic')" <?php echo 'basic' === $active_tab ? 'id="defaultOpen"' : ''; ?>><span class="dashicons dashicons-admin-generic"></span><?php esc_html_e(' Basic Settings', 'single-product-customizer'); ?></button>
-                    <button style="padding: 8px" class="tablinks-sppcfw <?php echo 'advance' === $active_tab ? 'active' : ''; ?>" onclick="opensppcfw(event, 'advance')" <?php echo 'advance' === $active_tab ? 'id="defaultOpen"' : ''; ?>><span class="dashicons dashicons-admin-settings"></span><?php esc_html_e(' Advance Settings', 'single-product-customizer'); ?></button>
-                    <button style="padding: 8px" class="tablinks-sppcfw <?php echo 'our_products' === $active_tab ? 'active' : ''; ?>" onclick="opensppcfw(event, 'our_products')" <?php echo 'our_products' === $active_tab ? 'id="defaultOpen"' : ''; ?>><span class="dashicons dashicons-products"></span><?php esc_html_e(' Our Products', 'single-product-customizer'); ?></button>
-					<button style="padding: 8px" class="tablinks-sppcfw <?php echo 'quick_checkout' === $active_tab ? 'active' : ''; ?>" onclick="opensppcfw(event, 'quick_checkout')" <?php echo 'quick_checkout' === $active_tab ? 'id="defaultOpen"' : ''; ?>><span class="dashicons dashicons-cart"></span><?php esc_html_e(' Enable Quick Checkout', 'single-product-customizer'); ?></button>
-                    <button style="padding: 8px" class="tablinks-sppcfw <?php echo 'support' === $active_tab ? 'active' : ''; ?>" onclick="opensppcfw(event, 'support')" <?php echo 'support' === $active_tab ? 'id="defaultOpen"' : ''; ?>><span class="dashicons dashicons-admin-site"></span><?php esc_html_e(' Support', 'single-product-customizer'); ?></button>
-                    <a style="padding: 8px; text-decoration: none; display: flex; align-items: center; gap: 5px;" class="tablinks-sppcfw <?php echo 'sppcfw-pro-license' === $current_page ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'admin.php?page=sppcfw-pro-license' ) ); ?>">
-                        <span class="dashicons dashicons-key"></span>
-                        <?php esc_html_e( 'Pro License', 'single-product-customizer' ); ?>
-                        <?php if ( class_exists( 'SPPCFW_Pro_Admin_Placeholders' ) && SPPCFW_Pro_Admin_Placeholders::sppcfw_should_show_placeholders() ) : ?>
-                            <span class="sppcfw-pro-menu-badge"><?php esc_html_e( 'Pro', 'single-product-customizer' ); ?></span>
-                        <?php endif; ?>
-                    </a>
-                </div>
+            <div class="wrap">
+                <div class="sppcfw-dashboard">
+                    <div class="sppcfw__panel">
+                        <?php include SPPCFW_DIR_PATH . 'backend/templates/sidebar/sidebar-menu.php'; ?>
+                        <div class="sppcfw__panel_content">
+                            <div id="basic" class="tabcontent-sppcfw <?php echo 'basic' === $active_tab ? 'active' : ''; ?>">
+                                <div class="metabox-holder">
+                                    <div id="sppcfw_basic" class="sppcfw-group">
+                                        <form method="post" action="options.php">
+                                            <?php
+                                            settings_fields('sppcfw_basic');
+                                            do_settings_sections('sppcfw_basic');
+                                            submit_button(null, 'primary', 'submit_sppcfw_basic');
+                                            ?>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
 
-                <div id="basic" class="tabcontent-sppcfw <?php echo 'basic' === $active_tab ? 'active' : ''; ?>">
-                    <div class="metabox-holder">
-                        <div id="sppcfw_basic" class="sppcfw-group">
-                            <form method="post" action="options.php">
-                                <?php
-                                settings_fields('sppcfw_basic');
-                                do_settings_sections('sppcfw_basic');
-                                submit_button(null, 'primary', 'submit_sppcfw_basic');
-                                ?>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                            <div id="advance" class="tabcontent-sppcfw <?php echo 'advance' === $active_tab ? 'active' : ''; ?>">
+                                <div class="metabox-holder">
+                                    <div id="sppcfw_advanced" class="sppcfw-group">
+                                        <form method="post" action="options.php">
+                                            <?php
+                                            settings_fields('sppcfw_advanced');
+                                            do_settings_sections('sppcfw_advanced');
+                                            submit_button(null, 'primary', 'submit_sppcfw_advanced');
+                                            ?>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
 
-                <div id="advance" class="tabcontent-sppcfw">
-                    <div class="metabox-holder">
-                        <div id="sppcfw_advanced" class="sppcfw-group">
-                            <form method="post" action="options.php">
-                                <?php
-                                settings_fields('sppcfw_advanced');
-                                do_settings_sections('sppcfw_advanced');
-                                submit_button(null, 'primary', 'submit_sppcfw_advanced');
-                                ?>
-                            </form>
-                        </div>
-                    </div>
-                </div>
+                            <div id="our_products" class="tabcontent-sppcfw <?php echo 'our_products' === $active_tab ? 'active' : ''; ?>">
+                                <div class="metabox-holder">
+                                    <div id="sppcfw_our_products" class="sppcfw-group">
+                                        <?php
+                                        // Include the Our Products admin page content.
+                                        $our_products_file = dirname( __FILE__ ) . '/../Our-products/our-products.php';
+                                        if ( file_exists( $our_products_file ) ) {
+                                            include_once $our_products_file;
+                                        } else {
+                                            echo '<p>' . esc_html__( 'Our Products file not found.', 'single-product-customizer' ) . '</p>';
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
 
-				<div id="our_products" class="tabcontent-sppcfw">
-					<div class="metabox-holder">
-						<div id="sppcfw_our_products" class="sppcfw-group">
-							<?php
-							// Include the Our Products admin page content.
-							// Path is relative to this file: backend/resources -> ../Our-products/our-products.php
-							$our_products_file = dirname( __FILE__ ) . '/../Our-products/our-products.php';
-							if ( file_exists( $our_products_file ) ) {
-								include_once $our_products_file;
-							} else {
-								echo '<p>' . esc_html__( 'Our Products file not found.', 'single-product-customizer' ) . '</p>';
-							}
-							?>
-						</div>
-					</div>
-				</div>
+                            <div id="quick_checkout" class="tabcontent-sppcfw <?php echo 'quick_checkout' === $active_tab ? 'active' : ''; ?>">
+                                <div class="metabox-holder">
+                                    <div id="sppcfw_quick_checkout" class="sppcfw-group">
+                                        <?php
+                                        $quick_checkout_file = dirname( __FILE__ ) . '/../Enable-Quick-Checkout/quick-checkout.php';
+                                        if ( file_exists( $quick_checkout_file ) ) {
+                                            include_once $quick_checkout_file;
+                                        } else {
+                                            echo '<p>' . esc_html__( 'Quick Checkout file not found.', 'single-product-customizer' ) . '</p>';
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+                            </div>
 
-				<div id="quick_checkout" class="tabcontent-sppcfw">
-					<div class="metabox-holder">
-						<div id="sppcfw_quick_checkout" class="sppcfw-group">
-							<?php
-							$quick_checkout_file = dirname( __FILE__ ) . '/../Enable-Quick-Checkout/quick-checkout.php';
-							if ( file_exists( $quick_checkout_file ) ) {
-								include_once $quick_checkout_file;
-							} else {
-								echo '<p>' . esc_html__( 'Quick Checkout file not found.', 'single-product-customizer' ) . '</p>';
-							}
-							?>
-						</div>
-					</div>
-				</div>
-
-                <div id="support" class="tabcontent-sppcfw">
-                    <div class="grid-support">
-                        <div class="support-item">
-                            <strong><span class="dashicons dashicons-admin-site-alt3"></span>
-                                <?php esc_html_e('Website:','single-product-customizer'); ?></strong>
-                            <a href="https://www.webcartisan.com/" target="_blank"><?php esc_html_e('webcartisan.com','single-product-customizer'); ?></a>
-                            <p><?php esc_html_e('Visit our official website for live chat and more information, tutorials, and resources.','single-product-customizer'); ?></p>
-                        </div>
-                        <div class="support-item">
-                            <strong><span class="dashicons dashicons-facebook-alt"></span><?php esc_html_e('Facebook:','single-product-customizer'); ?></strong>
-                            <a href="https://www.facebook.com/webcartisan" target="_blank"><?php esc_html_e('Follow us','single-product-customizer'); ?></a>
-                            <p><?php esc_html_e('Join our community on Facebook for support, updates, and discussions.','single-product-customizer'); ?></p>
-                        </div>
-                        <div class="support-item">
-                            <strong><span class="dashicons dashicons-whatsapp"></span> <?php esc_html_e('WhatsApp:','single-product-customizer'); ?></strong>
-                            <a href="https://wa.me/01926167151" target="_blank"><?php esc_html_e('Chat Now ','single-product-customizer'); ?></a>
-                            <p><?php esc_html_e('Get instant support by chatting with us on WhatsApp. We’re here to help!','single-product-customizer'); ?></p>
-                        </div>
-                        <div class="support-item">
-                            <strong><span class="dashicons dashicons-email-alt"></span> <?php esc_html_e('Email:','single-product-customizer'); ?></strong> <a href="mailto:hello@webcartisan.com"><?php esc_html_e('hello@webcartisan.com','single-product-customizer'); ?></a>
-                            <p><?php esc_html_e('Feel free to reach out to us via email for any inquiries or support requests.','single-product-customizer'); ?></p>
-                        </div>
-                        <div class="support-item">
-                            <strong><span class="dashicons dashicons-linkedin"></span> <?php esc_html_e('LinkedIn:','single-product-customizer'); ?></strong>
-                            <a href="https://www.linkedin.com/company/webcartisan" target="_blank"><?php esc_html_e('Connect on LinkedIn','single-product-customizer'); ?></a>
-                            <p><?php esc_html_e('Let’s connect on LinkedIn for networking, updates, and professional support.','single-product-customizer'); ?></p>
-                        </div>
-                        <div class="support-item">
-                            <strong><span class="dashicons dashicons-twitter"></span> <?php esc_html_e('Twitter:','single-product-customizer'); ?></strong> <a href="https://x.com/WebCartisan" target="_blank"><?php esc_html_e('Follow us','single-product-customizer'); ?></a>
-                            <p><?php esc_html_e('Stay updated with the latest news and announcements by following us on Twitter.','single-product-customizer'); ?></p>
-                        </div>
-                        <div class="support-item">
-                            <strong><span class="dashicons dashicons-youtube"></span> <?php esc_html_e('YouTube:','single-product-customizer'); ?></strong> <a href="https://www.youtube.com/@WebCartisan" target="_blank"><?php esc_html_e('Subscribe','single-product-customizer'); ?></a>
-                            <p><?php esc_html_e('Check out our YouTube channel for video tutorials and product showcases.','single-product-customizer'); ?></p>
-                        </div>
-                        <div class="support-item">
-                            <strong><span class="dashicons dashicons-instagram"></span> <?php esc_html_e('Instagram:','single-product-customizer'); ?></strong>
-                            <a href="https://www.instagram.com/webcartisan/" target="_blank"><?php esc_html_e('Follow us','single-product-customizer'); ?></a>
-                            <p><?php esc_html_e('See behind-the-scenes content and our latest updates on Instagram.','single-product-customizer'); ?></p>
+                            <div id="support" class="tabcontent-sppcfw <?php echo 'support' === $active_tab ? 'active' : ''; ?>">
+                                <div class="grid-support">
+                                    <div class="support-item">
+                                        <strong><span class="dashicons dashicons-admin-site-alt3"></span>
+                                            <?php esc_html_e('Website:','single-product-customizer'); ?></strong>
+                                        <a href="https://www.webcartisan.com/" target="_blank"><?php esc_html_e('webcartisan.com','single-product-customizer'); ?></a>
+                                        <p><?php esc_html_e('Visit our official website for live chat and more information, tutorials, and resources.','single-product-customizer'); ?></p>
+                                    </div>
+                                    <div class="support-item">
+                                        <strong><span class="dashicons dashicons-facebook-alt"></span><?php esc_html_e('Facebook:','single-product-customizer'); ?></strong>
+                                        <a href="https://www.facebook.com/webcartisan" target="_blank"><?php esc_html_e('Follow us','single-product-customizer'); ?></a>
+                                        <p><?php esc_html_e('Join our community on Facebook for support, updates, and discussions.','single-product-customizer'); ?></p>
+                                    </div>
+                                    <div class="support-item">
+                                        <strong><span class="dashicons dashicons-whatsapp"></span> <?php esc_html_e('WhatsApp:','single-product-customizer'); ?></strong>
+                                        <a href="https://wa.me/01926167151" target="_blank"><?php esc_html_e('Chat Now ','single-product-customizer'); ?></a>
+                                        <p><?php esc_html_e('Get instant support by chatting with us on WhatsApp. We’re here to help!','single-product-customizer'); ?></p>
+                                    </div>
+                                    <div class="support-item">
+                                        <strong><span class="dashicons dashicons-email-alt"></span> <?php esc_html_e('Email:','single-product-customizer'); ?></strong> <a href="mailto:hello@webcartisan.com"><?php esc_html_e('hello@webcartisan.com','single-product-customizer'); ?></a>
+                                        <p><?php esc_html_e('Feel free to reach out to us via email for any inquiries or support requests.','single-product-customizer'); ?></p>
+                                    </div>
+                                    <div class="support-item">
+                                        <strong><span class="dashicons dashicons-linkedin"></span> <?php esc_html_e('LinkedIn:','single-product-customizer'); ?></strong>
+                                        <a href="https://www.linkedin.com/company/webcartisan" target="_blank"><?php esc_html_e('Connect on LinkedIn','single-product-customizer'); ?></a>
+                                        <p><?php esc_html_e('Let’s connect on LinkedIn for networking, updates, and professional support.','single-product-customizer'); ?></p>
+                                    </div>
+                                    <div class="support-item">
+                                        <strong><span class="dashicons dashicons-twitter"></span> <?php esc_html_e('Twitter:','single-product-customizer'); ?></strong> <a href="https://x.com/WebCartisan" target="_blank"><?php esc_html_e('Follow us','single-product-customizer'); ?></a>
+                                        <p><?php esc_html_e('Stay updated with the latest news and announcements by following us on Twitter.','single-product-customizer'); ?></p>
+                                    </div>
+                                    <div class="support-item">
+                                        <strong><span class="dashicons dashicons-youtube"></span> <?php esc_html_e('YouTube:','single-product-customizer'); ?></strong> <a href="https://www.youtube.com/@WebCartisan" target="_blank"><?php esc_html_e('Subscribe','single-product-customizer'); ?></a>
+                                        <p><?php esc_html_e('Check out our YouTube channel for video tutorials and product showcases.','single-product-customizer'); ?></p>
+                                    </div>
+                                    <div class="support-item">
+                                        <strong><span class="dashicons dashicons-instagram"></span> <?php esc_html_e('Instagram:','single-product-customizer'); ?></strong>
+                                        <a href="https://www.instagram.com/webcartisan/" target="_blank"><?php esc_html_e('Follow us','single-product-customizer'); ?></a>
+                                        <p><?php esc_html_e('See behind-the-scenes content and our latest updates on Instagram.','single-product-customizer'); ?></p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
