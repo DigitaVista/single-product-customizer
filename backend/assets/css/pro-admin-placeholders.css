@@ -1,0 +1,71 @@
+/* Pro discovery placeholders — admin only */
+
+#adminmenu .sppcfw-pro-menu-badge {
+	display: inline-block;
+	margin-left: 6px;
+	padding: 0 5px;
+	border-radius: 3px;
+	font-size: 10px;
+	font-weight: 600;
+	line-height: 1.6;
+	text-transform: uppercase;
+	vertical-align: middle;
+	color: #6d28d9;
+	border: 1px solid #7c3aed;
+	background: #f5f3ff;
+}
+
+.sppcfw-pro-placeholder-screen .sppcfw-pro-placeholder-card {
+	max-width: 640px;
+	margin-top: 20px;
+	padding: 24px 28px;
+	border: 1px solid #e5e7eb;
+	border-radius: 8px;
+	background: #fff;
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.sppcfw-pro-placeholder-screen .sppcfw-pro-placeholder-card p {
+	font-size: 14px;
+	line-height: 1.6;
+	color: #3c434a;
+	margin-bottom: 12px;
+}
+
+.sppcfw-pro-placeholder-screen .sppcfw-pro-placeholder-card p.description {
+	color: #646970;
+	font-size: 13px;
+	margin-bottom: 20px;
+}
+
+.sppcfw-pro-placeholder-screen .sppcfw-pro-placeholder-card .button {
+	margin-right: 10px;
+	padding: 6px 14px;
+	font-weight: 600;
+}
+
+.sppcfw-pro-badge {
+	display: inline-block;
+	margin-left: 8px;
+	padding: 2px 6px;
+	border-radius: 3px;
+	font-size: 11px;
+	font-weight: 600;
+	line-height: 1.4;
+	text-transform: uppercase;
+	vertical-align: middle;
+	color: #6d28d9;
+	border: 1px solid #7c3aed;
+	background: #f5f3ff;
+}
+
+.pro-notice {
+	display: inline-block;
+	padding: 3px 8px;
+	background: #f5f3ff;
+	border: 1px solid #7c3aed;
+	color: #6d28d9;
+	border-radius: 4px;
+	font-weight: 600;
+	font-size: 12px;
+}

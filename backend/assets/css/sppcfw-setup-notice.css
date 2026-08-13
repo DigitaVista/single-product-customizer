@@ -1,0 +1,176 @@
+.notice.sppcfw-setup-notice-card,
+.sppcfw-content.sppcfw-notice-warning {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    background: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-left: 4px solid #22C55E;
+    border-radius: 12px;
+    padding: 16px 20px;
+    box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+}
+
+.sppcfw-setup-dismiss-btn {
+    position: absolute;
+    top: 5px;
+    right: 8px;
+    background: transparent;
+    border: none;
+    color: #94A3B8;
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    z-index: 5;
+}
+
+.sppcfw-setup-dismiss-btn:hover {
+    background: #F1F5F9;
+    color: #0F172A;
+}
+
+.notice.sppcfw-setup-notice-card:hover {
+    border-color: #CBD5E1;
+    border-left-color: #16A34A;
+    box-shadow: 0 6px 16px rgba(15, 23, 42, 0.08);
+}
+
+.sppcfw-setup-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+.sppcfw-setup-avatar-wrapper {
+    position: relative;
+    width: 48px;
+    height: 48px;
+    flex-shrink: 0;
+}
+
+.sppcfw-setup-avatar-svg {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: block;
+}
+
+.sppcfw-setup-status-dot {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 10px;
+    height: 10px;
+    background: #22C55E;
+    border: 2px solid #FFFFFF;
+    border-radius: 50%;
+}
+
+.sppcfw-setup-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.sppcfw-setup-time-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    background: #F3E8FF;
+    color: #6D28D9;
+    font-size: 11.5px;
+    font-weight: 600;
+    padding: 5px 9px;
+    border-radius: 20px;
+    width: fit-content;
+}
+
+.sppcfw-setup-time-badge svg {
+    flex-shrink: 0;
+}
+
+.sppcfw-setup-badge-wrap {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-direction: row;
+}
+
+.sppcfw-setup-badge-wrap p {
+    color: #0F172A;
+    font-weight: 700;
+    padding: 0px !important;
+    margin: 0px !important;
+    line-height: 1;
+}
+
+.sppcfw-setup-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0F172A !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.3;
+}
+
+.sppcfw-setup-desc {
+    font-size: 13px;
+    color: #64748B !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    line-height: 1.4;
+}
+
+.sppcfw-setup-right {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.sppcfw-setup-claim-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: #22C55E;
+    color: #FFFFFF !important;
+    font-size: 13.5px;
+    font-weight: 600;
+    padding: 9px 18px;
+    border-radius: 8px;
+    text-decoration: none !important;
+    box-shadow: 0 2px 6px rgba(34, 197, 94, 0.3);
+    transition: all 0.2s ease;
+}
+
+.sppcfw-setup-claim-btn:hover {
+    background: #16A34A;
+    color: #FFFFFF !important;
+    box-shadow: 0 4px 10px rgba(22, 163, 74, 0.4);
+    transform: translateY(-1px);
+}
+
+@media (max-width: 782px) {
+    .notice.sppcfw-setup-notice-card {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
+        margin-right: 10px;
+    }
+    
+    .sppcfw-setup-right {
+        width: 100%;
+    }
+    
+    .sppcfw-setup-claim-btn {
+        width: 100%;
+        justify-content: center;
+    }
+}

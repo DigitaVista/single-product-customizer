@@ -1,5 +1,9 @@
 function opensppcfw(evt, cityName) {
-  var i, tabcontent, tablinks;
+  if (evt && evt.preventDefault) {
+    evt.preventDefault();
+  }
+
+  var i, tabcontent, menuItems;
 
   // Hide all tab content
   tabcontent = document.getElementsByClassName("tabcontent-sppcfw");
@@ -7,19 +11,66 @@ function opensppcfw(evt, cityName) {
     tabcontent[i].classList.remove("active");
   }
 
-  // Remove active class from all tab buttons
-  tablinks = document.getElementsByClassName("tablinks-sppcfw");
-  for (i = 0; i < tablinks.length; i++) {
-    tablinks[i].classList.remove("active");
+  // Remove active-item class from all sidebar menu items
+  menuItems = document.querySelectorAll(".sppcfw_sidebar_menu .menu-item");
+  for (i = 0; i < menuItems.length; i++) {
+    menuItems[i].classList.remove("active-item");
   }
 
-  // Show the current tab and add active class
-  document.getElementById(cityName).classList.add("active");
-  evt.currentTarget.classList.add("active");
+  // Show the current tab content
+  var targetContent = document.getElementById(cityName);
+  if (targetContent) {
+    targetContent.classList.add("active");
+  }
+
+  // Set active class on active sidebar item
+  var activeMenuItem = document.querySelector('.sppcfw_sidebar_menu .menu-item[data-tab="' + cityName + '"]');
+  if (activeMenuItem) {
+    activeMenuItem.classList.add("active-item");
+  }
 }
+
 document.addEventListener("DOMContentLoaded", function () {
-  if (document.getElementById("defaultOpen")) {
-    document.getElementById("defaultOpen").click();
+  var sidebar = document.querySelector(".sppcfw_panel_sidebar");
+  if (sidebar) {
+    var collapseBtn = sidebar.querySelector(".collapse-item .item-link");
+
+    // Restore sidebar collapsed state
+    if (localStorage.getItem("sppcfw_sidebarCollapsed") === "true") {
+      sidebar.classList.add("collapsed");
+      if (collapseBtn) {
+        var icon = collapseBtn.querySelector(".dashicons");
+        if (icon) icon.style.transform = "rotate(180deg)";
+      }
+    }
+
+    if (collapseBtn) {
+      collapseBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        sidebar.classList.toggle("collapsed");
+        var isCollapsed = sidebar.classList.contains("collapsed");
+        localStorage.setItem("sppcfw_sidebarCollapsed", isCollapsed ? "true" : "false");
+        var icon = collapseBtn.querySelector(".dashicons");
+        if (icon) {
+          icon.style.transform = isCollapsed ? "rotate(180deg)" : "rotate(0deg)";
+        }
+      });
+    }
+
+    // Handle submenu toggle if present
+    var menuItems = sidebar.querySelectorAll(".menu-item");
+    menuItems.forEach(function (menuItem) {
+      var submenu = menuItem.querySelector(".sppcfw_panel_submenu");
+      if (submenu) {
+        var menuLink = menuItem.querySelector(".item-link");
+        if (menuLink) {
+          menuLink.addEventListener("click", function (e) {
+            e.preventDefault();
+            submenu.classList.toggle("open");
+          });
+        }
+      }
+    });
   }
 });
 
