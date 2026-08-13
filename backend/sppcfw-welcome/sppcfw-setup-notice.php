@@ -43,9 +43,9 @@ if ( ! class_exists( 'SPPCFW_Setup_Help_Notice' ) ) {
 				return false;
 			}
 
-			// if ( self::is_dismissed() ) {
-			// 	return false;
-			// }
+			if ( self::is_dismissed() ) {
+				return false;
+			}
 
 			return true;
 		}
@@ -182,7 +182,7 @@ if ( ! class_exists( 'SPPCFW_Setup_Help_Notice' ) ) {
 							<span><?php echo esc_html( $days_text ); ?></span>
 						</div>
 					</div>
-					<h3 class="sppcfw-setup-title"><?php esc_html_e( 'Get free setup help', 'single-product-customizer' ); ?></h3>
+					<h3 class="sppcfw-setup-title"><?php esc_html_e( 'Get free setup help For Single Product Page Customizer', 'single-product-customizer' ); ?></h3>
 					<p class="sppcfw-setup-desc"><?php esc_html_e( 'Get expert help at no cost — Single Product Customizer for WooCommerce plugin team is here to support you!', 'single-product-customizer' ); ?></p>
 				</div>
 			</div>
