@@ -210,3 +210,47 @@ function sppcfw_wc_action_hooks_select_html($args=array()){
     $html.='</select>';
     return $html;
 }
+
+/**
+ * Render YouTube help link icon for settings fields.
+ *
+ * @param string $field_key Field key name.
+ * @return string HTML output for the help link.
+ */
+if ( ! function_exists( 'sppcfw_render_help_link' ) ) {
+	function sppcfw_render_help_link( $field_key ) {
+		$links = array(
+			'enable_plus_minus_button'       => 'https://youtu.be/6xcKyu1WOlY',
+			'out_of_stock_text'              => 'https://youtu.be/NA_64H6iZeM',
+			'sale_badge_text'                => 'https://youtu.be/_OtfykY5yu8',
+			'add_to_cart_button_text'        => 'https://youtu.be/8KR6cL31g50',
+			'remove_product_meta'            => 'https://youtu.be/7kFJkk2pcrA',
+			'remove_related_product_section' => 'https://youtu.be/m2KvHkxbBq8',
+			'remove_product_rating'          => 'https://youtu.be/cVVj1whdToM',
+			'hide_product_price'             => 'https://youtu.be/cHYMTeSrCKI',
+			'hide_add_to_cart_button'        => 'https://youtu.be/PATPq1Ttnjw',
+			'hide_short_description'         => 'https://youtu.be/ljORAW46ShQ',
+			'enable_custom_message'          => 'https://youtu.be/0znk5Jpwpr0',
+			'enable_varition_table'          => 'https://youtu.be/pwRVObgvxSI',
+			'enable_variation_switcher'      => 'https://youtu.be/PpKSdsaOMeg',
+			'related_products_title'         => 'https://youtu.be/eOsk7buqgmI',
+			'upsell_products_title'          => 'https://youtu.be/lrXgTynjQ9E',
+			'change_clear_text'              => 'https://youtu.be/JLfqhSXl70I',
+			'change_backorder_text'          => 'https://youtu.be/CXFJX_3RNXk',
+		);
+
+		if ( empty( $links[ $field_key ] ) ) {
+			return '';
+		}
+
+		$url = $links[ $field_key ];
+
+		if ( function_exists( 'wodgc_help_youtube_link' ) ) {
+			ob_start();
+			wodgc_help_youtube_link( $url );
+			return ob_get_clean();
+		}
+
+		return '<span class="wwodgc_youtube-link"><a href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer" style="text-decoration: none;"><span class="dashicons dashicons-youtube" style="color: #FF0000;"></span></a></span>';
+	}
+}
