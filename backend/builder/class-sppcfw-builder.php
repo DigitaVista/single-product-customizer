@@ -43,7 +43,7 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 		}
 
 		/**
-		 * Register admin menu item for Single Page Builder.
+		 * Register admin menu items for Single Page Builder.
 		 *
 		 * @return void
 		 */
@@ -51,14 +51,38 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 			$parent_slug = 'sppcfw-single-product-customizer';
 			$capability  = function_exists( 'sppcfw_admin_capability' ) ? sppcfw_admin_capability() : 'manage_options';
 
+			// 1. All Templates Submenu
 			add_submenu_page(
 				$parent_slug,
-				__( 'Single Page Builder', 'single-product-customizer' ),
-				__( 'Single Page Builder', 'single-product-customizer' ),
+				__( 'All Templates', 'single-product-customizer' ),
+				__( 'All Templates', 'single-product-customizer' ),
+				$capability,
+				'sppcfw-builder-all-templates',
+				array( $this, 'render_templates_list_view' )
+			);
+
+			// 2. Add New Template Submenu (Opens Builder)
+			add_submenu_page(
+				$parent_slug,
+				__( 'Add New Template', 'single-product-customizer' ),
+				__( 'Add New Template', 'single-product-customizer' ),
 				$capability,
 				'sppcfw-single-page-builder',
 				array( $this, 'render_builder_view' )
 			);
+		}
+
+		/**
+		 * Render templates list view screen.
+		 *
+		 * @return void
+		 */
+		public function render_templates_list_view() {
+			if ( ! current_user_can( function_exists( 'sppcfw_admin_capability' ) ? sppcfw_admin_capability() : 'manage_options' ) ) {
+				wp_die( esc_html__( 'You do not have permission to access this page.', 'single-product-customizer' ) );
+			}
+
+			require_once __DIR__ . '/templates-list-view.php';
 		}
 
 		/**
@@ -116,13 +140,16 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 					true
 				);
 
+				$template_id = isset( $_GET['template_id'] ) ? sanitize_text_field( $_GET['template_id'] ) : 'template_default';
+
 				wp_localize_script(
 					'sppcfw-builder-app',
 					'SPPCFWBuilderConfig',
 					array(
-						'ajax_url'   => admin_url( 'admin-ajax.php' ),
-						'nonce'      => wp_create_nonce( 'sppcfw_builder_nonce' ),
-						'plugin_url' => SPPCFW_DIR_URL,
+						'ajax_url'    => admin_url( 'admin-ajax.php' ),
+						'nonce'       => wp_create_nonce( 'sppcfw_builder_nonce' ),
+						'plugin_url'  => SPPCFW_DIR_URL,
+						'template_id' => $template_id,
 					)
 				);
 			}
@@ -389,7 +416,7 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 		}
 
 		/**
-		 * AJAX: Save Builder Template & Display Conditions.
+		 * AJAX: Save Builder Template & Display Conditions (Multi-Template Registry).
 		 *
 		 * @return void
 		 */
@@ -400,31 +427,99 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 				wp_send_json_error( array( 'message' => __( 'Permission denied', 'single-product-customizer' ) ) );
 			}
 
-			$layout     = isset( $_POST['layout'] ) ? wp_unslash( $_POST['layout'] ) : '';
-			$conditions = isset( $_POST['conditions'] ) ? wp_unslash( $_POST['conditions'] ) : '';
+			$template_id    = isset( $_POST['template_id'] ) ? sanitize_text_field( $_POST['template_id'] ) : '';
+			$template_title = isset( $_POST['template_title'] ) ? sanitize_text_field( $_POST['template_title'] ) : '';
+			$layout         = isset( $_POST['layout'] ) ? wp_unslash( $_POST['layout'] ) : '';
+			$conditions     = isset( $_POST['conditions'] ) ? wp_unslash( $_POST['conditions'] ) : '';
 
-			$data_to_save = array(
+			if ( empty( $template_id ) || 'new' === $template_id ) {
+				$template_id = 'template_' . time();
+			}
+
+			if ( empty( $template_title ) ) {
+				$template_title = __( 'Single Product Template', 'single-product-customizer' );
+			}
+
+			$templates = get_option( 'sppcfw_builder_templates', array() );
+
+			$templates[ $template_id ] = array(
+				'id'         => $template_id,
+				'title'      => $template_title,
 				'layout'     => json_decode( $layout, true ),
 				'conditions' => json_decode( $conditions, true ),
+				'status'     => 'published',
 				'updated_at' => current_time( 'mysql' ),
 			);
 
-			update_option( 'sppcfw_builder_template', $data_to_save );
+			update_option( 'sppcfw_builder_templates', $templates );
 
-			wp_send_json_success( array( 'message' => __( 'Single Page Builder layout published successfully!', 'single-product-customizer' ) ) );
+			// Also update legacy single option for fallback
+			update_option( 'sppcfw_builder_template', $templates[ $template_id ] );
+
+			wp_send_json_success(
+				array(
+					'message'     => __( 'Single Page Builder layout published successfully!', 'single-product-customizer' ),
+					'template_id' => $template_id,
+				)
+			);
 		}
 
 		/**
-		 * AJAX: Load Builder Template.
+		 * AJAX: Load Builder Template from Registry.
 		 *
 		 * @return void
 		 */
 		public function ajax_load_builder_template() {
 			check_ajax_referer( 'sppcfw_builder_nonce', 'nonce' );
 
-			$template_data = get_option( 'sppcfw_builder_template', array() );
+			$template_id = isset( $_POST['template_id'] ) ? sanitize_text_field( $_POST['template_id'] ) : 'template_default';
 
-			wp_send_json_success( array( 'template' => $template_data ) );
+			if ( 'new' === $template_id ) {
+				$blank_template = array(
+					'id'         => 'new',
+					'title'      => __( 'New Product Template', 'single-product-customizer' ),
+					'layout'     => array(),
+					'conditions' => array( 'scope' => 'entire' ),
+					'status'     => 'draft',
+				);
+				wp_send_json_success( array( 'template' => $blank_template ) );
+				return;
+			}
+
+			$templates = get_option( 'sppcfw_builder_templates', array() );
+
+			if ( isset( $templates[ $template_id ] ) ) {
+				wp_send_json_success( array( 'template' => $templates[ $template_id ] ) );
+				return;
+			}
+
+			// Fallback: check legacy single option or first item in templates array
+			if ( ! empty( $templates ) ) {
+				$first = reset( $templates );
+				wp_send_json_success( array( 'template' => $first ) );
+				return;
+			}
+
+			$legacy = get_option( 'sppcfw_builder_template', array() );
+			if ( ! empty( $legacy ) ) {
+				if ( empty( $legacy['id'] ) ) {
+					$legacy['id'] = 'template_default';
+				}
+				if ( empty( $legacy['title'] ) ) {
+					$legacy['title'] = __( 'Default Single Product Template', 'single-product-customizer' );
+				}
+				wp_send_json_success( array( 'template' => $legacy ) );
+				return;
+			}
+
+			// Complete blank template fallback
+			$blank = array(
+				'id'         => 'template_default',
+				'title'      => __( 'Default Single Product Template', 'single-product-customizer' ),
+				'layout'     => array(),
+				'conditions' => array( 'scope' => 'entire' ),
+			);
+			wp_send_json_success( array( 'template' => $blank ) );
 		}
 	}
 

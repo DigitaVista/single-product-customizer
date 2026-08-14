@@ -21,6 +21,13 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 		}
 
 		/**
+		 * Active matching template instance.
+		 *
+		 * @var array
+		 */
+		private $matched_template = array();
+
+		/**
 		 * Check conditions and initialize template override.
 		 *
 		 * @return void
@@ -30,52 +37,90 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 				return;
 			}
 
-			$template_data = get_option( 'sppcfw_builder_template', array() );
+			$matched = $this->get_matching_template( get_the_ID() );
 
-			if ( empty( $template_data ) || empty( $template_data['layout'] ) ) {
+			if ( empty( $matched ) || empty( $matched['layout'] ) ) {
 				return;
 			}
 
-			$conditions = isset( $template_data['conditions'] ) ? $template_data['conditions'] : array();
-			$scope      = isset( $conditions['scope'] ) ? $conditions['scope'] : 'entire';
+			$this->matched_template = $matched;
 
-			$product_id    = get_the_ID();
-			$should_render = false;
+			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_builder_styles' ) );
 
-			if ( 'entire' === $scope ) {
-				$should_render = true;
-			} elseif ( 'category' === $scope ) {
-				$selected_cats = isset( $conditions['category_ids'] ) ? (array) $conditions['category_ids'] : array();
-				$product_cats  = wp_get_post_terms( $product_id, 'product_cat', array( 'fields' => 'ids' ) );
+			// Hook into WooCommerce single product summary to render builder layout
+			add_action( 'woocommerce_before_single_product_summary', array( $this, 'render_builder_template' ), 5 );
+			// Remove default WooCommerce single product hooks to avoid duplication when custom template is active
+			remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20 );
+			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_title', 5 );
+			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_rating', 10 );
+			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_price', 10 );
+			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20 );
+			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
+			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_meta', 40 );
+			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_sharing', 50 );
+			remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 10 );
+			remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_upsell_display', 15 );
+			remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+		}
 
-				if ( ! empty( array_intersect( $selected_cats, $product_cats ) ) ) {
-					$should_render = true;
+		/**
+		 * Find best matching template from registry for product ID.
+		 *
+		 * @param int $product_id Product ID.
+		 * @return array Template array.
+		 */
+		private function get_matching_template( $product_id ) {
+			$templates = get_option( 'sppcfw_builder_templates', array() );
+
+			if ( empty( $templates ) ) {
+				$legacy = get_option( 'sppcfw_builder_template', array() );
+				if ( ! empty( $legacy ) && ! empty( $legacy['layout'] ) ) {
+					return $legacy;
 				}
-			} elseif ( 'product' === $scope ) {
-				$selected_prods = isset( $conditions['product_ids'] ) ? (array) $conditions['product_ids'] : array();
-				if ( in_array( $product_id, $selected_prods, true ) ) {
-					$should_render = true;
+				return array();
+			}
+
+			$product_cats = wp_get_post_terms( $product_id, 'product_cat', array( 'fields' => 'ids' ) );
+
+			$product_match  = array();
+			$category_match = array();
+			$entire_match   = array();
+
+			foreach ( $templates as $tpl ) {
+				if ( empty( $tpl['layout'] ) || ( isset( $tpl['status'] ) && 'draft' === $tpl['status'] ) ) {
+					continue;
+				}
+
+				$conditions = isset( $tpl['conditions'] ) ? $tpl['conditions'] : array();
+				$scope      = isset( $conditions['scope'] ) ? $conditions['scope'] : 'entire';
+
+				if ( 'product' === $scope ) {
+					$selected_prods = isset( $conditions['product_ids'] ) ? (array) $conditions['product_ids'] : array();
+					if ( in_array( $product_id, $selected_prods, true ) ) {
+						$product_match = $tpl;
+						break;
+					}
+				} elseif ( 'category' === $scope ) {
+					$selected_cats = isset( $conditions['category_ids'] ) ? (array) $conditions['category_ids'] : array();
+					if ( ! empty( array_intersect( $selected_cats, $product_cats ) ) ) {
+						$category_match = $tpl;
+					}
+				} elseif ( 'entire' === $scope ) {
+					$entire_match = $tpl;
 				}
 			}
 
-			if ( $should_render ) {
-				add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_builder_styles' ) );
-
-				// Hook into WooCommerce single product summary to render builder layout
-				add_action( 'woocommerce_before_single_product_summary', array( $this, 'render_builder_template' ), 5 );
-				// Remove default WooCommerce single product hooks to avoid duplication when custom template is active
-				remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20 );
-				remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_title', 5 );
-				remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_rating', 10 );
-				remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_price', 10 );
-				remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_excerpt', 20 );
-				remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_add_to_cart', 30 );
-				remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_meta', 40 );
-				remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_sharing', 50 );
-				remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 10 );
-				remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_upsell_display', 15 );
-				remove_action( 'woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20 );
+			if ( ! empty( $product_match ) ) {
+				return $product_match;
 			}
+			if ( ! empty( $category_match ) ) {
+				return $category_match;
+			}
+			if ( ! empty( $entire_match ) ) {
+				return $entire_match;
+			}
+
+			return array();
 		}
 
 		/**
@@ -84,8 +129,7 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 		 * @return void
 		 */
 		public function enqueue_frontend_builder_styles() {
-			$template_data = get_option( 'sppcfw_builder_template', array() );
-			$layout        = isset( $template_data['layout'] ) ? $template_data['layout'] : array();
+			$layout = isset( $this->matched_template['layout'] ) ? $this->matched_template['layout'] : array();
 
 			$custom_css = '
 				.sppcfw-builder-section { width: 100%; box-sizing: border-box; }
@@ -162,8 +206,7 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 		 * @return void
 		 */
 		public function render_builder_template() {
-			$template_data = get_option( 'sppcfw_builder_template', array() );
-			$elements      = isset( $template_data['layout'] ) ? $template_data['layout'] : array();
+			$elements = isset( $this->matched_template['layout'] ) ? $this->matched_template['layout'] : array();
 
 			if ( empty( $elements ) ) {
 				return;

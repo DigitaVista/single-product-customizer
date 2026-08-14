@@ -1,7 +1,7 @@
 /**
  * Single Product Page Builder React App
  * Built with React (wp.element) & Tailwind CSS
- * Features: Container / Flexbox / Grid / Div layout system, Elementor-style Boxed Width, Layout Popup (+ Placeholder), Categorized Meta Widgets, Drag & Drop Structure Tab
+ * Features: Multi-template management (All Templates / Add New), Container / Flexbox / Grid / Div layout system, Elementor-style Boxed Width, Layout Popup (+ Placeholder), Categorized Meta Widgets, Drag & Drop Structure Tab
  *
  * @package Single_Product_Customizer
  */
@@ -299,6 +299,10 @@
 
 	// Main App Component
 	function BuilderApp() {
+		const initialTplId = window.SPPCFWBuilderConfig ? window.SPPCFWBuilderConfig.template_id || 'template_default' : 'template_default';
+		const [templateId, setTemplateId] = useState(initialTplId);
+		const [templateTitle, setTemplateTitle] = useState('Single Product Template');
+
 		const [products, setProducts] = useState([]);
 		const [categories, setCategories] = useState([]);
 		const [selectedProductId, setSelectedProductId] = useState('');
@@ -329,13 +333,16 @@
 				}
 			});
 
-			apiPost('sppcfw_load_builder_template', {}).then(res => {
+			apiPost('sppcfw_load_builder_template', { template_id: initialTplId }).then(res => {
 				if (res && res.success && res.data && res.data.template) {
-					if (res.data.template.layout && Array.isArray(res.data.template.layout)) {
-						setElements(res.data.template.layout);
+					const tpl = res.data.template;
+					if (tpl.id) setTemplateId(tpl.id);
+					if (tpl.title) setTemplateTitle(tpl.title);
+					if (tpl.layout && Array.isArray(tpl.layout)) {
+						setElements(tpl.layout);
 					}
-					if (res.data.template.conditions) {
-						setDisplayConditions(res.data.template.conditions);
+					if (tpl.conditions) {
+						setDisplayConditions(tpl.conditions);
 					}
 				}
 			});
@@ -447,11 +454,16 @@
 			setIsSaving(true);
 			setStatusMessage('Publishing template...');
 			apiPost('sppcfw_save_builder_template', {
+				template_id: templateId,
+				template_title: templateTitle,
 				layout: JSON.stringify(elements),
 				conditions: JSON.stringify(displayConditions),
 			}).then(res => {
 				setIsSaving(false);
 				if (res && res.success) {
+					if (res.data && res.data.template_id) {
+						setTemplateId(res.data.template_id);
+					}
 					setStatusMessage(res.data.message || 'Published successfully!');
 					setTimeout(() => setStatusMessage(''), 4000);
 				} else {
@@ -472,8 +484,10 @@
 			'div',
 			{ className: 'sppcfw-builder-layout flex flex-col h-screen w-screen overflow-hidden bg-[#091421] text-[#d9e3f6]' },
 
-			// Top Bar
+			// Top Bar with Editable Template Name and All Templates Link
 			h(TopBar, {
+				templateTitle,
+				setTemplateTitle,
 				deviceView,
 				setDeviceView,
 				saveTemplate,
@@ -548,7 +562,7 @@
 	}
 
 	// 1. Top Navigation Bar Component
-	function TopBar({ deviceView, setDeviceView, saveTemplate, isSaving, statusMessage, openConditionsModal }) {
+	function TopBar({ templateTitle, setTemplateTitle, deviceView, setDeviceView, saveTemplate, isSaving, statusMessage, openConditionsModal }) {
 		return h(
 			'header',
 			{ className: 'bg-[#16202e] border-b border-[#4d4354] h-12 fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-4' },
@@ -558,15 +572,39 @@
 				h(
 					'a',
 					{
-						href: 'admin.php?page=sppcfw-single-product-customizer',
+						href: 'admin.php?page=sppcfw-builder-all-templates',
 						className: 'flex items-center gap-1.5 px-3 py-1 bg-[#121c2a] hover:bg-[#212b39] text-[#92ccff] border border-[#3a98d7] rounded text-xs font-semibold transition-colors',
-						title: 'Back to Dashboard',
+						title: 'All Templates List',
 					},
 					h('span', { className: 'material-symbols-outlined text-base' }, 'arrow_back'),
-					'Back to Dashboard'
+					'All Templates'
 				),
 				h('span', { className: 'h-4 w-[1px] bg-[#4d4354]' }),
-				h('span', { className: 'font-bold text-sm text-[#d9e3f6]' }, 'WooCommerce Single Page Builder')
+
+				// Editable Template Title Input
+				h(
+					'div',
+					{ className: 'flex items-center gap-2' },
+					h('span', { className: 'material-symbols-outlined text-sm text-[#9333ea]' }, 'edit_note'),
+					h('input', {
+						type: 'text',
+						className: 'bg-[#091421] border border-[#374151] focus:border-[#9333ea] rounded px-2.5 py-0.5 text-xs font-bold text-[#d9e3f6] w-[220px] focus:outline-none',
+						value: templateTitle,
+						onChange: e => setTemplateTitle(e.target.value),
+						placeholder: 'Template Name...',
+					})
+				),
+
+				h(
+					'a',
+					{
+						href: 'admin.php?page=sppcfw-single-page-builder&template_id=new',
+						className: 'flex items-center gap-1 px-2 py-0.5 bg-[#9333ea]/20 hover:bg-[#9333ea]/40 text-[#ddb8ff] border border-[#9333ea]/50 rounded text-[11px] font-semibold transition-colors ml-1',
+						title: 'Create New Template',
+					},
+					h('span', { className: 'material-symbols-outlined text-xs' }, 'add'),
+					'Add New'
+				)
 			),
 
 			// Viewport Switcher
