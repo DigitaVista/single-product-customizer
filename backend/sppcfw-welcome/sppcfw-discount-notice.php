@@ -135,7 +135,7 @@ if ( ! class_exists( 'SPPCFW_Campaign_Notice' ) ) {
 
 			wp_enqueue_script(
 				'sppcfw-campaign-notice',
-				SPPCFW_DIR_URL . 'backend/assets/js/bfcm-admin-notice.js',
+				SPPCFW_DIR_URL . 'backend/assets/js/sppcfw-admin-notice.js',
 				array( 'jquery' ),
 				SPPCFW_VERSION,
 				true
