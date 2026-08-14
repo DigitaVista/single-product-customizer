@@ -1,0 +1,110 @@
+/* Single Product Page Builder Tailwind & Workbench Theme Styles */
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root {
+  --bg-surface: #091421;
+  --bg-surface-container: #16202e;
+  --bg-surface-container-high: #212b39;
+  --bg-surface-container-highest: #2b3544;
+  --bg-surface-container-low: #121c2a;
+  --color-primary: #ddb8ff;
+  --color-primary-purple: #9333ea;
+  --color-on-surface: #d9e3f6;
+  --color-on-surface-variant: #cfc2d7;
+  --border-outline: #4d4354;
+  --font-geist: 'Geist', sans-serif;
+  --font-inter: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+body, #sppcfw-builder-root {
+  background-color: var(--bg-surface);
+  color: var(--color-on-surface);
+  font-family: var(--font-inter);
+}
+
+/* Custom Scrollbars */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #121c2a;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #2b3544;
+  border-radius: 3px;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #9333ea;
+}
+
+/* Builder Workspace Grid Layout */
+.sppcfw-builder-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+/* Device Preview Scaling */
+.preview-canvas-container {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.preview-viewport-desktop {
+  width: 100%;
+  max-width: 1200px;
+}
+.preview-viewport-tablet {
+  width: 768px;
+}
+.preview-viewport-mobile {
+  width: 375px;
+}
+
+/* Active Highlight & Drag Outline */
+.widget-canvas-item {
+  position: relative;
+  transition: outline 0.15s ease, box-shadow 0.15s ease;
+}
+.widget-canvas-item:hover {
+  outline: 2px dashed #9333ea;
+  outline-offset: -2px;
+}
+.widget-canvas-item.is-selected {
+  outline: 2px solid #9333ea !important;
+  outline-offset: -2px;
+}
+
+/* Material Symbol Icon Tweaks */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+}
+
+/* Kirki Property Inspector Controls */
+.inspector-input {
+  background-color: #091421;
+  border: 1px solid #374151;
+  color: #d9e3f6;
+  border-radius: 4px;
+  padding: 6px 10px;
+  font-size: 13px;
+  width: 100%;
+  transition: border-color 0.2s ease;
+}
+.inspector-input:focus {
+  border-color: #9333ea;
+  outline: none;
+}
+
+.inspector-label {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #cfc2d7;
+  margin-bottom: 4px;
+  display: block;
+}

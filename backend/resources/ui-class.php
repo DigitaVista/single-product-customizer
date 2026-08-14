@@ -946,6 +946,19 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
                 $parent_slug,
                 array( $this, 'plugin_page' )
             );
+
+            // Submenu: Single Page Builder
+            add_submenu_page(
+                $parent_slug,
+                __( 'Single Page Builder', 'single-product-customizer' ),
+                $capability,
+                'sppcfw-single-page-builder',
+                array( $this, 'builder_page' )
+            );
+        }
+
+        public function builder_page() {
+            require_once SPPCFW_DIR_PATH . 'backend/builder/builder-view.php';
         }
 
 		public function plugin_page() {

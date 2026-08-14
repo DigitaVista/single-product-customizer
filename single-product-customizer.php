@@ -119,6 +119,8 @@ require_once plugin_dir_path( __FILE__ ) . 'includes/sppcfw-admin-menu.php';
 require_once plugin_dir_path( __FILE__ ) . 'backend/sppcfw-welcome/sppcfw-welcome.php';
 require_once plugin_dir_path( __FILE__ ) . 'backend/sppcfw-welcome/sppcfw-discount-notice.php';
 require_once plugin_dir_path( __FILE__ ) . 'backend/sppcfw-welcome/sppcfw-setup-notice.php';
+require_once plugin_dir_path( __FILE__ ) . 'backend/builder/class-sppcfw-builder.php';
+require_once plugin_dir_path( __FILE__ ) . 'frontend/class-sppcfw-builder-renderer.php';
 
 /**
  * Check if WooCommerce is active (single-site + multisite).
@@ -229,6 +231,8 @@ if ( sppcfw_is_woocommerce_active() ) {
         include_once SPPCFW_DIR_PATH . 'common/util.php';
         include_once SPPCFW_DIR_PATH . 'backend/backend-master.php';
         include_once SPPCFW_DIR_PATH . 'frontend/frontend-master.php';
+        include_once SPPCFW_DIR_PATH . 'backend/builder/class-sppcfw-builder.php';
+        include_once SPPCFW_DIR_PATH . 'frontend/class-sppcfw-builder-renderer.php';
     }
 }
 
