@@ -35,6 +35,30 @@ $products = [
         'is_woocommerce' => true
     ],
     [
+        'id' => 'GiftRocket-for-WooCommerce',
+        'name' => __('GiftRocket – Ultimate Gift Cards for WooCommerce', 'single-product-customizer'),
+        'description' => __('Easily create, manage, and deliver digital gift cards by email. Shoppers redeem them at cart and checkout. WooCommerce Blocks are supported.', 'single-product-customizer'),
+        'features' => [
+            __('Digital Gift Cards — Custom amounts & messages.', 'single-product-customizer'),
+            __('Email & Scheduled Delivery — Send instantly or later.', 'single-product-customizer'),
+            __('PDF Gift Cards — QR, barcode & PDF417 support.', 'single-product-customizer'),
+            __('Apple & Google Wallet — Mobile wallet support.', 'single-product-customizer'),
+            __('CSV Import — Bulk import codes & balances.', 'single-product-customizer'),
+            __('Easy Redemption — Redeem at cart & checkout.', 'single-product-customizer'),
+            __('Admin Dashboard — Manage cards, balances & transactions.', 'single-product-customizer'),
+        ],
+        'icon' => 'dashicons-admin-customizer',
+        'badge' => __('Popular', 'single-product-customizer'),
+        'color' => '#633bba',
+        'link' => 'https://wordpress.org/plugins/wallet-ready-gift-cards-for-woocommerce/',
+        'install_link' => admin_url('plugin-install.php?s=Wallet%2520Ready%2520Gift%2520Cards%2520for%2520WooCommerce%2520webcartisan&tab=search&type=term'),
+        'price' => __('Free', 'single-product-customizer'),
+        'rating' => 5,
+        'installs' => '70+',
+        'wporg_slug' => 'wallet-ready-gift-cards-for-woocommerce',
+        'is_woocommerce' => true
+    ],
+    [
         'id' => 'variation-monster',
         'name' => __('Variation Monster for WooCommerce', 'single-product-customizer'),
         'description' => __('Transform your WooCommerce variable products with beautiful swatches, galleries, and quick-view features. Enhance user experience and boost conversions.', 'single-product-customizer'),
