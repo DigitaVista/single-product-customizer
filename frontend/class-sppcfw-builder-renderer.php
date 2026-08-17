@@ -321,6 +321,8 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 								$val = $product->get_stock_status();
 							} elseif ( '_weight' === $meta_key ) {
 								$val = $product->get_weight();
+							} elseif ( '_dimensions' === $meta_key ) {
+								$val = function_exists( 'wc_format_dimensions' ) ? wc_format_dimensions( $product->get_dimensions( false ) ) : '';
 							}
 						}
 						if ( ! empty( $val ) ) {

@@ -805,7 +805,7 @@
 													'div',
 													{ className: 'flex items-center gap-2 overflow-hidden' },
 													h('span', { className: 'material-symbols-outlined text-xs text-[#92ccff]' }, 'data_object'),
-													h('div', { className: 'overflow-hidden' }, h('div', { className: 'text-xs font-medium truncate' }, m.label), h('div', { className: 'text-[10px] text-[#9ca3af] truncate font-mono' }, m.value))
+													h('div', { className: 'overflow-hidden' }, h('div', { className: 'text-xs font-medium truncate' }, m.label), h('div', { className: 'text-[10px] text-[#9ca3af] truncate font-mono' }, typeof m.value === 'object' ? JSON.stringify(m.value) : String(m.value || '')))
 												),
 												h('span', { className: 'text-[9px] bg-[#212b39] text-[#cfc2d7] px-1.5 py-0.5 rounded font-mono' }, 'Meta')
 											)
@@ -960,7 +960,7 @@
 			h(
 				'div',
 				{
-					className: `preview-canvas-container bg-[#ffffff] text-[#111827] rounded shadow-2xl overflow-visible min-h-[700px] p-6 border ${
+					className: `preview-canvas-container bg-[#ffffff] text-[#111827] rounded shadow-2xl overflow-visible p-6 border ${
 						isCanvasDragOver ? 'border-2 border-dashed border-[#9333ea] bg-[#faf5ff]' : 'border-[#e5e7eb]'
 					} ${deviceView === 'tablet' ? 'preview-viewport-tablet' : deviceView === 'mobile' ? 'preview-viewport-mobile' : 'preview-viewport-desktop'} transition-all`,
 				},

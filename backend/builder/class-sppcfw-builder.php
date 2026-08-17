@@ -309,6 +309,13 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 			$cat_names = wp_get_post_terms( $product_id, 'product_cat', array( 'fields' => 'names' ) );
 			$tag_names = wp_get_post_terms( $product_id, 'product_tag', array( 'fields' => 'names' ) );
 
+			// Format dimensions properly as string
+			$raw_dimensions       = $product->get_dimensions( false );
+			$formatted_dimensions = function_exists( 'wc_format_dimensions' ) ? wc_format_dimensions( $raw_dimensions ) : '';
+			if ( empty( $formatted_dimensions ) || 'N/A' === $formatted_dimensions ) {
+				$formatted_dimensions = 'N/A';
+			}
+
 			// Build Meta Groups
 			$meta_groups = array();
 
@@ -318,7 +325,7 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 				array( 'key' => '_stock_status', 'label' => __( 'Stock Status', 'single-product-customizer' ), 'value' => $product->is_in_stock() ? __( 'In Stock', 'single-product-customizer' ) : __( 'Out of Stock', 'single-product-customizer' ) ),
 				array( 'key' => '_stock', 'label' => __( 'Stock Quantity', 'single-product-customizer' ), 'value' => $product->get_stock_quantity() !== null ? (string) $product->get_stock_quantity() : 'N/A' ),
 				array( 'key' => '_weight', 'label' => __( 'Weight', 'single-product-customizer' ), 'value' => $product->get_weight() ? $product->get_weight() . ' ' . get_option( 'woocommerce_weight_unit', 'kg' ) : 'N/A' ),
-				array( 'key' => '_dimensions', 'label' => __( 'Dimensions', 'single-product-customizer' ), 'value' => $product->get_dimensions( false ) ? $product->get_dimensions( false ) : 'N/A' ),
+				array( 'key' => '_dimensions', 'label' => __( 'Dimensions', 'single-product-customizer' ), 'value' => $formatted_dimensions ),
 				array( 'key' => 'total_sales', 'label' => __( 'Total Sales', 'single-product-customizer' ), 'value' => (string) $product->get_total_sales() ),
 			);
 
@@ -348,10 +355,12 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 						$attr_terms = $attribute->get_options();
 					}
 
+					$formatted_attr = ! empty( $attr_terms ) && is_array( $attr_terms ) ? implode( ', ', array_map( 'strval', $attr_terms ) ) : 'N/A';
+
 					$tax_meta[] = array(
 						'key'   => 'attr_' . sanitize_key( $attr_slug ),
 						'label' => $attr_name,
-						'value' => ! empty( $attr_terms ) ? implode( ', ', $attr_terms ) : 'N/A',
+						'value' => $formatted_attr,
 					);
 				}
 			}
@@ -370,6 +379,10 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 						continue; // skip WP/WC hidden meta
 					}
 					$val = is_array( $values ) && isset( $values[0] ) ? $values[0] : '';
+					$val = maybe_unserialize( $val );
+					if ( is_array( $val ) ) {
+						$val = implode( ', ', array_map( 'strval', $val ) );
+					}
 					if ( is_string( $val ) && '' !== trim( $val ) ) {
 						$custom_meta[] = array(
 							'key'   => $key,
@@ -398,7 +411,7 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 				'stock_status'      => $product->get_stock_status(),
 				'stock_text'        => $product->is_in_stock() ? __( 'In Stock', 'single-product-customizer' ) : __( 'Out of Stock', 'single-product-customizer' ),
 				'weight'            => $product->get_weight() ? $product->get_weight() . ' ' . get_option( 'woocommerce_weight_unit', 'kg' ) : '',
-				'dimensions'        => $product->get_dimensions( false ),
+				'dimensions'        => 'N/A' !== $formatted_dimensions ? $formatted_dimensions : '',
 				'total_sales'       => (string) $product->get_total_sales(),
 				'rating_html'       => wc_get_rating_html( $product->get_average_rating(), $product->get_rating_count() ),
 				'average_rating'    => $product->get_average_rating(),
