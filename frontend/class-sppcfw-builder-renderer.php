@@ -17,7 +17,7 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 		 * Constructor.
 		 */
 		public function __construct() {
-			add_action( 'wp', array( $this, 'maybe_init_frontend_override' ) );
+			add_action( 'wp', array( $this, 'sppcfw_maybe_init_frontend_override' ) );
 		}
 
 		/**
@@ -32,12 +32,12 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 		 *
 		 * @return void
 		 */
-		public function maybe_init_frontend_override() {
+		public function sppcfw_maybe_init_frontend_override() {
 			if ( is_admin() || ! is_singular( 'product' ) ) {
 				return;
 			}
 
-			$matched = $this->get_matching_template( get_the_ID() );
+			$matched = $this->sppcfw_get_matching_template( get_the_ID() );
 
 			if ( empty( $matched ) || empty( $matched['layout'] ) ) {
 				return;
@@ -45,10 +45,10 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 
 			$this->matched_template = $matched;
 
-			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_frontend_builder_styles' ) );
+			add_action( 'wp_enqueue_scripts', array( $this, 'sppcfw_enqueue_frontend_builder_styles' ) );
 
 			// Hook into WooCommerce single product summary to render builder layout
-			add_action( 'woocommerce_before_single_product_summary', array( $this, 'render_builder_template' ), 5 );
+			add_action( 'woocommerce_before_single_product_summary', array( $this, 'sppcfw_render_builder_template' ), 5 );
 			// Remove default WooCommerce single product hooks to avoid duplication when custom template is active
 			remove_action( 'woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20 );
 			remove_action( 'woocommerce_single_product_summary', 'woocommerce_template_single_title', 5 );
@@ -69,7 +69,7 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 		 * @param int $product_id Product ID.
 		 * @return array Template array.
 		 */
-		private function get_matching_template( $product_id ) {
+		private function sppcfw_get_matching_template( $product_id ) {
 			$templates = get_option( 'sppcfw_builder_templates', array() );
 
 			if ( empty( $templates ) ) {
@@ -128,7 +128,7 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 		 *
 		 * @return void
 		 */
-		public function enqueue_frontend_builder_styles() {
+		public function sppcfw_enqueue_frontend_builder_styles() {
 			$layout = isset( $this->matched_template['layout'] ) ? $this->matched_template['layout'] : array();
 
 			$custom_css = '
@@ -140,7 +140,7 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 			';
 
 			if ( ! empty( $layout ) && is_array( $layout ) ) {
-				$custom_css .= $this->generate_recursive_styles( $layout );
+				$custom_css .= $this->sppcfw_generate_recursive_styles( $layout );
 			}
 
 			wp_register_style( 'sppcfw-builder-frontend-inline', false );
@@ -154,7 +154,7 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 		 * @param array $elements Elements array.
 		 * @return string CSS string.
 		 */
-		private function generate_recursive_styles( $elements ) {
+		private function sppcfw_generate_recursive_styles( $elements ) {
 			$css = '';
 			foreach ( $elements as $el ) {
 				$id     = isset( $el['id'] ) ? esc_attr( $el['id'] ) : '';
@@ -194,7 +194,7 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 				}
 
 				if ( ! empty( $el['children'] ) && is_array( $el['children'] ) ) {
-					$css .= $this->generate_recursive_styles( $el['children'] );
+					$css .= $this->sppcfw_generate_recursive_styles( $el['children'] );
 				}
 			}
 			return $css;
@@ -205,7 +205,7 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 		 *
 		 * @return void
 		 */
-		public function render_builder_template() {
+		public function sppcfw_render_builder_template() {
 			$elements = isset( $this->matched_template['layout'] ) ? $this->matched_template['layout'] : array();
 
 			if ( empty( $elements ) ) {
@@ -213,7 +213,7 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 			}
 
 			echo '<div class="sppcfw-builder-frontend-wrapper">';
-			$this->render_elements_recursive( $elements );
+			$this->sppcfw_render_elements_recursive( $elements );
 			echo '</div>';
 		}
 
@@ -223,7 +223,7 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 		 * @param array $elements List of elements.
 		 * @return void
 		 */
-		private function render_elements_recursive( $elements ) {
+		private function sppcfw_render_elements_recursive( $elements ) {
 			if ( empty( $elements ) || ! is_array( $elements ) ) {
 				return;
 			}

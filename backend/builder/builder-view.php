@@ -108,7 +108,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 		padding-top: 0 !important;
 	}
 	body {
-		background: #091421 !important;
 		overflow: hidden !important;
 	}
 	.notice, .updated, .error, .is-dismissible, .notice-warning, .notice-info, .notice-error, .notice-success, #wpbody-content > div.notice, #wpbody-content > div.updated, .sppcfw_sreview_notices, #sppcfw-review-notice, .sales-campaign-notice, .sppcfw-setup-notice, div[class*="notice"], div[id*="notice"] {

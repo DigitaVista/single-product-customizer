@@ -33,6 +33,8 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
 			// Hook it up.
 			add_action( 'admin_init', array( $this, 'admin_init' ) );
 			add_action( 'admin_menu', array( $this, 'sppcfw_register_admin_menu' ) );
+			add_action( 'admin_menu', array( $this, 'sppcfw_format_admin_sidebar_menu' ), 1000 );
+			add_action( 'admin_head', array( $this, 'sppcfw_admin_menu_sidebar_styles' ) );
 
 		}
 
@@ -937,28 +939,123 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
                 56
             );
 
-            // Submenu: Dashboard_Settings
+            // Submenu: Dashboard Settings
             add_submenu_page(
                 $parent_slug,
-                __( 'Dashboard_Settings', 'single-product-customizer' ),
-                __( 'Dashboard_Settings', 'single-product-customizer' ),
+                __( 'Dashboard Settings', 'single-product-customizer' ),
+                __( 'Dashboard Settings', 'single-product-customizer' ),
                 $capability,
                 $parent_slug,
                 array( $this, 'plugin_page' )
             );
 
-            // Submenu: Single Page Builder
+            // Submenu: All Templates
             add_submenu_page(
                 $parent_slug,
-                __( 'Single Page Builder', 'single-product-customizer' ),
+                __( 'All Templates', 'single-product-customizer' ),
+                __( 'All Templates', 'single-product-customizer' ),
+                $capability,
+                'sppcfw-builder-all-templates',
+                array( $this, 'templates_list_page' )
+            );
+
+            // Submenu: Add New Template
+            add_submenu_page(
+                $parent_slug,
+                __( 'Add New Template', 'single-product-customizer' ),
+                __( 'Add New Template', 'single-product-customizer' ),
                 $capability,
                 'sppcfw-single-page-builder',
                 array( $this, 'builder_page' )
             );
         }
 
+        public function templates_list_page() {
+            require_once SPPCFW_DIR_PATH . 'backend/builder/templates-list-view.php';
+        }
+
         public function builder_page() {
             require_once SPPCFW_DIR_PATH . 'backend/builder/builder-view.php';
+        }
+
+        /**
+         * Format admin sidebar menu to display Single Page Builder header and nested items (Image 1 style).
+         */
+        public function sppcfw_format_admin_sidebar_menu() {
+            global $submenu;
+            $parent = 'sppcfw-single-product-customizer';
+
+            if ( empty( $submenu[ $parent ] ) || ! is_array( $submenu[ $parent ] ) ) {
+                return;
+            }
+
+            $formatted  = array();
+            $seen_slugs = array();
+
+            $icon_dashboard = '<span class="dashicons dashicons-dashboard" style="font-size: 15px; width:15px; height:15px; margin-right: 6px; vertical-align: middle;"></span>';
+            $icon_header    = '<span style="font-size: 9px; margin-right: 6px; display: inline-block; transform: translateY(-1px);">▼</span>';
+            $icon_templates = '<span class="dashicons dashicons-category" style="font-size: 14px; width:14px; height:14px; margin-right: 6px; vertical-align: middle;"></span>';
+            $icon_add_new   = '<span class="dashicons dashicons-plus-alt2" style="font-size: 14px; width:14px; height:14px; margin-right: 6px; vertical-align: middle;"></span>';
+
+            foreach ( $submenu[ $parent ] as $item ) {
+                if ( ! is_array( $item ) || empty( $item[2] ) ) {
+                    continue;
+                }
+
+                $slug = (string) $item[2];
+
+                if ( in_array( $slug, $seen_slugs, true ) ) {
+                    continue;
+                }
+                $seen_slugs[] = $slug;
+
+                if ( 'sppcfw-single-product-customizer' === $slug ) {
+                    $item[0]     = $icon_dashboard . __( 'Dashboard Settings', 'single-product-customizer' );
+                    $formatted[] = $item;
+
+                    // Header item for Single Page Builder
+                    $formatted[] = array(
+                        $icon_header . '<strong>' . __( 'Single Page Builder', 'single-product-customizer' ) . '</strong>',
+                        'manage_options',
+                        'sppcfw-builder-all-templates',
+                        __( 'Single Page Builder', 'single-product-customizer' ),
+                        'sppcfw-menu-header-item',
+                    );
+                } elseif ( 'sppcfw-builder-all-templates' === $slug ) {
+                    $item[0]     = '<span style="padding-left: 14px; display: inline-flex; align-items: center;">' . $icon_templates . __( 'All Templates', 'single-product-customizer' ) . '</span>';
+                    $formatted[] = $item;
+                } elseif ( 'sppcfw-single-page-builder' === $slug ) {
+                    $item[0]     = '<span style="padding-left: 14px; display: inline-flex; align-items: center;">' . $icon_add_new . __( 'Add New Template', 'single-product-customizer' ) . '</span>';
+                    $formatted[] = $item;
+                } else {
+                    $formatted[] = $item;
+                }
+            }
+
+            $submenu[ $parent ] = $formatted;
+        }
+
+        /**
+         * Custom CSS to style admin sidebar menu to match design.
+         */
+        public function sppcfw_admin_menu_sidebar_styles() {
+            ?>
+            <style id="sppcfw-admin-sidebar-menu-css">
+                #adminmenu .toplevel_page_sppcfw-single-product-customizer .wp-submenu li.sppcfw-menu-header-item a {
+                    font-weight: 700 !important;
+                    color: #ffffff !important;
+                    font-size: 13px !important;
+                    border-top: 1px solid rgba(255, 255, 255, 0.08);
+                    margin-top: 4px;
+                    padding-top: 8px !important;
+                    padding-left: 12px !important;
+                    opacity: 1 !important;
+                }
+                #adminmenu .toplevel_page_sppcfw-single-product-customizer .wp-submenu li.sppcfw-menu-header-item {
+                    margin-top: 4px;
+                }
+            </style>
+            <?php
         }
 
 		public function plugin_page() {

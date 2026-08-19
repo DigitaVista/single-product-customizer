@@ -1,7 +1,7 @@
 /**
  * Single Product Page Builder React App
  * Built with React (wp.element) & Tailwind CSS
- * Features: Multi-template management (All Templates / Add New), Container / Flexbox / Grid / Div layout system, Elementor-style Boxed Width, Layout Popup (+ Placeholder), Categorized Meta Widgets, Drag & Drop Structure Tab
+ * Features: Left-side Edit Container Inspector, Atomic Elements Drawer, Live Widget Search, Floating Structure Panel, Multi-template Management
  *
  * @package Single_Product_Customizer
  */
@@ -28,7 +28,7 @@
 		}).then(res => res.json());
 	}
 
-	// Static Visual Sample Data for Edit Canvas (Isolates Canvas from direct product data loading)
+	// Static Visual Sample Data for Edit Canvas
 	const CANVAS_STATIC_DATA = {
 		title: 'Product Title Placeholder',
 		price: '$49.99',
@@ -41,6 +41,14 @@
 		categories: 'Clothing, Featured',
 		tags: 'Customizer, Premium',
 	};
+
+	// Atomic Elements Definitions (Mark-2 Image 1)
+	const ATOMIC_ELEMENTS = [
+		{ type: 'div_block', name: 'Div block', preset: 'div_block', icon: 'crop_square', desc: 'Simple full width div container' },
+		{ type: 'flexbox', name: 'Flexbox', preset: '1_container', icon: 'grid_view', desc: 'Flexbox layout container' },
+		{ type: 'grid', name: 'Grid', preset: 'grid_2x2', icon: 'apps', desc: '2x2 grid container' },
+		{ type: 'tabs', name: 'Tabs', preset: 'product_description', icon: 'folder', desc: 'Tabs container widget' },
+	];
 
 	// Core Single Product Widget Definitions
 	const CORE_WIDGETS = [
@@ -73,11 +81,16 @@
 			align_items: 'stretch',
 			grid_columns: '2',
 			gap: '16px',
+			row_gap: '16px',
+			gaps_linked: true,
+			flex_wrap: 'nowrap',
+			min_height: '0px',
 			alignment: 'left',
 		};
 
 		switch (presetType) {
 			case '1_container':
+			case 'flexbox':
 				children = [
 					{
 						id: 'col-' + timestamp + '-1',
@@ -109,62 +122,8 @@
 					},
 				];
 				break;
-			case '2_col_33_67':
-				children = [
-					{
-						id: 'col-' + timestamp + '-1',
-						type: 'column',
-						label: 'Column 1 (33%)',
-						settings: { flex_width: '33.33%' },
-						children: [],
-						styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' },
-					},
-					{
-						id: 'col-' + timestamp + '-2',
-						type: 'column',
-						label: 'Column 2 (67%)',
-						settings: { flex_width: '66.66%' },
-						children: [],
-						styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' },
-					},
-				];
-				break;
-			case '2_col_67_33':
-				children = [
-					{
-						id: 'col-' + timestamp + '-1',
-						type: 'column',
-						label: 'Column 1 (67%)',
-						settings: { flex_width: '66.66%' },
-						children: [],
-						styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' },
-					},
-					{
-						id: 'col-' + timestamp + '-2',
-						type: 'column',
-						label: 'Column 2 (33%)',
-						settings: { flex_width: '33.33%' },
-						children: [],
-						styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' },
-					},
-				];
-				break;
-			case '3_col':
-				children = [
-					{ id: 'col-' + timestamp + '-1', type: 'column', label: 'Column 1', settings: { flex_width: '33.33%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-2', type: 'column', label: 'Column 2', settings: { flex_width: '33.33%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-3', type: 'column', label: 'Column 3', settings: { flex_width: '33.33%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-				];
-				break;
-			case '4_col':
-				children = [
-					{ id: 'col-' + timestamp + '-1', type: 'column', label: 'Column 1', settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-2', type: 'column', label: 'Column 2', settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-3', type: 'column', label: 'Column 3', settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-4', type: 'column', label: 'Column 4', settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-				];
-				break;
 			case 'grid_2x2':
+			case 'grid':
 				settings.flex_direction = 'grid';
 				settings.grid_columns = '2';
 				children = [
@@ -189,7 +148,7 @@
 		return {
 			id: containerId,
 			type: 'container',
-			label: 'Container Layout',
+			label: presetType === 'div_block' ? 'Div Container' : presetType === 'grid_2x2' || presetType === 'grid' ? 'Grid Container' : 'Flexbox Container',
 			settings: settings,
 			children: children,
 			styles: {
@@ -213,7 +172,7 @@
 		};
 	}
 
-	// Helper to find element anywhere in nested tree
+	// Helpers for nested element tree
 	function findElementInTree(tree, targetId) {
 		for (const el of tree) {
 			if (el.id === targetId) return el;
@@ -225,7 +184,6 @@
 		return null;
 	}
 
-	// Helper to update element anywhere in nested tree
 	function updateElementInTree(tree, targetId, updateFn) {
 		return tree.map(el => {
 			if (el.id === targetId) {
@@ -241,7 +199,6 @@
 		});
 	}
 
-	// Helper to remove element anywhere in nested tree
 	function removeElementFromTree(tree, targetId) {
 		return tree
 			.filter(el => el.id !== targetId)
@@ -256,7 +213,6 @@
 			});
 	}
 
-	// Helper to insert child inside parent or root
 	function insertChildInTree(tree, parentId, newChild, targetIndex) {
 		if (!parentId) {
 			const copy = [...tree];
@@ -288,7 +244,6 @@
 		});
 	}
 
-	// Helper to move an element from anywhere to a target parent/index
 	function moveElementInTree(tree, sourceId, targetParentId, targetIndex) {
 		const elementToMove = findElementInTree(tree, sourceId);
 		if (!elementToMove) return tree;
@@ -310,10 +265,13 @@
 
 		const [deviceView, setDeviceView] = useState('desktop'); // 'desktop' | 'tablet' | 'mobile'
 		const [activeLeftTab, setActiveLeftTab] = useState('widgets'); // 'widgets' | 'structure'
-		const [elements, setElements] = useState([]); // Canvas layout elements tree - defaults to EMPTY (no default container)
+		const [activeSubTab, setActiveSubTab] = useState('widgets'); // 'widgets' | 'components' | 'globals'
+		const [searchQuery, setSearchQuery] = useState('');
+
+		const [elements, setElements] = useState([]);
 		const [selectedElementId, setSelectedElementId] = useState(null);
 
-		const [isLayoutModalOpen, setIsLayoutModalOpen] = useState(false);
+		const [isStructureOpen, setIsStructureOpen] = useState(true);
 		const [isConditionsModalOpen, setIsConditionsModalOpen] = useState(false);
 		const [displayConditions, setDisplayConditions] = useState({
 			scope: 'entire',
@@ -347,7 +305,6 @@
 				}
 			});
 
-			// Initial product meta list for Widget tab
 			apiPost('sppcfw_get_builder_product_data', { product_id: 0 }).then(res => {
 				if (res && res.success) {
 					setProductData(res.data.product);
@@ -355,7 +312,6 @@
 			});
 		}, []);
 
-		// Fetch Single Product Data for Left Panel Widget Tab Meta Fields (Does NOT mutate canvas directly)
 		function fetchProductData(productId) {
 			apiPost('sppcfw_get_builder_product_data', { product_id: productId || 0 }).then(res => {
 				if (res && res.success) {
@@ -364,7 +320,6 @@
 			});
 		}
 
-		// Handle Product Selector Change in Preview Product Data dropdown
 		function handleProductChange(e) {
 			const id = e.target.value;
 			setSelectedProductId(id);
@@ -376,15 +331,24 @@
 			const newContainer = createContainerStructure(presetType);
 			setElements(prev => [...prev, newContainer]);
 			setSelectedElementId(newContainer.id);
-			setIsLayoutModalOpen(false);
 		}
 
 		// Add Widget to specified Parent Column/Container
 		function addWidgetToTarget(widgetType, name, metaKey, targetParentId, targetIndex) {
-			// If edit field has no containers yet, prompt user to select a container layout first
-			if (elements.length === 0 && !targetParentId) {
-				setIsLayoutModalOpen(true);
+			// If adding preset layout directly from atomic cards
+			if (['div_block', '1_container', 'flexbox', 'grid_2x2', 'grid'].includes(widgetType)) {
+				addContainerPreset(widgetType);
 				return;
+			}
+
+			// If canvas has no containers yet, automatically create a default flexbox container
+			let currentElements = elements;
+			let resolvedParentId = targetParentId;
+
+			if (currentElements.length === 0 && !resolvedParentId) {
+				const autoContainer = createContainerStructure('1_container');
+				currentElements = [autoContainer];
+				resolvedParentId = autoContainer.children[0].id;
 			}
 
 			const newId = 'el-' + widgetType + '-' + Date.now();
@@ -422,26 +386,21 @@
 				},
 			};
 
-			setElements(prev => {
-				let resolvedParentId = targetParentId;
-
+			setElements(() => {
 				if (!resolvedParentId) {
-					// Insert into first column of last container
-					const lastContainer = prev[prev.length - 1];
+					const lastContainer = currentElements[currentElements.length - 1];
 					if (lastContainer && lastContainer.children && lastContainer.children[0]) {
 						resolvedParentId = lastContainer.children[0].id;
 					} else if (lastContainer) {
 						resolvedParentId = lastContainer.id;
 					}
 				}
-
-				return insertChildInTree(prev, resolvedParentId, newElement, targetIndex);
+				return insertChildInTree(currentElements, resolvedParentId, newElement, targetIndex);
 			});
 
 			setSelectedElementId(newId);
 		}
 
-		// Remove element anywhere in tree
 		function removeElement(id) {
 			setElements(prev => removeElementFromTree(prev, id));
 			if (selectedElementId === id) {
@@ -449,7 +408,6 @@
 			}
 		}
 
-		// Save / Publish Template
 		function saveTemplate() {
 			setIsSaving(true);
 			setStatusMessage('Publishing template...');
@@ -472,19 +430,24 @@
 			});
 		}
 
-		// Selected Element
 		const selectedElement = findElementInTree(elements, selectedElementId);
 
-		// Update Element Properties
 		function updateElementProperties(updatedElement) {
 			setElements(prev => updateElementInTree(prev, updatedElement.id, () => updatedElement));
+		}
+
+		// Helper to open Elements panel from header + icon button
+		function openElementsTab() {
+			setActiveLeftTab('widgets');
+			setSelectedElementId(null);
+			setSearchQuery('');
 		}
 
 		return h(
 			'div',
 			{ className: 'sppcfw-builder-layout flex flex-col h-screen w-screen overflow-hidden bg-[#091421] text-[#d9e3f6]' },
 
-			// Top Bar with Editable Template Name and All Templates Link
+			// Top Bar Navigation
 			h(TopBar, {
 				templateTitle,
 				setTemplateTitle,
@@ -493,6 +456,9 @@
 				saveTemplate,
 				isSaving,
 				statusMessage,
+				openElementsTab,
+				isStructureOpen,
+				setIsStructureOpen,
 				openConditionsModal: () => setIsConditionsModalOpen(true),
 			}),
 
@@ -501,25 +467,36 @@
 				'div',
 				{ className: 'flex flex-1 pt-12 overflow-hidden relative' },
 
-				// Left Rail
-				h(LeftRail, { activeLeftTab, setActiveLeftTab }),
-
-				// Left Panel (Widgets / Structure Tab)
-				h(LeftPanel, {
+				// Left Rail Navigation Icons
+				h(LeftRail, {
 					activeLeftTab,
+					setActiveLeftTab,
+					openElementsTab,
+				}),
+
+				// Left Sidebar Panel (Renders Inspector on left when element selected, or Elements Library when none selected)
+				h(LeftPanel, {
+					selectedElement,
+					updateElementProperties,
+					activeLeftTab,
+					activeSubTab,
+					setActiveSubTab,
+					searchQuery,
+					setSearchQuery,
 					products,
+					categories,
 					selectedProductId,
 					handleProductChange,
 					productData,
 					addWidgetToTarget,
+					addContainerPreset,
 					elements,
 					setElements,
 					selectedElementId,
 					setSelectedElementId,
-					openLayoutModal: () => setIsLayoutModalOpen(true),
 				}),
 
-				// Central Canvas (Uses static placeholder sample data for edit page)
+				// Central Canvas Workspace
 				h(CentralCanvas, {
 					deviceView,
 					elements,
@@ -529,24 +506,23 @@
 					sampleData: CANVAS_STATIC_DATA,
 					removeElement,
 					addWidgetToTarget,
-					openLayoutModal: () => setIsLayoutModalOpen(true),
+					openElementsTab,
+					isStructureOpen,
+					setIsStructureOpen,
 				}),
 
-				// Right Property Inspector
-				h(RightInspector, {
-					selectedElement,
-					updateElementProperties,
-					categories,
-					products,
-				})
+				// Right Floating Dockable Structure Panel (Image 2 Mark 1)
+				isStructureOpen &&
+					h(FloatingStructurePanel, {
+						elements,
+						setElements,
+						selectedElementId,
+						setSelectedElementId,
+						removeElement,
+						openElementsTab,
+						closeStructure: () => setIsStructureOpen(false),
+					})
 			),
-
-			// Layout Selection Popup Modal
-			isLayoutModalOpen &&
-				h(LayoutPopupModal, {
-					closeModal: () => setIsLayoutModalOpen(false),
-					addContainerPreset,
-				}),
 
 			// Display Conditions Modal
 			isConditionsModalOpen &&
@@ -561,11 +537,11 @@
 		);
 	}
 
-	// 1. Top Navigation Bar Component
-	function TopBar({ templateTitle, setTemplateTitle, deviceView, setDeviceView, saveTemplate, isSaving, statusMessage, openConditionsModal }) {
+	// 1. Top Navigation Bar Component (Mark 1 Image 1 Header Plus Icon)
+	function TopBar({ templateTitle, setTemplateTitle, deviceView, setDeviceView, saveTemplate, isSaving, statusMessage, openElementsTab, isStructureOpen, setIsStructureOpen, openConditionsModal }) {
 		return h(
 			'header',
-			{ className: 'bg-[#16202e] border-b border-[#4d4354] h-12 fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-4' },
+			{ className: 'bg-[#16202e] border-b border-[#4d4354] h-12 fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-4 select-none' },
 			h(
 				'div',
 				{ className: 'flex items-center gap-3' },
@@ -579,6 +555,18 @@
 					h('span', { className: 'material-symbols-outlined text-base' }, 'arrow_back'),
 					'All Templates'
 				),
+
+				// Mark-1 Image 1: [+] Elements Header Button
+				h(
+					'button',
+					{
+						className: 'flex items-center justify-center w-8 h-8 bg-[#9333ea] hover:bg-[#7e22ce] text-white rounded shadow transition-all',
+						onClick: openElementsTab,
+						title: 'Elements (Add Widgets & Containers)',
+					},
+					h('span', { className: 'material-symbols-outlined text-lg font-bold' }, 'add')
+				),
+
 				h('span', { className: 'h-4 w-[1px] bg-[#4d4354]' }),
 
 				// Editable Template Title Input
@@ -651,6 +639,20 @@
 				'div',
 				{ className: 'flex items-center gap-3' },
 				statusMessage && h('span', { className: 'text-xs text-[#10b981] font-medium' }, statusMessage),
+
+				h(
+					'button',
+					{
+						className: `px-2.5 py-1.5 border rounded text-xs font-semibold flex items-center gap-1 transition-colors ${
+							isStructureOpen ? 'bg-[#9333ea] text-white border-[#9333ea]' : 'border-[#374151] text-[#cfc2d7] hover:bg-[#212b39]'
+						}`,
+						onClick: () => setIsStructureOpen(!isStructureOpen),
+						title: 'Toggle Floating Structure Panel',
+					},
+					h('span', { className: 'material-symbols-outlined text-sm' }, 'account_tree'),
+					'Structure'
+				),
+
 				h(
 					'button',
 					{
@@ -674,67 +676,123 @@
 		);
 	}
 
-	// 2. Left Rail Component
-	function LeftRail({ activeLeftTab, setActiveLeftTab }) {
+	// 2. Left Rail Navigation Component
+	function LeftRail({ activeLeftTab, setActiveLeftTab, openElementsTab }) {
 		return h(
 			'nav',
-			{ className: 'bg-[#16202e] border-r border-[#4d4354] w-[64px] fixed left-0 top-12 bottom-0 flex flex-col items-center py-4 z-40' },
+			{ className: 'bg-[#16202e] border-r border-[#4d4354] w-[64px] fixed left-0 top-12 bottom-0 flex flex-col items-center py-4 z-40 select-none' },
 			h(
 				'button',
 				{
 					className: `w-12 h-12 flex flex-col items-center justify-center gap-1 mb-4 rounded transition-all ${
 						activeLeftTab === 'widgets' ? 'text-[#ddb8ff] border-l-2 border-[#9333ea] bg-[#2b3544]' : 'text-[#cfc2d7] hover:bg-[#212b39]'
 					}`,
-					onClick: () => setActiveLeftTab('widgets'),
-					title: 'Widgets Tab',
+					onClick: openElementsTab,
+					title: 'Elements Drawer',
 				},
-				h('span', { className: 'material-symbols-outlined text-xl' }, 'widgets'),
-				h('span', { className: 'text-[9px] uppercase font-bold tracking-wider' }, 'Widgets')
-			),
-			h(
-				'button',
-				{
-					className: `w-12 h-12 flex flex-col items-center justify-center gap-1 mb-4 rounded transition-all ${
-						activeLeftTab === 'structure' ? 'text-[#ddb8ff] border-l-2 border-[#9333ea] bg-[#2b3544]' : 'text-[#cfc2d7] hover:bg-[#212b39]'
-					}`,
-					onClick: () => setActiveLeftTab('structure'),
-					title: 'Structure Tab',
-				},
-				h('span', { className: 'material-symbols-outlined text-xl' }, 'account_tree'),
-				h('span', { className: 'text-[9px] uppercase font-bold tracking-wider' }, 'Structure')
+				h('span', { className: 'material-symbols-outlined text-xl' }, 'add_box'),
+				h('span', { className: 'text-[9px] uppercase font-bold tracking-wider' }, 'Elements')
 			)
 		);
 	}
 
-	// 3. Left Panel (Product Selector & Draggable Widgets + Categorized Product Meta Data)
+	// 3. Left Panel (Renders LeftInspector when element selected, or Elements Library when none selected)
 	function LeftPanel({
+		selectedElement,
+		updateElementProperties,
 		activeLeftTab,
+		activeSubTab,
+		setActiveSubTab,
+		searchQuery,
+		setSearchQuery,
+		products,
+		categories,
+		selectedProductId,
+		handleProductChange,
+		productData,
+		addWidgetToTarget,
+		addContainerPreset,
+		elements,
+		setElements,
+		selectedElementId,
+		setSelectedElementId,
+	}) {
+		// If an element or container is selected, render the LEFT-SIDE "Edit Container" / "Edit Element" Inspector
+		if (selectedElement) {
+			return h(LeftInspector, {
+				selectedElement,
+				updateElementProperties,
+				closeInspector: () => setSelectedElementId(null),
+				categories,
+				products,
+			});
+		}
+
+		// Otherwise, render the Left Elements Panel (Image 1 Mark 1, Mark 2, Mark 3)
+		return h(LeftElementsPanel, {
+			activeSubTab,
+			setActiveSubTab,
+			searchQuery,
+			setSearchQuery,
+			products,
+			selectedProductId,
+			handleProductChange,
+			productData,
+			addWidgetToTarget,
+			addContainerPreset,
+			elements,
+		});
+	}
+
+	// 3a. Left Elements Panel Component (Search Box, Atomic Elements 2x2, Widgets)
+	function LeftElementsPanel({
+		activeSubTab,
+		setActiveSubTab,
+		searchQuery,
+		setSearchQuery,
 		products,
 		selectedProductId,
 		handleProductChange,
 		productData,
 		addWidgetToTarget,
+		addContainerPreset,
 		elements,
-		setElements,
-		selectedElementId,
-		setSelectedElementId,
-		openLayoutModal,
 	}) {
+		const [isAtomicOpen, setIsAtomicOpen] = useState(true);
+
 		function handleDragStart(e, widgetType, name, metaKey) {
 			e.dataTransfer.setData('application/json', JSON.stringify({ type: widgetType, name: name, metaKey: metaKey || null }));
 		}
 
+		// Filter elements based on Search Query (Mark-3 Image 1)
+		const query = (searchQuery || '').trim().toLowerCase();
+
+		const filteredAtomic = ATOMIC_ELEMENTS.filter(a => !query || a.name.toLowerCase().includes(query) || a.type.toLowerCase().includes(query));
+
+		const filteredCore = CORE_WIDGETS.filter(w => !query || w.name.toLowerCase().includes(query) || w.type.toLowerCase().includes(query));
+
+		const filteredMetaGroups = productData && productData.meta_groups
+			? productData.meta_groups.map(group => ({
+					...group,
+					items: group.items.filter(m => !query || m.label.toLowerCase().includes(query) || m.key.toLowerCase().includes(query)),
+			  })).filter(g => g.items.length > 0)
+			: [];
+
 		return h(
 			'aside',
-			{ className: 'w-[320px] bg-[#1f2937] border-r border-[#374151] flex flex-col ml-[64px] z-30 h-full overflow-hidden shadow-md' },
+			{ className: 'w-[340px] bg-[#1f2937] border-r border-[#374151] flex flex-col ml-[64px] z-30 h-full overflow-hidden shadow-md select-none' },
+
+			// Header Title "Elements" + Preview Product Data
 			h(
 				'div',
-				{ className: 'p-3 border-b border-[#374151] bg-[#121c2a]' },
-				h('label', { className: 'inspector-label mb-1' }, 'Preview Product Data'),
+				{ className: 'p-3 border-b border-[#374151] bg-[#121c2a] space-y-2' },
+				h('div', { className: 'flex justify-between items-center' }, h('h2', { className: 'text-sm font-extrabold text-[#d9e3f6] flex items-center gap-1.5' }, h('span', { className: 'material-symbols-outlined text-base text-[#9333ea]' }, 'widgets'), 'Elements'), h('span', { className: 'text-[10px] text-[#9ca3af] font-mono' }, `${elements.length} items on canvas`)),
+
+				h('label', { className: 'inspector-label text-[10px]' }, 'Preview Product Data'),
 				h(
 					'select',
 					{
-						className: 'inspector-input',
+						className: 'inspector-input text-xs py-1',
 						value: selectedProductId,
 						onChange: handleProductChange,
 					},
@@ -743,98 +801,985 @@
 				)
 			),
 
-			// --- WIDGETS TAB ---
-			activeLeftTab === 'widgets' &&
+			// Sub-tabs Bar: Widgets | Components | Globals (Image 1 Header Tabs)
+			h(
+				'div',
+				{ className: 'flex border-b border-[#374151] bg-[#16202e] text-xs font-semibold' },
+				h(
+					'button',
+					{
+						className: `flex-1 py-2 text-center border-b-2 transition-colors ${
+							activeSubTab === 'widgets' ? 'border-[#9333ea] text-[#ddb8ff] bg-[#1f2937]' : 'border-transparent text-[#9ca3af] hover:text-[#d9e3f6]'
+						}`,
+						onClick: () => setActiveSubTab('widgets'),
+					},
+					'Widgets'
+				),
+				h(
+					'button',
+					{
+						className: `flex-1 py-2 text-center border-b-2 transition-colors ${
+							activeSubTab === 'components' ? 'border-[#9333ea] text-[#ddb8ff] bg-[#1f2937]' : 'border-transparent text-[#9ca3af] hover:text-[#d9e3f6]'
+						}`,
+						onClick: () => setActiveSubTab('components'),
+					},
+					'Components'
+				),
+				h(
+					'button',
+					{
+						className: `flex-1 py-2 text-center border-b-2 transition-colors ${
+							activeSubTab === 'globals' ? 'border-[#9333ea] text-[#ddb8ff] bg-[#1f2937]' : 'border-transparent text-[#9ca3af] hover:text-[#d9e3f6]'
+						}`,
+						onClick: () => setActiveSubTab('globals'),
+					},
+					'Globals'
+				)
+			),
+
+			// Search Widget Input (Mark-3 Image 1)
+			h(
+				'div',
+				{ className: 'p-3 border-b border-[#374151] bg-[#111827]' },
 				h(
 					'div',
-					{ className: 'p-3 overflow-y-auto custom-scrollbar flex-1' },
+					{ className: 'relative flex items-center' },
+					h('span', { className: 'material-symbols-outlined text-base absolute left-2.5 text-[#9ca3af]' }, 'search'),
+					h('input', {
+						type: 'text',
+						className: 'w-full bg-[#091421] border border-[#374151] focus:border-[#9333ea] rounded pl-8 pr-7 py-1.5 text-xs text-[#d9e3f6] placeholder-[#6b7280] focus:outline-none',
+						placeholder: 'Search Widget...',
+						value: searchQuery,
+						onChange: e => setSearchQuery(e.target.value),
+					}),
+					searchQuery &&
+						h(
+							'button',
+							{
+								className: 'absolute right-2 text-[#9ca3af] hover:text-white text-xs font-bold',
+								onClick: () => setSearchQuery(''),
+							},
+							'✕'
+						)
+				)
+			),
 
-					// Add Section / Layout Button
-					h(
-						'button',
-						{
-							className: 'w-full mb-4 py-2.5 px-3 bg-[#9333ea] hover:bg-[#7e22ce] text-white rounded text-xs font-bold flex items-center justify-center gap-2 shadow transition-all',
-							onClick: openLayoutModal,
-						},
-						h('span', { className: 'material-symbols-outlined text-base' }, 'add_circle'),
-						'Add Layout / Container'
-					),
+			// Scrollable Elements List
+			h(
+				'div',
+				{ className: 'p-3 overflow-y-auto custom-scrollbar flex-1 space-y-4' },
 
-					// Single Product Widgets
-					h('h3', { className: 'text-xs font-bold text-[#cfc2d7] uppercase tracking-wider mb-2' }, 'Single Product Widgets'),
+				// Add Layout / Container Action Button
+				h(
+					'button',
+					{
+						className: 'w-full py-2.5 px-3 bg-[#9333ea] hover:bg-[#7e22ce] text-white rounded text-xs font-bold flex items-center justify-center gap-2 shadow transition-all mb-3',
+						onClick: () => addContainerPreset('1_container'),
+					},
+					h('span', { className: 'material-symbols-outlined text-base' }, 'add_circle'),
+					'Add Layout / Container'
+				),
+
+				// Mark-2 Image 1: Atomic Elements Collapsible Section (2x2 Cards Grid)
+				filteredAtomic.length > 0 &&
 					h(
 						'div',
-						{ className: 'grid grid-cols-2 gap-2 mb-6' },
-						CORE_WIDGETS.map(w =>
+						{ className: 'border-b border-[#374151] pb-4' },
+						h(
+							'div',
+							{
+								className: 'flex items-center justify-between cursor-pointer mb-2',
+								onClick: () => setIsAtomicOpen(!isAtomicOpen),
+							},
+							h('h3', { className: 'text-xs font-bold text-[#d9e3f6] flex items-center gap-1.5' }, h('span', { className: 'text-[10px]' }, isAtomicOpen ? '▼' : '▶'), 'Atomic Elements'),
+							h('span', { className: 'text-[9px] bg-[#9333ea]/30 text-[#ddb8ff] px-2 py-0.5 rounded font-bold uppercase border border-[#9333ea]/50' }, 'New ⓘ')
+						),
+
+						isAtomicOpen &&
 							h(
 								'div',
-								{
-									key: w.type,
-									draggable: true,
-									onDragStart: e => handleDragStart(e, w.type, w.name),
-									onClick: () => addWidgetToTarget(w.type, w.name),
-									className: 'bg-[#111827] border border-[#374151] rounded p-2.5 flex flex-col items-center gap-1.5 cursor-grab active:cursor-grabbing hover:border-[#9333ea] hover:bg-[#16202e] transition-colors group select-none',
-								},
-								h('span', { className: 'material-symbols-outlined text-[#ddb8ff] group-hover:scale-110 transition-transform text-lg' }, w.icon),
-								h('span', { className: 'text-[11px] font-semibold text-center' }, w.name)
+								{ className: 'grid grid-cols-2 gap-2 mt-2' },
+								filteredAtomic.map(item =>
+									h(
+										'div',
+										{
+											key: item.type,
+											draggable: true,
+											onDragStart: e => handleDragStart(e, item.preset, item.name),
+											onClick: () => addContainerPreset(item.preset),
+											className: 'bg-[#111827] border border-[#374151] hover:border-[#9333ea] hover:bg-[#16202e] rounded-lg p-3 flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-colors group select-none relative',
+										},
+										h('span', { className: 'material-symbols-outlined text-2xl text-[#92ccff] group-hover:scale-110 transition-transform' }, item.icon),
+										h('span', { className: 'text-xs font-semibold text-center text-[#d9e3f6] group-hover:text-white' }, item.name),
+										h('span', { className: 'text-[9px] text-[#9ca3af] font-mono text-center' }, item.desc)
+									)
+								)
+							)
+					),
+
+				// Single Product Widgets Category
+				filteredCore.length > 0 &&
+					h(
+						'div',
+						null,
+						h('h3', { className: 'text-xs font-bold text-[#cfc2d7] uppercase tracking-wider mb-2' }, 'Single Product Widgets'),
+						h(
+							'div',
+							{ className: 'grid grid-cols-2 gap-2 mb-4' },
+							filteredCore.map(w =>
+								h(
+									'div',
+									{
+										key: w.type,
+										draggable: true,
+										onDragStart: e => handleDragStart(e, w.type, w.name),
+										onClick: () => addWidgetToTarget(w.type, w.name),
+										className: 'bg-[#111827] border border-[#374151] rounded p-2.5 flex flex-col items-center gap-1.5 cursor-grab active:cursor-grabbing hover:border-[#9333ea] hover:bg-[#16202e] transition-colors group select-none',
+									},
+									h('span', { className: 'material-symbols-outlined text-[#ddb8ff] group-hover:scale-110 transition-transform text-lg' }, w.icon),
+									h('span', { className: 'text-[11px] font-semibold text-center' }, w.name)
+								)
 							)
 						)
 					),
 
-					// Categorized Product Metadata Widgets (populated when product selected)
-					productData && productData.meta_groups && productData.meta_groups.length > 0
-						? productData.meta_groups.map((group, gIdx) =>
-								h(
-									'div',
-									{ key: 'group-' + gIdx, className: 'mb-5 border-t border-[#374151] pt-3' },
-									h('h3', { className: 'text-xs font-bold text-[#ddb8ff] uppercase tracking-wider mb-2 flex items-center gap-1.5' }, h('span', { className: 'material-symbols-outlined text-sm text-[#92ccff]' }, 'dataset'), group.title),
+				// Categorized Product Metadata Widgets
+				filteredMetaGroups.length > 0 &&
+					filteredMetaGroups.map((group, gIdx) =>
+						h(
+							'div',
+							{ key: 'group-' + gIdx, className: 'mb-4 border-t border-[#374151] pt-3' },
+							h('h3', { className: 'text-xs font-bold text-[#ddb8ff] uppercase tracking-wider mb-2 flex items-center gap-1.5' }, h('span', { className: 'material-symbols-outlined text-sm text-[#92ccff]' }, 'dataset'), group.title),
+							h(
+								'div',
+								{ className: 'flex flex-col gap-1.5' },
+								group.items.map(m =>
 									h(
 										'div',
-										{ className: 'flex flex-col gap-1.5' },
-										group.items.map(m =>
-											h(
-												'div',
-												{
-													key: m.key,
-													draggable: true,
-													onDragStart: e => handleDragStart(e, 'product_meta_item', m.label, m.key),
-													onClick: () => addWidgetToTarget('product_meta_item', m.label, m.key),
-													className: 'bg-[#111827] border border-[#374151] rounded p-2.5 flex items-center justify-between cursor-grab active:cursor-grabbing hover:border-[#9333ea] transition-colors group',
-												},
-												h(
-													'div',
-													{ className: 'flex items-center gap-2 overflow-hidden' },
-													h('span', { className: 'material-symbols-outlined text-xs text-[#92ccff]' }, 'data_object'),
-													h('div', { className: 'overflow-hidden' }, h('div', { className: 'text-xs font-medium truncate' }, m.label), h('div', { className: 'text-[10px] text-[#9ca3af] truncate font-mono' }, typeof m.value === 'object' ? JSON.stringify(m.value) : String(m.value || '')))
-												),
-												h('span', { className: 'text-[9px] bg-[#212b39] text-[#cfc2d7] px-1.5 py-0.5 rounded font-mono' }, 'Meta')
-											)
-										)
+										{
+											key: m.key,
+											draggable: true,
+											onDragStart: e => handleDragStart(e, 'product_meta_item', m.label, m.key),
+											onClick: () => addWidgetToTarget('product_meta_item', m.label, m.key),
+											className: 'bg-[#111827] border border-[#374151] rounded p-2.5 flex items-center justify-between cursor-grab active:cursor-grabbing hover:border-[#9333ea] transition-colors group',
+										},
+										h(
+											'div',
+											{ className: 'flex items-center gap-2 overflow-hidden' },
+											h('span', { className: 'material-symbols-outlined text-xs text-[#92ccff]' }, 'data_object'),
+											h('div', { className: 'overflow-hidden' }, h('div', { className: 'text-xs font-medium truncate' }, m.label), h('div', { className: 'text-[10px] text-[#9ca3af] truncate font-mono' }, typeof m.value === 'object' ? JSON.stringify(m.value) : String(m.value || '')))
+										),
+										h('span', { className: 'text-[9px] bg-[#212b39] text-[#cfc2d7] px-1.5 py-0.5 rounded font-mono' }, 'Meta')
 									)
 								)
-						  )
-						: null
-				),
+							)
+						)
+					)
+			)
+		);
+	}
 
-			// --- STRUCTURE TAB (Drag & Drop Hierarchy Panel) ---
-			activeLeftTab === 'structure' &&
+	// 3b. Left Inspector Component (Image 2 Mark 2: "Edit Container" / "Edit Element")
+	function LeftInspector({ selectedElement, updateElementProperties, closeInspector, categories, products }) {
+		const [activeTab, setActiveTab] = useState('layout'); // 'layout' | 'style' | 'advanced'
+		const [isContainerOpen, setIsContainerOpen] = useState(true);
+		const [isItemsOpen, setIsItemsOpen] = useState(true);
+
+		function handleSettingChange(key, value) {
+			const updated = {
+				...selectedElement,
+				settings: { ...selectedElement.settings, [key]: value },
+			};
+			updateElementProperties(updated);
+		}
+
+		function handleStyleChange(key, value) {
+			const updated = {
+				...selectedElement,
+				styles: { ...selectedElement.styles, [key]: value },
+			};
+			updateElementProperties(updated);
+		}
+
+		function handleAdvancedChange(key, value) {
+			const updated = {
+				...selectedElement,
+				advanced: { ...selectedElement.advanced, [key]: value },
+			};
+			updateElementProperties(updated);
+		}
+
+		const isContainer = selectedElement.type === 'container';
+		const isColumn = selectedElement.type === 'column';
+
+		const containerSettings = selectedElement.settings || {};
+
+		return h(
+			'aside',
+			{ className: 'w-[340px] bg-[#1f2937] border-r border-[#374151] flex flex-col ml-[64px] z-30 h-full overflow-hidden shadow-xl select-none' },
+
+			// Inspector Header: "Edit Container" (Image 2 Mark 2 Header)
+			h(
+				'div',
+				{ className: 'border-b border-[#374151] bg-[#121c2a]' },
 				h(
 					'div',
-					{ className: 'p-3 overflow-y-auto custom-scrollbar flex-1' },
-					h('h3', { className: 'text-xs font-bold text-[#cfc2d7] uppercase tracking-wider mb-1 flex items-center justify-between' }, h('span', { className: 'flex items-center gap-1' }, h('span', { className: 'material-symbols-outlined text-sm text-[#9333ea]' }, 'account_tree'), 'Template Structure'), h('span', { className: 'text-[10px] text-[#9ca3af] font-mono' }, `${elements.length} Sections`)),
-					h('p', { className: 'text-[11px] text-[#9ca3af] mb-3' }, 'Drag tree nodes to rearrange content directly:'),
+					{ className: 'p-3 flex justify-between items-center border-b border-[#212b39]' },
+					h(
+						'div',
+						{ className: 'flex items-center gap-2' },
+						h(
+							'button',
+							{
+								className: 'text-[#9ca3af] hover:text-white p-1 rounded hover:bg-[#212b39] transition-colors',
+								onClick: closeInspector,
+								title: 'Back to Elements',
+							},
+							'←'
+						),
+						h('h2', { className: 'font-bold text-xs uppercase tracking-wider text-[#d9e3f6]' }, isContainer ? 'Edit Container' : selectedElement.label || 'Edit Element')
+					),
+					h(
+						'button',
+						{
+							className: 'text-[#9ca3af] hover:text-white font-bold text-sm px-2',
+							onClick: closeInspector,
+							title: 'Close Inspector',
+						},
+						'✕'
+					)
+				),
 
+				// 3 Tabs Header: Layout | Style | Advanced (Image 2 Mark 2 Header Tabs)
+				h(
+					'div',
+					{ className: 'flex text-xs font-semibold bg-[#16202e]' },
+					h(
+						'button',
+						{
+							className: `flex-1 py-2.5 flex items-center justify-center gap-1.5 border-b-2 transition-colors ${
+								activeTab === 'layout' ? 'border-[#9333ea] text-[#ddb8ff] bg-[#1f2937]' : 'border-transparent text-[#9ca3af] hover:text-[#d9e3f6]'
+							}`,
+							onClick: () => setActiveTab('layout'),
+						},
+						h('span', { className: 'material-symbols-outlined text-sm' }, 'grid_view'),
+						'Layout'
+					),
+					h(
+						'button',
+						{
+							className: `flex-1 py-2.5 flex items-center justify-center gap-1.5 border-b-2 transition-colors ${
+								activeTab === 'style' ? 'border-[#9333ea] text-[#ddb8ff] bg-[#1f2937]' : 'border-transparent text-[#9ca3af] hover:text-[#d9e3f6]'
+							}`,
+							onClick: () => setActiveTab('style'),
+						},
+						'Style'
+					),
+					h(
+						'button',
+						{
+							className: `flex-1 py-2.5 flex items-center justify-center gap-1.5 border-b-2 transition-colors ${
+								activeTab === 'advanced' ? 'border-[#9333ea] text-[#ddb8ff] bg-[#1f2937]' : 'border-transparent text-[#9ca3af] hover:text-[#d9e3f6]'
+							}`,
+							onClick: () => setActiveTab('advanced'),
+						},
+						'Advanced'
+					)
+				)
+			),
+
+			// Inspector Body Content
+			h(
+				'div',
+				{ className: 'p-4 overflow-y-auto custom-scrollbar space-y-4 flex-1' },
+
+				// --- 1. LAYOUT TAB (Image 2 Mark 2 Detailed Controls) ---
+				activeTab === 'layout' &&
+					h(
+						'div',
+						{ className: 'space-y-4' },
+
+						// Container Section (Collapsible)
+						isContainer &&
+							h(
+								'div',
+								{ className: 'space-y-3 bg-[#111827] p-3 rounded border border-[#374151]' },
+								h(
+									'div',
+									{
+										className: 'flex items-center justify-between cursor-pointer border-b border-[#374151] pb-1.5',
+										onClick: () => setIsContainerOpen(!isContainerOpen),
+									},
+									h('h4', { className: 'text-xs font-bold uppercase text-[#ddb8ff] flex items-center gap-1' }, h('span', { className: 'text-[10px]' }, isContainerOpen ? '▼' : '▶'), 'Container')
+								),
+
+								isContainerOpen &&
+									h(
+										'div',
+										{ className: 'space-y-3 pt-1' },
+
+										// Container Layout Dropdown (Flexbox / Grid)
+										h(
+											'div',
+											null,
+											h('label', { className: 'inspector-label' }, 'Container Layout'),
+											h(
+												'select',
+												{
+													className: 'inspector-input',
+													value: containerSettings.flex_direction === 'grid' ? 'grid' : 'flexbox',
+													onChange: e => {
+														const val = e.target.value;
+														handleSettingChange('flex_direction', val === 'grid' ? 'grid' : 'row');
+													},
+												},
+												h('option', { value: 'flexbox' }, 'Flexbox'),
+												h('option', { value: 'grid' }, 'Grid')
+											)
+										),
+
+										// Content Width Dropdown (Full Width / Boxed)
+										h(
+											'div',
+											null,
+											h('label', { className: 'inspector-label' }, 'Content Width'),
+											h(
+												'select',
+												{
+													className: 'inspector-input',
+													value: containerSettings.width_mode || 'boxed',
+													onChange: e => handleSettingChange('width_mode', e.target.value),
+												},
+												h('option', { value: 'full' }, 'Full Width'),
+												h('option', { value: 'boxed' }, 'Boxed')
+											)
+										),
+
+										// Width Slider & Input (Image 2 Mark 2 Width Control)
+										h(
+											'div',
+											null,
+											h(
+												'div',
+												{ className: 'flex justify-between items-center mb-1' },
+												h('label', { className: 'inspector-label mb-0' }, 'Width'),
+												h('span', { className: 'text-[10px] font-mono text-[#9ca3af]' }, '%')
+											),
+											h(
+												'div',
+												{ className: 'flex items-center gap-3' },
+												h('input', {
+													type: 'range',
+													min: 10,
+													max: 100,
+													className: 'inspector-slider flex-1',
+													value: parseInt(containerSettings.boxed_width || '100', 10) || 100,
+													onChange: e => handleSettingChange('boxed_width', e.target.value + '%'),
+												}),
+												h('input', {
+													type: 'text',
+													className: 'inspector-input w-16 text-center text-xs py-1',
+													value: parseInt(containerSettings.boxed_width || '100', 10) || 100,
+													onChange: e => handleSettingChange('boxed_width', e.target.value + '%'),
+												})
+											)
+										),
+
+										// Min Height Slider & Input (Image 2 Mark 2 Min Height Control)
+										h(
+											'div',
+											null,
+											h(
+												'div',
+												{ className: 'flex justify-between items-center mb-1' },
+												h('label', { className: 'inspector-label mb-0' }, 'Min Height'),
+												h('span', { className: 'text-[10px] font-mono text-[#9ca3af]' }, 'px')
+											),
+											h(
+												'div',
+												{ className: 'flex items-center gap-3' },
+												h('input', {
+													type: 'range',
+													min: 0,
+													max: 800,
+													className: 'inspector-slider flex-1',
+													value: parseInt(containerSettings.min_height || '0', 10) || 0,
+													onChange: e => handleSettingChange('min_height', e.target.value + 'px'),
+												}),
+												h('input', {
+													type: 'text',
+													className: 'inspector-input w-16 text-center text-xs py-1',
+													value: parseInt(containerSettings.min_height || '0', 10) || 0,
+													onChange: e => handleSettingChange('min_height', e.target.value + 'px'),
+												})
+											),
+											h('p', { className: 'text-[10px] italic text-[#9ca3af] mt-1' }, 'To achieve full height Container use 100vh.')
+										)
+									)
+							),
+
+						// Items Section (Collapsible Image 2 Mark 2 Items Control)
+						isContainer &&
+							h(
+								'div',
+								{ className: 'space-y-3 bg-[#111827] p-3 rounded border border-[#374151]' },
+								h(
+									'div',
+									{
+										className: 'flex items-center justify-between cursor-pointer border-b border-[#374151] pb-1.5',
+										onClick: () => setIsItemsOpen(!isItemsOpen),
+									},
+									h('h4', { className: 'text-xs font-bold uppercase text-[#ddb8ff] flex items-center gap-1' }, h('span', { className: 'text-[10px]' }, isItemsOpen ? '▼' : '▶'), 'Items')
+								),
+
+								isItemsOpen &&
+									h(
+										'div',
+										{ className: 'space-y-3 pt-1' },
+
+										// Direction (Row, Row-Reverse, Column, Column-Reverse - Image 2 Mark 2 Direction Buttons)
+										h(
+											'div',
+											null,
+											h('label', { className: 'inspector-label' }, 'Direction'),
+											h(
+												'div',
+												{ className: 'icon-btn-group' },
+												h(
+													'button',
+													{
+														className: `icon-btn ${containerSettings.flex_direction === 'row' || !containerSettings.flex_direction ? 'is-active' : ''}`,
+														onClick: () => handleSettingChange('flex_direction', 'row'),
+														title: 'Row (Right)',
+													},
+													'→'
+												),
+												h(
+													'button',
+													{
+														className: `icon-btn ${containerSettings.flex_direction === 'row-reverse' ? 'is-active' : ''}`,
+														onClick: () => handleSettingChange('flex_direction', 'row-reverse'),
+														title: 'Row Reverse (Left)',
+													},
+													'←'
+												),
+												h(
+													'button',
+													{
+														className: `icon-btn ${containerSettings.flex_direction === 'column' ? 'is-active' : ''}`,
+														onClick: () => handleSettingChange('flex_direction', 'column'),
+														title: 'Column (Down)',
+													},
+													'↓'
+												),
+												h(
+													'button',
+													{
+														className: `icon-btn ${containerSettings.flex_direction === 'column-reverse' ? 'is-active' : ''}`,
+														onClick: () => handleSettingChange('flex_direction', 'column-reverse'),
+														title: 'Column Reverse (Up)',
+													},
+													'↑'
+												)
+											)
+										),
+
+										// Justify Content (Image 2 Mark 2 Justify Content Buttons)
+										h(
+											'div',
+											null,
+											h('label', { className: 'inspector-label' }, 'Justify Content'),
+											h(
+												'div',
+												{ className: 'icon-btn-group' },
+												h(
+													'button',
+													{
+														className: `icon-btn ${containerSettings.justify_content === 'flex-start' || !containerSettings.justify_content ? 'is-active' : ''}`,
+														onClick: () => handleSettingChange('justify_content', 'flex-start'),
+														title: 'Start',
+													},
+													'├─'
+												),
+												h(
+													'button',
+													{
+														className: `icon-btn ${containerSettings.justify_content === 'center' ? 'is-active' : ''}`,
+														onClick: () => handleSettingChange('justify_content', 'center'),
+														title: 'Center',
+													},
+													'─┼─'
+												),
+												h(
+													'button',
+													{
+														className: `icon-btn ${containerSettings.justify_content === 'flex-end' ? 'is-active' : ''}`,
+														onClick: () => handleSettingChange('justify_content', 'flex-end'),
+														title: 'End',
+													},
+													'─┤'
+												),
+												h(
+													'button',
+													{
+														className: `icon-btn ${containerSettings.justify_content === 'space-between' ? 'is-active' : ''}`,
+														onClick: () => handleSettingChange('justify_content', 'space-between'),
+														title: 'Space Between',
+													},
+													'├─┤'
+												),
+												h(
+													'button',
+													{
+														className: `icon-btn ${containerSettings.justify_content === 'space-around' ? 'is-active' : ''}`,
+														onClick: () => handleSettingChange('justify_content', 'space-around'),
+														title: 'Space Around',
+													},
+													'░┼░'
+												)
+											)
+										),
+
+										// Align Items (Image 2 Mark 2 Align Items Buttons)
+										h(
+											'div',
+											null,
+											h('label', { className: 'inspector-label' }, 'Align Items'),
+											h(
+												'div',
+												{ className: 'icon-btn-group' },
+												h(
+													'button',
+													{
+														className: `icon-btn ${containerSettings.align_items === 'flex-start' ? 'is-active' : ''}`,
+														onClick: () => handleSettingChange('align_items', 'flex-start'),
+														title: 'Start',
+													},
+													'┬'
+												),
+												h(
+													'button',
+													{
+														className: `icon-btn ${containerSettings.align_items === 'center' ? 'is-active' : ''}`,
+														onClick: () => handleSettingChange('align_items', 'center'),
+														title: 'Center',
+													},
+													'┼'
+												),
+												h(
+													'button',
+													{
+														className: `icon-btn ${containerSettings.align_items === 'flex-end' ? 'is-active' : ''}`,
+														onClick: () => handleSettingChange('align_items', 'flex-end'),
+														title: 'End',
+													},
+													'┴'
+												),
+												h(
+													'button',
+													{
+														className: `icon-btn ${containerSettings.align_items === 'stretch' || !containerSettings.align_items ? 'is-active' : ''}`,
+														onClick: () => handleSettingChange('align_items', 'stretch'),
+														title: 'Stretch',
+													},
+													'↕'
+												)
+											)
+										),
+
+										// Gaps (Column Gap & Row Gap with Link Toggle Chain Button - Image 2 Mark 2 Gaps Control)
+										h(
+											'div',
+											null,
+											h('label', { className: 'inspector-label' }, 'Gaps'),
+											h(
+												'div',
+												{ className: 'grid grid-cols-5 gap-2 items-center' },
+												h(
+													'div',
+													{ className: 'col-span-2' },
+													h('span', { className: 'text-[9px] text-[#9ca3af] block text-center mb-0.5' }, 'Column'),
+													h('input', {
+														type: 'number',
+														className: 'inspector-input text-center text-xs py-1',
+														value: parseInt(containerSettings.gap || '16', 10) || 0,
+														onChange: e => {
+															const val = e.target.value + 'px';
+															handleSettingChange('gap', val);
+															if (containerSettings.gaps_linked !== false) {
+																handleSettingChange('row_gap', val);
+															}
+														},
+													})
+												),
+												h(
+													'div',
+													{ className: 'col-span-2' },
+													h('span', { className: 'text-[9px] text-[#9ca3af] block text-center mb-0.5' }, 'Row'),
+													h('input', {
+														type: 'number',
+														className: 'inspector-input text-center text-xs py-1',
+														value: parseInt(containerSettings.row_gap || containerSettings.gap || '16', 10) || 0,
+														onChange: e => handleSettingChange('row_gap', e.target.value + 'px'),
+													})
+												),
+												h(
+													'div',
+													{ className: 'col-span-1 flex items-end justify-center pt-3' },
+													h(
+														'button',
+														{
+															className: `p-1.5 rounded border text-xs transition-colors ${
+																containerSettings.gaps_linked !== false ? 'bg-[#9333ea] border-[#9333ea] text-white' : 'bg-[#091421] border-[#374151] text-[#9ca3af]'
+															}`,
+															onClick: () => handleSettingChange('gaps_linked', containerSettings.gaps_linked === false ? true : false),
+															title: 'Link / Unlink Column & Row Gap',
+														},
+														'🔗'
+													)
+												)
+											)
+										),
+
+										// Wrap (No wrap / Wrap - Image 2 Mark 2 Wrap Control)
+										h(
+											'div',
+											null,
+											h('label', { className: 'inspector-label' }, 'Wrap'),
+											h(
+												'div',
+												{ className: 'icon-btn-group' },
+												h(
+													'button',
+													{
+														className: `icon-btn ${containerSettings.flex_wrap === 'nowrap' || !containerSettings.flex_wrap ? 'is-active' : ''}`,
+														onClick: () => handleSettingChange('flex_wrap', 'nowrap'),
+														title: 'No Wrap',
+													},
+													'No wrap |→'
+												),
+												h(
+													'button',
+													{
+														className: `icon-btn ${containerSettings.flex_wrap === 'wrap' ? 'is-active' : ''}`,
+														onClick: () => handleSettingChange('flex_wrap', 'wrap'),
+														title: 'Wrap',
+													},
+													'Wrap ↳'
+												)
+											),
+											h('p', { className: 'text-[10px] italic text-[#9ca3af] mt-1' }, 'Items within the container can stay in a single line (No wrap), or break into multiple lines (Wrap).')
+										)
+									)
+							),
+
+						// Column Flex Width
+						isColumn &&
+							h(
+								'div',
+								{ className: 'space-y-3 bg-[#111827] p-3 rounded border border-[#374151]' },
+								h('h4', { className: 'text-xs font-bold uppercase text-[#ddb8ff]' }, 'Column Layout'),
+								h(
+									'div',
+									null,
+									h('label', { className: 'inspector-label' }, 'Flex Width (e.g. 50%, 33.33%)'),
+									h('input', {
+										type: 'text',
+										className: 'inspector-input',
+										value: selectedElement.settings.flex_width || '100%',
+										onChange: e => handleSettingChange('flex_width', e.target.value),
+									})
+								)
+							),
+
+						// Widget Alignment & Custom Scope
+						!isContainer &&
+							!isColumn &&
+							h(
+								'div',
+								{ className: 'space-y-3 bg-[#111827] p-3 rounded border border-[#374151]' },
+								h(
+									'div',
+									null,
+									h('label', { className: 'inspector-label' }, 'Alignment'),
+									h(
+										'select',
+										{
+											className: 'inspector-input',
+											value: selectedElement.settings.alignment || 'left',
+											onChange: e => handleSettingChange('alignment', e.target.value),
+										},
+										h('option', { value: 'left' }, 'Left'),
+										h('option', { value: 'center' }, 'Center'),
+										h('option', { value: 'right' }, 'Right')
+									)
+								)
+							)
+					),
+
+				// --- 2. STYLE TAB ---
+				activeTab === 'style' &&
+					h(
+						'div',
+						{ className: 'space-y-4' },
+						h('h4', { className: 'text-xs font-bold uppercase text-[#ddb8ff] border-b border-[#374151] pb-1' }, 'Colors & Background'),
+						h(
+							'div',
+							{ className: 'grid grid-cols-2 gap-2' },
+							h(
+								'div',
+								null,
+								h('label', { className: 'inspector-label' }, 'Text Color'),
+								h('input', {
+									type: 'color',
+									className: 'inspector-input h-9 p-1 cursor-pointer',
+									value: selectedElement.styles ? selectedElement.styles.text_color || '#111827' : '#111827',
+									onChange: e => handleStyleChange('text_color', e.target.value),
+								})
+							),
+							h(
+								'div',
+								null,
+								h('label', { className: 'inspector-label' }, 'Background'),
+								h('input', {
+									type: 'color',
+									className: 'inspector-input h-9 p-1 cursor-pointer',
+									value: selectedElement.styles ? selectedElement.styles.bg_color || '#ffffff' : '#ffffff',
+									onChange: e => handleStyleChange('bg_color', e.target.value),
+								})
+							)
+						),
+
+						h('h4', { className: 'text-xs font-bold uppercase text-[#ddb8ff] border-b border-[#374151] pb-1 pt-2' }, 'Border & Padding'),
+						h(
+							'div',
+							{ className: 'grid grid-cols-2 gap-2' },
+							h(
+								'div',
+								null,
+								h('label', { className: 'inspector-label' }, 'Border Width'),
+								h('input', {
+									type: 'text',
+									className: 'inspector-input',
+									value: selectedElement.styles ? selectedElement.styles.border_width || '1px' : '1px',
+									onChange: e => handleStyleChange('border_width', e.target.value),
+								})
+							),
+							h(
+								'div',
+								null,
+								h('label', { className: 'inspector-label' }, 'Border Radius'),
+								h('input', {
+									type: 'text',
+									className: 'inspector-input',
+									value: selectedElement.styles ? selectedElement.styles.border_radius || '8px' : '8px',
+									onChange: e => handleStyleChange('border_radius', e.target.value),
+								})
+							)
+						),
+
+						h(
+							'div',
+							{ className: 'grid grid-cols-2 gap-2' },
+							h(
+								'div',
+								null,
+								h('label', { className: 'inspector-label' }, 'Padding Vertical'),
+								h('input', {
+									type: 'text',
+									className: 'inspector-input',
+									value: selectedElement.styles ? selectedElement.styles.padding_top || '16px' : '16px',
+									onChange: e => {
+										handleStyleChange('padding_top', e.target.value);
+										handleStyleChange('padding_bottom', e.target.value);
+									},
+								})
+							),
+							h(
+								'div',
+								null,
+								h('label', { className: 'inspector-label' }, 'Margin Bottom'),
+								h('input', {
+									type: 'text',
+									className: 'inspector-input',
+									value: selectedElement.styles ? selectedElement.styles.margin_bottom || '24px' : '24px',
+									onChange: e => handleStyleChange('margin_bottom', e.target.value),
+								})
+							)
+						)
+					),
+
+				// --- 3. ADVANCED TAB ---
+				activeTab === 'advanced' &&
+					h(
+						'div',
+						{ className: 'space-y-4' },
+						h(
+							'div',
+							null,
+							h('label', { className: 'inspector-label' }, 'Custom CSS Class'),
+							h('input', {
+								type: 'text',
+								className: 'inspector-input',
+								placeholder: 'e.g. my-custom-section',
+								value: (selectedElement.advanced && selectedElement.advanced.custom_class) || '',
+								onChange: e => handleAdvancedChange('custom_class', e.target.value),
+							})
+						),
+						h(
+							'div',
+							null,
+							h('label', { className: 'inspector-label' }, 'Z-Index'),
+							h('input', {
+								type: 'number',
+								className: 'inspector-input',
+								value: (selectedElement.advanced && selectedElement.advanced.z_index) || '1',
+								onChange: e => handleAdvancedChange('z_index', e.target.value),
+							})
+						)
+					)
+			)
+		);
+	}
+
+	// 4. Central Canvas Component with Viewport Preview
+	function CentralCanvas({ deviceView, elements, setElements, selectedElementId, setSelectedElementId, sampleData, removeElement, addWidgetToTarget, openElementsTab, isStructureOpen, setIsStructureOpen }) {
+		const [isCanvasDragOver, setIsCanvasDragOver] = useState(false);
+
+		return h(
+			'main',
+			{ className: 'flex-1 bg-[#0f172a] overflow-y-auto relative p-8 flex flex-col items-center custom-scrollbar' },
+
+			// Outer Canvas Container
+			h(
+				'div',
+				{
+					className: `preview-canvas-container bg-[#ffffff] text-[#111827] rounded shadow-2xl overflow-visible p-6 border ${
+						isCanvasDragOver ? 'border-2 border-dashed border-[#9333ea] bg-[#faf5ff]' : 'border-[#e5e7eb]'
+					} ${deviceView === 'tablet' ? 'preview-viewport-tablet' : deviceView === 'mobile' ? 'preview-viewport-mobile' : 'preview-viewport-desktop'} transition-all`,
+				},
+
+				// Empty Canvas Placeholder
+				elements.length === 0
+					? h(
+							'div',
+							{
+								className: 'flex flex-col items-center justify-center min-h-[500px] border-2 border-dashed border-[#9333ea]/40 rounded-xl p-12 text-center bg-[#faf5ff] cursor-pointer hover:border-[#9333ea] transition-all group',
+								onClick: openElementsTab,
+							},
+							h('div', { className: 'w-16 h-16 rounded-full bg-[#9333ea]/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform' }, h('span', { className: 'material-symbols-outlined text-4xl text-[#9333ea]' }, 'add_circle')),
+							h('h2', { className: 'text-2xl font-extrabold text-[#111827] mb-2' }, 'Select Layout Structure'),
+							h('p', { className: 'text-sm text-[#6b7280] max-w-md mb-6' }, 'Choose an Atomic Element (Div block, Flexbox, Grid, Tabs) from the left panel to start building your single product page layout.'),
+							h(
+								'button',
+								{
+									className: 'px-6 py-2.5 bg-[#9333ea] hover:bg-[#7e22ce] text-white rounded-lg font-bold shadow-lg flex items-center gap-2 text-sm transition-all',
+									onClick: e => {
+										e.stopPropagation();
+										openElementsTab();
+									},
+								},
+								h('span', { className: 'material-symbols-outlined text-lg' }, 'add'),
+								'Add Layout / Container'
+							)
+					  )
+					: h(
+							'div',
+							{ className: 'space-y-6' },
+							elements.map((container, cIdx) =>
+								h(CanvasContainerRenderer, {
+									key: container.id,
+									container,
+									cIdx,
+									elements,
+									setElements,
+									selectedElementId,
+									setSelectedElementId,
+									removeElement,
+									sampleData,
+									addWidgetToTarget,
+								})
+							),
+
+							// Add Container Section Bottom Action Bar
+							h(
+								'div',
+								{
+									className: 'py-4 border-2 border-dashed border-[#d1d5db] hover:border-[#9333ea] rounded-lg text-center cursor-pointer bg-[#f9fafb] hover:bg-[#faf5ff] transition-all flex justify-center items-center gap-2 group',
+									onClick: openElementsTab,
+								},
+								h('span', { className: 'material-symbols-outlined text-xl text-[#9333ea] group-hover:scale-125 transition-transform' }, 'add_circle'),
+								h('span', { className: 'text-sm font-bold text-[#4b5563] group-hover:text-[#9333ea]' }, 'Add Container Section')
+							)
+					  )
+			),
+
+			// Breadcrumb Footer
+			h(
+				'div',
+				{ className: 'fixed bottom-4 left-[420px] bg-[#16202e] border border-[#4d4354] rounded px-3 py-1 text-xs font-mono text-[#cfc2d7] z-20 shadow-md' },
+				'Layout > ' + (findElementInTree(elements, selectedElementId)?.label || 'Empty Selection')
+			)
+		);
+	}
+
+	// 5. Right Floating Structure Panel (Image 2 Mark 1 Dockable Window)
+	function FloatingStructurePanel({ elements, setElements, selectedElementId, setSelectedElementId, removeElement, openElementsTab, closeStructure }) {
+		const [isCollapsed, setIsCollapsed] = useState(false);
+
+		return h(
+			'div',
+			{ className: 'floating-structure-panel select-none' },
+
+			// Header Bar: "Structure" (Image 2 Mark 1 Header)
+			h(
+				'div',
+				{ className: 'bg-[#121c2a] border-b border-[#374151] p-2.5 flex items-center justify-between rounded-t-8' },
+				h(
+					'div',
+					{ className: 'flex items-center gap-1.5' },
+					h('span', { className: 'material-symbols-outlined text-base text-[#9333ea]' }, 'account_tree'),
+					h('h3', { className: 'text-xs font-extrabold text-[#d9e3f6] uppercase tracking-wider' }, 'Structure')
+				),
+				h(
+					'div',
+					{ className: 'flex items-center gap-1' },
+					h(
+						'button',
+						{
+							className: 'text-[#9ca3af] hover:text-white p-1 text-xs font-bold',
+							onClick: () => setIsCollapsed(!isCollapsed),
+							title: isCollapsed ? 'Expand Structure' : 'Collapse Structure',
+						},
+						isCollapsed ? '□' : '—'
+					),
+					h(
+						'button',
+						{
+							className: 'text-[#9ca3af] hover:text-white p-1 text-xs font-bold ml-1',
+							onClick: closeStructure,
+							title: 'Close Structure Panel',
+						},
+						'✕'
+					)
+				)
+			),
+
+			// Tree View Body
+			!isCollapsed &&
+				h(
+					'div',
+					{ className: 'p-3 overflow-y-auto custom-scrollbar flex-1 max-h-[480px]' },
 					elements.length === 0
 						? h(
 								'div',
-								{ className: 'text-center p-6 border border-dashed border-[#374151] rounded text-xs text-[#9ca3af]' },
-								h('span', { className: 'material-symbols-outlined text-2xl mb-1 text-[#4b5563]' }, 'folder_off'),
+								{ className: 'text-center p-4 border border-dashed border-[#374151] rounded text-xs text-[#9ca3af]' },
 								h('p', null, 'Canvas is empty.'),
-								h('button', { className: 'mt-2 px-3 py-1 bg-[#9333ea] text-white rounded font-semibold text-xs', onClick: openLayoutModal }, 'Add Layout Structure')
+								h('button', { className: 'mt-2 px-3 py-1 bg-[#9333ea] text-white rounded font-semibold text-xs', onClick: openElementsTab }, 'Add Container')
 						  )
 						: h(
 								'div',
-								{ className: 'space-y-2' },
+								{ className: 'space-y-1.5' },
 								elements.map((container, cIdx) =>
 									h(StructureTreeNode, {
 										key: container.id,
@@ -948,94 +1893,18 @@
 		);
 	}
 
-	// 4. Central Canvas Component with Dynamic Layout Wrapping & Scrolling
-	function CentralCanvas({ deviceView, elements, setElements, selectedElementId, setSelectedElementId, sampleData, removeElement, addWidgetToTarget, openLayoutModal }) {
-		const [isCanvasDragOver, setIsCanvasDragOver] = useState(false);
-
-		return h(
-			'main',
-			{ className: 'flex-1 bg-[#0f172a] overflow-y-auto relative p-8 flex flex-col items-center custom-scrollbar' },
-
-			// Canvas Outer Container
-			h(
-				'div',
-				{
-					className: `preview-canvas-container bg-[#ffffff] text-[#111827] rounded shadow-2xl overflow-visible p-6 border ${
-						isCanvasDragOver ? 'border-2 border-dashed border-[#9333ea] bg-[#faf5ff]' : 'border-[#e5e7eb]'
-					} ${deviceView === 'tablet' ? 'preview-viewport-tablet' : deviceView === 'mobile' ? 'preview-viewport-mobile' : 'preview-viewport-desktop'} transition-all`,
-				},
-
-				// Empty Canvas State (+ Placeholder) - No Default Container
-				elements.length === 0
-					? h(
-							'div',
-							{
-								className: 'flex flex-col items-center justify-center min-h-[500px] border-2 border-dashed border-[#9333ea]/40 rounded-xl p-12 text-center bg-[#faf5ff] cursor-pointer hover:border-[#9333ea] transition-all group',
-								onClick: openLayoutModal,
-							},
-							h('div', { className: 'w-16 h-16 rounded-full bg-[#9333ea]/10 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform' }, h('span', { className: 'material-symbols-outlined text-4xl text-[#9333ea]' }, 'add_circle')),
-							h('h2', { className: 'text-2xl font-extrabold text-[#111827] mb-2' }, 'Select Layout Structure'),
-							h('p', { className: 'text-sm text-[#6b7280] max-w-md mb-6' }, 'Click + to choose a container shape (Container, Flexbox, Grid, Div) to start building your WooCommerce product layout.'),
-							h(
-								'button',
-								{
-									className: 'px-6 py-2.5 bg-[#9333ea] hover:bg-[#7e22ce] text-white rounded-lg font-bold shadow-lg flex items-center gap-2 text-sm transition-all',
-									onClick: e => {
-										e.stopPropagation();
-										openLayoutModal();
-									},
-								},
-								h('span', { className: 'material-symbols-outlined text-lg' }, 'add'),
-								'Choose Layout'
-							)
-					  )
-					: h(
-							'div',
-							{ className: 'space-y-6' },
-							elements.map((container, cIdx) =>
-								h(CanvasContainerRenderer, {
-									key: container.id,
-									container,
-									cIdx,
-									elements,
-									setElements,
-									selectedElementId,
-									setSelectedElementId,
-									removeElement,
-									sampleData,
-									addWidgetToTarget,
-								})
-							),
-
-							// Add Section Bottom Bar
-							h(
-								'div',
-								{
-									className: 'py-4 border-2 border-dashed border-[#d1d5db] hover:border-[#9333ea] rounded-lg text-center cursor-pointer bg-[#f9fafb] hover:bg-[#faf5ff] transition-all flex justify-center items-center gap-2 group',
-									onClick: openLayoutModal,
-								},
-								h('span', { className: 'material-symbols-outlined text-xl text-[#9333ea] group-hover:scale-125 transition-transform' }, 'add_circle'),
-								h('span', { className: 'text-sm font-bold text-[#4b5563] group-hover:text-[#9333ea]' }, 'Add Container Section')
-							)
-					  )
-			),
-
-			// Breadcrumb Footer
-			h(
-				'div',
-				{ className: 'fixed bottom-4 left-[400px] bg-[#16202e] border border-[#4d4354] rounded px-3 py-1 text-xs font-mono text-[#cfc2d7] z-20' },
-				'Layout > ' + (findElementInTree(elements, selectedElementId)?.label || 'Empty')
-			)
-		);
-	}
-
-	// Renderer for Top-Level Containers on Canvas
+	// Canvas Container Renderer
 	function CanvasContainerRenderer({ container, cIdx, elements, setElements, selectedElementId, setSelectedElementId, removeElement, sampleData, addWidgetToTarget }) {
 		const isSelected = selectedElementId === container.id;
 		const widthMode = container.settings && container.settings.width_mode === 'full' ? 'full' : 'boxed';
 		const boxedWidth = (container.settings && container.settings.boxed_width) || '1140px';
 		const isGrid = container.settings && container.settings.flex_direction === 'grid';
 		const gridCols = (container.settings && container.settings.grid_columns) || '2';
+		const flexDir = container.settings && container.settings.flex_direction ? container.settings.flex_direction : 'row';
+		const justifyContent = container.settings && container.settings.justify_content ? container.settings.justify_content : 'flex-start';
+		const alignItems = container.settings && container.settings.align_items ? container.settings.align_items : 'stretch';
+		const flexWrap = container.settings && container.settings.flex_wrap ? container.settings.flex_wrap : 'nowrap';
+		const minHeight = container.settings && container.settings.min_height ? container.settings.min_height : 'auto';
 
 		function handleContainerDrop(e) {
 			e.preventDefault();
@@ -1068,6 +1937,7 @@
 					maxWidth: widthMode === 'boxed' ? boxedWidth : '100%',
 					margin: '0 auto 24px auto',
 					width: '100%',
+					minHeight: minHeight,
 					backgroundColor: container.styles ? container.styles.bg_color || '#ffffff' : '#ffffff',
 					borderColor: container.styles ? container.styles.border_color || '#e5e7eb' : '#e5e7eb',
 					borderWidth: container.styles ? container.styles.border_width || '1px' : '1px',
@@ -1077,7 +1947,7 @@
 				},
 			},
 
-			// Container Toolbar Badge
+			// Toolbar Badge
 			isSelected &&
 				h(
 					'div',
@@ -1096,12 +1966,18 @@
 					)
 				),
 
-			// Columns Layout Wrapper
+			// Column Flex / Grid Layout Wrapper
 			h(
 				'div',
 				{
-					className: isGrid ? `grid grid-cols-${gridCols} gap-4` : 'flex flex-wrap gap-4 items-stretch',
-					style: { gap: container.settings ? container.settings.gap || '16px' : '16px' },
+					className: isGrid ? `grid grid-cols-${gridCols} gap-4` : 'flex gap-4',
+					style: {
+						flexDirection: !isGrid ? flexDir : undefined,
+						justifyContent: !isGrid ? justifyContent : undefined,
+						alignItems: !isGrid ? alignItems : undefined,
+						flexWrap: !isGrid ? flexWrap : undefined,
+						gap: container.settings ? container.settings.gap || '16px' : '16px',
+					},
 				},
 				container.children &&
 					container.children.map(column =>
@@ -1122,7 +1998,7 @@
 		);
 	}
 
-	// Renderer for Columns inside Container
+	// Canvas Column Renderer
 	function CanvasColumnRenderer({ column, containerId, elements, setElements, selectedElementId, setSelectedElementId, removeElement, sampleData, addWidgetToTarget }) {
 		const isSelected = selectedElementId === column.id;
 		const flexWidth = (column.settings && column.settings.flex_width) || '100%';
@@ -1131,7 +2007,6 @@
 			e.preventDefault();
 			e.stopPropagation();
 
-			// Dropping new widget from Left Panel
 			const jsonStr = e.dataTransfer.getData('application/json');
 			if (jsonStr) {
 				try {
@@ -1143,7 +2018,6 @@
 				} catch (err) {}
 			}
 
-			// Moving existing widget from Structure or Canvas
 			const textData = e.dataTransfer.getData('text/plain');
 			if (textData && textData.indexOf('structure_move:') === 0) {
 				const sourceId = textData.replace('structure_move:', '');
@@ -1198,7 +2072,7 @@
 		);
 	}
 
-	// Renderer for Individual Widgets inside Column
+	// Canvas Widget Renderer
 	function CanvasWidgetRenderer({ widget, columnId, elements, setElements, selectedElementId, setSelectedElementId, removeElement, sampleData }) {
 		const isSelected = selectedElementId === widget.id;
 
@@ -1338,400 +2212,7 @@
 		}
 	}
 
-	// 5. Right Kirki-Style 3-Tab Property Inspector
-	function RightInspector({ selectedElement, updateElementProperties, categories, products }) {
-		const [activeTab, setActiveTab] = useState('content');
-
-		if (!selectedElement) {
-			return h(
-				'aside',
-				{ className: 'w-[320px] bg-[#1f2937] border-l border-[#374151] p-6 flex flex-col items-center justify-center text-center text-xs text-[#9ca3af]' },
-				h('span', { className: 'material-symbols-outlined text-4xl mb-2 text-[#4b5563]' }, 'touch_app'),
-				'Select a Container, Column, or Widget on canvas to edit its properties.'
-			);
-		}
-
-		function handleSettingChange(key, value) {
-			const updated = {
-				...selectedElement,
-				settings: { ...selectedElement.settings, [key]: value },
-			};
-			updateElementProperties(updated);
-		}
-
-		function handleStyleChange(key, value) {
-			const updated = {
-				...selectedElement,
-				styles: { ...selectedElement.styles, [key]: value },
-			};
-			updateElementProperties(updated);
-		}
-
-		function handleAdvancedChange(key, value) {
-			const updated = {
-				...selectedElement,
-				advanced: { ...selectedElement.advanced, [key]: value },
-			};
-			updateElementProperties(updated);
-		}
-
-		const isContainer = selectedElement.type === 'container';
-		const isColumn = selectedElement.type === 'column';
-
-		return h(
-			'aside',
-			{ className: 'w-[320px] bg-[#1f2937] border-l border-[#374151] flex flex-col h-full overflow-hidden shadow-lg' },
-
-			// Inspector Header & 3-Tab Switcher
-			h(
-				'div',
-				{ className: 'border-b border-[#374151] bg-[#121c2a]' },
-				h(
-					'div',
-					{ className: 'p-3 flex justify-between items-center border-b border-[#212b39]' },
-					h('h2', { className: 'font-bold text-xs uppercase tracking-wider text-[#d9e3f6]' }, selectedElement.label),
-					h('span', { className: 'text-[10px] bg-[#9333ea] text-white px-1.5 py-0.5 rounded font-mono uppercase' }, selectedElement.type)
-				),
-				h(
-					'div',
-					{ className: 'flex text-xs font-semibold' },
-					h(
-						'button',
-						{
-							className: `flex-1 py-2 text-center border-b-2 transition-colors ${
-								activeTab === 'content' ? 'border-[#9333ea] text-[#ddb8ff] bg-[#16202e]' : 'border-transparent text-[#9ca3af] hover:text-[#d9e3f6]'
-							}`,
-							onClick: () => setActiveTab('content'),
-						},
-						'Content'
-					),
-					h(
-						'button',
-						{
-							className: `flex-1 py-2 text-center border-b-2 transition-colors ${
-								activeTab === 'style' ? 'border-[#9333ea] text-[#ddb8ff] bg-[#16202e]' : 'border-transparent text-[#9ca3af] hover:text-[#d9e3f6]'
-							}`,
-							onClick: () => setActiveTab('style'),
-						},
-						'Style'
-					),
-					h(
-						'button',
-						{
-							className: `flex-1 py-2 text-center border-b-2 transition-colors ${
-								activeTab === 'advanced' ? 'border-[#9333ea] text-[#ddb8ff] bg-[#16202e]' : 'border-transparent text-[#9ca3af] hover:text-[#d9e3f6]'
-							}`,
-							onClick: () => setActiveTab('advanced'),
-						},
-						'Advanced'
-					)
-				)
-			),
-
-			// Inspector Body
-			h(
-				'div',
-				{ className: 'p-4 overflow-y-auto custom-scrollbar space-y-4 flex-1' },
-
-				// --- 1. CONTENT TAB ---
-				activeTab === 'content' &&
-					h(
-						'div',
-						{ className: 'space-y-4' },
-
-						// Container Width Controls (Elementor-Style)
-						isContainer &&
-							h(
-								'div',
-								{ className: 'space-y-3 bg-[#121c2a] p-3 rounded border border-[#374151]' },
-								h('h4', { className: 'text-xs font-bold uppercase text-[#9333ea] border-b border-[#374151] pb-1' }, 'Container Width Options'),
-								h(
-									'div',
-									null,
-									h('label', { className: 'inspector-label' }, 'Width Mode'),
-									h(
-										'select',
-										{
-											className: 'inspector-input',
-											value: selectedElement.settings.width_mode || 'boxed',
-											onChange: e => handleSettingChange('width_mode', e.target.value),
-										},
-										h('option', { value: 'boxed' }, 'Boxed / Fixed Width'),
-										h('option', { value: 'full' }, 'Full Width (100%)')
-									)
-								),
-
-								selectedElement.settings.width_mode === 'boxed' &&
-									h(
-										'div',
-										null,
-										h('label', { className: 'inspector-label' }, 'Boxed Max-Width (px/%)'),
-										h('input', {
-											type: 'text',
-											className: 'inspector-input',
-											value: selectedElement.settings.boxed_width || '1140px',
-											onChange: e => handleSettingChange('boxed_width', e.target.value),
-										})
-									),
-
-								h(
-									'div',
-									null,
-									h('label', { className: 'inspector-label' }, 'Column Gap (px)'),
-									h('input', {
-										type: 'text',
-										className: 'inspector-input',
-										value: selectedElement.settings.gap || '16px',
-										onChange: e => handleSettingChange('gap', e.target.value),
-									})
-								)
-							),
-
-						// Column Width
-						isColumn &&
-							h(
-								'div',
-								{ className: 'space-y-3 bg-[#121c2a] p-3 rounded border border-[#374151]' },
-								h('h4', { className: 'text-xs font-bold uppercase text-[#9333ea] border-b border-[#374151] pb-1' }, 'Column Layout'),
-								h(
-									'div',
-									null,
-									h('label', { className: 'inspector-label' }, 'Flex Width (e.g. 50%, 33.33%)'),
-									h('input', {
-										type: 'text',
-										className: 'inspector-input',
-										value: selectedElement.settings.flex_width || '100%',
-										onChange: e => handleSettingChange('flex_width', e.target.value),
-									})
-								)
-							),
-
-						// Widget Scope & Alignment
-						!isContainer &&
-							!isColumn &&
-							h(
-								'div',
-								{ className: 'space-y-3' },
-								h(
-									'div',
-									null,
-									h('label', { className: 'inspector-label' }, 'Customization Scope'),
-									h(
-										'select',
-										{
-											className: 'inspector-input',
-											value: selectedElement.settings.scope || 'global',
-											onChange: e => handleSettingChange('scope', e.target.value),
-										},
-										h('option', { value: 'global' }, 'Global (All Products)'),
-										h('option', { value: 'category' }, 'Category-Based Scope'),
-										h('option', { value: 'product' }, 'Product-Based Scope')
-									)
-								),
-								h(
-									'div',
-									null,
-									h('label', { className: 'inspector-label' }, 'Alignment'),
-									h(
-										'select',
-										{
-											className: 'inspector-input',
-											value: selectedElement.settings.alignment || 'left',
-											onChange: e => handleSettingChange('alignment', e.target.value),
-										},
-										h('option', { value: 'left' }, 'Left'),
-										h('option', { value: 'center' }, 'Center'),
-										h('option', { value: 'right' }, 'Right')
-									)
-								)
-							)
-					),
-
-				// --- 2. STYLE TAB ---
-				activeTab === 'style' &&
-					h(
-						'div',
-						{ className: 'space-y-4' },
-						h('h4', { className: 'text-xs font-bold uppercase tracking-wider text-[#9333ea] border-b border-[#374151] pb-1' }, 'Colors & Background'),
-						h(
-							'div',
-							{ className: 'grid grid-cols-2 gap-2' },
-							h(
-								'div',
-								null,
-								h('label', { className: 'inspector-label' }, 'Text Color'),
-								h('input', {
-									type: 'color',
-									className: 'inspector-input h-9 p-1 cursor-pointer',
-									value: selectedElement.styles ? selectedElement.styles.text_color || '#111827' : '#111827',
-									onChange: e => handleStyleChange('text_color', e.target.value),
-								})
-							),
-							h(
-								'div',
-								null,
-								h('label', { className: 'inspector-label' }, 'Background'),
-								h('input', {
-									type: 'color',
-									className: 'inspector-input h-9 p-1 cursor-pointer',
-									value: selectedElement.styles ? selectedElement.styles.bg_color || '#ffffff' : '#ffffff',
-									onChange: e => handleStyleChange('bg_color', e.target.value),
-								})
-							)
-						),
-
-						h('h4', { className: 'text-xs font-bold uppercase tracking-wider text-[#9333ea] border-b border-[#374151] pb-1 pt-2' }, 'Border & Padding'),
-						h(
-							'div',
-							{ className: 'grid grid-cols-2 gap-2' },
-							h(
-								'div',
-								null,
-								h('label', { className: 'inspector-label' }, 'Border Width'),
-								h('input', {
-									type: 'text',
-									className: 'inspector-input',
-									value: selectedElement.styles ? selectedElement.styles.border_width || '1px' : '1px',
-									onChange: e => handleStyleChange('border_width', e.target.value),
-								})
-							),
-							h(
-								'div',
-								null,
-								h('label', { className: 'inspector-label' }, 'Border Radius'),
-								h('input', {
-									type: 'text',
-									className: 'inspector-input',
-									value: selectedElement.styles ? selectedElement.styles.border_radius || '8px' : '8px',
-									onChange: e => handleStyleChange('border_radius', e.target.value),
-								})
-							)
-						),
-
-						h(
-							'div',
-							{ className: 'grid grid-cols-2 gap-2' },
-							h(
-								'div',
-								null,
-								h('label', { className: 'inspector-label' }, 'Padding Vertical'),
-								h('input', {
-									type: 'text',
-									className: 'inspector-input',
-									value: selectedElement.styles ? selectedElement.styles.padding_top || '16px' : '16px',
-									onChange: e => {
-										handleStyleChange('padding_top', e.target.value);
-										handleStyleChange('padding_bottom', e.target.value);
-									},
-								})
-							),
-							h(
-								'div',
-								null,
-								h('label', { className: 'inspector-label' }, 'Margin Bottom'),
-								h('input', {
-									type: 'text',
-									className: 'inspector-input',
-									value: selectedElement.styles ? selectedElement.styles.margin_bottom || '24px' : '24px',
-									onChange: e => handleStyleChange('margin_bottom', e.target.value),
-								})
-							)
-						)
-					),
-
-				// --- 3. ADVANCED TAB ---
-				activeTab === 'advanced' &&
-					h(
-						'div',
-						{ className: 'space-y-4' },
-						h(
-							'div',
-							null,
-							h('label', { className: 'inspector-label' }, 'Custom CSS Class'),
-							h('input', {
-								type: 'text',
-								className: 'inspector-input',
-								placeholder: 'e.g. my-custom-section',
-								value: (selectedElement.advanced && selectedElement.advanced.custom_class) || '',
-								onChange: e => handleAdvancedChange('custom_class', e.target.value),
-							})
-						),
-						h(
-							'div',
-							null,
-							h('label', { className: 'inspector-label' }, 'Z-Index'),
-							h('input', {
-								type: 'number',
-								className: 'inspector-input',
-								value: (selectedElement.advanced && selectedElement.advanced.z_index) || '1',
-								onChange: e => handleAdvancedChange('z_index', e.target.value),
-							})
-						)
-					)
-			)
-		);
-	}
-
-	// 6. Layout Selection Popup Modal Component
-	function LayoutPopupModal({ closeModal, addContainerPreset }) {
-		const PRESETS = [
-			{ type: '1_container', title: '1 Column Container', desc: '100% Full Width Column', icon: 'crop_16_9' },
-			{ type: '2_col_50_50', title: '2 Columns (50% / 50%)', desc: 'Equal 2 Column Layout', icon: 'view_column' },
-			{ type: '2_col_33_67', title: '2 Columns (33% / 67%)', desc: 'Left Sidebar Layout', icon: 'auto_awesome_mosaic' },
-			{ type: '2_col_67_33', title: '2 Columns (67% / 33%)', desc: 'Right Sidebar Layout', icon: 'auto_awesome_mosaic' },
-			{ type: '3_col', title: '3 Columns (33% / 33% / 33%)', desc: 'Equal 3 Column Layout', icon: 'view_week' },
-			{ type: '4_col', title: '4 Columns (25% each)', desc: 'Equal 4 Column Grid', icon: 'grid_view' },
-			{ type: 'grid_2x2', title: 'Grid 2x2 Layout', desc: '2 Columns by 2 Rows Grid', icon: 'apps' },
-			{ type: 'div_block', title: 'Div Block Container', desc: 'Simple Div Container', icon: 'square' },
-		];
-
-		return h(
-			'div',
-			{ className: 'fixed inset-0 bg-black/75 backdrop-blur-sm z-50 flex items-center justify-center p-4' },
-			h(
-				'div',
-				{ className: 'bg-[#16202e] border border-[#4d4354] rounded-xl w-full max-w-2xl shadow-2xl p-6 text-[#d9e3f6]' },
-				h(
-					'div',
-					{ className: 'flex justify-between items-center border-b border-[#374151] pb-3 mb-4' },
-					h('h3', { className: 'text-lg font-bold text-white flex items-center gap-2' }, h('span', { className: 'material-symbols-outlined text-[#9333ea]' }, 'grid_view'), 'Select Layout Structure'),
-					h('button', { className: 'text-[#cfc2d7] hover:text-white font-bold text-lg', onClick: closeModal }, '✕')
-				),
-
-				h('p', { className: 'text-xs text-[#cfc2d7] mb-4' }, 'Choose a container shape structure to insert into your single product edit canvas:'),
-
-				h(
-					'div',
-					{ className: 'grid grid-cols-2 gap-3 mb-6 max-h-[420px] overflow-y-auto custom-scrollbar p-1' },
-					PRESETS.map(p =>
-						h(
-							'div',
-							{
-								key: p.type,
-								onClick: () => addContainerPreset(p.type),
-								className: 'bg-[#111827] border border-[#374151] hover:border-[#9333ea] hover:bg-[#16202e] rounded-lg p-4 cursor-pointer transition-all flex items-center gap-3 group shadow-md',
-							},
-							h('div', { className: 'w-10 h-10 rounded bg-[#9333ea]/20 text-[#ddb8ff] flex items-center justify-center group-hover:scale-110 transition-transform' }, h('span', { className: 'material-symbols-outlined text-2xl' }, p.icon)),
-							h(
-								'div',
-								null,
-								h('h4', { className: 'text-xs font-bold text-white group-hover:text-[#ddb8ff]' }, p.title),
-								h('p', { className: 'text-[10px] text-[#9ca3af]' }, p.desc)
-							)
-						)
-					)
-				),
-
-				h(
-					'div',
-					{ className: 'flex justify-end pt-3 border-t border-[#374151]' },
-					h('button', { className: 'px-4 py-2 bg-[#121c2a] hover:bg-[#212b39] text-[#d9e3f6] rounded text-xs font-semibold', onClick: closeModal }, 'Cancel')
-				)
-			)
-		);
-	}
-
-	// 7. Display Conditions Modal Component
+	// 6. Display Conditions Modal Component
 	function DisplayConditionsModal({ displayConditions, setDisplayConditions, categories, products, closeModal, saveTemplate }) {
 		return h(
 			'div',

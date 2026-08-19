@@ -17,15 +17,14 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 		 * Constructor.
 		 */
 		public function __construct() {
-			add_action( 'admin_menu', array( $this, 'register_admin_menu' ), 20 );
-			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_builder_assets' ) );
-			add_action( 'in_admin_header', array( $this, 'suppress_builder_admin_notices' ), 1 );
+			add_action( 'admin_enqueue_scripts', array( $this, 'sppcfw_enqueue_builder_assets' ) );
+			add_action( 'in_admin_header', array( $this, 'sppcfw_suppress_builder_admin_notices' ), 1 );
 
 			// AJAX actions
-			add_action( 'wp_ajax_sppcfw_get_builder_products_and_categories', array( $this, 'ajax_get_products_and_categories' ) );
-			add_action( 'wp_ajax_sppcfw_get_builder_product_data', array( $this, 'ajax_get_product_data' ) );
-			add_action( 'wp_ajax_sppcfw_save_builder_template', array( $this, 'ajax_save_builder_template' ) );
-			add_action( 'wp_ajax_sppcfw_load_builder_template', array( $this, 'ajax_load_builder_template' ) );
+			add_action( 'wp_ajax_sppcfw_get_builder_products_and_categories', array( $this, 'sppcfw_ajax_get_products_and_categories' ) );
+			add_action( 'wp_ajax_sppcfw_get_builder_product_data', array( $this, 'sppcfw_ajax_get_product_data' ) );
+			add_action( 'wp_ajax_sppcfw_save_builder_template', array( $this, 'sppcfw_ajax_save_builder_template' ) );
+			add_action( 'wp_ajax_sppcfw_load_builder_template', array( $this, 'sppcfw_ajax_load_builder_template' ) );
 		}
 
 		/**
@@ -33,7 +32,7 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 		 *
 		 * @return void
 		 */
-		public function suppress_builder_admin_notices() {
+		public function sppcfw_suppress_builder_admin_notices() {
 			if ( isset( $_GET['page'] ) && 'sppcfw-single-page-builder' === $_GET['page'] ) {
 				remove_all_actions( 'admin_notices' );
 				remove_all_actions( 'all_admin_notices' );
@@ -77,7 +76,7 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 		 *
 		 * @return void
 		 */
-		public function render_templates_list_view() {
+		public function sppcfw_render_templates_list_view() {
 			if ( ! current_user_can( function_exists( 'sppcfw_admin_capability' ) ? sppcfw_admin_capability() : 'manage_options' ) ) {
 				wp_die( esc_html__( 'You do not have permission to access this page.', 'single-product-customizer' ) );
 			}
@@ -90,7 +89,7 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 		 *
 		 * @return void
 		 */
-		public function render_builder_view() {
+		public function sppcfw_render_builder_view() {
 			if ( ! current_user_can( function_exists( 'sppcfw_admin_capability' ) ? sppcfw_admin_capability() : 'manage_options' ) ) {
 				wp_die( esc_html__( 'You do not have permission to access this page.', 'single-product-customizer' ) );
 			}
@@ -99,12 +98,22 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 		}
 
 		/**
-		 * Enqueue assets for builder screen.
+		 * Enqueue assets for builder screen and template list.
 		 *
 		 * @param string $hook Page hook string.
 		 * @return void
 		 */
-		public function enqueue_builder_assets( $hook ) {
+		public function sppcfw_enqueue_builder_assets( $hook ) {
+			if ( isset( $_GET['page'] ) && ( 'sppcfw-single-page-builder' === $_GET['page'] || 'sppcfw-builder-all-templates' === $_GET['page'] ) ) {
+				// Enqueue Builder Tailwind CSS
+				wp_enqueue_style(
+					'sppcfw-builder-tailwind',
+					SPPCFW_DIR_URL . 'backend/assets/css/builder-tailwind.css',
+					array(),
+					SPPCFW_VERSION
+				);
+			}
+
 			if ( isset( $_GET['page'] ) && 'sppcfw-single-page-builder' === $_GET['page'] ) {
 				// Enqueue React / WP Element
 				wp_enqueue_script( 'wp-element' );
@@ -122,14 +131,6 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 					'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap',
 					array(),
 					null
-				);
-
-				// Enqueue Builder Tailwind CSS & React App script
-				wp_enqueue_style(
-					'sppcfw-builder-tailwind',
-					SPPCFW_DIR_URL . 'backend/assets/css/builder-tailwind.css',
-					array(),
-					SPPCFW_VERSION
 				);
 
 				wp_enqueue_script(
@@ -160,7 +161,7 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 		 *
 		 * @return void
 		 */
-		public function ajax_get_products_and_categories() {
+		public function sppcfw_ajax_get_products_and_categories() {
 			check_ajax_referer( 'sppcfw_builder_nonce', 'nonce' );
 
 			$products   = array();
@@ -216,7 +217,7 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 		 *
 		 * @return void
 		 */
-		public function ajax_get_product_data() {
+		public function sppcfw_ajax_get_product_data() {
 			check_ajax_referer( 'sppcfw_builder_nonce', 'nonce' );
 
 			$product_id = isset( $_POST['product_id'] ) ? intval( $_POST['product_id'] ) : 0;
@@ -433,7 +434,7 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 		 *
 		 * @return void
 		 */
-		public function ajax_save_builder_template() {
+		public function sppcfw_ajax_save_builder_template() {
 			check_ajax_referer( 'sppcfw_builder_nonce', 'nonce' );
 
 			if ( ! current_user_can( function_exists( 'sppcfw_admin_capability' ) ? sppcfw_admin_capability() : 'manage_options' ) ) {
@@ -482,7 +483,7 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 		 *
 		 * @return void
 		 */
-		public function ajax_load_builder_template() {
+		public function sppcfw_ajax_load_builder_template() {
 			check_ajax_referer( 'sppcfw_builder_nonce', 'nonce' );
 
 			$template_id = isset( $_POST['template_id'] ) ? sanitize_text_field( $_POST['template_id'] ) : 'template_default';
