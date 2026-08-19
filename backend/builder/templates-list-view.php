@@ -56,18 +56,21 @@ if ( isset( $_GET['action'] ) && 'duplicate' === $_GET['action'] && isset( $_GET
 }
 
 // Handle Bulk Actions (Move to Trash, Scope updates)
-if ( isset( $_GET['sppcfw_bulk_action_option'] ) && '-1' !== $_GET['sppcfw_bulk_action_option'] && ! empty( $_GET['sppcfw_template_ids'] ) && is_array( $_GET['sppcfw_template_ids'] ) ) {
-	if ( isset( $_GET['sppcfw_bulk_delete_nonce'] ) && wp_verify_nonce( $_GET['sppcfw_bulk_delete_nonce'], 'sppcfw_bulk_delete_action' ) ) {
-		$action_type = sanitize_text_field( $_GET['sppcfw_bulk_action_option'] );
-		$ids_to_act  = array_map( 'sanitize_text_field', $_GET['sppcfw_template_ids'] );
+$bulk_option  = isset( $_REQUEST['sppcfw_bulk_action_option'] ) ? sanitize_text_field( $_REQUEST['sppcfw_bulk_action_option'] ) : '-1';
+$template_ids = isset( $_REQUEST['sppcfw_template_ids'] ) ? (array) $_REQUEST['sppcfw_template_ids'] : array();
+$bulk_nonce   = isset( $_REQUEST['sppcfw_bulk_delete_nonce'] ) ? sanitize_text_field( $_REQUEST['sppcfw_bulk_delete_nonce'] ) : '';
 
-		if ( 'sppcfw_delete' === $action_type ) {
+if ( '-1' !== $bulk_option && ! empty( $template_ids ) ) {
+	if ( empty( $bulk_nonce ) || wp_verify_nonce( $bulk_nonce, 'sppcfw_bulk_delete_action' ) ) {
+		$ids_to_act = array_map( 'sanitize_text_field', $template_ids );
+
+		if ( 'sppcfw_delete' === $bulk_option ) {
 			foreach ( $ids_to_act as $id ) {
 				unset( $templates[ $id ] );
 			}
 			update_option( 'sppcfw_builder_templates', $templates );
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Selected templates moved to trash successfully.', 'single-product-customizer' ) . '</p></div>';
-		} elseif ( 'sppcfw_scope_entire' === $action_type ) {
+		} elseif ( 'sppcfw_scope_entire' === $bulk_option ) {
 			foreach ( $ids_to_act as $id ) {
 				if ( isset( $templates[ $id ] ) ) {
 					$templates[ $id ]['conditions']['scope'] = 'entire';
@@ -76,7 +79,7 @@ if ( isset( $_GET['sppcfw_bulk_action_option'] ) && '-1' !== $_GET['sppcfw_bulk_
 			}
 			update_option( 'sppcfw_builder_templates', $templates );
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Selected templates scope updated to Entire Website.', 'single-product-customizer' ) . '</p></div>';
-		} elseif ( 'sppcfw_scope_category' === $action_type ) {
+		} elseif ( 'sppcfw_scope_category' === $bulk_option ) {
 			foreach ( $ids_to_act as $id ) {
 				if ( isset( $templates[ $id ] ) ) {
 					$templates[ $id ]['conditions']['scope'] = 'category';
@@ -85,7 +88,7 @@ if ( isset( $_GET['sppcfw_bulk_action_option'] ) && '-1' !== $_GET['sppcfw_bulk_
 			}
 			update_option( 'sppcfw_builder_templates', $templates );
 			echo '<div class="notice notice-success is-dismissible"><p>' . esc_html__( 'Selected templates scope updated to Specific Category.', 'single-product-customizer' ) . '</p></div>';
-		} elseif ( 'sppcfw_scope_product' === $action_type ) {
+		} elseif ( 'sppcfw_scope_product' === $bulk_option ) {
 			foreach ( $ids_to_act as $id ) {
 				if ( isset( $templates[ $id ] ) ) {
 					$templates[ $id ]['conditions']['scope'] = 'product';
@@ -123,12 +126,13 @@ foreach ( $templates as $tpl ) {
 }
 krsort( $available_months );
 
-// Status & Date Filter Selections
-$current_status      = isset( $_GET['status'] ) ? sanitize_text_field( $_GET['status'] ) : 'all';
-$current_date_filter = isset( $_GET['sppcfw_filter_date'] ) ? sanitize_text_field( $_GET['sppcfw_filter_date'] ) : 'all';
-$search_query        = isset( $_GET['search_query'] ) ? trim( sanitize_text_field( $_GET['search_query'] ) ) : '';
+// Status, Scope, Date & Search Filter Selections
+$current_status      = isset( $_REQUEST['status'] ) ? sanitize_text_field( $_REQUEST['status'] ) : 'all';
+$current_scope_filter = isset( $_REQUEST['sppcfw_filter_scope'] ) ? sanitize_text_field( $_REQUEST['sppcfw_filter_scope'] ) : 'all';
+$current_date_filter = isset( $_REQUEST['sppcfw_filter_date'] ) ? sanitize_text_field( $_REQUEST['sppcfw_filter_date'] ) : 'all';
+$search_query        = isset( $_REQUEST['search_query'] ) ? trim( sanitize_text_field( $_REQUEST['search_query'] ) ) : '';
 
-// Filter $templates array based on status, date, and search filters
+// Filter $templates array based on status, scope, date, and search filters
 $filtered_templates = array();
 foreach ( $templates as $id => $tpl ) {
 	$st = isset( $tpl['status'] ) ? $tpl['status'] : 'published';
@@ -137,6 +141,14 @@ foreach ( $templates as $id => $tpl ) {
 	}
 	if ( 'draft' === $current_status && 'draft' !== $st ) {
 		continue;
+	}
+
+	// Scope filter
+	$scope = isset( $tpl['conditions']['scope'] ) ? $tpl['conditions']['scope'] : 'entire';
+	if ( 'all' !== $current_scope_filter && ! empty( $current_scope_filter ) ) {
+		if ( $scope !== $current_scope_filter ) {
+			continue;
+		}
 	}
 
 	// Date filter
@@ -179,8 +191,9 @@ $new_template_url = admin_url( 'admin.php?page=sppcfw-single-page-builder&templa
 	</div>
 
 	<?php if ( ! empty( $templates ) ) : ?>
-		<form action="#" method="get" id="sppcfw_template_filter_form" class="sppcfw_card_body posts-filter">
+		<form action="<?php echo esc_url( admin_url( 'admin.php?page=sppcfw-builder-all-templates' ) ); ?>" method="post" id="sppcfw_template_filter_form" class="sppcfw_card_body posts-filter">
 			<input type="hidden" name="page" value="sppcfw-builder-all-templates" />
+			<input type="hidden" name="status" value="<?php echo esc_attr( $current_status ); ?>" />
 			<?php wp_nonce_field( 'sppcfw_bulk_delete_action', 'sppcfw_bulk_delete_nonce' ); ?>
 
 			<!-- Status Subsubsub Bar Above TableNav Box -->
@@ -227,7 +240,7 @@ $new_template_url = admin_url( 'admin.php?page=sppcfw-single-page-builder&templa
 
 				<div class="sppcfw_tablenav_right_side">
 					<p class="sppcfw_search_box">
-						<input type="search" id="sppcfw_search_query" name="search_query" value="" placeholder="<?php esc_html_e( 'Search Templates...', 'single-product-customizer' ); ?>">
+						<input type="search" id="sppcfw_search_query" name="search_query" value="<?php echo esc_attr( $search_query ); ?>" placeholder="<?php esc_html_e( 'Search Templates...', 'single-product-customizer' ); ?>">
 					</p>
 					<div class="tablenav-pages one-page">
 						<span class="displaying-num"><?php echo esc_html( count( $filtered_templates ) . ' ' . __( 'items', 'single-product-customizer' ) ); ?></span>
@@ -315,3 +328,29 @@ $new_template_url = admin_url( 'admin.php?page=sppcfw-single-page-builder&templa
 		</div>
 	<?php endif; ?>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+	var selectAllCb = document.getElementById('sppcfw_cb_select_all');
+	var itemCbs     = document.querySelectorAll('input[name="sppcfw_template_ids[]"]');
+
+	if (selectAllCb) {
+		selectAllCb.addEventListener('change', function() {
+			itemCbs.forEach(function(cb) {
+				cb.checked = selectAllCb.checked;
+			});
+		});
+	}
+
+	if (itemCbs.length > 0) {
+		itemCbs.forEach(function(cb) {
+			cb.addEventListener('change', function() {
+				var allChecked = Array.from(itemCbs).every(function(c) { return c.checked; });
+				if (selectAllCb) {
+					selectAllCb.checked = allChecked;
+				}
+			});
+		});
+	}
+});
+</script>

@@ -244,7 +244,7 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 					echo '<div class="sppcfw-builder-section sppcfw-container-' . esc_attr( $width_mode ) . ' sppcfw-el-' . $id . ' ' . $css_class . '" style="' . $max_w_style . '">';
 					echo '<div class="sppcfw-flex-row" style="display: flex; flex-wrap: wrap; gap: ' . $gap . ';">';
 					if ( ! empty( $el['children'] ) ) {
-						$this->render_elements_recursive( $el['children'] );
+						$this->sppcfw_render_elements_recursive( $el['children'] );
 					}
 					echo '</div>';
 					echo '</div>';
@@ -252,13 +252,13 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 					$flex_width = isset( $settings['flex_width'] ) ? esc_attr( $settings['flex_width'] ) : '100%';
 					echo '<div class="sppcfw-column sppcfw-el-' . $id . ' ' . $css_class . '" style="flex: 1 1 calc(' . $flex_width . ' - 16px); min-width: 250px;">';
 					if ( ! empty( $el['children'] ) ) {
-						$this->render_elements_recursive( $el['children'] );
+						$this->sppcfw_render_elements_recursive( $el['children'] );
 					}
 					echo '</div>';
 				} else {
 					// Render Widget
 					echo '<div class="sppcfw-widget-item sppcfw-el-' . $id . ' ' . $css_class . '">';
-					$this->render_single_widget( $el );
+					$this->sppcfw_render_single_widget( $el );
 					echo '</div>';
 				}
 			}
@@ -270,7 +270,7 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 		 * @param array $el Widget element data.
 		 * @return void
 		 */
-		private function render_single_widget( $el ) {
+		private function sppcfw_render_single_widget( $el ) {
 			global $product;
 
 			if ( ! $product ) {
