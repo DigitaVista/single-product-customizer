@@ -9,7 +9,7 @@
 (function () {
 	'use strict';
 
-	const { createElement: h, useState, useEffect } = window.wp.element;
+	const { createElement: h, useState, useEffect, useRef } = window.wp.element;
 
 	// Helper for AJAX post
 	function apiPost(action, data) {
@@ -1723,21 +1723,81 @@
 		);
 	}
 
-	// 5. Right Floating Structure Panel (Image 2 Mark 1 Dockable Window)
+	// 5. Right Floating Structure Panel (Image 2 Mark 1 Dockable Window - Draggable)
 	function FloatingStructurePanel({ elements, setElements, selectedElementId, setSelectedElementId, removeElement, openElementsTab, closeStructure }) {
 		const [isCollapsed, setIsCollapsed] = useState(false);
+		const [position, setPosition] = useState({ top: 16, right: 16 });
+		const [isDragging, setIsDragging] = useState(false);
+		const dragRef = useRef({ startX: 0, startY: 0, initialTop: 16, initialLeft: null });
+
+		const handleMouseDown = (e) => {
+			if (e.target.closest('button')) return;
+
+			const panelEl = e.currentTarget.closest('.floating-structure-panel');
+			if (!panelEl) return;
+			const rect = panelEl.getBoundingClientRect();
+
+			setIsDragging(true);
+			dragRef.current = {
+				startX: e.clientX,
+				startY: e.clientY,
+				initialTop: rect.top,
+				initialLeft: rect.left,
+			};
+		};
+
+		useEffect(() => {
+			if (!isDragging) return;
+
+			const handleMouseMove = (e) => {
+				const dx = e.clientX - dragRef.current.startX;
+				const dy = e.clientY - dragRef.current.startY;
+
+				let newTop = dragRef.current.initialTop + dy;
+				let newLeft = dragRef.current.initialLeft + dx;
+
+				newTop = Math.max(10, Math.min(window.innerHeight - 60, newTop));
+				newLeft = Math.max(10, Math.min(window.innerWidth - 100, newLeft));
+
+				setPosition({ top: newTop, left: newLeft });
+			};
+
+			const handleMouseUp = () => {
+				setIsDragging(false);
+			};
+
+			window.addEventListener('mousemove', handleMouseMove);
+			window.addEventListener('mouseup', handleMouseUp);
+
+			return () => {
+				window.removeEventListener('mousemove', handleMouseMove);
+				window.removeEventListener('mouseup', handleMouseUp);
+			};
+		}, [isDragging]);
+
+		const panelStyle = position.left !== undefined && position.left !== null
+			? { top: position.top + 'px', left: position.left + 'px', right: 'auto', position: 'fixed' }
+			: { top: position.top + 'px', right: (position.right || 16) + 'px', position: 'fixed' };
 
 		return h(
 			'div',
-			{ className: 'floating-structure-panel select-none' },
+			{
+				className: `floating-structure-panel select-none ${isDragging ? 'dragging' : ''}`,
+				style: panelStyle,
+			},
 
-			// Header Bar: "Structure" (Image 2 Mark 1 Header)
+			// Header Bar: "Structure" (Drag Handle)
 			h(
 				'div',
-				{ className: 'bg-[#121c2a] border-b border-[#374151] p-2.5 flex items-center justify-between rounded-t-8' },
+				{
+					className: 'bg-[#121c2a] border-b border-[#374151] p-2.5 flex items-center justify-between rounded-t-8 cursor-grab active:cursor-grabbing hover:bg-[#1a2638] transition-colors',
+					onMouseDown: handleMouseDown,
+					title: 'Click and drag to move panel',
+				},
 				h(
 					'div',
-					{ className: 'flex items-center gap-1.5' },
+					{ className: 'flex items-center gap-1.5 pointer-events-none' },
+					h('span', { className: 'material-symbols-outlined text-base text-[#9333ea]' }, 'drag_indicator'),
 					h('span', { className: 'material-symbols-outlined text-base text-[#9333ea]' }, 'account_tree'),
 					h('h3', { className: 'text-xs font-extrabold text-[#d9e3f6] uppercase tracking-wider' }, 'Structure')
 				),
