@@ -191,25 +191,25 @@ $new_template_url = admin_url( 'admin.php?page=sppcfw-single-page-builder&templa
 	</div>
 
 	<?php if ( ! empty( $templates ) ) : ?>
-		<form action="<?php echo esc_url( admin_url( 'admin.php?page=sppcfw-builder-all-templates' ) ); ?>" method="post" id="sppcfw_template_filter_form" class="sppcfw_card_body posts-filter">
-			<input type="hidden" name="page" value="sppcfw-builder-all-templates" />
+		<form action="<?php echo esc_url( admin_url( 'admin.php?page=sppcfw-single-page-builder' ) ); ?>" method="post" id="sppcfw_template_filter_form" class="sppcfw_card_body posts-filter">
+			<input type="hidden" name="page" value="sppcfw-single-page-builder" />
 			<input type="hidden" name="status" value="<?php echo esc_attr( $current_status ); ?>" />
 			<?php wp_nonce_field( 'sppcfw_bulk_delete_action', 'sppcfw_bulk_delete_nonce' ); ?>
 
 			<!-- Status Subsubsub Bar Above TableNav Box -->
 			<ul class="subsubsub sppcfw_status_tabs">
 				<li class="all">
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=sppcfw-builder-all-templates&status=all' ) ); ?>" class="<?php echo ( 'all' === $current_status || '' === $current_status ) ? 'current' : ''; ?>">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=sppcfw-single-page-builder&status=all' ) ); ?>" class="<?php echo ( 'all' === $current_status || '' === $current_status ) ? 'current' : ''; ?>">
 						<?php esc_html_e( 'All', 'single-product-customizer' ); ?> <span class="count">(<?php echo esc_html( $count_all ); ?>)</span>
 					</a> |
 				</li>
 				<li class="published">
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=sppcfw-builder-all-templates&status=published' ) ); ?>" class="<?php echo 'published' === $current_status ? 'current' : ''; ?>">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=sppcfw-single-page-builder&status=published' ) ); ?>" class="<?php echo 'published' === $current_status ? 'current' : ''; ?>">
 						<?php esc_html_e( 'Published', 'single-product-customizer' ); ?> <span class="count">(<?php echo esc_html( $count_published ); ?>)</span>
 					</a> |
 				</li>
 				<li class="draft">
-					<a href="<?php echo esc_url( admin_url( 'admin.php?page=sppcfw-builder-all-templates&status=draft' ) ); ?>" class="<?php echo 'draft' === $current_status ? 'current' : ''; ?>">
+					<a href="<?php echo esc_url( admin_url( 'admin.php?page=sppcfw-single-page-builder&status=draft' ) ); ?>" class="<?php echo 'draft' === $current_status ? 'current' : ''; ?>">
 						<?php esc_html_e( 'Draft', 'single-product-customizer' ); ?> <span class="count">(<?php echo esc_html( $count_draft ); ?>)</span>
 					</a>
 				</li>
@@ -265,8 +265,8 @@ $new_template_url = admin_url( 'admin.php?page=sppcfw-single-page-builder&templa
 					<?php foreach ( $filtered_templates as $t_id => $tpl ) : ?>
 						<?php
 						$edit_url = admin_url( 'admin.php?page=sppcfw-single-page-builder&template_id=' . esc_attr( $t_id ) );
-						$dup_url  = wp_nonce_url( admin_url( 'admin.php?page=sppcfw-builder-all-templates&action=duplicate&template_id=' . esc_attr( $t_id ) ), 'sppcfw_duplicate_template_' . $t_id );
-						$del_url  = wp_nonce_url( admin_url( 'admin.php?page=sppcfw-builder-all-templates&action=delete&template_id=' . esc_attr( $t_id ) ), 'sppcfw_delete_template_' . $t_id );
+						$dup_url  = wp_nonce_url( admin_url( 'admin.php?page=sppcfw-single-page-builder&action=duplicate&template_id=' . esc_attr( $t_id ) ), 'sppcfw_duplicate_template_' . $t_id );
+						$del_url  = wp_nonce_url( admin_url( 'admin.php?page=sppcfw-single-page-builder&action=delete&template_id=' . esc_attr( $t_id ) ), 'sppcfw_delete_template_' . $t_id );
 
 						$scope       = isset( $tpl['conditions']['scope'] ) ? $tpl['conditions']['scope'] : 'entire';
 						$scope_label = 'entire' === $scope ? __( 'Entire Website', 'single-product-customizer' ) : ( 'category' === $scope ? __( 'Specific Category', 'single-product-customizer' ) : __( 'Specific Product', 'single-product-customizer' ) );

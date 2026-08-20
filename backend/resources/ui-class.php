@@ -949,21 +949,11 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
                 array( $this, 'plugin_page' )
             );
 
-            // Submenu: All Templates
+            // Submenu: Single Page Builder
             add_submenu_page(
                 $parent_slug,
-                __( 'All Templates', 'single-product-customizer' ),
-                __( 'All Templates', 'single-product-customizer' ),
-                $capability,
-                'sppcfw-builder-all-templates',
-                array( $this, 'templates_list_page' )
-            );
-
-            // Submenu: Add New Template
-            add_submenu_page(
-                $parent_slug,
-                __( 'Add New Template', 'single-product-customizer' ),
-                __( 'Add New Template', 'single-product-customizer' ),
+                __( 'Single Page Builder', 'single-product-customizer' ),
+                __( 'Single Page Builder', 'single-product-customizer' ),
                 $capability,
                 'sppcfw-single-page-builder',
                 array( $this, 'builder_page' )
@@ -975,11 +965,15 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
         }
 
         public function builder_page() {
-            require_once SPPCFW_DIR_PATH . 'backend/builder/builder-view.php';
+            if ( isset( $_GET['template_id'] ) ) {
+                require_once SPPCFW_DIR_PATH . 'backend/builder/builder-view.php';
+            } else {
+                require_once SPPCFW_DIR_PATH . 'backend/builder/templates-list-view.php';
+            }
         }
 
         /**
-         * Format admin sidebar menu to display Single Page Builder header and nested items (Image 1 style).
+         * Format admin sidebar menu to display Dashboard Settings title.
          */
         public function sppcfw_format_admin_sidebar_menu() {
             global $submenu;
@@ -989,50 +983,9 @@ if ( ! class_exists( 'SPPCFW_backend_ui' ) ) :
                 return;
             }
 
-            $formatted  = array();
-            $seen_slugs = array();
-
-            $icon_dashboard = '<span class="dashicons dashicons-dashboard" style="font-size: 15px; width:15px; height:15px; margin-right: 6px; vertical-align: middle;"></span>';
-            $icon_header    = '<span style="font-size: 9px; margin-right: 6px; display: inline-block; transform: translateY(-1px);">▼</span>';
-            $icon_templates = '<span class="dashicons dashicons-category" style="font-size: 14px; width:14px; height:14px; margin-right: 6px; vertical-align: middle;"></span>';
-            $icon_add_new   = '<span class="dashicons dashicons-plus-alt2" style="font-size: 14px; width:14px; height:14px; margin-right: 6px; vertical-align: middle;"></span>';
-
-            foreach ( $submenu[ $parent ] as $item ) {
-                if ( ! is_array( $item ) || empty( $item[2] ) ) {
-                    continue;
-                }
-
-                $slug = (string) $item[2];
-
-                if ( in_array( $slug, $seen_slugs, true ) ) {
-                    continue;
-                }
-                $seen_slugs[] = $slug;
-
-                if ( 'sppcfw-single-product-customizer' === $slug ) {
-                    $item[0]     = $icon_dashboard . __( 'Dashboard Settings', 'single-product-customizer' );
-                    $formatted[] = $item;
-
-                    // Header item for Single Page Builder
-                    $formatted[] = array(
-                        $icon_header . '<strong>' . __( 'Single Page Builder', 'single-product-customizer' ) . '</strong>',
-                        'manage_options',
-                        'sppcfw-builder-all-templates',
-                        __( 'Single Page Builder', 'single-product-customizer' ),
-                        'sppcfw-menu-header-item',
-                    );
-                } elseif ( 'sppcfw-builder-all-templates' === $slug ) {
-                    $item[0]     = '<span style="padding-left: 14px; display: inline-flex; align-items: center;">' . $icon_templates . __( 'All Templates', 'single-product-customizer' ) . '</span>';
-                    $formatted[] = $item;
-                } elseif ( 'sppcfw-single-page-builder' === $slug ) {
-                    $item[0]     = '<span style="padding-left: 14px; display: inline-flex; align-items: center;">' . $icon_add_new . __( 'Add New Template', 'single-product-customizer' ) . '</span>';
-                    $formatted[] = $item;
-                } else {
-                    $formatted[] = $item;
-                }
+            if ( isset( $submenu[ $parent ][0] ) && is_array( $submenu[ $parent ][0] ) ) {
+                $submenu[ $parent ][0][0] = __( 'Dashboard Settings', 'single-product-customizer' );
             }
-
-            $submenu[ $parent ] = $formatted;
         }
 
         /**

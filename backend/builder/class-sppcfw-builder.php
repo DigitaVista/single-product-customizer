@@ -40,37 +40,7 @@ if ( ! class_exists( 'SPPCFW_Builder' ) ) {
 				remove_all_actions( 'network_admin_notices' );
 			}
 		}
-
-		/**
-		 * Register admin menu items for Single Page Builder.
-		 *
-		 * @return void
-		 */
-		public function register_admin_menu() {
-			$parent_slug = 'sppcfw-single-product-customizer';
-			$capability  = function_exists( 'sppcfw_admin_capability' ) ? sppcfw_admin_capability() : 'manage_options';
-
-			// 1. All Templates Submenu
-			add_submenu_page(
-				$parent_slug,
-				__( 'All Templates', 'single-product-customizer' ),
-				__( 'All Templates', 'single-product-customizer' ),
-				$capability,
-				'sppcfw-builder-all-templates',
-				array( $this, 'render_templates_list_view' )
-			);
-
-			// 2. Add New Template Submenu (Opens Builder)
-			add_submenu_page(
-				$parent_slug,
-				__( 'Add New Template', 'single-product-customizer' ),
-				__( 'Add New Template', 'single-product-customizer' ),
-				$capability,
-				'sppcfw-single-page-builder',
-				array( $this, 'render_builder_view' )
-			);
-		}
-
+ 
 		/**
 		 * Render templates list view screen.
 		 *
