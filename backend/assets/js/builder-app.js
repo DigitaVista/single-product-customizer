@@ -465,7 +465,7 @@
 			// Main Workspace Grid
 			h(
 				'div',
-				{ className: 'flex flex-1 pt-12 overflow-hidden relative' },
+				{ className: 'sppcfw-builder-workspace flex flex-1 pt-12 overflow-hidden relative' },
 
 				// Left Rail Navigation Icons
 				h(LeftRail, {
@@ -541,7 +541,7 @@
 	function TopBar({ templateTitle, setTemplateTitle, deviceView, setDeviceView, saveTemplate, isSaving, statusMessage, openElementsTab, isStructureOpen, setIsStructureOpen, openConditionsModal }) {
 		return h(
 			'header',
-			{ className: 'bg-[#16202e] border-b border-[#4d4354] h-12 fixed top-0 left-0 right-0 z-50 flex justify-between items-center px-4 select-none' },
+			{ className: 'bg-[#16202e] border-b border-[#4d4354] h-12 top-0 left-0 right-0 z-50 flex justify-between items-center px-4 select-none' },
 			h(
 				'div',
 				{ className: 'flex items-center gap-3' },
@@ -1723,26 +1723,29 @@
 		);
 	}
 
-	// 5. Right Floating Structure Panel (Image 2 Mark 1 Dockable Window - Draggable)
+	// 5. Right Floating Structure Panel (Image 2 Mark 1 Dockable Window - Draggable bounded to workspace)
 	function FloatingStructurePanel({ elements, setElements, selectedElementId, setSelectedElementId, removeElement, openElementsTab, closeStructure }) {
 		const [isCollapsed, setIsCollapsed] = useState(false);
-		const [position, setPosition] = useState({ top: 16, right: 16 });
+		const [position, setPosition] = useState({ top: 16, left: null, right: 16 });
 		const [isDragging, setIsDragging] = useState(false);
-		const dragRef = useRef({ startX: 0, startY: 0, initialTop: 16, initialLeft: null });
+		const dragRef = useRef({ startX: 0, startY: 0, initialTopRel: 16, initialLeftRel: null });
 
 		const handleMouseDown = (e) => {
 			if (e.target.closest('button')) return;
 
 			const panelEl = e.currentTarget.closest('.floating-structure-panel');
 			if (!panelEl) return;
-			const rect = panelEl.getBoundingClientRect();
+
+			const workspaceEl = panelEl.closest('.sppcfw-builder-workspace') || document.querySelector('.sppcfw-builder-workspace');
+			const wsRect = workspaceEl ? workspaceEl.getBoundingClientRect() : { left: 0, top: 0 };
+			const panelRect = panelEl.getBoundingClientRect();
 
 			setIsDragging(true);
 			dragRef.current = {
 				startX: e.clientX,
 				startY: e.clientY,
-				initialTop: rect.top,
-				initialLeft: rect.left,
+				initialTopRel: panelRect.top - wsRect.top,
+				initialLeftRel: panelRect.left - wsRect.left,
 			};
 		};
 
@@ -1753,11 +1756,24 @@
 				const dx = e.clientX - dragRef.current.startX;
 				const dy = e.clientY - dragRef.current.startY;
 
-				let newTop = dragRef.current.initialTop + dy;
-				let newLeft = dragRef.current.initialLeft + dx;
+				let newTop = dragRef.current.initialTopRel + dy;
+				let newLeft = dragRef.current.initialLeftRel + dx;
 
-				newTop = Math.max(10, Math.min(window.innerHeight - 60, newTop));
-				newLeft = Math.max(10, Math.min(window.innerWidth - 100, newLeft));
+				const workspaceEl = document.querySelector('.sppcfw-builder-workspace');
+				const panelEl = document.querySelector('.floating-structure-panel');
+
+				const wsWidth = workspaceEl ? workspaceEl.clientWidth : window.innerWidth;
+				const wsHeight = workspaceEl ? workspaceEl.clientHeight : window.innerHeight;
+				const panelWidth = panelEl ? panelEl.offsetWidth : 280;
+				const panelHeight = panelEl ? panelEl.offsetHeight : 300;
+
+				const minTop = 8;
+				const maxTop = Math.max(minTop, wsHeight - panelHeight - 8);
+				const minLeft = 8;
+				const maxLeft = Math.max(minLeft, wsWidth - panelWidth - 8);
+
+				newTop = Math.max(minTop, Math.min(maxTop, newTop));
+				newLeft = Math.max(minLeft, Math.min(maxLeft, newLeft));
 
 				setPosition({ top: newTop, left: newLeft });
 			};
@@ -1776,8 +1792,8 @@
 		}, [isDragging]);
 
 		const panelStyle = position.left !== undefined && position.left !== null
-			? { top: position.top + 'px', left: position.left + 'px', right: 'auto', position: 'fixed' }
-			: { top: position.top + 'px', right: (position.right || 16) + 'px', position: 'fixed' };
+			? { top: position.top + 'px', left: position.left + 'px', right: 'auto', position: 'absolute' }
+			: { top: '16px', right: '16px', position: 'absolute' };
 
 		return h(
 			'div',
