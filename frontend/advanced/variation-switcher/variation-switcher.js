@@ -7,7 +7,7 @@ jQuery(function ($) {
     .on("found_variation reset_data", "form.variations_form", function () {
       setTimeout(initVariationSwitcher, 100);
     })
-    .on("change", ".vairation_select", function () {
+    .on("change", ".sppcfw-variation-select", function () {
       setTimeout(initVariationSwitcher, 100);
     })
     .on("show_variation hide_variation", function () {
@@ -15,19 +15,19 @@ jQuery(function ($) {
     });
 
   function initVariationSwitcher() {
-    $(".webfwc_variation_button.color").each(function () {
+    $(".sppcfw-variation-button.color").each(function () {
       let bgColor = $(this).data("bg-color");
       if (bgColor) $(this).css("background-color", bgColor);
     });
 
-    $("button.webfwc_variation_button")
+    $("button.sppcfw-variation-button")
       .off("click")
       .on("click", function () {
-        if ($(this).hasClass("webcfwc_btn_disable")) return false;
+        if ($(this).hasClass("sppcfw-btn-disable")) return false;
 
         let btnVal = $(this).data("val");
-        let $parent = $(this).closest(".cu_button_el");
-        let $select = $parent.find("select.vairation_select");
+        let $parent = $(this).closest(".sppcfw-cu-button-el");
+        let $select = $parent.find("select.sppcfw-variation-select");
 
         $select.val(btnVal).trigger("change");
 
@@ -41,7 +41,7 @@ jQuery(function ($) {
         }
 
         $parent
-          .find("button.webfwc_variation_button.selected")
+          .find("button.sppcfw-variation-button.selected")
           .removeClass("selected");
         $(this).addClass("selected");
       });
@@ -50,41 +50,41 @@ jQuery(function ($) {
   }
 
   function updateVariationButtons() {
-    $(".cu_button_el").each(function () {
+    $(".sppcfw-cu-button-el").each(function () {
       let $container = $(this);
-      let selectedVal = $container.find("select.vairation_select").val();
+      let selectedVal = $container.find("select.sppcfw-variation-select").val();
 
       $container
-        .find("button.webfwc_variation_button.selected")
+        .find("button.sppcfw-variation-button.selected")
         .removeClass("selected");
       if (selectedVal) {
         $container
           .find(
-            "button.webfwc_variation_button[data-val='" + selectedVal + "']"
+            "button.sppcfw-variation-button[data-val='" + selectedVal + "']"
           )
           .addClass("selected");
       }
 
-      let $buttons = $container.find(".webfwc_variation_button");
+      let $buttons = $container.find(".sppcfw-variation-button");
       let $form = $container.closest("form.variations_form");
       let variations =
         $form.data("product_variations") || $form.data("variations");
 
       if (variations && Array.isArray(variations)) {
         let selections = {};
-        $form.find("select.vairation_select").each(function () {
+        $form.find("select.sppcfw-variation-select").each(function () {
           let name = $(this).attr("name");
           if (name) selections[name] = $(this).val();
         });
 
-        let thisName = $container.find("select.vairation_select").attr("name");
+        let thisName = $container.find("select.sppcfw-variation-select").attr("name");
 
         $buttons.each(function () {
           let $btn = $(this),
             btnVal = $btn.data("val");
 
           if (!btnVal) {
-            $btn.addClass("webcfwc_btn_disable");
+            $btn.addClass("sppcfw-btn-disable");
             return;
           }
 
@@ -115,7 +115,7 @@ jQuery(function ($) {
               })
           );
 
-          $btn.toggleClass("webcfwc_btn_disable", !matchExists);
+          $btn.toggleClass("sppcfw-btn-disable", !matchExists);
         });
         return;
       }
@@ -127,7 +127,7 @@ jQuery(function ($) {
       });
 
       if ($container.find("option:disabled").length === 0) {
-        $buttons.removeClass("webcfwc_btn_disable");
+        $buttons.removeClass("sppcfw-btn-disable");
         return;
       }
 
@@ -135,9 +135,9 @@ jQuery(function ($) {
         let btnVal = $(this).data("val");
         $btn = $(this);
         if (btnVal && enabledOptions.includes(btnVal.toString())) {
-          $btn.removeClass("webcfwc_btn_disable");
+          $btn.removeClass("sppcfw-btn-disable");
         } else {
-          $btn.addClass("webcfwc_btn_disable");
+          $btn.addClass("sppcfw-btn-disable");
         }
       });
     });

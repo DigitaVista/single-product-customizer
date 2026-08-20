@@ -157,11 +157,26 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 		private function sppcfw_generate_recursive_styles( $elements ) {
 			$css = '';
 			foreach ( $elements as $el ) {
-				$id     = isset( $el['id'] ) ? esc_attr( $el['id'] ) : '';
-				$styles = isset( $el['styles'] ) ? $el['styles'] : array();
+				$type     = isset( $el['type'] ) ? $el['type'] : '';
+				$id       = isset( $el['id'] ) ? esc_attr( $el['id'] ) : '';
+				$settings = isset( $el['settings'] ) ? $el['settings'] : array();
+				$styles   = isset( $el['styles'] ) ? $el['styles'] : array();
 
-				if ( $id && ! empty( $styles ) ) {
+				if ( $id ) {
 					$css .= ".sppcfw-el-{$id} {";
+					if ( 'container' === $type ) {
+						$width_mode  = isset( $settings['width_mode'] ) && 'full' === $settings['width_mode'] ? 'full' : 'boxed';
+						$boxed_width = isset( $settings['boxed_width'] ) ? esc_attr( $settings['boxed_width'] ) : '1140px';
+						if ( 'boxed' === $width_mode ) {
+							$css .= "max-width: {$boxed_width} !important; margin: 0 auto 24px auto !important;";
+						} else {
+							$css .= "width: 100% !important; margin-bottom: 24px !important;";
+						}
+					} elseif ( 'column' === $type ) {
+						$flex_width = isset( $settings['flex_width'] ) ? esc_attr( $settings['flex_width'] ) : '100%';
+						$css .= "flex: 1 1 calc({$flex_width} - 16px) !important; min-width: 250px !important;";
+					}
+
 					if ( ! empty( $styles['text_color'] ) ) {
 						$css .= 'color: ' . esc_attr( $styles['text_color'] ) . ' !important;';
 					}
@@ -191,6 +206,11 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 						$css .= 'margin-bottom: ' . esc_attr( $styles['margin_bottom'] ) . ' !important;';
 					}
 					$css .= '}';
+
+					if ( 'container' === $type ) {
+						$gap = isset( $settings['gap'] ) ? esc_attr( $settings['gap'] ) : '16px';
+						$css .= ".sppcfw-el-{$id} > .sppcfw-flex-row { gap: {$gap} !important; }";
+					}
 				}
 
 				if ( ! empty( $el['children'] ) && is_array( $el['children'] ) ) {
@@ -236,21 +256,17 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 				$css_class  = ! empty( $advanced['custom_class'] ) ? esc_attr( $advanced['custom_class'] ) : '';
 
 				if ( 'container' === $type ) {
-					$width_mode  = isset( $settings['width_mode'] ) && 'full' === $settings['width_mode'] ? 'full' : 'boxed';
-					$boxed_width = isset( $settings['boxed_width'] ) ? esc_attr( $settings['boxed_width'] ) : '1140px';
-					$gap         = isset( $settings['gap'] ) ? esc_attr( $settings['gap'] ) : '16px';
-					$max_w_style = 'boxed' === $width_mode ? "max-width: {$boxed_width}; margin: 0 auto 24px auto;" : 'width: 100%; margin-bottom: 24px;';
+					$width_mode = isset( $settings['width_mode'] ) && 'full' === $settings['width_mode'] ? 'full' : 'boxed';
 
-					echo '<div class="sppcfw-builder-section sppcfw-container-' . esc_attr( $width_mode ) . ' sppcfw-el-' . $id . ' ' . $css_class . '" style="' . $max_w_style . '">';
-					echo '<div class="sppcfw-flex-row" style="display: flex; flex-wrap: wrap; gap: ' . $gap . ';">';
+					echo '<div class="sppcfw-builder-section sppcfw-container-' . esc_attr( $width_mode ) . ' sppcfw-el-' . $id . ' ' . $css_class . '">';
+					echo '<div class="sppcfw-flex-row">';
 					if ( ! empty( $el['children'] ) ) {
 						$this->sppcfw_render_elements_recursive( $el['children'] );
 					}
 					echo '</div>';
 					echo '</div>';
 				} elseif ( 'column' === $type ) {
-					$flex_width = isset( $settings['flex_width'] ) ? esc_attr( $settings['flex_width'] ) : '100%';
-					echo '<div class="sppcfw-column sppcfw-el-' . $id . ' ' . $css_class . '" style="flex: 1 1 calc(' . $flex_width . ' - 16px); min-width: 250px;">';
+					echo '<div class="sppcfw-column sppcfw-el-' . $id . ' ' . $css_class . '">';
 					if ( ! empty( $el['children'] ) ) {
 						$this->sppcfw_render_elements_recursive( $el['children'] );
 					}

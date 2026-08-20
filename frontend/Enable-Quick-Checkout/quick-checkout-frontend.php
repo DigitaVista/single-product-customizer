@@ -96,14 +96,14 @@ if (!class_exists('Sppcfw_Frontend_Quick_Checkout')) {
             $this->sppcfw_rendering_fallback = true;
             try {
                 if (file_exists($template_path)) {
-                    echo '<div class="sppcfw-quick-checkout-wrapper" style="margin: 20px 0;">';
+                    echo '<div class="sppcfw-quick-checkout-wrapper">';
                     include $template_path;
                     echo '</div>';
                 } else {
                     // Fallback to default if template doesn't exist
                     $default_path = $this->sppcfw_get_template_path('default');
                     if (file_exists($default_path)) {
-                        echo '<div class="sppcfw-quick-checkout-wrapper" style="margin: 20px 0;">';
+                        echo '<div class="sppcfw-quick-checkout-wrapper">';
                         include $default_path;
                         echo '</div>';
                     }

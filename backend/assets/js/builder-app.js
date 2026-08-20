@@ -465,7 +465,7 @@
 			// Main Workspace Grid
 			h(
 				'div',
-				{ className: 'sppcfw-builder-workspace flex flex-1 pt-12 overflow-hidden relative' },
+				{ className: 'sppcfw-builder-workspace flex flex-1 overflow-hidden relative' },
 
 				// Left Rail Navigation Icons
 				h(LeftRail, {
@@ -1648,7 +1648,7 @@
 
 		return h(
 			'main',
-			{ className: 'flex-1 bg-[#0f172a] overflow-y-auto relative p-8 flex flex-col items-center custom-scrollbar' },
+			{ className: 'flex-1 bg-[#0f172a] overflow-y-auto relative flex flex-col items-center custom-scrollbar' },
 
 			// Outer Canvas Container
 			h(

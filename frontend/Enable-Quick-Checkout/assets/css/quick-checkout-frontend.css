@@ -73,6 +73,16 @@
     line-height: 1.6;
 }
 
+.sppcfw-quick-checkout-wrapper {
+    margin: 20px 0;
+}
+
+.sppcfw-checkout-quantity {
+    width: 60px;
+    display: inline-block;
+    text-align: center;
+}
+
 /* Responsive Design */
 @media (max-width: 768px) {
     .sppcfw-qc-modal-content {
