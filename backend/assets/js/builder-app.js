@@ -279,6 +279,14 @@
 			product_ids: [],
 		});
 
+		const [pageSettings, setPageSettings] = useState({
+			status: 'Published',
+			hideTitle: false,
+			pageLayout: 'Default',
+			bgColor: '#091421',
+			customCss: '',
+		});
+
 		const [isSaving, setIsSaving] = useState(false);
 		const [statusMessage, setStatusMessage] = useState('');
 
@@ -301,6 +309,11 @@
 					}
 					if (tpl.conditions) {
 						setDisplayConditions(tpl.conditions);
+					}
+					if (tpl.page_settings) {
+						setPageSettings(tpl.page_settings);
+					} else if (tpl.status) {
+						setPageSettings(prev => ({ ...prev, status: tpl.status }));
 					}
 				}
 			});
@@ -410,10 +423,15 @@
 
 		function saveTemplate() {
 			setIsSaving(true);
-			setStatusMessage('Publishing template...');
+			const currentStatus = (pageSettings && pageSettings.status) || 'Published';
+			const isDraft = currentStatus === 'Draft';
+			setStatusMessage(isDraft ? 'Saving draft...' : 'Publishing template...');
+
 			apiPost('sppcfw_save_builder_template', {
 				template_id: templateId,
 				template_title: templateTitle,
+				status: currentStatus,
+				page_settings: JSON.stringify(pageSettings),
 				layout: JSON.stringify(elements),
 				conditions: JSON.stringify(displayConditions),
 			}).then(res => {
@@ -422,10 +440,10 @@
 					if (res.data && res.data.template_id) {
 						setTemplateId(res.data.template_id);
 					}
-					setStatusMessage(res.data.message || 'Published successfully!');
+					setStatusMessage(res.data.message || (isDraft ? 'Draft saved successfully!' : 'Published successfully!'));
 					setTimeout(() => setStatusMessage(''), 4000);
 				} else {
-					setStatusMessage('Failed to publish template.');
+					setStatusMessage('Failed to save template.');
 				}
 			});
 		}
@@ -443,6 +461,12 @@
 			setSearchQuery('');
 		}
 
+		// Helper to open Page Settings (Post Settings) panel button
+		function openPageSettings() {
+			setActiveLeftTab('settings');
+			setSelectedElementId(null);
+		}
+
 		return h(
 			'div',
 			{ className: 'sppcfw-builder-layout flex flex-col h-screen w-screen overflow-hidden bg-[#091421] text-[#d9e3f6]' },
@@ -457,6 +481,9 @@
 				isSaving,
 				statusMessage,
 				openElementsTab,
+				openPageSettings,
+				activeLeftTab,
+				pageSettings,
 				isStructureOpen,
 				setIsStructureOpen,
 				openConditionsModal: () => setIsConditionsModalOpen(true),
@@ -474,7 +501,7 @@
 					openElementsTab,
 				}),
 
-				// Left Sidebar Panel (Renders Inspector on left when element selected, or Elements Library when none selected)
+				// Left Sidebar Panel (Renders Inspector on left when element selected, Post Settings when settings active, or Elements Library)
 				h(LeftPanel, {
 					selectedElement,
 					updateElementProperties,
@@ -494,6 +521,11 @@
 					setElements,
 					selectedElementId,
 					setSelectedElementId,
+					templateTitle,
+					setTemplateTitle,
+					pageSettings,
+					setPageSettings,
+					openElementsTab,
 				}),
 
 				// Central Canvas Workspace
@@ -504,6 +536,7 @@
 					selectedElementId,
 					setSelectedElementId,
 					sampleData: CANVAS_STATIC_DATA,
+					pageSettings,
 					removeElement,
 					addWidgetToTarget,
 					openElementsTab,
@@ -538,7 +571,7 @@
 	}
 
 	// 1. Top Navigation Bar Component (Positioned: Left [Mark 1,2,3], Center [Mark 4], Right [Mark 5])
-	function TopBar({ templateTitle, setTemplateTitle, deviceView, setDeviceView, saveTemplate, isSaving, statusMessage, openElementsTab, isStructureOpen, setIsStructureOpen, openConditionsModal }) {
+	function TopBar({ templateTitle, setTemplateTitle, deviceView, setDeviceView, saveTemplate, isSaving, statusMessage, openElementsTab, openPageSettings, activeLeftTab, pageSettings, isStructureOpen, setIsStructureOpen, openConditionsModal }) {
 		const [isMenuOpen, setIsMenuOpen] = useState(false);
 		const menuRef = useRef(null);
 
@@ -552,6 +585,18 @@
 			document.addEventListener('mousedown', handleClickOutside);
 			return () => document.removeEventListener('mousedown', handleClickOutside);
 		}, []);
+
+		const currentStatus = (pageSettings && pageSettings.status) || 'Published';
+		let publishLabel = 'Publish';
+		if (isSaving) {
+			publishLabel = currentStatus === 'Draft' ? 'Saving...' : 'Publishing...';
+		} else if (currentStatus === 'Draft') {
+			publishLabel = 'Save Draft';
+		} else if (currentStatus === 'Pending Review' || currentStatus === 'Private') {
+			publishLabel = 'Save (' + currentStatus + ')';
+		} else {
+			publishLabel = 'Publish';
+		}
 
 		return h(
 			'header',
@@ -603,12 +648,15 @@
 					h('span', { className: 'material-symbols-outlined text-base' }, 'add')
 				),
 
-				// Mark-3: Document with Gear Icon Button
+				// Mark-3: Document with Gear Icon Button (Post Settings)
 				h(
 					'button',
 					{
-						className: 'w-7 h-7 bg-[#262626] hover:bg-[#333333] border border-[#3a3a3a] text-white rounded flex items-center justify-center transition-colors cursor-pointer',
-						title: 'Page Settings (Mark-3)',
+						className: `w-7 h-7 bg-[#262626] hover:bg-[#333333] border rounded flex items-center justify-center transition-colors cursor-pointer ${
+							activeLeftTab === 'settings' ? 'border-[#9333ea] text-white bg-[#333333]' : 'border-[#3a3a3a] text-white'
+						}`,
+						onClick: openPageSettings,
+						title: 'Page Settings',
 					},
 					h('span', { className: 'material-symbols-outlined text-base' }, 'article')
 				),
@@ -723,7 +771,7 @@
 								onClick: saveTemplate,
 								disabled: isSaving,
 							},
-							isSaving ? 'Publishing...' : 'Publish',
+							publishLabel,
 							h('span', { className: 'material-symbols-outlined text-sm text-purple-300', onClick: (e) => { e.stopPropagation(); openConditionsModal(); } }, 'expand_more')
 						)
 					)
@@ -752,7 +800,7 @@
 		);
 	}
 
-	// 3. Left Panel (Renders LeftInspector when element selected, or Elements Library when none selected)
+	// 3. Left Panel (Renders LeftInspector when element selected, Post Settings when settings tab active, or Elements Library)
 	function LeftPanel({
 		selectedElement,
 		updateElementProperties,
@@ -772,6 +820,11 @@
 		setElements,
 		selectedElementId,
 		setSelectedElementId,
+		templateTitle,
+		setTemplateTitle,
+		pageSettings,
+		setPageSettings,
+		openElementsTab,
 	}) {
 		// If an element or container is selected, render the LEFT-SIDE "Edit Container" / "Edit Element" Inspector
 		if (selectedElement) {
@@ -784,7 +837,18 @@
 			});
 		}
 
-		// Otherwise, render the Left Elements Panel (Image 1 Mark 1, Mark 2, Mark 3)
+		// If activeLeftTab is 'settings', render the Post Settings panel
+		if (activeLeftTab === 'settings') {
+			return h(PageSettingsPanel, {
+				templateTitle,
+				setTemplateTitle,
+				pageSettings,
+				setPageSettings,
+				closePanel: openElementsTab,
+			});
+		}
+
+		// Otherwise, render the Left Elements Panel
 		return h(LeftElementsPanel, {
 			activeSubTab,
 			setActiveSubTab,
@@ -798,6 +862,243 @@
 			addContainerPreset,
 			elements,
 		});
+	}
+
+	// 3c. Page Settings (Post Settings) Panel Component
+	function PageSettingsPanel({ templateTitle, setTemplateTitle, pageSettings, setPageSettings, closePanel }) {
+		const [activeTab, setActiveTab] = useState('settings'); // 'settings' | 'style' | 'advanced'
+		const [isGeneralOpen, setIsGeneralOpen] = useState(true);
+
+		function handlePageSettingChange(key, value) {
+			setPageSettings(prev => ({ ...prev, [key]: value }));
+		}
+
+		return h(
+			'aside',
+			{ className: 'w-[340px] bg-[#1f2937] border-r border-[#374151] flex flex-col ml-[64px] z-30 h-full overflow-hidden shadow-md select-none text-[#d9e3f6]' },
+
+			// Header Title "Post Settings"
+			h(
+				'div',
+				{ className: 'p-3 border-b border-[#374151] bg-[#121c2a] flex justify-between items-center' },
+				h('h2', { className: 'text-sm font-extrabold text-white text-center flex-1' }, 'Post Settings'),
+				h(
+					'button',
+					{
+						className: 'text-gray-400 hover:text-white text-xs font-bold px-1.5 py-0.5 rounded hover:bg-[#212b39]',
+						onClick: closePanel,
+						title: 'Close',
+					},
+					'✕'
+				)
+			),
+
+			// Top Sub-Tabs Bar: Settings (wrench) | Style (contrast) | Advanced (gear)
+			h(
+				'div',
+				{ className: 'flex border-b border-[#374151] bg-[#16202e] text-xs font-semibold' },
+				h(
+					'button',
+					{
+						className: `flex-1 py-2.5 flex flex-col items-center gap-1 border-b-2 transition-colors ${
+							activeTab === 'settings' ? 'border-white text-white bg-[#1f2937]' : 'border-transparent text-gray-400 hover:text-white'
+						}`,
+						onClick: () => setActiveTab('settings'),
+					},
+					h('span', { className: 'material-symbols-outlined text-base' }, 'build'),
+					'Settings'
+				),
+				h(
+					'button',
+					{
+						className: `flex-1 py-2.5 flex flex-col items-center gap-1 border-b-2 transition-colors ${
+							activeTab === 'style' ? 'border-white text-white bg-[#1f2937]' : 'border-transparent text-gray-400 hover:text-white'
+						}`,
+						onClick: () => setActiveTab('style'),
+					},
+					h('span', { className: 'material-symbols-outlined text-base' }, 'contrast'),
+					'Style'
+				),
+				h(
+					'button',
+					{
+						className: `flex-1 py-2.5 flex flex-col items-center gap-1 border-b-2 transition-colors ${
+							activeTab === 'advanced' ? 'border-white text-white bg-[#1f2937]' : 'border-transparent text-gray-400 hover:text-white'
+						}`,
+						onClick: () => setActiveTab('advanced'),
+					},
+					h('span', { className: 'material-symbols-outlined text-base' }, 'settings'),
+					'Advanced'
+				)
+			),
+
+			// Scrollable Panel Content
+			h(
+				'div',
+				{ className: 'p-4 overflow-y-auto custom-scrollbar flex-1 space-y-4 text-xs' },
+
+				// TAB 1: Settings
+				activeTab === 'settings' &&
+					h(
+						'div',
+						{ className: 'space-y-4' },
+
+						// Accordion: General Settings
+						h(
+							'div',
+							{ className: 'border-b border-[#374151] pb-4' },
+							h(
+								'div',
+								{
+									className: 'flex items-center justify-between cursor-pointer mb-3 select-none',
+									onClick: () => setIsGeneralOpen(!isGeneralOpen),
+								},
+								h('h3', { className: 'text-xs font-bold text-white flex items-center gap-2' }, h('span', { className: 'text-[10px]' }, isGeneralOpen ? '▼' : '▶'), 'General Settings')
+							),
+
+							isGeneralOpen &&
+								h(
+									'div',
+									{ className: 'space-y-4 pt-1' },
+
+									// Title Field
+									h(
+										'div',
+										{ className: 'space-y-1.5' },
+										h(
+											'div',
+											{ className: 'flex justify-between items-center' },
+											h('label', { className: 'font-semibold text-gray-200' }, 'Title'),
+											h(
+												'button',
+												{ className: 'text-[11px] text-purple-300 hover:text-purple-200 font-bold flex items-center gap-1 cursor-pointer' },
+												h('span', { className: 'material-symbols-outlined text-xs' }, 'auto_awesome'),
+												'Write with AI'
+											)
+										),
+										h('input', {
+											type: 'text',
+											className: 'w-full bg-[#111827] border border-[#374151] focus:border-[#9333ea] rounded px-3 py-1.5 text-xs text-white placeholder-gray-500 focus:outline-none',
+											value: templateTitle,
+											onChange: e => setTemplateTitle(e.target.value),
+											placeholder: 'Page title...',
+										})
+									),
+
+									// Status Field
+									h(
+										'div',
+										{ className: 'space-y-1.5' },
+										h('label', { className: 'font-semibold text-gray-200 block' }, 'Status'),
+										h(
+											'select',
+											{
+												className: 'w-full bg-[#111827] border border-[#374151] focus:border-[#9333ea] rounded px-3 py-1.5 text-xs text-white focus:outline-none cursor-pointer',
+												value: pageSettings.status || 'Published',
+												onChange: e => handlePageSettingChange('status', e.target.value),
+											},
+											h('option', { value: 'Published' }, 'Published'),
+											h('option', { value: 'Draft' }, 'Draft'),
+											h('option', { value: 'Private' }, 'Private'),
+											h('option', { value: 'Pending Review' }, 'Pending Review')
+										)
+									),
+
+									// Hide Title Switch Field
+									h(
+										'div',
+										{ className: 'pt-2 border-t border-[#374151]/50 space-y-1.5' },
+										h(
+											'div',
+											{ className: 'flex justify-between items-center' },
+											h('label', { className: 'font-semibold text-gray-200' }, 'Hide Title'),
+											h(
+												'button',
+												{
+													className: `w-12 h-6 rounded-full p-0.5 transition-colors cursor-pointer relative flex items-center ${
+														pageSettings.hideTitle ? 'bg-[#9333ea]' : 'bg-[#374151]'
+													}`,
+													onClick: () => handlePageSettingChange('hideTitle', !pageSettings.hideTitle),
+												},
+												h(
+													'span',
+													{
+														className: `w-5 h-5 rounded-full bg-white transition-transform transform shadow ${
+															pageSettings.hideTitle ? 'translate-x-6' : 'translate-x-0'
+														}`,
+													}
+												),
+												h(
+													'span',
+													{ className: 'text-[9px] font-bold text-white absolute inset-0 flex items-center justify-center pointer-events-none' },
+													pageSettings.hideTitle ? 'Yes' : 'No'
+												)
+											)
+										),
+										h('p', { className: 'text-[11px] text-gray-400 italic font-sans' }, 'Set a different selector for the title in the ', h('a', { className: 'text-blue-400 hover:underline', href: '#' }, 'Layout panel'), '.')
+									),
+
+									// Page Layout Field
+									h(
+										'div',
+										{ className: 'space-y-1.5 pt-2' },
+										h('label', { className: 'font-semibold text-gray-200 block' }, 'Page Layout'),
+										h(
+											'select',
+											{
+												className: 'w-full bg-[#111827] border border-[#374151] focus:border-[#9333ea] rounded px-3 py-1.5 text-xs text-white focus:outline-none cursor-pointer',
+												value: pageSettings.pageLayout || 'Default',
+												onChange: e => handlePageSettingChange('pageLayout', e.target.value),
+											},
+											h('option', { value: 'Default' }, 'Default'),
+											h('option', { value: 'Canvas' }, 'Canvas'),
+											h('option', { value: 'Full Width' }, 'Full Width')
+										),
+										h('p', { className: 'text-[11px] text-gray-400 italic font-sans' }, 'The default page template as defined in Panel → Hamburger Menu → Site Settings.')
+									)
+								)
+						)
+					),
+
+				// TAB 2: Style
+				activeTab === 'style' &&
+					h(
+						'div',
+						{ className: 'space-y-4' },
+						h('h3', { className: 'text-xs font-bold text-white uppercase tracking-wider mb-2' }, 'Page Background & Style'),
+						h(
+							'div',
+							{ className: 'space-y-1.5' },
+							h('label', { className: 'font-semibold text-gray-200 block' }, 'Background Color'),
+							h('input', {
+								type: 'color',
+								className: 'w-full h-8 bg-[#111827] border border-[#374151] rounded cursor-pointer',
+								value: pageSettings.bgColor || '#091421',
+								onChange: e => handlePageSettingChange('bgColor', e.target.value),
+							})
+						)
+					),
+
+				// TAB 3: Advanced
+				activeTab === 'advanced' &&
+					h(
+						'div',
+						{ className: 'space-y-4' },
+						h('h3', { className: 'text-xs font-bold text-white uppercase tracking-wider mb-2' }, 'Custom CSS & Scripts'),
+						h(
+							'div',
+							{ className: 'space-y-1.5' },
+							h('label', { className: 'font-semibold text-gray-200 block' }, 'Custom CSS'),
+							h('textarea', {
+								className: 'w-full bg-[#111827] border border-[#374151] rounded p-2 text-xs font-mono text-white h-32 focus:outline-none focus:border-[#9333ea]',
+								placeholder: '/* Add custom CSS for this page template */',
+								value: pageSettings.customCss || '',
+								onChange: e => handlePageSettingChange('customCss', e.target.value),
+							})
+						)
+					)
+			)
+		);
 	}
 
 	// 3a. Left Elements Panel Component (Search Box, Atomic Elements 2x2, Widgets)
@@ -1699,7 +2000,7 @@
 	}
 
 	// 4. Central Canvas Component with Viewport Preview
-	function CentralCanvas({ deviceView, elements, setElements, selectedElementId, setSelectedElementId, sampleData, removeElement, addWidgetToTarget, openElementsTab, isStructureOpen, setIsStructureOpen }) {
+	function CentralCanvas({ deviceView, elements, setElements, selectedElementId, setSelectedElementId, sampleData, pageSettings, removeElement, addWidgetToTarget, openElementsTab, isStructureOpen, setIsStructureOpen }) {
 		const [isCanvasDragOver, setIsCanvasDragOver] = useState(false);
 
 		return h(
@@ -1753,6 +2054,7 @@
 									setSelectedElementId,
 									removeElement,
 									sampleData,
+									pageSettings,
 									addWidgetToTarget,
 								})
 							),
@@ -1848,82 +2150,61 @@
 		}, [isDragging]);
 
 		const panelStyle = position.left !== undefined && position.left !== null
-			? { top: position.top + 'px', left: position.left + 'px', right: 'auto', position: 'absolute' }
+			? { top: `${position.top}px`, left: `${position.left}px`, right: 'auto', position: 'absolute' }
 			: { top: '16px', right: '16px', position: 'absolute' };
 
 		return h(
-			'div',
+			'aside',
 			{
-				className: `floating-structure-panel select-none ${isDragging ? 'dragging' : ''}`,
+				className: 'floating-structure-panel fixed z-40 w-72 bg-[#16202e] border border-[#4d4354] rounded-lg shadow-2xl overflow-hidden flex flex-col text-[#d9e3f6] select-none',
 				style: panelStyle,
 			},
-
-			// Header Bar: "Structure" (Drag Handle)
 			h(
 				'div',
 				{
-					className: 'bg-[#121c2a] border-b border-[#374151] p-2.5 flex items-center justify-between rounded-t-8 cursor-grab active:cursor-grabbing hover:bg-[#1a2638] transition-colors',
+					className: 'p-3 bg-[#121c2a] border-b border-[#374151] flex justify-between items-center cursor-move',
 					onMouseDown: handleMouseDown,
-					title: 'Click and drag to move panel',
 				},
-				h(
-					'div',
-					{ className: 'flex items-center gap-1.5 pointer-events-none' },
-					h('span', { className: 'material-symbols-outlined text-base text-[#9333ea]' }, 'drag_indicator'),
-					h('span', { className: 'material-symbols-outlined text-base text-[#9333ea]' }, 'account_tree'),
-					h('h3', { className: 'text-xs font-extrabold text-[#d9e3f6] uppercase tracking-wider' }, 'Structure')
-				),
+				h('h3', { className: 'text-xs font-bold flex items-center gap-1.5' }, h('span', { className: 'material-symbols-outlined text-sm text-[#9333ea]' }, 'account_tree'), 'Structure'),
 				h(
 					'div',
 					{ className: 'flex items-center gap-1' },
 					h(
 						'button',
 						{
-							className: 'text-[#9ca3af] hover:text-white p-1 text-xs font-bold',
+							className: 'text-xs text-[#cfc2d7] hover:text-white font-bold p-1 rounded hover:bg-[#212b39]',
 							onClick: () => setIsCollapsed(!isCollapsed),
-							title: isCollapsed ? 'Expand Structure' : 'Collapse Structure',
 						},
-						isCollapsed ? '□' : '—'
+						isCollapsed ? '□' : '–'
 					),
 					h(
 						'button',
 						{
-							className: 'text-[#9ca3af] hover:text-white p-1 text-xs font-bold ml-1',
+							className: 'text-xs text-[#cfc2d7] hover:text-white font-bold p-1 rounded hover:bg-[#212b39]',
 							onClick: closeStructure,
-							title: 'Close Structure Panel',
 						},
 						'✕'
 					)
 				)
 			),
 
-			// Tree View Body
 			!isCollapsed &&
 				h(
 					'div',
-					{ className: 'p-3 overflow-y-auto custom-scrollbar flex-1 max-h-[480px]' },
+					{ className: 'p-2 max-h-[400px] overflow-y-auto custom-scrollbar space-y-1' },
 					elements.length === 0
-						? h(
-								'div',
-								{ className: 'text-center p-4 border border-dashed border-[#374151] rounded text-xs text-[#9ca3af]' },
-								h('p', null, 'Canvas is empty.'),
-								h('button', { className: 'mt-2 px-3 py-1 bg-[#9333ea] text-white rounded font-semibold text-xs', onClick: openElementsTab }, 'Add Container')
-						  )
-						: h(
-								'div',
-								{ className: 'space-y-1.5' },
-								elements.map((container, cIdx) =>
-									h(StructureTreeNode, {
-										key: container.id,
-										item: container,
-										index: cIdx,
-										parentId: null,
-										elements,
-										setElements,
-										selectedElementId,
-										setSelectedElementId,
-									})
-								)
+						? h('div', { className: 'text-xs text-[#9ca3af] text-center py-4' }, 'No elements on canvas')
+						: elements.map((item, idx) =>
+								h(StructureTreeNode, {
+									key: item.id,
+									item,
+									index: idx,
+									parentId: null,
+									elements,
+									setElements,
+									selectedElementId,
+									setSelectedElementId,
+								})
 						  )
 				)
 		);
@@ -1931,52 +2212,62 @@
 
 	// Recursive Structure Tree Node Component
 	function StructureTreeNode({ item, index, parentId, elements, setElements, selectedElementId, setSelectedElementId }) {
-		const [isCollapsed, setIsCollapsed] = useState(false);
 		const isSelected = selectedElementId === item.id;
 		const hasChildren = item.children && item.children.length > 0;
+		const [isCollapsed, setIsCollapsed] = useState(false);
 
-		function handleTreeDragStart(e) {
+		function handleDragStart(e) {
 			e.stopPropagation();
 			e.dataTransfer.setData('text/plain', 'structure_move:' + item.id);
 		}
 
-		function handleTreeDrop(e) {
+		function handleDragOver(e) {
 			e.preventDefault();
 			e.stopPropagation();
+		}
 
+		function handleDrop(e) {
+			e.preventDefault();
+			e.stopPropagation();
 			const textData = e.dataTransfer.getData('text/plain');
 			if (textData && textData.indexOf('structure_move:') === 0) {
 				const sourceId = textData.replace('structure_move:', '');
 				if (sourceId && sourceId !== item.id) {
-					const targetParent = item.type === 'container' || item.type === 'column' ? item.id : parentId;
-					setElements(prev => moveElementInTree(prev, sourceId, targetParent, index));
+					const targetParentId = item.type === 'container' || item.type === 'column' ? item.id : parentId;
+					const targetIndex = item.type === 'container' || item.type === 'column' ? (item.children ? item.children.length : 0) : index;
+					setElements(prev => moveElementInTree(prev, sourceId, targetParentId, targetIndex));
 				}
 			}
 		}
 
 		function getItemIcon() {
-			if (item.type === 'container') return 'inventory_2';
+			if (item.type === 'container') return 'grid_view';
 			if (item.type === 'column') return 'view_column';
-			if (item.type === 'product_meta_item') return 'data_object';
+			if (item.type === 'product_title') return 'title';
+			if (item.type === 'product_price') return 'payments';
+			if (item.type === 'product_gallery') return 'image';
+			if (item.type === 'product_add_to_cart') return 'shopping_cart';
 			return 'widgets';
 		}
 
 		return h(
 			'div',
-			{ className: 'tree-node-wrapper' },
+			{
+				draggable: true,
+				onDragStart: handleDragStart,
+				onDragOver: handleDragOver,
+				onDrop: handleDrop,
+				className: 'select-none',
+			},
 			h(
 				'div',
 				{
-					draggable: true,
-					onDragStart: handleTreeDragStart,
-					onDragOver: e => e.preventDefault(),
-					onDrop: handleTreeDrop,
 					onClick: e => {
 						e.stopPropagation();
 						setSelectedElementId(item.id);
 					},
-					className: `p-2 rounded border text-xs flex items-center justify-between cursor-pointer select-none transition-colors ${
-						isSelected ? 'bg-[#9333ea] border-[#9333ea] text-white shadow' : 'bg-[#111827] border-[#374151] text-[#d9e3f6] hover:bg-[#16202e]'
+					className: `flex items-center justify-between p-1.5 rounded cursor-pointer text-xs transition-colors ${
+						isSelected ? 'bg-[#9333ea] text-white font-bold' : 'hover:bg-[#212b39] text-[#cfc2d7]'
 					}`,
 				},
 				h(
@@ -2026,7 +2317,7 @@
 	}
 
 	// Canvas Container Renderer
-	function CanvasContainerRenderer({ container, cIdx, elements, setElements, selectedElementId, setSelectedElementId, removeElement, sampleData, addWidgetToTarget }) {
+	function CanvasContainerRenderer({ container, cIdx, elements, setElements, selectedElementId, setSelectedElementId, removeElement, sampleData, pageSettings, addWidgetToTarget }) {
 		const isSelected = selectedElementId === container.id;
 		const widthMode = container.settings && container.settings.width_mode === 'full' ? 'full' : 'boxed';
 		const boxedWidth = (container.settings && container.settings.boxed_width) || '1140px';
@@ -2123,6 +2414,7 @@
 							setSelectedElementId,
 							removeElement,
 							sampleData,
+							pageSettings,
 							addWidgetToTarget,
 						})
 					)
@@ -2131,7 +2423,7 @@
 	}
 
 	// Canvas Column Renderer
-	function CanvasColumnRenderer({ column, containerId, elements, setElements, selectedElementId, setSelectedElementId, removeElement, sampleData, addWidgetToTarget }) {
+	function CanvasColumnRenderer({ column, containerId, elements, setElements, selectedElementId, setSelectedElementId, removeElement, sampleData, pageSettings, addWidgetToTarget }) {
 		const isSelected = selectedElementId === column.id;
 		const flexWidth = (column.settings && column.settings.flex_width) || '100%';
 
@@ -2193,6 +2485,7 @@
 							setSelectedElementId,
 							removeElement,
 							sampleData,
+							pageSettings,
 						})
 				  )
 				: h(
@@ -2205,7 +2498,7 @@
 	}
 
 	// Canvas Widget Renderer
-	function CanvasWidgetRenderer({ widget, columnId, elements, setElements, selectedElementId, setSelectedElementId, removeElement, sampleData }) {
+	function CanvasWidgetRenderer({ widget, columnId, elements, setElements, selectedElementId, setSelectedElementId, removeElement, sampleData, pageSettings }) {
 		const isSelected = selectedElementId === widget.id;
 
 		function handleWidgetDragStart(e) {
@@ -2265,14 +2558,27 @@
 					)
 				),
 
-			renderLiveWidgetContent(widget, sampleData)
+			renderLiveWidgetContent(widget, sampleData, pageSettings)
 		);
 	}
 
 	// Live Content Rendering for Canvas
-	function renderLiveWidgetContent(el, sample) {
+	function renderLiveWidgetContent(el, sample, pageSettings) {
 		switch (el.type) {
 			case 'product_title':
+				if (pageSettings && pageSettings.hideTitle) {
+					return h(
+						'div',
+						{ className: 'p-3 border-2 border-dashed border-red-300 bg-red-50 text-red-700 rounded-lg flex items-center justify-between shadow-sm select-none' },
+						h(
+							'div',
+							{ className: 'flex items-center gap-2' },
+							h('span', { className: 'material-symbols-outlined text-red-500' }, 'visibility_off'),
+							h('span', { className: 'text-sm font-bold line-through opacity-60' }, sample.title || 'Product Title Placeholder')
+						),
+						h('span', { className: 'text-[10px] bg-red-600 text-white px-2 py-0.5 rounded font-extrabold uppercase tracking-wide' }, 'Title Hidden in Post Settings')
+					);
+				}
 				return h('h1', { className: 'text-2xl font-bold text-[#111827]' }, sample.title || 'Product Title Placeholder');
 			case 'product_price':
 				return h(

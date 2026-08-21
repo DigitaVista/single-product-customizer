@@ -25,6 +25,7 @@ if (!class_exists('SPPCFW_Builder')) {
 			add_action('wp_ajax_sppcfw_get_builder_product_data', array($this, 'sppcfw_ajax_get_product_data'));
 			add_action('wp_ajax_sppcfw_save_builder_template', array($this, 'sppcfw_ajax_save_builder_template'));
 			add_action('wp_ajax_sppcfw_load_builder_template', array($this, 'sppcfw_ajax_load_builder_template'));
+			add_action('wp_ajax_sppcfw_get_builder_templates', array($this, 'sppcfw_ajax_get_builder_templates'));
 		}
 
 		/**
@@ -420,6 +421,8 @@ if (!class_exists('SPPCFW_Builder')) {
 
 			$template_id = isset($_POST['template_id']) ? sanitize_text_field($_POST['template_id']) : '';
 			$template_title = isset($_POST['template_title']) ? sanitize_text_field($_POST['template_title']) : '';
+			$status = isset($_POST['status']) ? sanitize_text_field($_POST['status']) : 'Published';
+			$page_settings = isset($_POST['page_settings']) ? json_decode(wp_unslash($_POST['page_settings']), true) : array();
 			$layout = isset($_POST['layout']) ? wp_unslash($_POST['layout']) : '';
 			$conditions = isset($_POST['conditions']) ? wp_unslash($_POST['conditions']) : '';
 
@@ -436,9 +439,10 @@ if (!class_exists('SPPCFW_Builder')) {
 			$templates[$template_id] = array(
 				'id' => $template_id,
 				'title' => $template_title,
+				'status' => $status,
+				'page_settings' => $page_settings,
 				'layout' => json_decode($layout, true),
 				'conditions' => json_decode($conditions, true),
-				'status' => 'published',
 				'updated_at' => current_time('mysql'),
 			);
 
@@ -512,6 +516,42 @@ if (!class_exists('SPPCFW_Builder')) {
 				'conditions' => array('scope' => 'entire'),
 			);
 			wp_send_json_success(array('template' => $blank));
+		}
+
+		/**
+		 * AJAX: Get List of All Builder Templates.
+		 *
+		 * @return void
+		 */
+		public function sppcfw_ajax_get_builder_templates()
+		{
+			check_ajax_referer('sppcfw_builder_nonce', 'nonce');
+
+			$templates_option = get_option('sppcfw_builder_templates', array());
+			$list = array();
+
+			if (!empty($templates_option) && is_array($templates_option)) {
+				foreach ($templates_option as $id => $tpl) {
+					$list[] = array(
+						'id' => isset($tpl['id']) ? $tpl['id'] : $id,
+						'title' => !empty($tpl['title']) ? $tpl['title'] : __('Untitled Template', 'single-product-customizer'),
+						'status' => !empty($tpl['status']) ? $tpl['status'] : 'Published',
+						'updated_at' => !empty($tpl['updated_at']) ? $tpl['updated_at'] : '',
+					);
+				}
+			} else {
+				$legacy = get_option('sppcfw_builder_template', array());
+				if (!empty($legacy)) {
+					$list[] = array(
+						'id' => isset($legacy['id']) ? $legacy['id'] : 'template_default',
+						'title' => !empty($legacy['title']) ? $legacy['title'] : __('Default Single Product Template', 'single-product-customizer'),
+						'status' => 'Published',
+						'updated_at' => isset($legacy['updated_at']) ? $legacy['updated_at'] : '',
+					);
+				}
+			}
+
+			wp_send_json_success(array('templates' => $list));
 		}
 	}
 

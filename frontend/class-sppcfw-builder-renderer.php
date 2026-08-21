@@ -297,11 +297,15 @@ if ( ! class_exists( 'SPPCFW_Builder_Renderer' ) ) {
 				return;
 			}
 
-			$type = isset( $el['type'] ) ? $el['type'] : '';
+			$type          = isset( $el['type'] ) ? $el['type'] : '';
+			$page_settings = isset( $this->matched_template['page_settings'] ) ? $this->matched_template['page_settings'] : array();
+			$hide_title    = ! empty( $page_settings['hideTitle'] ) || ! empty( $page_settings['hide_title'] );
 
 			switch ( $type ) {
 				case 'product_title':
-					woocommerce_template_single_title();
+					if ( ! $hide_title ) {
+						woocommerce_template_single_title();
+					}
 					break;
 				case 'product_price':
 					woocommerce_template_single_price();
