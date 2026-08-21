@@ -537,140 +537,196 @@
 		);
 	}
 
-	// 1. Top Navigation Bar Component (Mark 1 Image 1 Header Plus Icon)
+	// 1. Top Navigation Bar Component (Positioned: Left [Mark 1,2,3], Center [Mark 4], Right [Mark 5])
 	function TopBar({ templateTitle, setTemplateTitle, deviceView, setDeviceView, saveTemplate, isSaving, statusMessage, openElementsTab, isStructureOpen, setIsStructureOpen, openConditionsModal }) {
+		const [isMenuOpen, setIsMenuOpen] = useState(false);
+		const menuRef = useRef(null);
+
+		// Close dropdown when clicking outside
+		useEffect(() => {
+			function handleClickOutside(event) {
+				if (menuRef.current && !menuRef.current.contains(event.target)) {
+					setIsMenuOpen(false);
+				}
+			}
+			document.addEventListener('mousedown', handleClickOutside);
+			return () => document.removeEventListener('mousedown', handleClickOutside);
+		}, []);
+
 		return h(
 			'header',
-			{ className: 'bg-[#16202e] border-b border-[#4d4354] h-12 top-0 left-0 right-0 z-50 flex justify-between items-center px-4 select-none' },
+			{ className: 'bg-[#111111] border-b border-[#262626] h-12 top-0 left-0 right-0 z-50 flex justify-between items-center px-3 select-none text-white text-xs font-sans relative' },
+
+			// 1. LEFT SECTION: Mark-1, Mark-2, AI, Mark-3, History, Droplet
 			h(
 				'div',
-				{ className: 'flex items-center gap-3' },
-				h(
-					'a',
-					{
-						href: 'admin.php?page=sppcfw-builder-all-templates',
-						className: 'flex items-center gap-1.5 px-3 py-1 bg-[#121c2a] hover:bg-[#212b39] text-[#92ccff] border border-[#3a98d7] rounded text-xs font-semibold transition-colors',
-						title: 'All Templates List',
-					},
-					h('span', { className: 'material-symbols-outlined text-base' }, 'arrow_back'),
-					'All Templates'
-				),
+				{ className: 'flex items-center gap-2 relative z-10', ref: menuRef },
 
-				// Mark-1 Image 1: [+] Elements Header Button
+				// Mark-1: White Circular Menu Button (≡)
 				h(
 					'button',
 					{
-						className: 'flex items-center justify-center w-8 h-8 bg-[#9333ea] hover:bg-[#7e22ce] text-white rounded shadow transition-all',
-						onClick: openElementsTab,
-						title: 'Elements (Add Widgets & Containers)',
+						className: 'w-7 h-7 rounded-full bg-white text-black flex items-center justify-center shadow hover:bg-gray-100 transition-all font-bold focus:outline-none cursor-pointer',
+						onClick: () => setIsMenuOpen(!isMenuOpen),
+						title: 'Menu (Mark-1)',
 					},
-					h('span', { className: 'material-symbols-outlined text-lg font-bold' }, 'add')
+					h('span', { className: 'material-symbols-outlined text-lg leading-none font-bold' }, 'menu')
 				),
 
-				h('span', { className: 'h-4 w-[1px] bg-[#4d4354]' }),
+				// Mark-1 Dropdown Menu (Image 2: Popover containing only "Exit to Builder")
+				isMenuOpen &&
+					h(
+						'div',
+						{ className: 'absolute top-9 left-0 w-60 bg-[#1e1e1e] border border-[#333333] rounded-lg shadow-2xl py-2 px-1 z-50 text-white animate-in fade-in slide-in-from-top-1 duration-150' },
+						h(
+							'button',
+							{
+								className: 'w-full flex items-center gap-3 px-3 py-2 text-left hover:bg-[#2d2d2d] rounded transition-colors text-xs font-medium text-gray-200 hover:text-white cursor-pointer',
+								onClick: () => {
+									setIsMenuOpen(false);
+									window.location.href = 'admin.php?page=sppcfw-single-page-builder';
+								},
+							},
+							h('span', { className: 'material-symbols-outlined text-base text-gray-300' }, 'logout'),
+							'Exit to Builder'
+						)
+					),
 
-				// Editable Template Title Input
+				// Mark-2: Square Plus Button (+)
+				h(
+					'button',
+					{
+						className: 'w-7 h-7 bg-[#262626] hover:bg-[#333333] border border-[#3a3a3a] text-white rounded flex items-center justify-center transition-colors cursor-pointer',
+						onClick: openElementsTab,
+						title: 'Add Elements (Mark-2)',
+					},
+					h('span', { className: 'material-symbols-outlined text-base' }, 'add')
+				),
+
+				// Mark-3: Document with Gear Icon Button
+				h(
+					'button',
+					{
+						className: 'w-7 h-7 bg-[#262626] hover:bg-[#333333] border border-[#3a3a3a] text-white rounded flex items-center justify-center transition-colors cursor-pointer',
+						title: 'Page Settings (Mark-3)',
+					},
+					h('span', { className: 'material-symbols-outlined text-base' }, 'article')
+				),
+
+				// History Icon Button
+				h(
+					'button',
+					{
+						className: 'w-7 h-7 text-gray-300 hover:text-white flex items-center justify-center transition-colors cursor-pointer',
+						title: 'Revision History',
+					},
+					h('span', { className: 'material-symbols-outlined text-base' }, 'history')
+				),
+
+			),
+
+			// 2. CENTER SECTION: Mark-4 (Template Dropdown + Viewport Device Switcher)
+			h(
+				'div',
+				{ className: 'absolute left-1/2 -translate-x-1/2 flex items-center gap-3 z-10' },
+
+				// Template Dropdown Selector ("home ∨")
 				h(
 					'div',
-					{ className: 'flex items-center gap-2' },
-					h('span', { className: 'material-symbols-outlined text-sm text-[#9333ea]' }, 'edit_note'),
-					h('input', {
-						type: 'text',
-						className: 'bg-[#091421] border border-[#374151] focus:border-[#9333ea] rounded px-2.5 py-0.5 text-xs font-bold text-[#d9e3f6] w-[220px] focus:outline-none',
-						value: templateTitle,
-						onChange: e => setTemplateTitle(e.target.value),
-						placeholder: 'Template Name...',
-					})
+					{ className: 'flex items-center gap-1 cursor-pointer text-gray-300 hover:text-white font-medium text-xs' },
+					h('span', null, templateTitle || 'home'),
+					h('span', { className: 'material-symbols-outlined text-sm' }, 'expand_more')
 				),
 
+				// Viewport Switcher Icons (Desktop, Tablet, Mobile)
 				h(
-					'a',
-					{
-						href: 'admin.php?page=sppcfw-single-page-builder&template_id=new',
-						className: 'flex items-center gap-1 px-2 py-0.5 bg-[#9333ea]/20 hover:bg-[#9333ea]/40 text-[#ddb8ff] border border-[#9333ea]/50 rounded text-[11px] font-semibold transition-colors ml-1',
-						title: 'Create New Template',
-					},
-					h('span', { className: 'material-symbols-outlined text-xs' }, 'add'),
-					'Add New'
+					'div',
+					{ className: 'flex items-center gap-3 text-gray-400' },
+					h(
+						'button',
+						{
+							className: `hover:text-white transition-colors py-0.5 cursor-pointer ${
+								deviceView === 'desktop' ? 'text-white border-b-2 border-white' : ''
+							}`,
+							onClick: () => setDeviceView('desktop'),
+							title: 'Desktop View',
+						},
+						h('span', { className: 'material-symbols-outlined text-base' }, 'desktop_windows')
+					),
+					h(
+						'button',
+						{
+							className: `hover:text-white transition-colors py-0.5 cursor-pointer ${
+								deviceView === 'tablet' ? 'text-white border-b-2 border-white' : ''
+							}`,
+							onClick: () => setDeviceView('tablet'),
+							title: 'Tablet View',
+						},
+						h('span', { className: 'material-symbols-outlined text-base' }, 'tablet_mac')
+					),
+					h(
+						'button',
+						{
+							className: `hover:text-white transition-colors py-0.5 cursor-pointer ${
+								deviceView === 'mobile' ? 'text-white border-b-2 border-white' : ''
+							}`,
+							onClick: () => setDeviceView('mobile'),
+							title: 'Mobile View',
+						},
+						h('span', { className: 'material-symbols-outlined text-base' }, 'smartphone')
+					)
 				)
 			),
 
-			// Viewport Switcher
+			// 3. RIGHT SECTION: Mark-5 (Publish & Canvas Actions Group) + Utilities
 			h(
 				'div',
-				{ className: 'flex items-center gap-1 bg-[#091421] p-1 rounded border border-[#374151]' },
-				h(
-					'button',
-					{
-						className: `px-3 py-1 text-xs rounded font-medium flex items-center gap-1 transition-colors ${
-							deviceView === 'desktop' ? 'bg-[#9333ea] text-white' : 'text-[#cfc2d7] hover:text-white'
-						}`,
-						onClick: () => setDeviceView('desktop'),
-					},
-					h('span', { className: 'material-symbols-outlined text-sm' }, 'desktop_windows'),
-					'Desktop'
-				),
-				h(
-					'button',
-					{
-						className: `px-3 py-1 text-xs rounded font-medium flex items-center gap-1 transition-colors ${
-							deviceView === 'tablet' ? 'bg-[#9333ea] text-white' : 'text-[#cfc2d7] hover:text-white'
-						}`,
-						onClick: () => setDeviceView('tablet'),
-					},
-					h('span', { className: 'material-symbols-outlined text-sm' }, 'tablet_mac'),
-					'Tablet'
-				),
-				h(
-					'button',
-					{
-						className: `px-3 py-1 text-xs rounded font-medium flex items-center gap-1 transition-colors ${
-							deviceView === 'mobile' ? 'bg-[#9333ea] text-white' : 'text-[#cfc2d7] hover:text-white'
-						}`,
-						onClick: () => setDeviceView('mobile'),
-					},
-					h('span', { className: 'material-symbols-outlined text-sm' }, 'smartphone'),
-					'Mobile'
-				)
-			),
+				{ className: 'flex items-center gap-3 z-10' },
 
-			// Actions
-			h(
-				'div',
-				{ className: 'flex items-center gap-3' },
-				statusMessage && h('span', { className: 'text-xs text-[#10b981] font-medium' }, statusMessage),
+				// Mark-5 Group (Layers, Eye, Badge, Publish Button)
+				h(
+					'div',
+					{ className: 'flex items-center gap-2.5' },
+					statusMessage && h('span', { className: 'text-xs text-[#10b981] font-medium' }, statusMessage),
 
-				h(
-					'button',
-					{
-						className: `px-2.5 py-1.5 border rounded text-xs font-semibold flex items-center gap-1 transition-colors ${
-							isStructureOpen ? 'bg-[#9333ea] text-white border-[#9333ea]' : 'border-[#374151] text-[#cfc2d7] hover:bg-[#212b39]'
-						}`,
-						onClick: () => setIsStructureOpen(!isStructureOpen),
-						title: 'Toggle Floating Structure Panel',
-					},
-					h('span', { className: 'material-symbols-outlined text-sm' }, 'account_tree'),
-					'Structure'
-				),
+					// Layers / Structure Icon Button
+					h(
+						'button',
+						{
+							className: `w-7 h-7 rounded flex items-center justify-center transition-colors cursor-pointer ${
+								isStructureOpen ? 'bg-[#262626] text-white border border-[#3a3a3a]' : 'text-gray-400 hover:text-white'
+							}`,
+							onClick: () => setIsStructureOpen(!isStructureOpen),
+							title: 'Structure Panel',
+						},
+						h('span', { className: 'material-symbols-outlined text-base' }, 'layers')
+					),
 
-				h(
-					'button',
-					{
-						className: 'px-3 py-1.5 border border-[#3a98d7] text-[#92ccff] hover:bg-[#121c2a] rounded text-xs font-semibold flex items-center gap-1 transition-colors',
-						onClick: openConditionsModal,
-					},
-					h('span', { className: 'material-symbols-outlined text-sm' }, 'tune'),
-					'Display Conditions'
-				),
-				h(
-					'button',
-					{
-						className: 'px-4 py-1.5 bg-[#9333ea] hover:bg-[#7e22ce] text-white rounded text-xs font-bold transition-all shadow flex items-center gap-1',
-						onClick: saveTemplate,
-						disabled: isSaving,
-					},
-					h('span', { className: 'material-symbols-outlined text-sm' }, 'publish'),
-					isSaving ? 'Publishing...' : 'Publish'
+					// Preview Eye Icon Button
+					h(
+						'button',
+						{
+							className: 'w-7 h-7 text-gray-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer',
+							title: 'Preview',
+						},
+						h('span', { className: 'material-symbols-outlined text-base' }, 'visibility')
+					),
+
+					// Publish Button with Dropdown Chevron Arrow
+					h(
+						'div',
+						{ className: 'relative flex items-center' },
+						h(
+							'button',
+							{
+								className: 'h-7 px-3 bg-[#1e1a29] border border-[#a855f7]/50 text-white hover:bg-[#2b1f3d] rounded text-xs font-semibold flex items-center gap-1.5 transition-all shadow-sm cursor-pointer',
+								onClick: saveTemplate,
+								disabled: isSaving,
+							},
+							isSaving ? 'Publishing...' : 'Publish',
+							h('span', { className: 'material-symbols-outlined text-sm text-purple-300', onClick: (e) => { e.stopPropagation(); openConditionsModal(); } }, 'expand_more')
+						)
+					)
 				)
 			)
 		);
