@@ -287,11 +287,54 @@
 			customCss: '',
 		});
 
+		const [allTemplates, setAllTemplates] = useState([]);
 		const [isSaving, setIsSaving] = useState(false);
 		const [statusMessage, setStatusMessage] = useState('');
 
+		function fetchTemplatesList() {
+			apiPost('sppcfw_get_builder_templates', {}).then(res => {
+				if (res && res.success && Array.isArray(res.data.templates)) {
+					setAllTemplates(res.data.templates);
+				}
+			});
+		}
+
+		function switchTemplate(targetId) {
+			apiPost('sppcfw_load_builder_template', { template_id: targetId }).then(res => {
+				if (res && res.success && res.data && res.data.template) {
+					const tpl = res.data.template;
+					if (tpl.id) setTemplateId(tpl.id);
+					if (tpl.title) setTemplateTitle(tpl.title);
+					if (tpl.layout && Array.isArray(tpl.layout)) {
+						setElements(tpl.layout);
+					} else {
+						setElements([]);
+					}
+					if (tpl.conditions) {
+						setDisplayConditions(tpl.conditions);
+					} else {
+						setDisplayConditions({ scope: 'entire', category_ids: [], product_ids: [] });
+					}
+					if (tpl.page_settings) {
+						setPageSettings(tpl.page_settings);
+					} else if (tpl.status) {
+						setPageSettings(prev => ({ ...prev, status: tpl.status }));
+					} else {
+						setPageSettings({ status: 'Published', hideTitle: false, pageLayout: 'Default', bgColor: '#091421', customCss: '' });
+					}
+					if (window.history && window.history.pushState) {
+						const newUrl = new URL(window.location.href);
+						newUrl.searchParams.set('template_id', tpl.id || targetId);
+						window.history.pushState(null, '', newUrl.toString());
+					}
+				}
+			});
+		}
+
 		// Initial Data Load
 		useEffect(() => {
+			fetchTemplatesList();
+
 			apiPost('sppcfw_get_builder_products_and_categories', {}).then(res => {
 				if (res && res.success) {
 					setProducts(res.data.products || []);
@@ -441,6 +484,7 @@
 						setTemplateId(res.data.template_id);
 					}
 					setStatusMessage(res.data.message || (isDraft ? 'Draft saved successfully!' : 'Published successfully!'));
+					fetchTemplatesList();
 					setTimeout(() => setStatusMessage(''), 4000);
 				} else {
 					setStatusMessage('Failed to save template.');
@@ -487,6 +531,9 @@
 				isStructureOpen,
 				setIsStructureOpen,
 				openConditionsModal: () => setIsConditionsModalOpen(true),
+				allTemplates,
+				templateId,
+				switchTemplate,
 			}),
 
 			// Main Workspace Grid
@@ -571,15 +618,21 @@
 	}
 
 	// 1. Top Navigation Bar Component (Positioned: Left [Mark 1,2,3], Center [Mark 4], Right [Mark 5])
-	function TopBar({ templateTitle, setTemplateTitle, deviceView, setDeviceView, saveTemplate, isSaving, statusMessage, openElementsTab, openPageSettings, activeLeftTab, pageSettings, isStructureOpen, setIsStructureOpen, openConditionsModal }) {
+	function TopBar({ templateTitle, setTemplateTitle, deviceView, setDeviceView, saveTemplate, isSaving, statusMessage, openElementsTab, openPageSettings, activeLeftTab, pageSettings, isStructureOpen, setIsStructureOpen, openConditionsModal, allTemplates, templateId, switchTemplate }) {
 		const [isMenuOpen, setIsMenuOpen] = useState(false);
 		const menuRef = useRef(null);
 
-		// Close dropdown when clicking outside
+		const [isTemplateMenuOpen, setIsTemplateMenuOpen] = useState(false);
+		const templateMenuRef = useRef(null);
+
+		// Close dropdowns when clicking outside
 		useEffect(() => {
 			function handleClickOutside(event) {
 				if (menuRef.current && !menuRef.current.contains(event.target)) {
 					setIsMenuOpen(false);
+				}
+				if (templateMenuRef.current && !templateMenuRef.current.contains(event.target)) {
+					setIsTemplateMenuOpen(false);
 				}
 			}
 			document.addEventListener('mousedown', handleClickOutside);
@@ -681,9 +734,82 @@
 				// Template Dropdown Selector ("home ∨")
 				h(
 					'div',
-					{ className: 'flex items-center gap-1 cursor-pointer text-gray-300 hover:text-white font-medium text-xs' },
-					h('span', null, templateTitle || 'home'),
-					h('span', { className: 'material-symbols-outlined text-sm' }, 'expand_more')
+					{ className: 'relative', ref: templateMenuRef },
+					h(
+						'button',
+						{
+							type: 'button',
+							className: 'flex items-center gap-1 cursor-pointer text-gray-300 hover:text-white font-medium text-xs bg-transparent border-none focus:outline-none py-1 px-2 rounded hover:bg-[#262626] transition-colors',
+							onClick: () => setIsTemplateMenuOpen(!isTemplateMenuOpen),
+							title: 'Switch Template',
+						},
+						h('span', { className: 'font-semibold max-w-[140px] truncate' }, templateTitle || 'home'),
+						h('span', { className: 'material-symbols-outlined text-sm' }, 'expand_more')
+					),
+
+					// Template Selection Popover Dropdown
+					isTemplateMenuOpen &&
+						h(
+							'div',
+							{ className: 'absolute top-9 left-1/2 -translate-x-1/2 w-64 bg-[#1e1e1e] border border-[#333333] rounded-lg shadow-2xl z-50 py-2 text-white animate-in fade-in slide-in-from-top-1 duration-150' },
+							h('div', { className: 'px-3 py-1 text-[10px] uppercase font-bold text-gray-400 border-b border-[#2d2d2d] mb-1 flex justify-between items-center' },
+								h('span', null, 'Page Templates'),
+								h('span', { className: 'text-[9px] bg-[#2d2d2d] text-gray-300 px-1.5 py-0.5 rounded' }, (allTemplates ? allTemplates.length : 0) + ' Total')
+							),
+							h(
+								'div',
+								{ className: 'max-h-60 overflow-y-auto custom-scrollbar space-y-0.5 px-1' },
+								allTemplates && allTemplates.length > 0
+									? allTemplates.map(tpl => {
+											const isActive = tpl.id === templateId;
+											return h(
+												'button',
+												{
+													key: tpl.id,
+													className: `w-full flex items-center justify-between px-2.5 py-1.5 text-left rounded transition-colors text-xs font-medium cursor-pointer ${
+														isActive ? 'bg-[#9333ea]/20 text-purple-200 font-bold border border-[#9333ea]/50' : 'hover:bg-[#2d2d2d] text-gray-200 hover:text-white'
+													}`,
+													onClick: () => {
+														setIsTemplateMenuOpen(false);
+														if (!isActive) {
+															switchTemplate(tpl.id);
+														}
+													},
+												},
+												h(
+													'div',
+													{ className: 'flex items-center gap-2 overflow-hidden' },
+													isActive && h('span', { className: 'text-purple-400 text-xs font-bold' }, '✓'),
+													h('span', { className: 'truncate max-w-[140px]' }, tpl.title || 'Untitled Template')
+												),
+												h(
+													'span',
+													{
+														className: `text-[9px] px-1.5 py-0.5 rounded uppercase font-mono ${
+															(tpl.status || '').toLowerCase() === 'draft' ? 'bg-amber-900/60 text-amber-300 border border-amber-500/30' : 'bg-emerald-900/60 text-emerald-300 border border-emerald-500/30'
+														}`,
+													},
+													tpl.status || 'Published'
+												)
+											);
+									  })
+									: h('div', { className: 'px-3 py-2 text-xs text-gray-400 italic text-center' }, 'No saved templates found')
+							),
+							h('div', { className: 'border-t border-[#2d2d2d] mt-1 pt-1 px-1' },
+								h(
+									'button',
+									{
+										className: 'w-full flex items-center justify-center gap-1.5 px-2 py-1.5 text-xs text-[#a855f7] hover:text-purple-300 hover:bg-[#2d2d2d] rounded transition-colors font-bold cursor-pointer',
+										onClick: () => {
+											setIsTemplateMenuOpen(false);
+											switchTemplate('new');
+										},
+									},
+									h('span', { className: 'material-symbols-outlined text-sm' }, 'add'),
+									'Create New Template'
+								)
+							)
+						)
 				),
 
 				// Viewport Switcher Icons (Desktop, Tablet, Mobile)
