@@ -511,6 +511,23 @@
 			setSelectedElementId(null);
 		}
 
+		// Helper to open live product preview in a new browser tab
+		function handlePreview() {
+			let targetProduct = null;
+			if (selectedProductId && Array.isArray(products)) {
+				targetProduct = products.find(p => String(p.id) === String(selectedProductId));
+			}
+			if (!targetProduct && Array.isArray(products) && products.length > 0) {
+				targetProduct = products[0];
+			}
+
+			let previewUrl = targetProduct && targetProduct.url ? targetProduct.url : window.location.origin;
+			const sep = previewUrl.includes('?') ? '&' : '?';
+			previewUrl += sep + 'sppcfw_preview=1&template_id=' + encodeURIComponent(templateId);
+
+			window.open(previewUrl, '_blank');
+		}
+
 		return h(
 			'div',
 			{ className: 'sppcfw-builder-layout flex flex-col h-screen w-screen overflow-hidden bg-[#091421] text-[#d9e3f6]' },
@@ -534,6 +551,7 @@
 				allTemplates,
 				templateId,
 				switchTemplate,
+				handlePreview,
 			}),
 
 			// Main Workspace Grid
@@ -618,7 +636,7 @@
 	}
 
 	// 1. Top Navigation Bar Component (Positioned: Left [Mark 1,2,3], Center [Mark 4], Right [Mark 5])
-	function TopBar({ templateTitle, setTemplateTitle, deviceView, setDeviceView, saveTemplate, isSaving, statusMessage, openElementsTab, openPageSettings, activeLeftTab, pageSettings, isStructureOpen, setIsStructureOpen, openConditionsModal, allTemplates, templateId, switchTemplate }) {
+	function TopBar({ templateTitle, setTemplateTitle, deviceView, setDeviceView, saveTemplate, isSaving, statusMessage, openElementsTab, openPageSettings, activeLeftTab, pageSettings, isStructureOpen, setIsStructureOpen, openConditionsModal, allTemplates, templateId, switchTemplate, handlePreview }) {
 		const [isMenuOpen, setIsMenuOpen] = useState(false);
 		const menuRef = useRef(null);
 
@@ -881,7 +899,8 @@
 						'button',
 						{
 							className: 'w-7 h-7 text-gray-400 hover:text-white flex items-center justify-center transition-colors cursor-pointer',
-							title: 'Preview',
+							onClick: handlePreview,
+							title: 'Preview designed page in new tab',
 						},
 						h('span', { className: 'material-symbols-outlined text-base' }, 'visibility')
 					),

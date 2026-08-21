@@ -157,6 +157,7 @@ if (!class_exists('SPPCFW_Builder')) {
 					$products[] = array(
 						'id' => get_the_ID(),
 						'title' => get_the_title(),
+						'url' => get_permalink(get_the_ID()),
 					);
 				}
 				wp_reset_postdata();
