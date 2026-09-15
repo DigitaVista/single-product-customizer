@@ -6,7 +6,7 @@ if (!defined('ABSPATH')) {
 if( !class_exists("Sppcfw_Frontend_Upsell_Product_Title")){
     class Sppcfw_Frontend_Upsell_Product_Title{
         public function __construct(){
-            add_filter("woocommerce_product_upsells_products_heading",[ $this, "sppcfw_display_upsell_product_title"],110,1);
+            add_filter("woocommerce_product_upsells_products_heading",[ $this, "sppcfw_display_upsell_product_title"],999,1);
         }
     
         public function sppcfw_display_upsell_product_title($sppcfw_upsell_prodct_text){

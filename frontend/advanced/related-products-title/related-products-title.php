@@ -7,7 +7,7 @@ if( ! class_exists('Sppcfw_Frontend_Related_Product_Title')){
     class Sppcfw_Frontend_Related_Product_Title{
 
         public function __construct(){
-            add_filter("woocommerce_product_related_products_heading",[$this, "sppcfw_display_related_products_title"]);
+            add_filter("woocommerce_product_related_products_heading",[$this, "sppcfw_display_related_products_title"], 999, 1);
         }
     
         function sppcfw_display_related_products_title($related_prducts_title){

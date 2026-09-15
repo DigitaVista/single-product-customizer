@@ -8,7 +8,7 @@ if( !class_exists("Sppcfw_Frontend_Change_Tab_Default_Label")){
     class Sppcfw_Frontend_Change_Tab_Default_Label{
 
         public function __construct(){
-            add_filter("woocommerce_product_tabs",[$this,"sppcfw_change_tab_default_label"], 144, 1 );
+            add_filter("woocommerce_product_tabs",[$this,"sppcfw_change_tab_default_label"], 999, 1 );
         }
 
         public function sppcfw_change_tab_default_label( $tabs ){

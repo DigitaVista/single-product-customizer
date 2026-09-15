@@ -7,7 +7,7 @@ if( !class_exists("Sppcfw_Frontend_Change_Add_To_Cart_Button_Text")){
 
     class Sppcfw_Frontend_Change_Add_To_Cart_Button_Text{
         public function __construct(){
-            add_action("woocommerce_product_single_add_to_cart_text",[$this,"sppcfw_change_add_to_cart_button_text"],10,1);
+            add_filter("woocommerce_product_single_add_to_cart_text",[$this,"sppcfw_change_add_to_cart_button_text"],999,1);
         }
     
     

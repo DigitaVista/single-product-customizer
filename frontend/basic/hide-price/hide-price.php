@@ -12,8 +12,15 @@ if( !class_exists("Sppcfw_Frontend_Hide_Price")){
             // For block themes - two approaches
             add_action("render_block", [$this, "sppcfw_remove_product_price_in_block_themes"], 99, 2);
             
-            // Additional hook for block themes to remove price from product template
-            add_filter('woocommerce_get_price_html', [$this, 'sppcfw_hide_price_in_all_locations'], 10, 2);
+            // Additional hook for block themes and filters to remove price
+            add_filter('woocommerce_get_price_html', [$this, 'sppcfw_hide_price_in_all_locations'], 999, 2);
+            
+            // Theme compatibility: Disable OceanWP price element
+            add_filter('ocean_woo_summary_elements_positioning', [$this, 'sppcfw_oceanwp_remove_price'], 999);
+            // Theme compatibility: Disable Astra price element
+            add_filter('astra_woo_single_product_structure', [$this, 'sppcfw_astra_remove_price'], 999);
+            // Fallback CSS to hide any theme-specific price elements
+            add_action('wp_head', [$this, 'sppcfw_hide_price_css']);
             
             // Hide price from shop/archive pages
             add_action('woocommerce_before_shop_loop_item', [$this, 'sppcfw_hide_price_in_loop'], 1);
@@ -33,6 +40,29 @@ if( !class_exists("Sppcfw_Frontend_Hide_Price")){
         public function sppcfw_hide_price_in_loop(){
             if($this->is_enabled() === 1){
                 remove_action('woocommerce_after_shop_loop_item_title', 'woocommerce_template_loop_price', 10);
+            }
+        }
+
+        // Disable price in OceanWP summary elements
+        public function sppcfw_oceanwp_remove_price($elements) {
+            if ($this->is_enabled() === 1 && is_array($elements)) {
+                return array_values(array_diff($elements, array('price')));
+            }
+            return $elements;
+        }
+
+        // Disable price in Astra summary elements
+        public function sppcfw_astra_remove_price($structure) {
+            if ($this->is_enabled() === 1 && is_array($structure)) {
+                return array_values(array_diff($structure, array('price')));
+            }
+            return $structure;
+        }
+
+        // Fallback CSS for theme price elements
+        public function sppcfw_hide_price_css() {
+            if ($this->is_enabled() === 1 && is_product()) {
+                echo '<style id="sppcfw-hide-price-css">.single-product div.product .price, .single-product .owp-product-price, .single-product .ast-single-product-price{display:none !important;}</style>';
             }
         }
 

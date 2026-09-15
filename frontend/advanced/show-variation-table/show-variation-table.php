@@ -81,15 +81,24 @@ if( ! class_exists('Sppcfw_Frontend_Variation_Table')){
         }
 
         public function sppcfw_show_variation_table(){
-            global $post;
+            $product = function_exists('sppcfw_get_current_product') ? sppcfw_get_current_product() : null;
+            if ( ! ($product instanceof WC_Product) ) {
+                global $post;
+                if ( isset($post->ID) && !empty($post->ID) && function_exists('wc_get_product') ) {
+                    $product = wc_get_product($post->ID);
+                }
+            }
 
-            $product = wc_get_product($post->ID);
+            if ( ! ($product instanceof WC_Product) ) {
+                return;
+            }
+
             if( 'variable' === $product->get_type() ) {
                 $variations=$product->get_children();
                 $attrs=$product->get_attributes();
             
             ?>
-            
+            <div class="sppcfw_variation_table_wrapper">
             <table class="sppcfw_variation_table">
                 <thead>
                     <tr>
@@ -104,31 +113,34 @@ if( ! class_exists('Sppcfw_Frontend_Variation_Table')){
                 </thead>
                 <tbody>
                     <?php
-                        foreach($variations as $var){
-                            $variation=wc_get_product($var);
-                            $vattrs=$variation->get_attributes();
-                            echo'<tr>
-                            <td>'.wp_kses_post($variation->get_sku()).'</td>';
-                            foreach($vattrs as $key=>$vattr){
-                                if($vattr){
-                                    $term=get_term_by('slug',$vattr,$key);
-                                    if($term){
-                                        $name=$term->name;
-                                    }else{
-                                        $name='';
-                                    }
-                                }else{
-                                    $name=$this->sppcfw_entry_terms($key);
+                    foreach( $variations as $variation_id ){
+                        $variation = wc_get_product( $variation_id );
+                        if (!$variation) continue;
+                        $sku = $variation->get_sku();
+                        $price = $variation->get_price_html();
+                        $var_attrs = $variation->get_attributes();
+                        ?>
+                        <tr>
+                            <td><?php echo esc_html( $sku ); ?></td>
+                            <?php
+                            foreach( $attrs as $attr ){
+                                $attr_name = $attr->get_name();
+                                $attr_val = isset( $var_attrs[ $attr_name ] ) ? $var_attrs[ $attr_name ] : '';
+                                if( taxonomy_exists( $attr_name ) ){
+                                    $term = get_term_by( 'slug', $attr_val, $attr_name );
+                                    $attr_val = $term ? $term->name : $attr_val;
                                 }
-                                echo'<td>'.wp_kses_post($name).'</td>';
+                                echo '<td>'.esc_html( $attr_val ).'</td>';
                             }
-                            echo'<td>'.wp_kses_post($variation->get_price_html()).'</td>
-                        </tr>';
-                        }
+                            ?>
+                            <td><?php echo wp_kses_post( $price ); ?></td>
+                        </tr>
+                        <?php
+                    }
                     ?>
                 </tbody>
             </table>
-            
+            </div>
             <?php
             }
         }

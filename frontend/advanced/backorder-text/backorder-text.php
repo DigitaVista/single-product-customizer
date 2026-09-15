@@ -10,6 +10,10 @@ if( !class_exists("Sppcfw_Frontend_Backorder_Text")){
         }
 
         public function sppcfw_change_backorder_text( $availability, $product ){
+            if (!($product instanceof WC_Product)) {
+                return $availability;
+            }
+
             if( $product->is_on_backorder() && $this->is_enabled()===1){
 
                 $sppcfw_backorder_text_val = $this->sppcfw_get_backorder_text();

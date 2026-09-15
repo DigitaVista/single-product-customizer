@@ -16,7 +16,12 @@ if( !class_exists("Sppcfw_Frontend_Hide_Short_Description")){
             add_action("render_block", [$this, "sppcfw_remove_short_description_in_block_themes"], 99, 2);
             
             // Filter to remove short description content
-            add_filter('woocommerce_short_description', [$this, 'sppcfw_filter_short_description'], 10, 1);
+            add_filter('woocommerce_short_description', [$this, 'sppcfw_filter_short_description'], 999, 1);
+            
+            // Theme compatibility: Disable OceanWP excerpt element
+            add_filter('ocean_woo_summary_elements_positioning', [$this, 'sppcfw_oceanwp_remove_excerpt'], 999);
+            // Theme compatibility: Disable Astra short_desc element
+            add_filter('astra_woo_single_product_structure', [$this, 'sppcfw_astra_remove_short_desc'], 999);
             
             // Add CSS for fallback
             add_action('wp_footer', [$this, 'sppcfw_hide_woocommerce_short_description_css'], 99);
@@ -40,6 +45,22 @@ if( !class_exists("Sppcfw_Frontend_Hide_Short_Description")){
                 // Remove from shop/archive pages if any theme adds it there
                 remove_action('woocommerce_after_shop_loop_item_title', 'woocommerce_template_single_excerpt', 5);
             }
+        }
+
+        // Disable excerpt in OceanWP summary elements
+        public function sppcfw_oceanwp_remove_excerpt($elements) {
+            if ($this->is_enabled() === 1 && is_array($elements)) {
+                return array_values(array_diff($elements, array('excerpt')));
+            }
+            return $elements;
+        }
+
+        // Disable short_desc in Astra summary elements
+        public function sppcfw_astra_remove_short_desc($structure) {
+            if ($this->is_enabled() === 1 && is_array($structure)) {
+                return array_values(array_diff($structure, array('short_desc')));
+            }
+            return $structure;
         }
 
         // Remove the short description block for block themes

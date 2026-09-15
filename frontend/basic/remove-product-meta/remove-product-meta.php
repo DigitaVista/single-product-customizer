@@ -9,6 +9,24 @@ if(!class_exists('Sppcfw_Frontend_Remove_Product_Meta_Section')){
             add_action('template_redirect', [$this, 'sppcfw_init_meta_removal'], 999);
             add_filter('render_block', [$this, 'sppcfw_remove_block_meta'], 99, 2);
             add_action('wp_head', [$this, 'sppcfw_add_css']);
+            // Theme compatibility: Disable OceanWP meta
+            add_filter('ocean_woo_summary_elements_positioning', [$this, 'sppcfw_oceanwp_remove_meta'], 999);
+            // Theme compatibility: Disable Astra meta
+            add_filter('astra_woo_single_product_structure', [$this, 'sppcfw_astra_remove_meta'], 999);
+        }
+
+        public function sppcfw_oceanwp_remove_meta($elements) {
+            if ($this->is_enabled() && is_array($elements)) {
+                return array_values(array_diff($elements, array('meta')));
+            }
+            return $elements;
+        }
+
+        public function sppcfw_astra_remove_meta($structure) {
+            if ($this->is_enabled() && is_array($structure)) {
+                return array_values(array_diff($structure, array('meta')));
+            }
+            return $structure;
         }
 
         public function sppcfw_init_meta_removal(){

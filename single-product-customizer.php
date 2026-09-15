@@ -105,10 +105,12 @@ add_action('wp',function(){
     if(!is_admin()){
         if(is_singular( 'product' )){
             global $post;
-            $product_id=$post->ID;
-            global $SPPCFW_INDIVIDUAL;
-            $sppcfw_individual_product_settings=get_post_meta($product_id,'sppcfw_product',true);
-            $SPPCFW_INDIVIDUAL=$sppcfw_individual_product_settings;
+            $product_id = (isset($post->ID) && !empty($post->ID)) ? $post->ID : get_the_ID();
+            if ($product_id) {
+                global $SPPCFW_INDIVIDUAL;
+                $sppcfw_individual_product_settings=get_post_meta($product_id,'sppcfw_product',true);
+                $SPPCFW_INDIVIDUAL=$sppcfw_individual_product_settings;
+            }
         }
     }
 });
@@ -167,6 +169,7 @@ if ( sppcfw_is_woocommerce_active() ) {
      */
     add_action( 'init', 'sppcfw_load_includes', 20 );
     function sppcfw_load_includes() {
+        global $sppcfw_available_hooks;
         include_once SPPCFW_DIR_PATH . 'backend/resources/hook-list.php';
         include_once SPPCFW_DIR_PATH . 'common/util.php';
         include_once SPPCFW_DIR_PATH . 'backend/backend-master.php';

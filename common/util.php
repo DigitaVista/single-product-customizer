@@ -128,12 +128,46 @@ function sppcfw_is_singular()
     }
 }
 
+function sppcfw_get_current_product($product = null)
+{
+    if ($product instanceof WC_Product) {
+        return $product;
+    }
+
+    global $product;
+    if ($product instanceof WC_Product) {
+        return $product;
+    }
+
+    $product_id = get_the_ID();
+    if ($product_id && function_exists('wc_get_product')) {
+        $found = wc_get_product($product_id);
+        if ($found instanceof WC_Product) {
+            return $found;
+        }
+    }
+
+    global $post;
+    if (isset($post->ID) && function_exists('wc_get_product')) {
+        $found = wc_get_product($post->ID);
+        if ($found instanceof WC_Product) {
+            return $found;
+        }
+    }
+
+    return null;
+}
+
 function sppcfw_get_product_category_id($product_id = null)
 {
     // Ensure a valid product ID is provided
     if (!$product_id) {
         global $post;
-        $product_id = $post->ID;  // Fallback to global post ID
+        if (isset($post->ID) && !empty($post->ID)) {
+            $product_id = $post->ID;
+        } elseif (function_exists('get_the_ID')) {
+            $product_id = get_the_ID();
+        }
     }
 
     if (!$product_id) {
@@ -141,12 +175,13 @@ function sppcfw_get_product_category_id($product_id = null)
     }
 
     // Get the category terms associated with the product
-    $terms = wc_get_product_term_ids($product_id, 'product_cat');
+    if (function_exists('wc_get_product_term_ids')) {
+        $terms = wc_get_product_term_ids($product_id, 'product_cat');
+        // Get the first category ID or fallback to 0
+        return !empty($terms) ? (int) $terms[0] : 0;
+    }
 
-    // Get the first category ID or fallback to 0
-    $product_cat = !empty($terms) ? $terms[0] : 0;
-
-    return $product_cat;
+    return 0;
 }
 
 function sppcfw_min_max_is_enabled($product_id)
@@ -298,3 +333,23 @@ if (!function_exists('sppcfw_is_valid_single_product_referer')) {
         return true;
     }
 }
+
+/**
+ * Suppress exif_read_data warnings on images with non-standard APP1 headers during WP_DEBUG.
+ * WordPress core intentionally silences this in production (@exif_read_data, see WP Trac #42480).
+ */
+add_filter('wp_read_image_metadata_types', function($types) {
+    set_error_handler(function($errno, $errstr) {
+        if (strpos($errstr, 'exif_read_data') !== false || strpos($errstr, 'Incorrect APP1') !== false) {
+            return true;
+        }
+        return false;
+    }, E_WARNING | E_NOTICE);
+    return $types;
+}, 10);
+
+add_filter('wp_read_image_metadata', function($meta) {
+    restore_error_handler();
+    return $meta;
+}, 999);
+

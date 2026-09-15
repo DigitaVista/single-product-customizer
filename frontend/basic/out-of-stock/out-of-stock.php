@@ -12,6 +12,9 @@ if( ! class_exists('Sppcfw_Frontend_Out_Of_Stock')){
     
     
         public function sppcfw_display_out_of_stock_text($sppcfw_stock_text, $product ){
+            if (!($product instanceof WC_Product)) {
+                return $sppcfw_stock_text;
+            }
                 
             if(  !$product->is_in_stock()  ){
 

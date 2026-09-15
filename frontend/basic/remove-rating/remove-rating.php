@@ -18,6 +18,25 @@ if( !class_exists('Sppcfw_Frontend_Remove_Rating')){
             add_action('wp_head', [$this, 'sppcfw_hide_review_link_css']);
             // Ensure comment count shows zero on product pages to prevent "0 customer reviews" text
             add_filter('get_comments_number', [$this, 'sppcfw_zero_comments_number'], 10, 2);
+
+            // Theme compatibility: Disable OceanWP rating
+            add_filter('ocean_woo_summary_elements_positioning', [$this, 'sppcfw_oceanwp_remove_rating'], 999);
+            // Theme compatibility: Disable Astra rating
+            add_filter('astra_woo_single_product_structure', [$this, 'sppcfw_astra_remove_rating'], 999);
+        }
+
+        public function sppcfw_oceanwp_remove_rating($elements) {
+            if ($this->is_enabled() === 1 && is_array($elements)) {
+                return array_values(array_diff($elements, array('rating')));
+            }
+            return $elements;
+        }
+
+        public function sppcfw_astra_remove_rating($structure) {
+            if ($this->is_enabled() === 1 && is_array($structure)) {
+                return array_values(array_diff($structure, array('ratings')));
+            }
+            return $structure;
         }
 
         public function sppcwf_remove_rating(){

@@ -20,10 +20,42 @@ if( !class_exists('Sppcfw_Frontend_Hide_Add_To_Cart_Button')){
             add_filter('woocommerce_is_sold_individually', [$this, 'sppcfw_remove_quantity_fields'], 999, 2);
             
             // Disable AJAX add to cart
-            add_filter('woocommerce_loop_add_to_cart_link', [$this, 'sppcfw_remove_add_to_cart_link'], 10, 2);
+            add_filter('woocommerce_loop_add_to_cart_link', [$this, 'sppcfw_remove_add_to_cart_link'], 999, 2);
+            
+            // Theme compatibility: Disable OceanWP quantity-button and floating bar
+            add_filter('ocean_woo_summary_elements_positioning', [$this, 'sppcfw_oceanwp_remove_cart_button'], 999);
+            add_filter('ocean_woo_floating_bar', [$this, 'sppcfw_oceanwp_disable_floating_bar'], 999);
+            // Theme compatibility: Disable Astra add_cart
+            add_filter('astra_woo_single_product_structure', [$this, 'sppcfw_astra_remove_cart_button'], 999);
+            // Fallback CSS
+            add_action('wp_head', [$this, 'sppcfw_hide_cart_button_css']);
             
             // Add custom CSS class
             add_filter('body_class', [$this, 'sppcfw_add_body_class_for_hide_cart']);
+        }
+
+        public function sppcfw_oceanwp_remove_cart_button($elements) {
+            if ($this->is_enabled() === 1 && is_array($elements)) {
+                return array_values(array_diff($elements, array('quantity-button')));
+            }
+            return $elements;
+        }
+
+        public function sppcfw_oceanwp_disable_floating_bar($show) {
+            return ($this->is_enabled() === 1) ? false : $show;
+        }
+
+        public function sppcfw_astra_remove_cart_button($structure) {
+            if ($this->is_enabled() === 1 && is_array($structure)) {
+                return array_values(array_diff($structure, array('add_cart')));
+            }
+            return $structure;
+        }
+
+        public function sppcfw_hide_cart_button_css() {
+            if ($this->is_enabled() === 1 && is_product()) {
+                echo '<style id="sppcfw-hide-cart-css">body.sppcfw-hide-add-to-cart .cart, body.sppcfw-hide-add-to-cart form.cart, body.sppcfw-hide-add-to-cart .owp-floating-bar, body.sppcfw-hide-add-to-cart .ast-sticky-add-to-cart, body.sppcfw-hide-add-to-cart .single_add_to_cart_button{display:none !important;}</style>';
+            }
         }
 
         public function sppcfw_hide_add_to_cart_button_single(){

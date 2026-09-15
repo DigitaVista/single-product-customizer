@@ -7,7 +7,7 @@ if( ! class_exists('Sppcfw_Frontend_Sales_Badge_Text')){
     class Sppcfw_Frontend_Sales_Badge_Text{
 
         public function __construct(){
-            add_filter("woocommerce_sale_flash",[ $this, "sppcfw_display_sale_badge_text"], 99,3);
+            add_filter("woocommerce_sale_flash",[ $this, "sppcfw_display_sale_badge_text"], 999,3);
         }
     
         public function sppcfw_display_sale_badge_text( $badge_text, $post, $product ){

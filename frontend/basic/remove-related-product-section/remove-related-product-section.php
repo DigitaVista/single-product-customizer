@@ -8,6 +8,37 @@ if( !class_exists("Sppcfw_Frontend_Remove_Related_Product_Section")){
 
         public function __construct(){
             add_action("woocommerce_after_single_product_summary",[$this, "sppcfw_remove_related_product_section"], 1 );
+            // Suppress related products at data level for any theme
+            add_filter("woocommerce_product_related_posts", [$this, "sppcfw_empty_related_posts"], 999, 3);
+            add_filter("woocommerce_related_products_args", [$this, "sppcfw_zero_related_products"], 999, 1);
+            // Theme compatibility: Disable OceanWP & Astra related products
+            add_filter("ocean_woo_related_products", [$this, "sppcfw_disable_theme_related"], 999);
+            add_filter("astra_woo_related_products", [$this, "sppcfw_disable_theme_related"], 999);
+            add_action("wp_head", [$this, "sppcfw_hide_related_css"]);
+        }
+
+        public function sppcfw_empty_related_posts($related_posts, $product_id, $args) {
+            if ($this->is_enabled() === 1) {
+                return array();
+            }
+            return $related_posts;
+        }
+
+        public function sppcfw_zero_related_products($args) {
+            if ($this->is_enabled() === 1 && is_array($args)) {
+                $args['posts_per_page'] = 0;
+            }
+            return $args;
+        }
+
+        public function sppcfw_disable_theme_related($show) {
+            return ($this->is_enabled() === 1) ? false : $show;
+        }
+
+        public function sppcfw_hide_related_css() {
+            if ($this->is_enabled() === 1 && is_product()) {
+                echo '<style id="sppcfw-hide-related-css">.related.products, .single-product .related-products, section.related{display:none !important;}</style>';
+            }
         }
 
         public function sppcfw_remove_related_product_section(){
