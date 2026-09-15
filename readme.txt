@@ -4,7 +4,7 @@ Tags: customize woocommerce, woocommerce, product tab, product customizer, varia
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.0.8
+Stable tag: 1.0.9
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
@@ -274,6 +274,13 @@ Yes! The plugin is designed to be compatible with standard WooCommerce themes as
 Yes, the Free version includes Quick Checkout with Template 1 (Modern Horizontal layout). Upgrading to Pro unlocks additional templates (Classic Vertical & Split Layout), component visibility controls, and inline billing/shipping checkout forms.
 
 == Changelog ==
+
+### 1.0.9 (September 16, 2026)
+
+- **Fix:** Improved compatibility with popular themes (OceanWP, Astra, Kadence, and Block themes).
+- **Fix:** Resolved error warnings on the category settings page.
+- **Fix:** Fixed category and product-level customizer settings not saving properly.
+- **Improvement:** Enhanced product page customization stability across all devices.
 
 ### 1.0.8 (August 27, 2026)
 

@@ -32,12 +32,12 @@ if( !class_exists("Sppcfw_Frontend_Enable_Plus_Minus_Button")){
                     'sppcfw-enable-plus-minus-button-js',
                     plugin_dir_url(__FILE__).'enable-plus-minus-button.js',
                     array('jquery'),
-                    (defined('SPPCFW_VERSION') ? SPPCFW_VERSION : false),
+                    SPPCFW_VERSION,
                     true
                 );
 
                 // Add small inline style to ensure quantity wrapper displays as flex and buttons are touch-friendly
-                wp_register_style('sppcfw-plus-minus-inline', false, array(), (defined('SPPCFW_VERSION') ? SPPCFW_VERSION : '1.0.0'));
+                wp_register_style('sppcfw-plus-minus-inline', false, array(), SPPCFW_VERSION);
                 wp_enqueue_style('sppcfw-plus-minus-inline');
                 $css = '.quantity{display:inline-flex !important; align-items:center; justify-content:center; gap:4px;} '
                      . '.quantity .sppcfw_minus_button, .quantity .sppcfw_plus_button{display:inline-flex !important; align-items:center; justify-content:center; min-width:38px; min-height:38px; height:38px; padding:0 10px !important; margin:0 !important; cursor:pointer; user-select:none; -webkit-user-select:none; touch-action:manipulation; line-height:1; font-size:16px; box-sizing:border-box;} '
