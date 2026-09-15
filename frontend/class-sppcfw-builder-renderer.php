@@ -168,10 +168,11 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				.sppcfw-builder-frontend-wrapper { width: 100% !important; max-width: 100% !important; float: none !important; clear: both !important; box-sizing: border-box !important; }
 				.sppcfw-builder-section { width: 100%; box-sizing: border-box; }
 				.sppcfw-container-boxed { margin-left: auto !important; margin-right: auto !important; }
-				.sppcfw-container-full { width: 100% !important; }
+				.sppcfw-container-full { width: 100% !important; max-width: 100% !important; }
 				.sppcfw-flex-row { display: flex; flex-wrap: wrap; width: 100%; box-sizing: border-box; }
 				.sppcfw-column { box-sizing: border-box; }
 				.sppcfw-widget-item { width: 100% !important; box-sizing: border-box !important; }
+				.woocommerce div.product, .woocommerce-page div.product { width: 100% !important; }
 
 				/* Hide empty summary container from native WooCommerce template */
 				.woocommerce div.product > .summary.entry-summary:empty,
@@ -599,16 +600,29 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				$id = isset($el['id']) ? esc_attr($el['id']) : '';
 				$settings = isset($el['settings']) ? $el['settings'] : array();
 				$styles = isset($el['styles']) ? $el['styles'] : array();
+				$advanced = isset($el['advanced']) ? $el['advanced'] : array();
+
+				// Helper to resolve property from $advanced first, falling back to $styles
+				$get_prop = function ($key, $default = '') use ($styles, $advanced, $device) {
+					$val = $this->sppcfw_get_device_prop($advanced, $key, $device, null);
+					if (null !== $val && '' !== $val) {
+						return $val;
+					}
+					return $this->sppcfw_get_device_prop($styles, $key, $device, $default);
+				};
 
 				if ($id && 'product_add_to_cart' !== $type) {
 					$css .= ".sppcfw-el-{$id} {";
 					if ('container' === $type) {
 						$width_mode = $this->sppcfw_get_device_prop($settings, 'width_mode', $device, 'boxed');
 						$boxed_width = esc_attr($this->sppcfw_get_device_prop($settings, 'boxed_width', $device, '1140px'));
-						if ('boxed' === $width_mode) {
-							$css .= "max-width: {$boxed_width} !important; margin: 0 auto 24px auto !important;";
+						$adv_width_mode = $this->sppcfw_get_device_prop($advanced, 'width_mode', $device, '');
+
+						$is_full_width = ('full' === $width_mode || '100%' === $boxed_width || 'Full Width (100%)' === $adv_width_mode);
+						if ($is_full_width) {
+							$css .= 'width: 100% !important; max-width: 100% !important;';
 						} else {
-							$css .= 'width: 100% !important; margin-bottom: 24px !important;';
+							$css .= "width: 100% !important; max-width: {$boxed_width} !important; margin-left: auto !important; margin-right: auto !important;";
 						}
 					} elseif ('column' === $type) {
 						$flex_width = esc_attr($this->sppcfw_get_device_prop($settings, 'flex_width', $device, '100%'));
@@ -618,7 +632,11 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						$gap = esc_attr($this->sppcfw_get_device_prop($settings, 'gap', $device, '12px'));
 						$min_height = esc_attr($this->sppcfw_get_device_prop($settings, 'min_height', $device, '0px'));
 
-						$css .= "flex: 1 1 calc({$flex_width} - 16px) !important; min-width: 200px !important; display: flex !important; flex-direction: {$flex_direction} !important; justify-content: {$justify_content} !important; align-items: {$align_items} !important; gap: {$gap} !important; min-height: {$min_height} !important;";
+						if ('100%' === $flex_width) {
+							$css .= "flex: 1 1 100% !important; width: 100% !important; max-width: 100% !important; display: flex !important; flex-direction: {$flex_direction} !important; justify-content: {$justify_content} !important; align-items: {$align_items} !important; gap: {$gap} !important; min-height: {$min_height} !important;";
+						} else {
+							$css .= "flex: 1 1 calc({$flex_width} - 16px) !important; min-width: 200px !important; display: flex !important; flex-direction: {$flex_direction} !important; justify-content: {$justify_content} !important; align-items: {$align_items} !important; gap: {$gap} !important; min-height: {$min_height} !important;";
+						}
 					}
 
 					$text_color = $this->sppcfw_get_device_prop($styles, 'text_color', $device, '');
@@ -644,7 +662,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					}
 
 					$bg_color = $this->sppcfw_get_device_prop($styles, 'bg_color', $device, '');
-					if (!empty($bg_color)) {
+					if (!empty($bg_color) && 'transparent' !== $bg_color) {
 						$css .= 'background-color: ' . esc_attr($bg_color) . ' !important;';
 					}
 
@@ -674,25 +692,29 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						$css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading { line-height: " . esc_attr($line_height) . ' !important; }';
 					}
 
-					$border_color = $this->sppcfw_get_device_prop($styles, 'border_color', $device, '');
-					if (!empty($border_color)) {
-						$css .= 'border-color: ' . esc_attr($border_color) . ' !important;';
-					}
-
+					// Border: Only generate when border_type is set and not None
+					$border_type = strtolower((string) $this->sppcfw_get_device_prop($styles, 'border_type', $device, ''));
 					$border_width = $this->sppcfw_get_device_prop($styles, 'border_width', $device, '');
-					if (!empty($border_width)) {
-						$css .= 'border-style: solid; border-width: ' . esc_attr($border_width) . ' !important;';
+					$border_color = $this->sppcfw_get_device_prop($styles, 'border_color', $device, '');
+
+					$has_active_border = !empty($border_type) && 'none' !== $border_type;
+					if ($has_active_border && !empty($border_width) && '0px' !== $border_width && '0' !== $border_width) {
+						$border_style_val = in_array($border_type, array('solid', 'dashed', 'dotted', 'double'), true) ? $border_type : 'solid';
+						$css .= 'border-style: ' . esc_attr($border_style_val) . '; border-width: ' . esc_attr($border_width) . ' !important;';
+						if (!empty($border_color) && 'transparent' !== $border_color) {
+							$css .= 'border-color: ' . esc_attr($border_color) . ' !important;';
+						}
 					}
 
 					$border_radius = $this->sppcfw_get_device_prop($styles, 'border_radius', $device, '');
-					if (!empty($border_radius)) {
+					if (!empty($border_radius) && '0px' !== $border_radius && '0' !== $border_radius) {
 						$css .= 'border-radius: ' . esc_attr($border_radius) . ' !important;';
 					} else {
 						$rad_t = $this->sppcfw_get_device_prop($styles, 'border_radius_top', $device, '');
 						$rad_r = $this->sppcfw_get_device_prop($styles, 'border_radius_right', $device, '');
 						$rad_b = $this->sppcfw_get_device_prop($styles, 'border_radius_bottom', $device, '');
 						$rad_l = $this->sppcfw_get_device_prop($styles, 'border_radius_left', $device, '');
-						if (!empty($rad_t) || !empty($rad_r) || !empty($rad_b) || !empty($rad_l)) {
+						if ((!empty($rad_t) && '0px' !== $rad_t) || (!empty($rad_r) && '0px' !== $rad_r) || (!empty($rad_b) && '0px' !== $rad_b) || (!empty($rad_l) && '0px' !== $rad_l)) {
 							$t = !empty($rad_t) ? $rad_t : '0px';
 							$r = !empty($rad_r) ? $rad_r : '0px';
 							$b = !empty($rad_b) ? $rad_b : '0px';
@@ -701,54 +723,66 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						}
 					}
 
-					$padding_top = $this->sppcfw_get_device_prop($styles, 'padding_top', $device, '');
-					if (!empty($padding_top)) {
+					// Padding: Check $advanced first, then $styles
+					$padding_top = $get_prop('padding_top', '');
+					if ('' !== $padding_top && null !== $padding_top && '0px' !== $padding_top && '0' !== $padding_top) {
 						$css .= 'padding-top: ' . esc_attr($padding_top) . ' !important;';
 					}
 
-					$padding_right = $this->sppcfw_get_device_prop($styles, 'padding_right', $device, '');
-					if (!empty($padding_right)) {
+					$padding_right = $get_prop('padding_right', '');
+					if ('' !== $padding_right && null !== $padding_right && '0px' !== $padding_right && '0' !== $padding_right) {
 						$css .= 'padding-right: ' . esc_attr($padding_right) . ' !important;';
 					}
 
-					$padding_bottom = $this->sppcfw_get_device_prop($styles, 'padding_bottom', $device, '');
-					if (!empty($padding_bottom)) {
+					$padding_bottom = $get_prop('padding_bottom', '');
+					if ('' !== $padding_bottom && null !== $padding_bottom && '0px' !== $padding_bottom && '0' !== $padding_bottom) {
 						$css .= 'padding-bottom: ' . esc_attr($padding_bottom) . ' !important;';
 					}
 
-					$padding_left = $this->sppcfw_get_device_prop($styles, 'padding_left', $device, '');
-					if (!empty($padding_left)) {
+					$padding_left = $get_prop('padding_left', '');
+					if ('' !== $padding_left && null !== $padding_left && '0px' !== $padding_left && '0' !== $padding_left) {
 						$css .= 'padding-left: ' . esc_attr($padding_left) . ' !important;';
 					}
 
-					$margin_top = $this->sppcfw_get_device_prop($styles, 'margin_top', $device, '');
-					if (!empty($margin_top)) {
+					// Margin: Check $advanced first, then $styles
+					$margin_top = $get_prop('margin_top', '');
+					if ('' !== $margin_top && null !== $margin_top && '0px' !== $margin_top && '0' !== $margin_top) {
 						$css .= 'margin-top: ' . esc_attr($margin_top) . ' !important;';
 					}
 
-					$margin_right = $this->sppcfw_get_device_prop($styles, 'margin_right', $device, '');
-					if (!empty($margin_right)) {
+					$margin_right = $get_prop('margin_right', '');
+					if ('' !== $margin_right && null !== $margin_right && '0px' !== $margin_right && '0' !== $margin_right) {
 						$css .= 'margin-right: ' . esc_attr($margin_right) . ' !important;';
 					}
 
-					$margin_bottom = $this->sppcfw_get_device_prop($styles, 'margin_bottom', $device, '');
-					if (!empty($margin_bottom)) {
+					$margin_bottom = $get_prop('margin_bottom', '');
+					if ('' !== $margin_bottom && null !== $margin_bottom && '0px' !== $margin_bottom && '0' !== $margin_bottom) {
 						$css .= 'margin-bottom: ' . esc_attr($margin_bottom) . ' !important;';
 					}
 
-					$margin_left = $this->sppcfw_get_device_prop($styles, 'margin_left', $device, '');
-					if (!empty($margin_left)) {
+					$margin_left = $get_prop('margin_left', '');
+					if ('' !== $margin_left && null !== $margin_left && '0px' !== $margin_left && '0' !== $margin_left) {
 						$css .= 'margin-left: ' . esc_attr($margin_left) . ' !important;';
 					}
 
-					$width = $this->sppcfw_get_device_prop($styles, 'width', $device, '');
+					$adv_width_mode = $this->sppcfw_get_device_prop($advanced, 'width_mode', $device, '');
+					if ('Inline (auto)' === $adv_width_mode) {
+						$css .= 'width: auto !important; display: inline-block !important;';
+					}
+
+					$width = $get_prop('width', '');
 					if (!empty($width)) {
 						$css .= 'width: ' . esc_attr($width) . ' !important;';
 					}
 
-					$max_width = $this->sppcfw_get_device_prop($styles, 'max_width', $device, '');
+					$max_width = $get_prop('max_width', '');
 					if (!empty($max_width)) {
 						$css .= 'max-width: ' . esc_attr($max_width) . ' !important;';
+					}
+
+					$z_index = $this->sppcfw_get_device_prop($advanced, 'z_index', $device, '');
+					if ('' !== $z_index && null !== $z_index) {
+						$css .= 'z-index: ' . esc_attr($z_index) . ' !important;';
 					}
 
 					$opacity = $this->sppcfw_get_device_prop($styles, 'opacity', $device, '');
@@ -937,9 +971,10 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				$css_class = !empty($advanced['custom_class']) ? esc_attr($advanced['custom_class']) : '';
 
 				if ('container' === $type) {
-					$width_mode = isset($settings['width_mode']) && 'full' === $settings['width_mode'] ? 'full' : 'boxed';
+					$is_full_width = (isset($settings['width_mode']) && 'full' === $settings['width_mode']) || (isset($settings['boxed_width']) && '100%' === $settings['boxed_width']) || (isset($advanced['width_mode']) && 'Full Width (100%)' === $advanced['width_mode']);
+					$width_mode = $is_full_width ? 'full' : 'boxed';
 
-					echo '<div class="sppcfw-builder-section sppcfw-container-' . esc_attr($width_mode) . ' sppcfw-el-' . $id . ' ' . $css_class . '">';
+					echo '<div class="sppcfw-builder-section sppcfw-container-' . esc_attr($width_mode) . ' sppcfw-el-' . $id . (!empty($css_class) ? ' ' . $css_class : '') . '">';
 					echo '<div class="sppcfw-flex-row">';
 					if (!empty($el['children'])) {
 						$this->sppcfw_render_elements_recursive($el['children']);

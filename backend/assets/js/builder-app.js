@@ -227,22 +227,31 @@
 			settings: settings,
 			children: children,
 			styles: {
-				bg_color: '#ffffff',
-				border_color: '#e5e7eb',
-				border_width: '1px',
-				border_radius: '8px',
-				padding_top: '20px',
-				padding_right: '20px',
-				padding_bottom: '20px',
-				padding_left: '20px',
+				bg_color: 'transparent',
+				border_type: 'None',
+				border_color: 'transparent',
+				border_width: '0px',
+				border_radius: '0px',
+				padding_top: '0px',
+				padding_right: '0px',
+				padding_bottom: '0px',
+				padding_left: '0px',
 				margin_top: '0px',
 				margin_right: '0px',
-				margin_bottom: '24px',
+				margin_bottom: '0px',
 				margin_left: '0px',
 			},
 			advanced: {
 				custom_class: '',
 				z_index: '1',
+				margin_top: '0px',
+				margin_right: '0px',
+				margin_bottom: '0px',
+				margin_left: '0px',
+				padding_top: '0px',
+				padding_right: '0px',
+				padding_bottom: '0px',
+				padding_left: '0px',
 			},
 		};
 	}
@@ -2307,7 +2316,11 @@
 		}
 
 		function getAdvanced(key) {
-			return getResponsiveProp(selectedElement.advanced, key, deviceView);
+			const advVal = getResponsiveProp(selectedElement.advanced, key, deviceView);
+			if (advVal !== undefined && advVal !== null && advVal !== '') {
+				return advVal;
+			}
+			return getResponsiveProp(selectedElement.styles, key, deviceView);
 		}
 
 		function handleSettingChange(key, value) {
@@ -2343,22 +2356,32 @@
 
 		function handleAdvancedChange(key, value) {
 			const targetKey = getDeviceKey(key, deviceView);
+			const updatedStyles = { ...selectedElement.styles };
+			if (key.indexOf('margin_') === 0 || key.indexOf('padding_') === 0) {
+				updatedStyles[targetKey] = value;
+			}
 			const updated = {
 				...selectedElement,
 				advanced: { ...selectedElement.advanced, [targetKey]: value },
+				styles: updatedStyles,
 			};
 			updateElementProperties(updated);
 		}
 
 		function handleMultiAdvancedChange(keyValues) {
 			const targetKeyValues = {};
+			const targetStyleValues = {};
 			Object.keys(keyValues).forEach(k => {
 				const tk = getDeviceKey(k, deviceView);
 				targetKeyValues[tk] = keyValues[k];
+				if (k.indexOf('margin_') === 0 || k.indexOf('padding_') === 0) {
+					targetStyleValues[tk] = keyValues[k];
+				}
 			});
 			const updated = {
 				...selectedElement,
 				advanced: { ...selectedElement.advanced, ...targetKeyValues },
+				styles: { ...selectedElement.styles, ...targetStyleValues },
 			};
 			updateElementProperties(updated);
 		}
@@ -5036,8 +5059,28 @@
 	function CanvasContainerRenderer({ container, cIdx, elements, setElements, selectedElementId, setSelectedElementId, removeElement, sampleData, pageSettings, addWidgetToTarget, addColumnToContainer, duplicateColumn, openElementsTab, openStructureChooser, deviceView = 'desktop' }) {
 		const isSelected = selectedElementId === container.id;
 		const [isContainerDragOver, setIsContainerDragOver] = useState(false);
-		const widthMode = getResponsiveProp(container.settings, 'width_mode', deviceView) === 'full' ? 'full' : 'boxed';
+		const rawWidthMode = getResponsiveProp(container.settings, 'width_mode', deviceView);
 		const boxedWidth = getResponsiveProp(container.settings, 'boxed_width', deviceView) || '1140px';
+		const advWidthMode = getResponsiveProp(container.advanced, 'width_mode', deviceView);
+		const isFullWidth = rawWidthMode === 'full' || boxedWidth === '100%' || advWidthMode === 'Full Width (100%)';
+		const widthMode = isFullWidth ? 'full' : 'boxed';
+
+		const padTop = getResponsiveProp(container.advanced, 'padding_top', deviceView) || getResponsiveProp(container.styles, 'padding_top', deviceView) || '0px';
+		const padRight = getResponsiveProp(container.advanced, 'padding_right', deviceView) || getResponsiveProp(container.styles, 'padding_right', deviceView) || '0px';
+		const padBottom = getResponsiveProp(container.advanced, 'padding_bottom', deviceView) || getResponsiveProp(container.styles, 'padding_bottom', deviceView) || '0px';
+		const padLeft = getResponsiveProp(container.advanced, 'padding_left', deviceView) || getResponsiveProp(container.styles, 'padding_left', deviceView) || '0px';
+
+		const marTop = getResponsiveProp(container.advanced, 'margin_top', deviceView) || getResponsiveProp(container.styles, 'margin_top', deviceView) || '0px';
+		const marRight = getResponsiveProp(container.advanced, 'margin_right', deviceView) || getResponsiveProp(container.styles, 'margin_right', deviceView) || (widthMode === 'boxed' ? 'auto' : '0px');
+		const marBottom = getResponsiveProp(container.advanced, 'margin_bottom', deviceView) || getResponsiveProp(container.styles, 'margin_bottom', deviceView) || '0px';
+		const marLeft = getResponsiveProp(container.advanced, 'margin_left', deviceView) || getResponsiveProp(container.styles, 'margin_left', deviceView) || (widthMode === 'boxed' ? 'auto' : '0px');
+
+		const borderType = (getResponsiveProp(container.styles, 'border_type', deviceView) || 'none').toLowerCase();
+		const hasBorder = borderType !== 'none';
+		const borderWidth = hasBorder ? (getResponsiveProp(container.styles, 'border_width', deviceView) || '1px') : '0px';
+		const borderColor = hasBorder ? (getResponsiveProp(container.styles, 'border_color', deviceView) || '#e5e7eb') : 'transparent';
+		const borderRadius = getResponsiveProp(container.styles, 'border_radius', deviceView) || '0px';
+		const bgColor = getResponsiveProp(container.styles, 'bg_color', deviceView) || 'transparent';
 		const isGrid = getResponsiveProp(container.settings, 'flex_direction', deviceView) === 'grid';
 		const flexDir = getResponsiveProp(container.settings, 'flex_direction', deviceView) || 'row';
 		const justifyContent = getResponsiveProp(container.settings, 'justify_content', deviceView) || 'flex-start';
@@ -5111,17 +5154,26 @@
 					e.stopPropagation();
 					setSelectedElementId(container.id);
 				},
-				className: `sppcfw-builder-container-item sppcfw-relative sppcfw-tab-group sppcfw-transition-all sppcfw-rounded-lg sppcfw-p-4 sppcfw-mb-4 ${
+				className: `sppcfw-builder-container-item sppcfw-relative sppcfw-tab-group sppcfw-transition-all sppcfw-rounded-lg ${
 					isContainerDragOver ? 'sppcfw-border-2 sppcfw-border-dashed sppcfw-border-[#9333ea] sppcfw-bg-[#faf5ff] ' : isSelected ? 'sppcfw-border-2 sppcfw-border-[#9333ea] sppcfw-ring-[#9333ea]/30' : 'sppcfw-border-[#e5e7eb] hover:sppcfw-border-[#9333ea]/50'
-				}`,
+				} ${container.advanced && container.advanced.custom_class ? container.advanced.custom_class : ''}`,
 				style: {
 					maxWidth: widthMode === 'boxed' ? boxedWidth : '100%',
-					margin: '0 auto',
 					width: '100%',
 					minHeight: minHeight,
-					backgroundColor: getResponsiveProp(container.styles, 'bg_color', deviceView) || '#ffffff',
-					paddingTop: getResponsiveProp(container.styles, 'padding_top', deviceView) || '16px',
-					paddingBottom: getResponsiveProp(container.styles, 'padding_bottom', deviceView) || '16px',
+					backgroundColor: bgColor,
+					borderStyle: hasBorder ? borderType : 'none',
+					borderWidth: borderWidth,
+					borderColor: borderColor,
+					borderRadius: borderRadius,
+					paddingTop: padTop,
+					paddingRight: padRight,
+					paddingBottom: padBottom,
+					paddingLeft: padLeft,
+					marginTop: marTop,
+					marginRight: marRight,
+					marginBottom: marBottom,
+					marginLeft: marLeft,
 				},
 			},
 
@@ -5275,7 +5327,9 @@
 					isColumnDragOver ? 'sppcfw-border-2 sppcfw-border-dashed sppcfw-border-[#9333ea] sppcfw-bg-[#faf5ff]' : isSelected ? 'sppcfw-border-[#9333ea] sppcfw-bg-[#faf5ff] sppcfw-ring-2 sppcfw-ring-[#9333ea]/30' : 'sppcfw-border-[#d1d5db] hover:sppcfw-border-[#9333ea]/50 sppcfw-bg-[#f9fafb]'
 				}`,
 				style: {
-					flex: `1 1 calc(${flexWidth} - 16px)`,
+					flex: flexWidth === '100%' ? '1 1 100%' : `1 1 calc(${flexWidth} - 16px)`,
+					width: flexWidth === '100%' ? '100%' : undefined,
+					maxWidth: flexWidth === '100%' ? '100%' : undefined,
 					minHeight: minHeight,
 					display: 'flex',
 					flexDirection: flexDir,
@@ -5286,10 +5340,14 @@
 					borderColor: getResponsiveProp(column.styles, 'border_color', deviceView) || '#d1d5db',
 					borderWidth: getResponsiveProp(column.styles, 'border_width', deviceView) || '1px',
 					borderRadius: getResponsiveProp(column.styles, 'border_radius', deviceView) || '4px',
-					paddingTop: getResponsiveProp(column.styles, 'padding_top', deviceView) || '12px',
-					paddingRight: getResponsiveProp(column.styles, 'padding_right', deviceView) || '12px',
-					paddingBottom: getResponsiveProp(column.styles, 'padding_bottom', deviceView) || '12px',
-					paddingLeft: getResponsiveProp(column.styles, 'padding_left', deviceView) || '12px',
+					paddingTop: getResponsiveProp(column.advanced, 'padding_top', deviceView) || getResponsiveProp(column.styles, 'padding_top', deviceView) || '12px',
+					paddingRight: getResponsiveProp(column.advanced, 'padding_right', deviceView) || getResponsiveProp(column.styles, 'padding_right', deviceView) || '12px',
+					paddingBottom: getResponsiveProp(column.advanced, 'padding_bottom', deviceView) || getResponsiveProp(column.styles, 'padding_bottom', deviceView) || '12px',
+					paddingLeft: getResponsiveProp(column.advanced, 'padding_left', deviceView) || getResponsiveProp(column.styles, 'padding_left', deviceView) || '12px',
+					marginTop: getResponsiveProp(column.advanced, 'margin_top', deviceView) || getResponsiveProp(column.styles, 'margin_top', deviceView) || '0px',
+					marginRight: getResponsiveProp(column.advanced, 'margin_right', deviceView) || getResponsiveProp(column.styles, 'margin_right', deviceView) || '0px',
+					marginBottom: getResponsiveProp(column.advanced, 'margin_bottom', deviceView) || getResponsiveProp(column.styles, 'margin_bottom', deviceView) || '0px',
+					marginLeft: getResponsiveProp(column.advanced, 'margin_left', deviceView) || getResponsiveProp(column.styles, 'margin_left', deviceView) || '0px',
 				},
 			},
 
@@ -5485,14 +5543,14 @@
 					borderColor: getResponsiveProp(widget.styles, 'border_color', deviceView) || 'transparent',
 					borderWidth: getResponsiveProp(widget.styles, 'border_width', deviceView) || '0px',
 					borderRadius: getResponsiveProp(widget.styles, 'border_radius', deviceView) || '0px',
-					paddingTop: getResponsiveProp(widget.styles, 'padding_top', deviceView) || '0px',
-					paddingRight: getResponsiveProp(widget.styles, 'padding_right', deviceView) || '0px',
-					paddingBottom: getResponsiveProp(widget.styles, 'padding_bottom', deviceView) || '0px',
-					paddingLeft: getResponsiveProp(widget.styles, 'padding_left', deviceView) || '0px',
-					marginTop: getResponsiveProp(widget.styles, 'margin_top', deviceView) || '0px',
-					marginRight: getResponsiveProp(widget.styles, 'margin_right', deviceView) || '0px',
-					marginBottom: getResponsiveProp(widget.styles, 'margin_bottom', deviceView) || '0px',
-					marginLeft: getResponsiveProp(widget.styles, 'margin_left', deviceView) || '0px',
+					paddingTop: getResponsiveProp(widget.advanced, 'padding_top', deviceView) || getResponsiveProp(widget.styles, 'padding_top', deviceView) || '0px',
+					paddingRight: getResponsiveProp(widget.advanced, 'padding_right', deviceView) || getResponsiveProp(widget.styles, 'padding_right', deviceView) || '0px',
+					paddingBottom: getResponsiveProp(widget.advanced, 'padding_bottom', deviceView) || getResponsiveProp(widget.styles, 'padding_bottom', deviceView) || '0px',
+					paddingLeft: getResponsiveProp(widget.advanced, 'padding_left', deviceView) || getResponsiveProp(widget.styles, 'padding_left', deviceView) || '0px',
+					marginTop: getResponsiveProp(widget.advanced, 'margin_top', deviceView) || getResponsiveProp(widget.styles, 'margin_top', deviceView) || '0px',
+					marginRight: getResponsiveProp(widget.advanced, 'margin_right', deviceView) || getResponsiveProp(widget.styles, 'margin_right', deviceView) || '0px',
+					marginBottom: getResponsiveProp(widget.advanced, 'margin_bottom', deviceView) || getResponsiveProp(widget.styles, 'margin_bottom', deviceView) || '0px',
+					marginLeft: getResponsiveProp(widget.advanced, 'margin_left', deviceView) || getResponsiveProp(widget.styles, 'margin_left', deviceView) || '0px',
 					textAlign: getResponsiveProp(widget.settings, 'alignment', deviceView) || 'left',
 				},
 			},
