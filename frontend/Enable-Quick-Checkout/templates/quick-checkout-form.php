@@ -11,6 +11,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 global $product;
+$product = function_exists('sppcfw_get_current_product') ? sppcfw_get_current_product($product) : null;
+$product_id = ($product instanceof WC_Product) ? $product->get_id() : get_the_ID();
 
 // Setup quick checkout cart (adds product if not in cart)
 do_action( 'sppcfw_before_quick_checkout_form', $product );
@@ -19,7 +21,7 @@ do_action( 'sppcfw_before_quick_checkout_form', $product );
 <div class="sppcfw-quick-checkout">
 	<h3 class="sppcfw-checkout-title"><?php esc_html_e( 'Quick Checkout', 'single-product-customizer' ); ?></h3>
 	
-	<input type="hidden" id="sppcfw-product-id" value="<?php echo esc_attr( $product->get_id() ); ?>">
+	<input type="hidden" id="sppcfw-product-id" value="<?php echo esc_attr( $product_id ); ?>">
 	
 	<div class="sppcfw-checkout-wrapper">
 		<?php

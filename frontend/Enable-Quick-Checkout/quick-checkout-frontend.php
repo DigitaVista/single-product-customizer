@@ -234,9 +234,9 @@ if (!class_exists('Sppcfw_Frontend_Quick_Checkout')) {
                 return;
             }
 
-            global $product;
+            $product = function_exists('sppcfw_get_current_product') ? sppcfw_get_current_product() : null;
 
-            if (!$product || !$product->get_id()) {
+            if (!($product instanceof WC_Product) || !$product->get_id()) {
                 return;
             }
 
@@ -279,9 +279,9 @@ if (!class_exists('Sppcfw_Frontend_Quick_Checkout')) {
                 return;
             }
 
-            global $product;
+            $product = function_exists('sppcfw_get_current_product') ? sppcfw_get_current_product() : null;
 
-            if (!$product || !$product->get_id()) {
+            if (!($product instanceof WC_Product) || !$product->get_id()) {
                 return;
             }
 
