@@ -2281,7 +2281,14 @@
 			colors: true,
 			image: true,
 			button: true,
+			button_colors: true,
+			button_typography: true,
+			button_quantity: true,
+			button_spacing: true,
 			rating: true,
+			rating_stars: true,
+			rating_text: true,
+			rating_layout: true,
 			border: false,
 			background: true,
 			shadow: false,
@@ -2290,6 +2297,7 @@
 			responsive: false,
 		});
 		const [widthUnit, setWidthUnit] = useState('px');
+		const [fontSizeUnit, setFontSizeUnit] = useState('px');
 		const [heightUnit, setHeightUnit] = useState('px');
 		const [imgWidthUnit, setImgWidthUnit] = useState('%');
 		const [maxImgWidthUnit, setMaxImgWidthUnit] = useState('%');
@@ -3848,50 +3856,127 @@
 				'div',
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
-					'button',
-					'Button Styles',
+					'button_colors',
+					'Button Colors',
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						renderColorPicker('Button Background', getStyle('btn_bg_color') || getStyle('bg_color'), v => {
 							handleStyleChange('btn_bg_color', v);
-							handleStyleChange('bg_color', v);
 						}, '#9333ea'),
 						renderColorPicker('Button Text Color', getStyle('btn_text_color') || getStyle('text_color'), v => {
 							handleStyleChange('btn_text_color', v);
-							handleStyleChange('text_color', v);
 						}, '#ffffff'),
+						renderColorPicker('Hover Background', getStyle('btn_hover_bg_color'), v => handleStyleChange('btn_hover_bg_color', v), '#7e22ce'),
+						renderColorPicker('Hover Text Color', getStyle('btn_hover_text_color'), v => handleStyleChange('btn_hover_text_color', v), '#ffffff')
+					)
+				),
+				renderAccordion(
+					'button_typography',
+					'Typography',
+					h(
+						'div',
+						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Button Font Size', true, widthUnit, setWidthUnit, ['px', 'rem']),
-						renderSliderInput(getStyle('font_size') || '14px', v => handleStyleChange('font_size', v), 10, 30, 1, widthUnit, '14')
+							renderControlHeader('Font Size', true, fontSizeUnit, setFontSizeUnit, ['px', 'rem', 'em']),
+							renderSliderInput(getStyle('btn_font_size') || getStyle('font_size') || '14px', v => {
+								handleMultiStyleChange({ btn_font_size: v, font_size: v });
+							}, 10, 60, 1, fontSizeUnit, '14')
 						),
 						h(
 							'div',
-							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Button Padding', true, paddingUnit, setPaddingUnit, ['px']),
-						renderFourBoxInput(getStyle, 'btn_padding', handleMultiStyleChange, paddingUnit, isPaddingLinked, setIsPaddingLinked)
+							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Font Weight'),
+							h(
+								'select',
+								{
+									className: 'sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea] sppcfw-w-36',
+									value: getStyle('font_weight') || 'Default',
+									onChange: e => handleStyleChange('font_weight', e.target.value),
+								},
+								h('option', { value: 'Default' }, 'Default'),
+								h('option', { value: '400' }, '400 (Normal)'),
+								h('option', { value: '500' }, '500 (Medium)'),
+								h('option', { value: '600' }, '600 (Semi-Bold)'),
+								h('option', { value: '700' }, '700 (Bold)'),
+								h('option', { value: '800' }, '800 (Extra-Bold)')
+							)
 						),
 						h(
 							'div',
-							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Border Radius', true, radiusUnit, setRadiusUnit, ['px', '%']),
-						renderFourBoxInput(getStyle, 'btn_border_radius', handleMultiStyleChange, radiusUnit, isRadiusLinked, setIsRadiusLinked)
-						),
-						h(
-							'div',
-							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Alignment', true),
-						renderButtonGroup(
-							[
-								{ value: 'left', icon: 'format_align_left', title: 'Left' },
-								{ value: 'center', icon: 'format_align_center', title: 'Center' },
-								{ value: 'right', icon: 'format_align_right', title: 'Right' },
-							],
-							getStyle('alignment') || 'left',
-							v => handleStyleChange('alignment', v)
+							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Font Family'),
+							h(
+								'select',
+								{
+									className: 'sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea] sppcfw-w-36',
+									value: getStyle('font_family') || 'Inherit',
+									onChange: e => handleStyleChange('font_family', e.target.value),
+								},
+								h('option', { value: 'Inherit' }, 'Inherit'),
+								h('option', { value: 'Inter' }, 'Inter'),
+								h('option', { value: 'Roboto' }, 'Roboto'),
+								h('option', { value: 'Open Sans' }, 'Open Sans'),
+								h('option', { value: 'Lato' }, 'Lato'),
+								h('option', { value: 'Poppins' }, 'Poppins'),
+								h('option', { value: 'Montserrat' }, 'Montserrat')
+							)
 						)
+					)
+				),
+				renderAccordion(
+					'button_quantity',
+					'Quantity Field',
+					h(
+						'div',
+						{ className: 'sppcfw-space-y-3.5' },
+						renderColorPicker('Input Background', getStyle('qty_bg_color'), v => handleStyleChange('qty_bg_color', v), '#ffffff'),
+						renderColorPicker('Input Text Color', getStyle('qty_text_color'), v => handleStyleChange('qty_text_color', v), '#111827'),
+						renderColorPicker('Border Color', getStyle('qty_border_color'), v => handleStyleChange('qty_border_color', v), '#d1d5db'),
+						renderColorPicker('+/- Buttons Background', getStyle('qty_btn_bg'), v => handleStyleChange('qty_btn_bg', v), '#f3f4f6'),
+						renderColorPicker('+/- Buttons Color', getStyle('qty_btn_color'), v => handleStyleChange('qty_btn_color', v), '#374151'),
+						renderColorPicker('+/- Buttons Hover BG', getStyle('qty_btn_hover_bg'), v => handleStyleChange('qty_btn_hover_bg', v), '#e5e7eb')
+					)
+				),
+				renderAccordion(
+					'button_spacing',
+					'Dimensions & Spacing',
+					h(
+						'div',
+						{ className: 'sppcfw-space-y-3.5' },
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							renderControlHeader('Button Padding', true, paddingUnit, setPaddingUnit, ['px']),
+							renderFourBoxInput(getStyle, 'btn_padding', handleMultiStyleChange, paddingUnit, isPaddingLinked, setIsPaddingLinked)
+						),
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							renderControlHeader('Border Radius', true, radiusUnit, setRadiusUnit, ['px', '%']),
+							renderFourBoxInput(getStyle, 'btn_border_radius', handleMultiStyleChange, radiusUnit, isRadiusLinked, setIsRadiusLinked)
+						),
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							renderControlHeader('Items Gap', true, widthUnit, setWidthUnit, ['px']),
+							renderSliderInput(getStyle('gap') || '12px', v => handleStyleChange('gap', v), 0, 40, 1, 'px', '12')
+						),
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							renderControlHeader('Alignment', true),
+							renderButtonGroup(
+								[
+									{ value: 'left', icon: 'format_align_left', title: 'Left' },
+									{ value: 'center', icon: 'format_align_center', title: 'Center' },
+									{ value: 'right', icon: 'format_align_right', title: 'Right' },
+								],
+								getStyle('alignment') || 'left',
+								v => handleStyleChange('alignment', v)
+							)
 						)
 					)
 				)
@@ -3904,35 +3989,84 @@
 				'div',
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
-					'rating',
-					'Star Rating Appearance',
+					'rating_stars',
+					'Stars Appearance',
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Star Color', getStyle('star_color') || getStyle('text_color'), v => {
+						renderColorPicker('Star Color (Filled)', getStyle('star_color') || getStyle('text_color'), v => {
 							handleStyleChange('star_color', v);
 							handleStyleChange('text_color', v);
 						}, '#f59e0b'),
-						renderColorPicker('Review Count Color', getStyle('review_count_color'), v => handleStyleChange('review_count_color', v), '#6b7280'),
+						renderColorPicker('Empty Star Color', getStyle('empty_star_color'), v => handleStyleChange('empty_star_color', v), '#d1d5db'),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Star Size', true, widthUnit, setWidthUnit, ['px']),
-						renderSliderInput(getStyle('star_size') || '18px', v => handleStyleChange('star_size', v), 10, 40, 1, widthUnit, '18')
+							renderControlHeader('Star Size', true, widthUnit, setWidthUnit, ['px']),
+							renderSliderInput(getStyle('star_size') || '18px', v => handleStyleChange('star_size', v), 10, 60, 1, widthUnit, '18')
+						)
+					)
+				),
+				renderAccordion(
+					'rating_text',
+					'Review Count & Typography',
+					h(
+						'div',
+						{ className: 'sppcfw-space-y-3.5' },
+						renderColorPicker('Text Color', getStyle('review_count_color'), v => handleStyleChange('review_count_color', v), '#6b7280'),
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							renderControlHeader('Font Size', true, widthUnit, setWidthUnit, ['px']),
+							renderSliderInput(getStyle('review_font_size') || '14px', v => handleStyleChange('review_font_size', v), 10, 32, 1, widthUnit, '14')
+						),
+						h(
+							'div',
+							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Font Weight'),
+							h(
+								'select',
+								{
+									className: 'sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea] sppcfw-w-36',
+									value: getStyle('review_font_weight') || 'Default',
+									onChange: e => handleStyleChange('review_font_weight', e.target.value),
+								},
+								h('option', { value: 'Default' }, 'Default'),
+								h('option', { value: '300' }, '300 (Light)'),
+								h('option', { value: '400' }, '400 (Normal)'),
+								h('option', { value: '500' }, '500 (Medium)'),
+								h('option', { value: '600' }, '600 (Semi-Bold)'),
+								h('option', { value: '700' }, '700 (Bold)'),
+								h('option', { value: '800' }, '800 (Extra-Bold)')
+							)
+						)
+					)
+				),
+				renderAccordion(
+					'rating_layout',
+					'Layout & Alignment',
+					h(
+						'div',
+						{ className: 'sppcfw-space-y-3.5' },
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							renderControlHeader('Space Between (Gap)', true, widthUnit, setWidthUnit, ['px']),
+							renderSliderInput(getStyle('gap') || '8px', v => handleStyleChange('gap', v), 0, 40, 1, widthUnit, '8')
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Alignment', true),
-						renderButtonGroup(
-							[
-								{ value: 'left', icon: 'format_align_left', title: 'Left' },
-								{ value: 'center', icon: 'format_align_center', title: 'Center' },
-								{ value: 'right', icon: 'format_align_right', title: 'Right' },
-							],
-							getStyle('alignment') || 'left',
-							v => handleStyleChange('alignment', v)
-						)
+							renderControlHeader('Alignment', true),
+							renderButtonGroup(
+								[
+									{ value: 'left', icon: 'format_align_left', title: 'Left' },
+									{ value: 'center', icon: 'format_align_center', title: 'Center' },
+									{ value: 'right', icon: 'format_align_right', title: 'Right' },
+								],
+								getStyle('alignment') || 'left',
+								v => handleStyleChange('alignment', v)
+							)
 						)
 					)
 				)
@@ -4643,7 +4777,7 @@
 						  )
 					: h(
 							'div',
-							{ className: 'sppcfw-space-y-6' },
+							{ className: 'sppcfw-space-y-6 sppcfw-w-full' },
 							elements.map((container, cIdx) =>
 								h(CanvasContainerRenderer, {
 									key: container.id,
@@ -5071,9 +5205,9 @@
 		const padLeft = getResponsiveProp(container.advanced, 'padding_left', deviceView) || getResponsiveProp(container.styles, 'padding_left', deviceView) || '0px';
 
 		const marTop = getResponsiveProp(container.advanced, 'margin_top', deviceView) || getResponsiveProp(container.styles, 'margin_top', deviceView) || '0px';
-		const marRight = getResponsiveProp(container.advanced, 'margin_right', deviceView) || getResponsiveProp(container.styles, 'margin_right', deviceView) || (widthMode === 'boxed' ? 'auto' : '0px');
+		const marRight = widthMode === 'boxed' ? 'auto' : getResponsiveProp(container.advanced, 'margin_right', deviceView) || getResponsiveProp(container.styles, 'margin_right', deviceView) || '0px';
 		const marBottom = getResponsiveProp(container.advanced, 'margin_bottom', deviceView) || getResponsiveProp(container.styles, 'margin_bottom', deviceView) || '0px';
-		const marLeft = getResponsiveProp(container.advanced, 'margin_left', deviceView) || getResponsiveProp(container.styles, 'margin_left', deviceView) || (widthMode === 'boxed' ? 'auto' : '0px');
+		const marLeft = widthMode === 'boxed' ? 'auto' : getResponsiveProp(container.advanced, 'margin_left', deviceView) || getResponsiveProp(container.styles, 'margin_left', deviceView) || '0px';
 
 		const borderType = (getResponsiveProp(container.styles, 'border_type', deviceView) || 'none').toLowerCase();
 		const hasBorder = borderType !== 'none';
@@ -5534,24 +5668,24 @@
 					isSelected ? 'is-selected sppcfw-ring-2 sppcfw-ring-[#9333ea]' : ''
 				} ${widget.advanced && widget.advanced.custom_class ? widget.advanced.custom_class : ''}`,
 				style: {
-					color: getResponsiveProp(widget.styles, 'text_color', deviceView) || 'inherit',
-					fontFamily: (getResponsiveProp(widget.styles, 'font_family', deviceView) && getResponsiveProp(widget.styles, 'font_family', deviceView) !== 'Inherit') ? getResponsiveProp(widget.styles, 'font_family', deviceView) : 'inherit',
-					fontSize: getResponsiveProp(widget.styles, 'font_size', deviceView) || 'inherit',
-					fontWeight: (getResponsiveProp(widget.styles, 'font_weight', deviceView) && getResponsiveProp(widget.styles, 'font_weight', deviceView) !== 'Default') ? getResponsiveProp(widget.styles, 'font_weight', deviceView) : 'inherit',
+					color: widget.type === 'product_add_to_cart' ? 'inherit' : (getResponsiveProp(widget.styles, 'text_color', deviceView) || 'inherit'),
+					fontFamily: widget.type === 'product_add_to_cart' ? 'inherit' : ((getResponsiveProp(widget.styles, 'font_family', deviceView) && getResponsiveProp(widget.styles, 'font_family', deviceView) !== 'Inherit') ? getResponsiveProp(widget.styles, 'font_family', deviceView) : 'inherit'),
+					fontSize: widget.type === 'product_add_to_cart' ? 'inherit' : (getResponsiveProp(widget.styles, 'font_size', deviceView) || 'inherit'),
+					fontWeight: widget.type === 'product_add_to_cart' ? 'inherit' : ((getResponsiveProp(widget.styles, 'font_weight', deviceView) && getResponsiveProp(widget.styles, 'font_weight', deviceView) !== 'Default') ? getResponsiveProp(widget.styles, 'font_weight', deviceView) : 'inherit'),
 					lineHeight: getResponsiveProp(widget.styles, 'line_height', deviceView) || 'inherit',
-					backgroundColor: getResponsiveProp(widget.styles, 'bg_color', deviceView) || 'transparent',
-					borderColor: getResponsiveProp(widget.styles, 'border_color', deviceView) || 'transparent',
-					borderWidth: getResponsiveProp(widget.styles, 'border_width', deviceView) || '0px',
-					borderRadius: getResponsiveProp(widget.styles, 'border_radius', deviceView) || '0px',
-					paddingTop: getResponsiveProp(widget.advanced, 'padding_top', deviceView) || getResponsiveProp(widget.styles, 'padding_top', deviceView) || '0px',
-					paddingRight: getResponsiveProp(widget.advanced, 'padding_right', deviceView) || getResponsiveProp(widget.styles, 'padding_right', deviceView) || '0px',
-					paddingBottom: getResponsiveProp(widget.advanced, 'padding_bottom', deviceView) || getResponsiveProp(widget.styles, 'padding_bottom', deviceView) || '0px',
-					paddingLeft: getResponsiveProp(widget.advanced, 'padding_left', deviceView) || getResponsiveProp(widget.styles, 'padding_left', deviceView) || '0px',
+					backgroundColor: widget.type === 'product_add_to_cart' ? 'transparent' : (getResponsiveProp(widget.styles, 'bg_color', deviceView) || 'transparent'),
+					borderColor: widget.type === 'product_add_to_cart' ? 'transparent' : (getResponsiveProp(widget.styles, 'border_color', deviceView) || 'transparent'),
+					borderWidth: widget.type === 'product_add_to_cart' ? '0px' : (getResponsiveProp(widget.styles, 'border_width', deviceView) || '0px'),
+					borderRadius: widget.type === 'product_add_to_cart' ? '0px' : (getResponsiveProp(widget.styles, 'border_radius', deviceView) || '0px'),
+					paddingTop: getResponsiveProp(widget.advanced, 'padding_top', deviceView) || (widget.type === 'product_add_to_cart' ? '0px' : (getResponsiveProp(widget.styles, 'padding_top', deviceView) || '0px')),
+					paddingRight: getResponsiveProp(widget.advanced, 'padding_right', deviceView) || (widget.type === 'product_add_to_cart' ? '0px' : (getResponsiveProp(widget.styles, 'padding_right', deviceView) || '0px')),
+					paddingBottom: getResponsiveProp(widget.advanced, 'padding_bottom', deviceView) || (widget.type === 'product_add_to_cart' ? '0px' : (getResponsiveProp(widget.styles, 'padding_bottom', deviceView) || '0px')),
+					paddingLeft: getResponsiveProp(widget.advanced, 'padding_left', deviceView) || (widget.type === 'product_add_to_cart' ? '0px' : (getResponsiveProp(widget.styles, 'padding_left', deviceView) || '0px')),
 					marginTop: getResponsiveProp(widget.advanced, 'margin_top', deviceView) || getResponsiveProp(widget.styles, 'margin_top', deviceView) || '0px',
 					marginRight: getResponsiveProp(widget.advanced, 'margin_right', deviceView) || getResponsiveProp(widget.styles, 'margin_right', deviceView) || '0px',
 					marginBottom: getResponsiveProp(widget.advanced, 'margin_bottom', deviceView) || getResponsiveProp(widget.styles, 'margin_bottom', deviceView) || '0px',
 					marginLeft: getResponsiveProp(widget.advanced, 'margin_left', deviceView) || getResponsiveProp(widget.styles, 'margin_left', deviceView) || '0px',
-					textAlign: getResponsiveProp(widget.settings, 'alignment', deviceView) || 'left',
+					textAlign: getResponsiveProp(widget.styles, 'alignment', deviceView) || getResponsiveProp(widget.settings, 'alignment', deviceView) || 'left',
 				},
 			},
 
@@ -5986,12 +6120,13 @@
 					(typeof window !== 'undefined' && window.SPPCFWBuilderConfig && window.SPPCFWBuilderConfig.basic_settings && window.SPPCFWBuilderConfig.basic_settings.add_to_cart_button_text) ||
 					'Add to cart';
 
-				// Only apply custom styling if explicitly defined, otherwise use default WooCommerce button styling
-				const customBtnBg = getResponsiveProp(styles, 'btn_bg_color', deviceView);
-				const customBtnColor = getResponsiveProp(styles, 'btn_text_color', deviceView);
-				const btnBg = customBtnBg && customBtnBg !== 'transparent' ? customBtnBg : '#111827';
+				const customBtnBg = getResponsiveProp(styles, 'btn_bg_color', deviceView) || getResponsiveProp(styles, 'bg_color', deviceView);
+				const customBtnColor = getResponsiveProp(styles, 'btn_text_color', deviceView) || getResponsiveProp(styles, 'text_color', deviceView);
+				const btnBg = customBtnBg && customBtnBg !== 'transparent' ? customBtnBg : '#9333ea';
 				const btnColor = customBtnColor || '#ffffff';
-				const btnFontSize = getResponsiveProp(styles, 'btn_font_size', deviceView) || '14px';
+				const btnFontSize = getResponsiveProp(styles, 'btn_font_size', deviceView) || getResponsiveProp(styles, 'font_size', deviceView) || '14px';
+				const btnFontWeight = getResponsiveProp(styles, 'font_weight', deviceView) || 'bold';
+				const btnFontFamily = getResponsiveProp(styles, 'font_family', deviceView);
 
 				// 4-box or single border radius
 				const radT = getResponsiveProp(styles, 'btn_border_radius_top', deviceView) || '4px';
@@ -6008,9 +6143,17 @@
 				const padL = getResponsiveProp(styles, 'btn_padding_left', deviceView) || '24px';
 				const btnPadding = `${padT} ${padR} ${padB} ${padL}`;
 
-				// Alignment
+				// Alignment & Gap
 				const alignVal = getResponsiveProp(styles, 'alignment', deviceView) || 'left';
 				const alignFlex = alignVal === 'center' ? 'sppcfw-justify-center' : (alignVal === 'right' ? 'sppcfw-justify-end' : 'sppcfw-justify-start');
+				const gapVal = getResponsiveProp(styles, 'gap', deviceView) || '12px';
+
+				// Quantity Box Styles
+				const qtyBg = getResponsiveProp(styles, 'qty_bg_color', deviceView) || '#ffffff';
+				const qtyColor = getResponsiveProp(styles, 'qty_text_color', deviceView) || '#111827';
+				const qtyBorder = getResponsiveProp(styles, 'qty_border_color', deviceView) || '#d1d5db';
+				const qtyBtnBg = getResponsiveProp(styles, 'qty_btn_bg', deviceView) || '#f3f4f6';
+				const qtyBtnColor = getResponsiveProp(styles, 'qty_btn_color', deviceView) || '#374151';
 
 				// Check if plus/minus button is enabled
 				const isPlusMinusOn = (settings && settings.enable_plus_minus_button === 'on') ||
@@ -6018,23 +6161,25 @@
 
 				return h(
 					'div',
-					{ className: `sppcfw-flex sppcfw-items-center sppcfw-gap-3 ${alignFlex}` },
+					{ className: `sppcfw-flex sppcfw-items-center ${alignFlex}`, style: { gap: gapVal } },
 					isPlusMinusOn
 						? h(
 								'div',
-								{ className: 'sppcfw-flex sppcfw-items-center sppcfw-border sppcfw-border-[#d1d5db] sppcfw-rounded sppcfw-overflow-hidden sppcfw-bg-white' },
-								h('button', { type: 'button', className: 'sppcfw-w-8 sppcfw-h-10 sppcfw-bg-[#f3f4f6] hover:sppcfw-bg-[#e5e7eb] sppcfw-font-bold sppcfw-text-[#374151] sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-border-r sppcfw-border-[#d1d5db] sppcfw-cursor-pointer sppcfw-select-none' }, '-'),
-								h('input', { type: 'number', defaultValue: 1, min: 1, className: 'sppcfw-w-12 sppcfw-h-10 sppcfw-text-center sppcfw-font-bold sppcfw-text-[#111827] sppcfw-border-0 sppcfw-outline-none focus:sppcfw-ring-0' }),
-								h('button', { type: 'button', className: 'sppcfw-w-8 sppcfw-h-10 sppcfw-bg-[#f3f4f6] hover:sppcfw-bg-[#e5e7eb] sppcfw-font-bold sppcfw-text-[#374151] sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-border-l sppcfw-border-[#d1d5db] sppcfw-cursor-pointer sppcfw-select-none' }, '+')
+								{ className: 'sppcfw-flex sppcfw-items-center sppcfw-border sppcfw-rounded sppcfw-overflow-hidden', style: { borderColor: qtyBorder, backgroundColor: qtyBg } },
+								h('button', { type: 'button', className: 'sppcfw-w-8 sppcfw-h-10 sppcfw-font-bold sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-border-r sppcfw-cursor-pointer sppcfw-select-none', style: { backgroundColor: qtyBtnBg, color: qtyBtnColor, borderRightColor: qtyBorder } }, '-'),
+								h('input', { type: 'number', defaultValue: 1, min: 1, className: 'sppcfw-w-12 sppcfw-h-10 sppcfw-text-center sppcfw-font-bold sppcfw-border-0 sppcfw-outline-none focus:sppcfw-ring-0', style: { backgroundColor: qtyBg, color: qtyColor } }),
+								h('button', { type: 'button', className: 'sppcfw-w-8 sppcfw-h-10 sppcfw-font-bold sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-border-l sppcfw-cursor-pointer sppcfw-select-none', style: { backgroundColor: qtyBtnBg, color: qtyBtnColor, borderLeftColor: qtyBorder } }, '+')
 						  )
-						: h('input', { type: 'number', defaultValue: 1, min: 1, className: 'sppcfw-w-16 sppcfw-p-2 sppcfw-border sppcfw-border-[#d1d5db] sppcfw-rounded sppcfw-text-center sppcfw-font-bold sppcfw-text-[#111827]' }),
+						: h('input', { type: 'number', defaultValue: 1, min: 1, className: 'sppcfw-w-16 sppcfw-p-2 sppcfw-border sppcfw-rounded sppcfw-text-center sppcfw-font-bold', style: { borderColor: qtyBorder, backgroundColor: qtyBg, color: qtyColor } }),
 					h('button', {
-						className: 'sppcfw-font-bold sppcfw-shadow sppcfw-transition-all',
+						className: 'sppcfw-shadow sppcfw-transition-all',
 						style: {
 							backgroundColor: btnBg,
 							color: btnColor,
 							borderRadius: btnRadius,
 							fontSize: btnFontSize,
+							fontWeight: btnFontWeight !== 'Default' ? btnFontWeight : 'bold',
+							fontFamily: btnFontFamily && btnFontFamily !== 'Inherit' ? `${btnFontFamily}, sans-serif` : undefined,
 							padding: btnPadding,
 						}
 					}, btnLabel)
@@ -6043,14 +6188,39 @@
 			case 'product_rating': {
 				const rCount = safeSample.rating_count !== undefined ? safeSample.rating_count : 5;
 				const starColor = getResponsiveProp(styles, 'star_color', deviceView) || getResponsiveProp(styles, 'text_color', deviceView) || '#f59e0b';
+				const emptyStarColor = getResponsiveProp(styles, 'empty_star_color', deviceView) || '#d1d5db';
 				const starSize = getResponsiveProp(styles, 'star_size', deviceView) || '18px';
 				const reviewCountColor = getResponsiveProp(styles, 'review_count_color', deviceView) || '#6b7280';
+				const reviewFontSize = getResponsiveProp(styles, 'review_font_size', deviceView) || '14px';
+				const reviewFontWeight = getResponsiveProp(styles, 'review_font_weight', deviceView) || '400';
+				const gap = getResponsiveProp(styles, 'gap', deviceView) || '8px';
+				const alignment = getResponsiveProp(styles, 'alignment', deviceView) || 'left';
+				const justifyClass = alignment === 'center' ? 'sppcfw-justify-center' : alignment === 'right' ? 'sppcfw-justify-end' : 'sppcfw-justify-start';
 
 				return h(
 					'div',
-					{ className: `sppcfw-flex sppcfw-items-center sppcfw-gap-2 ${alignClass}` },
-					h('span', { style: { color: starColor, fontSize: starSize } }, '★★★★★'),
-					h('span', { className: 'sppcfw-text-xs', style: { color: reviewCountColor } }, `(${rCount} reviews)`)
+					{
+						className: `sppcfw-flex sppcfw-items-center ${justifyClass}`,
+						style: { gap: gap }
+					},
+					h('span', {
+						className: 'sppcfw-flex sppcfw-items-center sppcfw-select-none',
+						style: {
+							color: starColor,
+							fontSize: starSize,
+							lineHeight: 1,
+							letterSpacing: '2px',
+						}
+					}, '★★★★★'),
+					h('span', {
+						className: 'sppcfw-transition-colors',
+						style: {
+							color: reviewCountColor,
+							fontSize: reviewFontSize,
+							fontWeight: reviewFontWeight !== 'Default' ? reviewFontWeight : undefined,
+							lineHeight: 1,
+						}
+					}, `(${rCount} reviews)`)
 				);
 			}
 			case 'product_short_desc':

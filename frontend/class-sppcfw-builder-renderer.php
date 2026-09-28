@@ -66,6 +66,9 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 
 			// Hook into WooCommerce single product summary to render builder layout
 			add_action('woocommerce_before_single_product_summary', array($this, 'sppcfw_render_builder_template'), 5);
+			// Remove default WooCommerce breadcrumb and sidebar when custom builder template is active
+			remove_action('woocommerce_before_main_content', 'woocommerce_breadcrumb', 20);
+			remove_action('woocommerce_sidebar', 'woocommerce_get_sidebar', 10);
 			// Remove default WooCommerce single product hooks to avoid duplication when custom template is active
 			remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10);
 			remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20);
@@ -172,12 +175,39 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				.sppcfw-flex-row { display: flex; flex-wrap: wrap; width: 100%; box-sizing: border-box; }
 				.sppcfw-column { box-sizing: border-box; }
 				.sppcfw-widget-item { width: 100% !important; box-sizing: border-box !important; }
-				.woocommerce div.product, .woocommerce-page div.product { width: 100% !important; }
+
+				/* Ensure outer theme containers do not cap max-width on custom single product layouts */
+				.woocommerce-page #primary,
+				.woocommerce #primary,
+				.woocommerce-page .content-area,
+				.woocommerce .content-area,
+				.woocommerce-page main.site-main,
+				.woocommerce main.site-main,
+				.woocommerce-page #main,
+				.woocommerce #main,
+				.woocommerce-page #content,
+				.woocommerce #content,
+				.woocommerce-page .entry-content,
+				.woocommerce .entry-content,
+				.woocommerce-page .site-content,
+				.woocommerce .site-content,
+				.woocommerce div.product,
+				.woocommerce-page div.product {
+					width: 100% !important;
+					max-width: 100% !important;
+					box-sizing: border-box !important;
+				}
 
 				/* Hide empty summary container from native WooCommerce template */
 				.woocommerce div.product > .summary.entry-summary:empty,
 				.woocommerce-page div.product > .summary.entry-summary:empty,
 				div.product > .summary:empty { display: none !important; width: 0 !important; float: none !important; margin: 0 !important; padding: 0 !important; }
+
+				/* Hide default breadcrumb outside builder layout */
+				.woocommerce .woocommerce-breadcrumb,
+				.woocommerce-page .woocommerce-breadcrumb,
+				main.site-main > .woocommerce-breadcrumb,
+				#main > .woocommerce-breadcrumb { display: none !important; }
 
 				/* Full width product gallery override matching builder edit canvas */
 				.woocommerce div.product .sppcfw-builder-frontend-wrapper div.images,
@@ -224,6 +254,66 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				}
 				.sppcfw-price-wrapper .price .woocommerce-Price-amount {
 					display: inline-block !important;
+				}
+
+				/* Product Rating Component Base Styles */
+				.sppcfw-rating-wrapper {
+					width: 100% !important;
+					box-sizing: border-box !important;
+				}
+				.sppcfw-rating-wrapper .woocommerce-product-rating {
+					display: flex !important;
+					align-items: center !important;
+					flex-wrap: wrap !important;
+					margin: 0 !important;
+					line-height: 1 !important;
+				}
+				.sppcfw-rating-wrapper .star-rating {
+					overflow: hidden !important;
+					position: relative !important;
+					height: 1.2em !important;
+					line-height: 1.2 !important;
+					font-size: 16px;
+					width: 5.4em !important;
+					font-family: star, WooCommerce, sans-serif !important;
+					display: inline-block !important;
+					vertical-align: middle !important;
+					letter-spacing: 0.1em !important;
+					margin: 0 !important;
+				}
+				.sppcfw-rating-wrapper .star-rating::before {
+					content: "\73\73\73\73\73" !important;
+					color: #d1d5db;
+					float: left !important;
+					top: 0 !important;
+					left: 0 !important;
+					position: absolute !important;
+				}
+				.sppcfw-rating-wrapper .star-rating span {
+					overflow: hidden !important;
+					float: left !important;
+					top: 0 !important;
+					left: 0 !important;
+					position: absolute !important;
+					padding-top: 1.5em !important;
+				}
+				.sppcfw-rating-wrapper .star-rating span::before {
+					content: "\53\53\53\53\53" !important;
+					top: 0 !important;
+					position: absolute !important;
+					left: 0 !important;
+					color: #f59e0b;
+				}
+				.sppcfw-rating-wrapper .woocommerce-review-link {
+					text-decoration: none !important;
+					color: #6b7280;
+					font-size: 14px;
+					display: inline-block !important;
+					line-height: 1 !important;
+					transition: color 0.2s ease !important;
+				}
+				.sppcfw-rating-wrapper .woocommerce-review-link:hover {
+					text-decoration: underline !important;
 				}
 
 				/* Gallery Component Styles */
@@ -568,21 +658,30 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				return $default;
 			}
 			if ('mobile' === $device) {
-				if (isset($array[$key . '_mobile']) && '' !== $array[$key . '_mobile']) {
+				if (isset($array[$key . '_mobile']) && '' !== $array[$key . '_mobile'] && null !== $array[$key . '_mobile']) {
 					return $array[$key . '_mobile'];
 				}
-				if (isset($array[$key . '_tablet']) && '' !== $array[$key . '_tablet']) {
+				if (isset($array[$key . '_tablet']) && '' !== $array[$key . '_tablet'] && null !== $array[$key . '_tablet']) {
 					return $array[$key . '_tablet'];
 				}
-				return isset($array[$key]) ? $array[$key] : $default;
+				if (isset($array[$key]) && '' !== $array[$key] && null !== $array[$key]) {
+					return $array[$key];
+				}
+				return $default;
 			}
 			if ('tablet' === $device) {
-				if (isset($array[$key . '_tablet']) && '' !== $array[$key . '_tablet']) {
+				if (isset($array[$key . '_tablet']) && '' !== $array[$key . '_tablet'] && null !== $array[$key . '_tablet']) {
 					return $array[$key . '_tablet'];
 				}
-				return isset($array[$key]) ? $array[$key] : $default;
+				if (isset($array[$key]) && '' !== $array[$key] && null !== $array[$key]) {
+					return $array[$key];
+				}
+				return $default;
 			}
-			return isset($array[$key]) ? $array[$key] : $default;
+			if (isset($array[$key]) && '' !== $array[$key] && null !== $array[$key]) {
+				return $array[$key];
+			}
+			return $default;
 		}
 
 		/**
@@ -611,7 +710,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					return $this->sppcfw_get_device_prop($styles, $key, $device, $default);
 				};
 
-				if ($id && 'product_add_to_cart' !== $type) {
+				if ($id) {
 					$css .= ".sppcfw-el-{$id} {";
 					if ('container' === $type) {
 						$width_mode = $this->sppcfw_get_device_prop($settings, 'width_mode', $device, 'boxed');
@@ -661,87 +760,145 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						$css .= ".sppcfw-el-{$id} .price del, .sppcfw-el-{$id} .price del .amount, .sppcfw-el-{$id} del, .sppcfw-el-{$id} del .amount { color: " . esc_attr($reg_price_color) . ' !important; }';
 					}
 
-					$bg_color = $this->sppcfw_get_device_prop($styles, 'bg_color', $device, '');
-					if (!empty($bg_color) && 'transparent' !== $bg_color) {
-						$css .= 'background-color: ' . esc_attr($bg_color) . ' !important;';
-					}
+					// Product Rating specific styles
+					if ('product_rating' === $type) {
+						$star_color = $this->sppcfw_get_device_prop($styles, 'star_color', $device, '');
+						if (empty($star_color)) {
+							$star_color = $this->sppcfw_get_device_prop($styles, 'text_color', $device, '#f59e0b');
+						}
+						$empty_star_color = $this->sppcfw_get_device_prop($styles, 'empty_star_color', $device, '#d1d5db');
+						$star_size = $this->sppcfw_get_device_prop($styles, 'star_size', $device, '');
+						$review_count_color = $this->sppcfw_get_device_prop($styles, 'review_count_color', $device, '');
+						$review_font_size = $this->sppcfw_get_device_prop($styles, 'review_font_size', $device, '');
+						$review_font_weight = $this->sppcfw_get_device_prop($styles, 'review_font_weight', $device, '');
+						$gap = $this->sppcfw_get_device_prop($styles, 'gap', $device, '');
+						$alignment = $this->sppcfw_get_device_prop($styles, 'alignment', $device, '');
 
-					$font_size = $this->sppcfw_get_device_prop($styles, 'font_size', $device, '');
-					if (!empty($font_size)) {
-						$css .= 'font-size: ' . esc_attr($font_size) . ' !important;';
-						$css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading { font-size: " . esc_attr($font_size) . ' !important; }';
-						$css .= ".sppcfw-el-{$id} .price, .sppcfw-el-{$id} .price .amount, .sppcfw-el-{$id} .woocommerce-Price-amount { font-size: " . esc_attr($font_size) . ' !important; }';
-					}
+						if (!empty($alignment)) {
+							$justify_map = array(
+								'left' => 'flex-start',
+								'center' => 'center',
+								'right' => 'flex-end',
+							);
+							$justify_val = isset($justify_map[$alignment]) ? $justify_map[$alignment] : 'flex-start';
+							$css .= ".sppcfw-el-{$id} .sppcfw-product-rating-container, .sppcfw-el-{$id} .woocommerce-product-rating, .sppcfw-el-{$id} .sppcfw-rating-wrapper, .sppcfw-el-{$id} { justify-content: {$justify_val} !important; text-align: {$alignment} !important; }";
+						}
 
-					$font_family = $this->sppcfw_get_device_prop($styles, 'font_family', $device, '');
-					if (!empty($font_family) && 'Inherit' !== $font_family) {
-						$css .= 'font-family: ' . esc_attr($font_family) . ', sans-serif !important;';
-						$css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading { font-family: " . esc_attr($font_family) . ', sans-serif !important; }';
-					}
+						if (!empty($gap)) {
+							$css .= ".sppcfw-el-{$id} .sppcfw-product-rating-container, .sppcfw-el-{$id} .woocommerce-product-rating, .sppcfw-el-{$id} .sppcfw-rating-wrapper { gap: " . esc_attr($gap) . ' !important; }';
+						}
 
-					$font_weight = $this->sppcfw_get_device_prop($styles, 'font_weight', $device, '');
-					if (!empty($font_weight) && 'Default' !== $font_weight) {
-						$css .= 'font-weight: ' . esc_attr($font_weight) . ' !important;';
-						$css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading, .sppcfw-el-{$id} a { font-weight: " . esc_attr($font_weight) . ' !important; }';
-						$css .= ".sppcfw-el-{$id} .price, .sppcfw-el-{$id} .price .amount, .sppcfw-el-{$id} .woocommerce-Price-amount { font-weight: " . esc_attr($font_weight) . ' !important; }';
-					}
+						if (!empty($star_color)) {
+							$css .= ".sppcfw-el-{$id} .sppcfw-stars-filled, .sppcfw-el-{$id} .star-rating span::before, .sppcfw-el-{$id} .star-rating span { color: " . esc_attr($star_color) . ' !important; }';
+						}
 
-					$line_height = $this->sppcfw_get_device_prop($styles, 'line_height', $device, '');
-					if (!empty($line_height)) {
-						$css .= 'line-height: ' . esc_attr($line_height) . ' !important;';
-						$css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading { line-height: " . esc_attr($line_height) . ' !important; }';
-					}
+						if (!empty($empty_star_color)) {
+							$css .= ".sppcfw-el-{$id} .sppcfw-stars-empty, .sppcfw-el-{$id} .star-rating::before { color: " . esc_attr($empty_star_color) . ' !important; }';
+						}
 
-					// Border: Only generate when border_type is set and not None
-					$border_type = strtolower((string) $this->sppcfw_get_device_prop($styles, 'border_type', $device, ''));
-					$border_width = $this->sppcfw_get_device_prop($styles, 'border_width', $device, '');
-					$border_color = $this->sppcfw_get_device_prop($styles, 'border_color', $device, '');
+						if (!empty($star_size)) {
+							$css .= ".sppcfw-el-{$id} .sppcfw-stars-box, .sppcfw-el-{$id} .star-rating { font-size: " . esc_attr($star_size) . ' !important; }';
+						}
 
-					$has_active_border = !empty($border_type) && 'none' !== $border_type;
-					if ($has_active_border && !empty($border_width) && '0px' !== $border_width && '0' !== $border_width) {
-						$border_style_val = in_array($border_type, array('solid', 'dashed', 'dotted', 'double'), true) ? $border_type : 'solid';
-						$css .= 'border-style: ' . esc_attr($border_style_val) . '; border-width: ' . esc_attr($border_width) . ' !important;';
-						if (!empty($border_color) && 'transparent' !== $border_color) {
-							$css .= 'border-color: ' . esc_attr($border_color) . ' !important;';
+						if (!empty($review_count_color)) {
+							$css .= ".sppcfw-el-{$id} .sppcfw-review-link, .sppcfw-el-{$id} .woocommerce-review-link, .sppcfw-el-{$id} a.woocommerce-review-link, .sppcfw-el-{$id} .woocommerce-review-link .count { color: " . esc_attr($review_count_color) . ' !important; }';
+						}
+
+						if (!empty($review_font_size)) {
+							$css .= ".sppcfw-el-{$id} .sppcfw-review-link, .sppcfw-el-{$id} .woocommerce-review-link { font-size: " . esc_attr($review_font_size) . ' !important; }';
+						}
+
+						if (!empty($review_font_weight) && 'Default' !== $review_font_weight) {
+							$css .= ".sppcfw-el-{$id} .sppcfw-review-link, .sppcfw-el-{$id} .woocommerce-review-link { font-weight: " . esc_attr($review_font_weight) . ' !important; }';
 						}
 					}
 
-					$border_radius = $this->sppcfw_get_device_prop($styles, 'border_radius', $device, '');
-					if (!empty($border_radius) && '0px' !== $border_radius && '0' !== $border_radius) {
-						$css .= 'border-radius: ' . esc_attr($border_radius) . ' !important;';
+					if ('product_add_to_cart' !== $type) {
+						$bg_color = $this->sppcfw_get_device_prop($styles, 'bg_color', $device, '');
+						if (!empty($bg_color) && 'transparent' !== $bg_color) {
+							$css .= 'background-color: ' . esc_attr($bg_color) . ' !important;';
+						}
+
+						$font_size = $this->sppcfw_get_device_prop($styles, 'font_size', $device, '');
+						if (!empty($font_size)) {
+							$css .= 'font-size: ' . esc_attr($font_size) . ' !important;';
+							$css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading { font-size: " . esc_attr($font_size) . ' !important; }';
+							$css .= ".sppcfw-el-{$id} .price, .sppcfw-el-{$id} .price .amount, .sppcfw-el-{$id} .woocommerce-Price-amount { font-size: " . esc_attr($font_size) . ' !important; }';
+						}
+
+						$font_family = $this->sppcfw_get_device_prop($styles, 'font_family', $device, '');
+						if (!empty($font_family) && 'Inherit' !== $font_family) {
+							$css .= 'font-family: ' . esc_attr($font_family) . ', sans-serif !important;';
+							$css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading { font-family: " . esc_attr($font_family) . ', sans-serif !important; }';
+						}
+
+						$font_weight = $this->sppcfw_get_device_prop($styles, 'font_weight', $device, '');
+						if (!empty($font_weight) && 'Default' !== $font_weight) {
+							$css .= 'font-weight: ' . esc_attr($font_weight) . ' !important;';
+							$css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading, .sppcfw-el-{$id} a { font-weight: " . esc_attr($font_weight) . ' !important; }';
+							$css .= ".sppcfw-el-{$id} .price, .sppcfw-el-{$id} .price .amount, .sppcfw-el-{$id} .woocommerce-Price-amount { font-weight: " . esc_attr($font_weight) . ' !important; }';
+						}
+
+						$line_height = $this->sppcfw_get_device_prop($styles, 'line_height', $device, '');
+						if (!empty($line_height)) {
+							$css .= 'line-height: ' . esc_attr($line_height) . ' !important;';
+							$css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading { line-height: " . esc_attr($line_height) . ' !important; }';
+						}
+
+						// Border: Only generate when border_type is set and not None
+						$border_type = strtolower((string) $this->sppcfw_get_device_prop($styles, 'border_type', $device, ''));
+						$border_width = $this->sppcfw_get_device_prop($styles, 'border_width', $device, '');
+						$border_color = $this->sppcfw_get_device_prop($styles, 'border_color', $device, '');
+
+						$has_active_border = !empty($border_type) && 'none' !== $border_type;
+						if ($has_active_border && !empty($border_width) && '0px' !== $border_width && '0' !== $border_width) {
+							$border_style_val = in_array($border_type, array('solid', 'dashed', 'dotted', 'double'), true) ? $border_type : 'solid';
+							$css .= 'border-style: ' . esc_attr($border_style_val) . '; border-width: ' . esc_attr($border_width) . ' !important;';
+							if (!empty($border_color) && 'transparent' !== $border_color) {
+								$css .= 'border-color: ' . esc_attr($border_color) . ' !important;';
+							}
+						}
+
+						$border_radius = $this->sppcfw_get_device_prop($styles, 'border_radius', $device, '');
+						if (!empty($border_radius) && '0px' !== $border_radius && '0' !== $border_radius) {
+							$css .= 'border-radius: ' . esc_attr($border_radius) . ' !important;';
+						} else {
+							$rad_t = $this->sppcfw_get_device_prop($styles, 'border_radius_top', $device, '');
+							$rad_r = $this->sppcfw_get_device_prop($styles, 'border_radius_right', $device, '');
+							$rad_b = $this->sppcfw_get_device_prop($styles, 'border_radius_bottom', $device, '');
+							$rad_l = $this->sppcfw_get_device_prop($styles, 'border_radius_left', $device, '');
+							if ((!empty($rad_t) && '0px' !== $rad_t) || (!empty($rad_r) && '0px' !== $rad_r) || (!empty($rad_b) && '0px' !== $rad_b) || (!empty($rad_l) && '0px' !== $rad_l)) {
+								$t = !empty($rad_t) ? $rad_t : '0px';
+								$r = !empty($rad_r) ? $rad_r : '0px';
+								$b = !empty($rad_b) ? $rad_b : '0px';
+								$l = !empty($rad_l) ? $rad_l : '0px';
+								$css .= "border-radius: {$t} {$r} {$b} {$l} !important;";
+							}
+						}
+
+						// Padding: Check $advanced first, then $styles
+						$padding_top = $get_prop('padding_top', '');
+						if ('' !== $padding_top && null !== $padding_top && '0px' !== $padding_top && '0' !== $padding_top) {
+							$css .= 'padding-top: ' . esc_attr($padding_top) . ' !important;';
+						}
+
+						$padding_right = $get_prop('padding_right', '');
+						if ('' !== $padding_right && null !== $padding_right && '0px' !== $padding_right && '0' !== $padding_right) {
+							$css .= 'padding-right: ' . esc_attr($padding_right) . ' !important;';
+						}
+
+						$padding_bottom = $get_prop('padding_bottom', '');
+						if ('' !== $padding_bottom && null !== $padding_bottom && '0px' !== $padding_bottom && '0' !== $padding_bottom) {
+							$css .= 'padding-bottom: ' . esc_attr($padding_bottom) . ' !important;';
+						}
+
+						$padding_left = $get_prop('padding_left', '');
+						if ('' !== $padding_left && null !== $padding_left && '0px' !== $padding_left && '0' !== $padding_left) {
+							$css .= 'padding-left: ' . esc_attr($padding_left) . ' !important;';
+						}
 					} else {
-						$rad_t = $this->sppcfw_get_device_prop($styles, 'border_radius_top', $device, '');
-						$rad_r = $this->sppcfw_get_device_prop($styles, 'border_radius_right', $device, '');
-						$rad_b = $this->sppcfw_get_device_prop($styles, 'border_radius_bottom', $device, '');
-						$rad_l = $this->sppcfw_get_device_prop($styles, 'border_radius_left', $device, '');
-						if ((!empty($rad_t) && '0px' !== $rad_t) || (!empty($rad_r) && '0px' !== $rad_r) || (!empty($rad_b) && '0px' !== $rad_b) || (!empty($rad_l) && '0px' !== $rad_l)) {
-							$t = !empty($rad_t) ? $rad_t : '0px';
-							$r = !empty($rad_r) ? $rad_r : '0px';
-							$b = !empty($rad_b) ? $rad_b : '0px';
-							$l = !empty($rad_l) ? $rad_l : '0px';
-							$css .= "border-radius: {$t} {$r} {$b} {$l} !important;";
-						}
-					}
-
-					// Padding: Check $advanced first, then $styles
-					$padding_top = $get_prop('padding_top', '');
-					if ('' !== $padding_top && null !== $padding_top && '0px' !== $padding_top && '0' !== $padding_top) {
-						$css .= 'padding-top: ' . esc_attr($padding_top) . ' !important;';
-					}
-
-					$padding_right = $get_prop('padding_right', '');
-					if ('' !== $padding_right && null !== $padding_right && '0px' !== $padding_right && '0' !== $padding_right) {
-						$css .= 'padding-right: ' . esc_attr($padding_right) . ' !important;';
-					}
-
-					$padding_bottom = $get_prop('padding_bottom', '');
-					if ('' !== $padding_bottom && null !== $padding_bottom && '0px' !== $padding_bottom && '0' !== $padding_bottom) {
-						$css .= 'padding-bottom: ' . esc_attr($padding_bottom) . ' !important;';
-					}
-
-					$padding_left = $get_prop('padding_left', '');
-					if ('' !== $padding_left && null !== $padding_left && '0px' !== $padding_left && '0' !== $padding_left) {
-						$css .= 'padding-left: ' . esc_attr($padding_left) . ' !important;';
+						// For product_add_to_cart, ensure outer container is clean and transparent
+						$css .= 'background: transparent !important; background-color: transparent !important; border: none !important; padding: 0 !important;';
 					}
 
 					// Margin: Check $advanced first, then $styles
@@ -752,7 +909,9 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 
 					$margin_right = $get_prop('margin_right', '');
 					if ('' !== $margin_right && null !== $margin_right && '0px' !== $margin_right && '0' !== $margin_right) {
-						$css .= 'margin-right: ' . esc_attr($margin_right) . ' !important;';
+						if ('container' !== $type || (isset($is_full_width) && $is_full_width)) {
+							$css .= 'margin-right: ' . esc_attr($margin_right) . ' !important;';
+						}
 					}
 
 					$margin_bottom = $get_prop('margin_bottom', '');
@@ -762,7 +921,9 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 
 					$margin_left = $get_prop('margin_left', '');
 					if ('' !== $margin_left && null !== $margin_left && '0px' !== $margin_left && '0' !== $margin_left) {
-						$css .= 'margin-left: ' . esc_attr($margin_left) . ' !important;';
+						if ('container' !== $type || (isset($is_full_width) && $is_full_width)) {
+							$css .= 'margin-left: ' . esc_attr($margin_left) . ' !important;';
+						}
 					}
 
 					$adv_width_mode = $this->sppcfw_get_device_prop($advanced, 'width_mode', $device, '');
@@ -807,52 +968,109 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					}
 
 					// Specific element component style rules (Add to Cart / Buttons)
-					// Only apply styles if explicitly customized by user (do not override default theme button color)
-					$btn_bg = $this->sppcfw_get_device_prop($styles, 'btn_bg_color', $device, '');
-					if ('transparent' === $btn_bg) {
-						$btn_bg = '';
-					}
-					$btn_color = $this->sppcfw_get_device_prop($styles, 'btn_text_color', $device, '');
-					$btn_font_size = $this->sppcfw_get_device_prop($styles, 'btn_font_size', $device, '');
-					if (empty($btn_font_size) && !empty($styles['btn_font_size'])) {
-						$btn_font_size = $styles['btn_font_size'];
-					}
+					if ('product_add_to_cart' === $type) {
+						$btn_bg = $this->sppcfw_get_device_prop($styles, 'btn_bg_color', $device, '');
+						if (empty($btn_bg)) {
+							$btn_bg = $this->sppcfw_get_device_prop($styles, 'bg_color', $device, '');
+						}
+						if ('transparent' === $btn_bg) {
+							$btn_bg = '';
+						}
+						$btn_color = $this->sppcfw_get_device_prop($styles, 'btn_text_color', $device, '');
+						if (empty($btn_color)) {
+							$btn_color = $this->sppcfw_get_device_prop($styles, 'text_color', $device, '');
+						}
+						$btn_hover_bg = $this->sppcfw_get_device_prop($styles, 'btn_hover_bg_color', $device, '');
+						$btn_hover_color = $this->sppcfw_get_device_prop($styles, 'btn_hover_text_color', $device, '');
+						$btn_font_size = $this->sppcfw_get_device_prop($styles, 'btn_font_size', $device, '');
+						if (empty($btn_font_size)) {
+							$btn_font_size = $this->sppcfw_get_device_prop($styles, 'font_size', $device, '');
+						}
+						$btn_font_weight = $this->sppcfw_get_device_prop($styles, 'font_weight', $device, '');
+						$btn_font_family = $this->sppcfw_get_device_prop($styles, 'font_family', $device, '');
 
-					// 4-box or single border radius (only if customized)
-					$btn_rad_top = $this->sppcfw_get_device_prop($styles, 'btn_border_radius_top', $device, '');
-					$btn_rad_right = $this->sppcfw_get_device_prop($styles, 'btn_border_radius_right', $device, '');
-					$btn_rad_bottom = $this->sppcfw_get_device_prop($styles, 'btn_border_radius_bottom', $device, '');
-					$btn_rad_left = $this->sppcfw_get_device_prop($styles, 'btn_border_radius_left', $device, '');
-					$btn_radius = $this->sppcfw_get_device_prop($styles, 'btn_border_radius', $device, '');
-					if ('' !== $btn_rad_top || '' !== $btn_rad_right || '' !== $btn_rad_bottom || '' !== $btn_rad_left) {
-						$btn_radius_css = ($btn_rad_top ? $btn_rad_top : '0px') . ' ' . ($btn_rad_right ? $btn_rad_right : '0px') . ' ' . ($btn_rad_bottom ? $btn_rad_bottom : '0px') . ' ' . ($btn_rad_left ? $btn_rad_left : '0px');
-					} elseif (!empty($btn_radius)) {
-						$btn_radius_css = $btn_radius;
-					} else {
-						$btn_radius_css = '';
-					}
+						// Quantity element styles
+						$qty_bg = $this->sppcfw_get_device_prop($styles, 'qty_bg_color', $device, '#ffffff');
+						$qty_bg = !empty($qty_bg) ? $qty_bg : '#ffffff';
+						$qty_color = $this->sppcfw_get_device_prop($styles, 'qty_text_color', $device, '#111827');
+						$qty_color = !empty($qty_color) ? $qty_color : '#111827';
+						$qty_border = $this->sppcfw_get_device_prop($styles, 'qty_border_color', $device, '#d1d5db');
+						$qty_border = !empty($qty_border) ? $qty_border : '#d1d5db';
+						$qty_btn_bg = $this->sppcfw_get_device_prop($styles, 'qty_btn_bg', $device, '#f3f4f6');
+						$qty_btn_bg = !empty($qty_btn_bg) ? $qty_btn_bg : '#f3f4f6';
+						$qty_btn_color = $this->sppcfw_get_device_prop($styles, 'qty_btn_color', $device, '#374151');
+						$qty_btn_color = !empty($qty_btn_color) ? $qty_btn_color : '#374151';
+						$qty_btn_hover_bg = $this->sppcfw_get_device_prop($styles, 'qty_btn_hover_bg', $device, '#e5e7eb');
+						$qty_btn_hover_bg = !empty($qty_btn_hover_bg) ? $qty_btn_hover_bg : '#e5e7eb';
+						$gap_val = $this->sppcfw_get_device_prop($styles, 'gap', $device, '12px');
 
-					// 4-box button padding (only if customized)
-					$btn_pad_top = $this->sppcfw_get_device_prop($styles, 'btn_padding_top', $device, '');
-					$btn_pad_right = $this->sppcfw_get_device_prop($styles, 'btn_padding_right', $device, '');
-					$btn_pad_bottom = $this->sppcfw_get_device_prop($styles, 'btn_padding_bottom', $device, '');
-					$btn_pad_left = $this->sppcfw_get_device_prop($styles, 'btn_padding_left', $device, '');
-					if ('' !== $btn_pad_top || '' !== $btn_pad_right || '' !== $btn_pad_bottom || '' !== $btn_pad_left) {
-						$btn_padding_css = ($btn_pad_top ? $btn_pad_top : '0px') . ' ' . ($btn_pad_right ? $btn_pad_right : '0px') . ' ' . ($btn_pad_bottom ? $btn_pad_bottom : '0px') . ' ' . ($btn_pad_left ? $btn_pad_left : '0px');
-					} else {
-						$btn_padding_css = '';
-					}
+						// 4-box or single border radius
+						$btn_rad_top = $this->sppcfw_get_device_prop($styles, 'btn_border_radius_top', $device, '');
+						$btn_rad_right = $this->sppcfw_get_device_prop($styles, 'btn_border_radius_right', $device, '');
+						$btn_rad_bottom = $this->sppcfw_get_device_prop($styles, 'btn_border_radius_bottom', $device, '');
+						$btn_rad_left = $this->sppcfw_get_device_prop($styles, 'btn_border_radius_left', $device, '');
+						$btn_radius = $this->sppcfw_get_device_prop($styles, 'btn_border_radius', $device, '');
+						if (empty($btn_radius)) {
+							$btn_radius = $this->sppcfw_get_device_prop($styles, 'border_radius', $device, '');
+						}
+						if ('' !== $btn_rad_top || '' !== $btn_rad_right || '' !== $btn_rad_bottom || '' !== $btn_rad_left) {
+							$btn_radius_css = ($btn_rad_top ? $btn_rad_top : '0px') . ' ' . ($btn_rad_right ? $btn_rad_right : '0px') . ' ' . ($btn_rad_bottom ? $btn_rad_bottom : '0px') . ' ' . ($btn_rad_left ? $btn_rad_left : '0px');
+						} elseif (!empty($btn_radius)) {
+							$btn_radius_css = $btn_radius;
+						} else {
+							$btn_radius_css = '';
+						}
 
-					if (!empty($btn_bg) || !empty($btn_color) || !empty($btn_radius_css) || !empty($btn_padding_css) || !empty($btn_font_size)) {
-						$css .= ".sppcfw-add-to-cart-wrapper .single_add_to_cart_button, .sppcfw-add-to-cart-wrapper button.single_add_to_cart_button, .sppcfw-add-to-cart-wrapper button.button {";
+						// 4-box button padding
+						$btn_pad_top = $this->sppcfw_get_device_prop($styles, 'btn_padding_top', $device, '');
+						$btn_pad_right = $this->sppcfw_get_device_prop($styles, 'btn_padding_right', $device, '');
+						$btn_pad_bottom = $this->sppcfw_get_device_prop($styles, 'btn_padding_bottom', $device, '');
+						$btn_pad_left = $this->sppcfw_get_device_prop($styles, 'btn_padding_left', $device, '');
+						$btn_padding = $this->sppcfw_get_device_prop($styles, 'btn_padding', $device, '');
+						if ('' !== $btn_pad_top || '' !== $btn_pad_right || '' !== $btn_pad_bottom || '' !== $btn_pad_left) {
+							$btn_padding_css = ($btn_pad_top ? $btn_pad_top : '0px') . ' ' . ($btn_pad_right ? $btn_pad_right : '0px') . ' ' . ($btn_pad_bottom ? $btn_pad_bottom : '0px') . ' ' . ($btn_pad_left ? $btn_pad_left : '0px');
+						} elseif (!empty($btn_padding)) {
+							$btn_padding_css = $btn_padding;
+						} else {
+							$btn_padding_css = '';
+						}
+
+						// Alignment for Cart Form & Add to Cart Wrapper
+						$cart_align = $this->sppcfw_get_device_prop($styles, 'alignment', $device, 'left');
+						$justify = 'center' === $cart_align ? 'center' : ('right' === $cart_align ? 'flex-end' : 'flex-start');
+						$align_text = 'center' === $cart_align ? 'center' : ('right' === $cart_align ? 'right' : 'left');
+
+						$css .= ".sppcfw-el-{$id}.sppcfw-add-to-cart-wrapper, .sppcfw-el-{$id} { background: transparent !important; background-color: transparent !important; border: none !important; padding: 0 !important; width: 100% !important; text-align: {$align_text} !important; }";
+						$css .= ".sppcfw-el-{$id} form.cart, .sppcfw-el-{$id} .variations_form { display: flex !important; flex-wrap: wrap !important; align-items: center !important; gap: {$gap_val} !important; margin: 0 !important; padding: 0 !important; background: transparent !important; background-color: transparent !important; border: none !important; justify-content: {$justify} !important; }";
+						$css .= ".sppcfw-el-{$id} form.cart table.variations { width: 100% !important; margin-bottom: 12px !important; background: transparent !important; }";
+
+						// Quantity wrapper & buttons styling (isolated from Add to Cart button styles)
+						$css .= ".sppcfw-el-{$id} form.cart .quantity, .sppcfw-el-{$id} .variations_form .quantity, .sppcfw-el-{$id} .quantity, .sppcfw-el-{$id} .quantity.buttons_added { display: inline-flex !important; align-items: center !important; margin: 0 !important; float: none !important; border: 1px solid {$qty_border} !important; border-color: {$qty_border} !important; border-radius: 4px !important; overflow: hidden !important; background-color: {$qty_bg} !important; background: {$qty_bg} !important; height: 42px !important; box-sizing: border-box !important; gap: 0 !important; }";
+						$css .= ".sppcfw-el-{$id} .quantity .qty, .sppcfw-el-{$id} .quantity input.qty, .sppcfw-el-{$id} .quantity input[type=\"number\"], .sppcfw-el-{$id} form.cart .quantity .qty, .sppcfw-el-{$id} form.cart .quantity input.qty { height: 40px !important; min-height: 40px !important; width: 50px !important; text-align: center !important; border: none !important; font-size: 14px !important; font-weight: 700 !important; color: {$qty_color} !important; background: {$qty_bg} !important; background-color: {$qty_bg} !important; padding: 0 !important; margin: 0 !important; outline: none !important; box-shadow: none !important; border-radius: 0 !important; }";
+						$css .= ".sppcfw-el-{$id} .quantity .sppcfw_minus_button, .sppcfw-el-{$id} .quantity .sppcfw_plus_button, .sppcfw-el-{$id} .quantity button.sppcfw_minus_button, .sppcfw-el-{$id} .quantity button.sppcfw_plus_button, .sppcfw-el-{$id} .quantity .minus, .sppcfw-el-{$id} .quantity .plus, .sppcfw-el-{$id} .quantity button.minus, .sppcfw-el-{$id} .quantity button.plus, .sppcfw-el-{$id} .quantity input.minus, .sppcfw-el-{$id} .quantity input.plus, .sppcfw-el-{$id} form.cart .quantity .sppcfw_minus_button, .sppcfw-el-{$id} form.cart .quantity .sppcfw_plus_button, .sppcfw-el-{$id} form.cart .quantity button.sppcfw_minus_button, .sppcfw-el-{$id} form.cart .quantity button.sppcfw_plus_button { height: 40px !important; width: 34px !important; min-width: 34px !important; max-width: 34px !important; border: none !important; background-color: {$qty_btn_bg} !important; background: {$qty_btn_bg} !important; color: {$qty_btn_color} !important; font-weight: bold !important; font-size: 16px !important; cursor: pointer !important; display: inline-flex !important; align-items: center !important; justify-content: center !important; padding: 0 !important; margin: 0 !important; line-height: 1 !important; text-decoration: none !important; box-shadow: none !important; border-radius: 0 !important; }";
+						$css .= ".sppcfw-el-{$id} .quantity .sppcfw_minus_button, .sppcfw-el-{$id} .quantity button.sppcfw_minus_button, .sppcfw-el-{$id} .quantity .minus, .sppcfw-el-{$id} .quantity button.minus, .sppcfw-el-{$id} .quantity input.minus, .sppcfw-el-{$id} form.cart .quantity .sppcfw_minus_button, .sppcfw-el-{$id} form.cart .quantity button.sppcfw_minus_button { border-right: 1px solid {$qty_border} !important; border-left: none !important; }";
+						$css .= ".sppcfw-el-{$id} .quantity .sppcfw_plus_button, .sppcfw-el-{$id} .quantity button.sppcfw_plus_button, .sppcfw-el-{$id} .quantity .plus, .sppcfw-el-{$id} .quantity button.plus, .sppcfw-el-{$id} .quantity input.plus, .sppcfw-el-{$id} form.cart .quantity .sppcfw_plus_button, .sppcfw-el-{$id} form.cart .quantity button.sppcfw_plus_button { border-right: none !important; border-left: 1px solid {$qty_border} !important; }";
+						$css .= ".sppcfw-el-{$id} .quantity .sppcfw_minus_button:hover, .sppcfw-el-{$id} .quantity .sppcfw_plus_button:hover, .sppcfw-el-{$id} .quantity button.sppcfw_minus_button:hover, .sppcfw-el-{$id} .quantity button.sppcfw_plus_button:hover, .sppcfw-el-{$id} .quantity .minus:hover, .sppcfw-el-{$id} .quantity .plus:hover, .sppcfw-el-{$id} .quantity button.minus:hover, .sppcfw-el-{$id} .quantity button.plus:hover, .sppcfw-el-{$id} .quantity input.minus:hover, .sppcfw-el-{$id} .quantity input.plus:hover, .sppcfw-el-{$id} form.cart .quantity .sppcfw_minus_button:hover, .sppcfw-el-{$id} form.cart .quantity .sppcfw_plus_button:hover { background-color: {$qty_btn_hover_bg} !important; background: {$qty_btn_hover_bg} !important; }";
+
+						// Strict selector for Add to Cart Button only (excludes quantity buttons)
+						$btn_sel = ".sppcfw-el-{$id} .single_add_to_cart_button, .sppcfw-el-{$id} button.single_add_to_cart_button, .sppcfw-el-{$id} button[name=\"add-to-cart\"], .sppcfw-el-{$id} input[name=\"add-to-cart\"], .sppcfw-el-{$id} form.cart > button.button, .sppcfw-el-{$id} .sppcfw-add-to-cart-wrapper .single_add_to_cart_button";
+
+						$css .= "{$btn_sel} {";
+						$css .= 'display: inline-flex !important; align-items: center !important; justify-content: center !important; cursor: pointer !important; text-decoration: none !important; outline: none !important; transition: all 0.2s ease-in-out !important; line-height: 1.2 !important; min-height: 42px !important; float: none !important; margin: 0 !important; box-sizing: border-box !important; border: none !important; box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05) !important;';
 						if (!empty($btn_bg)) {
-							$css .= 'background-color: ' . esc_attr($btn_bg) . ' !important;';
+							$css .= 'background-color: ' . esc_attr($btn_bg) . ' !important; background: ' . esc_attr($btn_bg) . ' !important;';
 						}
 						if (!empty($btn_color)) {
 							$css .= 'color: ' . esc_attr($btn_color) . ' !important;';
 						}
 						if (!empty($btn_font_size)) {
 							$css .= 'font-size: ' . esc_attr($btn_font_size) . ' !important;';
+						}
+						if (!empty($btn_font_weight) && 'Default' !== $btn_font_weight) {
+							$css .= 'font-weight: ' . esc_attr($btn_font_weight) . ' !important;';
+						}
+						if (!empty($btn_font_family) && 'Inherit' !== $btn_font_family) {
+							$css .= 'font-family: ' . esc_attr($btn_font_family) . ', sans-serif !important;';
 						}
 						if (!empty($btn_radius_css)) {
 							$css .= 'border-radius: ' . esc_attr($btn_radius_css) . ' !important;';
@@ -861,13 +1079,19 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 							$css .= 'padding: ' . esc_attr($btn_padding_css) . ' !important;';
 						}
 						$css .= '}';
-					}
 
-					// Alignment for Cart Form & Add to Cart Wrapper
-					$cart_align = $this->sppcfw_get_device_prop($styles, 'alignment', $device, '');
-					if (!empty($cart_align)) {
-						$justify = 'left' === $cart_align ? 'flex-start' : ('right' === $cart_align ? 'flex-end' : 'center');
-						$css .= ".sppcfw-add-to-cart-wrapper form.cart, .sppcfw-add-to-cart-wrapper { display: flex !important; flex-wrap: wrap !important; align-items: center !important; }";
+						if (!empty($btn_hover_bg) || !empty($btn_hover_color)) {
+							$btn_hover_sel = ".sppcfw-el-{$id} .single_add_to_cart_button:hover, .sppcfw-el-{$id} button.single_add_to_cart_button:hover, .sppcfw-el-{$id} button[name=\"add-to-cart\"]:hover, .sppcfw-el-{$id} input[name=\"add-to-cart\"]:hover, .sppcfw-el-{$id} form.cart > button.button:hover";
+							$css .= "{$btn_hover_sel} {";
+							if (!empty($btn_hover_bg)) {
+								$css .= 'background-color: ' . esc_attr($btn_hover_bg) . ' !important; background: ' . esc_attr($btn_hover_bg) . ' !important;';
+							}
+							if (!empty($btn_hover_color)) {
+								$css .= 'color: ' . esc_attr($btn_hover_color) . ' !important;';
+							}
+							$css .= 'opacity: 0.95 !important;';
+							$css .= '}';
+						}
 					}
 
 					$price_color = $this->sppcfw_get_device_prop($styles, 'price_color', $device, '');
@@ -988,8 +1212,8 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					}
 					echo '</div>';
 				} else {
-					// Render Widget (Do not place sppcfw-el-{$id} on wrapper div for product_add_to_cart)
-					$widget_el_class = ('product_add_to_cart' === $type) ? '' : ' sppcfw-el-' . $id;
+					// Render Widget
+					$widget_el_class = ' sppcfw-el-' . $id;
 					echo '<div class="sppcfw-widget-item' . $widget_el_class . (!empty($css_class) ? ' ' . $css_class : '') . '">';
 					$this->sppcfw_render_single_widget($el);
 					echo '</div>';
@@ -1219,8 +1443,8 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						echo '<button type="button" class="sppcfw-gallery-lightbox-btn" title="' . esc_attr__('View full image', 'single-product-customizer') . '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>';
 					}
 
-					echo '</div>'; // close sppcfw-gallery-main-frame
-					echo '</div>'; // close sppcfw-gallery-main-container
+					echo '</div>';  // close sppcfw-gallery-main-frame
+					echo '</div>';  // close sppcfw-gallery-main-container
 
 					// Thumbnails Row
 					if ($show_thumbnails && count($all_images) > 1) {
@@ -1236,11 +1460,11 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 								echo '<img src="' . esc_url($img['thumb']) . '" alt="' . esc_attr($img['alt']) . '" class="sppcfw-thumb-img" />';
 								echo '</div>';
 							}
-							echo '</div>'; // close sppcfw-gallery-carousel-track
+							echo '</div>';  // close sppcfw-gallery-carousel-track
 							if ($show_carousel_arrows) {
 								echo '<button type="button" class="sppcfw-carousel-nav sppcfw-carousel-next" aria-label="Next thumbnails">&#10095;</button>';
 							}
-							echo '</div>'; // close sppcfw-gallery-carousel-wrapper
+							echo '</div>';  // close sppcfw-gallery-carousel-wrapper
 						} else {
 							// Grid mode
 							echo '<div class="sppcfw-gallery-thumbs-grid" style="display:grid; grid-template-columns:repeat(' . esc_attr($cols) . ', minmax(0, 1fr)); gap:8px; margin-top:10px;">';
@@ -1254,7 +1478,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						}
 					}
 
-					echo '</div>'; // close sppcfw-product-gallery-frontend-wrapper
+					echo '</div>';  // close sppcfw-product-gallery-frontend-wrapper
 					break;
 				case 'image':
 					$settings = isset($el['settings']) ? $el['settings'] : array();
@@ -1315,14 +1539,14 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						$cart_btn_text = $settings['button_text'];
 					}
 
-					echo '<div class="sppcfw-add-to-cart-wrapper' . $custom_class . '">';
+					echo '<div class="sppcfw-add-to-cart-wrapper sppcfw-el-' . $id . $custom_class . '">';
 					ob_start();
 					woocommerce_template_single_add_to_cart();
 					$cart_html = ob_get_clean();
 
 					if (!empty($cart_btn_text)) {
 						// Ensure button text is updated to configured "Change add to cart button text"
-						$cart_html = preg_replace_callback('/(<button[^>]*class=["\'][^"\']*single_add_to_cart_button[^"\']*["\'][^>]*>)(.*?)(<\/button>)/is', function($matches) use ($cart_btn_text) {
+						$cart_html = preg_replace_callback('/(<button[^>]*class=["\'][^"\']*single_add_to_cart_button[^"\']*["\'][^>]*>)(.*?)(<\/button>)/is', function ($matches) use ($cart_btn_text) {
 							return $matches[1] . esc_html($cart_btn_text) . $matches[3];
 						}, $cart_html);
 					}
@@ -1331,8 +1555,38 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					echo '</div>';
 					break;
 				case 'product_rating':
+					$rating_val = $product ? (float) $product->get_average_rating() : 5.0;
+					if ($rating_val <= 0) {
+						$rating_val = 5.0;
+					}
+					$rating_count = $product ? (int) $product->get_rating_count() : 1;
+					if ($rating_count <= 0) {
+						$rating_count = 1;
+					}
+					$width_percent = ($rating_val / 5) * 100;
+					$star_color = $this->sppcfw_get_device_prop($styles, 'star_color', 'desktop', '');
+					if (empty($star_color)) {
+						$star_color = $this->sppcfw_get_device_prop($styles, 'text_color', 'desktop', '#f59e0b');
+					}
+					$empty_star_color = $this->sppcfw_get_device_prop($styles, 'empty_star_color', 'desktop', '#d1d5db');
+					$star_size = $this->sppcfw_get_device_prop($styles, 'star_size', 'desktop', '18px');
+					$review_count_color = $this->sppcfw_get_device_prop($styles, 'review_count_color', 'desktop', '#6b7280');
+					$review_font_size = $this->sppcfw_get_device_prop($styles, 'review_font_size', 'desktop', '14px');
+					$review_font_weight = $this->sppcfw_get_device_prop($styles, 'review_font_weight', 'desktop', '400');
+					$gap = $this->sppcfw_get_device_prop($styles, 'gap', 'desktop', '8px');
+					$alignment = $this->sppcfw_get_device_prop($styles, 'alignment', 'desktop', 'left');
+					$justify_val = ('center' === $alignment) ? 'center' : (('right' === $alignment) ? 'flex-end' : 'flex-start');
+
 					echo '<div class="sppcfw-rating-wrapper' . $el_class . '">';
-					woocommerce_template_single_rating();
+					echo '<div class="sppcfw-product-rating-container" style="display:flex; align-items:center; justify-content:' . esc_attr($justify_val) . '; gap:' . esc_attr($gap) . ';">';
+					echo '<div class="sppcfw-stars-box" style="position:relative; display:inline-flex; align-items:center; line-height:1; letter-spacing:2px; font-size:' . esc_attr($star_size) . '; user-select:none;">';
+					echo '<span class="sppcfw-stars-empty" style="color:' . esc_attr($empty_star_color) . ';">★★★★★</span>';
+					echo '<span class="sppcfw-stars-filled" style="position:absolute; top:0; left:0; overflow:hidden; white-space:nowrap; width:' . esc_attr($width_percent) . '%; color:' . esc_attr($star_color) . ';">★★★★★</span>';
+					echo '</div>';
+					echo '<a href="#reviews" class="sppcfw-review-link woocommerce-review-link" style="color:' . esc_attr($review_count_color) . '; font-size:' . esc_attr($review_font_size) . '; font-weight:' . esc_attr($review_font_weight) . '; text-decoration:none; line-height:1;">';
+					echo '(' . esc_html($rating_count) . ' ' . esc_html(_n('reviews', 'reviews', $rating_count, 'woocommerce')) . ')';
+					echo '</a>';
+					echo '</div>';
 					echo '</div>';
 					break;
 				case 'product_short_desc':
