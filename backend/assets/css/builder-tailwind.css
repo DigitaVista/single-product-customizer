@@ -124,6 +124,84 @@
   background-color: #faf5ff !important;
 }
 
+/* Color Picker & Checkerboard Pattern */
+.sppcfw-checkerboard {
+  background-image: linear-gradient(45deg, #cbd5e1 25%, transparent 25%),
+    linear-gradient(-45deg, #cbd5e1 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #cbd5e1 75%),
+    linear-gradient(-45deg, transparent 75%, #cbd5e1 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+  background-color: #ffffff;
+}
+
+.sppcfw-checkerboard-dark {
+  background-image: linear-gradient(45deg, #2b3544 25%, transparent 25%),
+    linear-gradient(-45deg, #2b3544 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, #2b3544 75%),
+    linear-gradient(-45deg, transparent 75%, #2b3544 75%);
+  background-size: 8px 8px;
+  background-position: 0 0, 0 4px, 4px -4px, -4px 0px;
+  background-color: #16202e;
+}
+
+.sppcfw-color-picker-popover {
+  position: absolute;
+  z-index: 100;
+  width: 250px;
+  background: #ffffff;
+  color: #1f2937;
+  border-radius: 8px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+  border: 1px solid #e5e7eb;
+  padding: 12px;
+  user-select: none;
+}
+
+.sppcfw-hue-slider {
+  background: linear-gradient(to right, #ff0000 0%, #ffff00 17%, #00ff00 33%, #00ffff 50%, #0000ff 67%, #ff00ff 83%, #ff0000 100%);
+  height: 10px;
+  border-radius: 5px;
+  position: relative;
+  cursor: pointer;
+}
+
+.sppcfw-alpha-slider {
+  height: 10px;
+  border-radius: 5px;
+  position: relative;
+  cursor: pointer;
+}
+
+/* iOS-style toggle switch */
+.sppcfw-toggle-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 52px;
+  height: 24px;
+  background-color: #cbd5e1;
+  border-radius: 9999px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  user-select: none;
+  padding: 2px;
+}
+.sppcfw-toggle-switch.is-active {
+  background-color: #9333ea;
+}
+.sppcfw-toggle-thumb {
+  width: 20px;
+  height: 20px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 0.2s ease;
+}
+.sppcfw-toggle-switch.is-active .sppcfw-toggle-thumb {
+  transform: translateX(28px);
+}
+
 /* Selected Element Toolbar Badge - Consistent Height Across All Elements */
 .sppcfw-selection-badge {
   height: 20px !important;

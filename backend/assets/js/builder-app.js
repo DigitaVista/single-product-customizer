@@ -62,6 +62,7 @@
 		{ type: 'product_price', name: 'Product Price', icon: 'payments' },
 		{ type: 'product_gallery', name: 'Product Gallery', icon: 'collections' },
 		{ type: 'image', name: 'Image', icon: 'image' },
+		{ type: 'html_code', name: 'HTML Element', icon: 'code' },
 		{ type: 'product_add_to_cart', name: 'Add to Cart', icon: 'shopping_cart' },
 		{ type: 'product_rating', name: 'Rating Stars', icon: 'star' },
 		{ type: 'product_short_desc', name: 'Short Description', icon: 'description' },
@@ -2271,6 +2272,425 @@
 		);
 	}
 
+	// --- Advanced Color Picker Component & Helpers (Matching Image 3) ---
+	function parseColorToHsva(colorStr) {
+		if (!colorStr || colorStr === 'transparent') return { h: 215, s: 0, v: 100, a: 1 };
+		let str = String(colorStr).trim();
+		if (str.startsWith('#')) {
+			let hex = str.slice(1);
+			if (hex.length === 3) hex = hex.split('').map(c => c + c).join('') + 'ff';
+			else if (hex.length === 6) hex += 'ff';
+			else if (hex.length === 4) hex = hex.split('').map(c => c + c).join('');
+			const num = parseInt(hex, 16);
+			if (isNaN(num)) return { h: 215, s: 0, v: 100, a: 1 };
+			const r = (num >> 24) & 255;
+			const g = (num >> 16) & 255;
+			const b = (num >> 8) & 255;
+			const a = parseFloat(((num & 255) / 255).toFixed(2));
+			return rgbToHsva(r, g, b, a);
+		}
+		if (str.startsWith('rgb')) {
+			const parts = str.match(/[\d.]+/g);
+			if (parts && parts.length >= 3) {
+				const r = parseInt(parts[0], 10);
+				const g = parseInt(parts[1], 10);
+				const b = parseInt(parts[2], 10);
+				const a = parts[3] !== undefined ? parseFloat(parts[3]) : 1;
+				return rgbToHsva(r, g, b, a);
+			}
+		}
+		if (str.startsWith('hsl')) {
+			const parts = str.match(/[\d.]+/g);
+			if (parts && parts.length >= 3) {
+				const h = parseFloat(parts[0]);
+				const s = parseFloat(parts[1]) / 100;
+				const l = parseFloat(parts[2]) / 100;
+				const a = parts[3] !== undefined ? parseFloat(parts[3]) : 1;
+				const v = l + s * Math.min(l, 1 - l);
+				const sv = v === 0 ? 0 : 2 * (1 - l / v);
+				return { h: Math.round(h % 360), s: Math.round(Math.max(0, Math.min(100, sv * 100))), v: Math.round(Math.max(0, Math.min(100, v * 100))), a: parseFloat(a.toFixed(2)) };
+			}
+		}
+		return { h: 215, s: 80, v: 90, a: 1 };
+	}
+
+	function rgbToHsva(r, g, b, a = 1) {
+		r /= 255; g /= 255; b /= 255;
+		const max = Math.max(r, g, b), min = Math.min(r, g, b);
+		let h = 0, s = 0, v = max;
+		const d = max - min;
+		s = max === 0 ? 0 : d / max;
+		if (max !== min) {
+			switch (max) {
+				case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+				case g: h = (b - r) / d + 2; break;
+				case b: h = (r - g) / d + 4; break;
+			}
+			h /= 6;
+		}
+		return { h: Math.round(h * 360), s: Math.round(s * 100), v: Math.round(v * 100), a: parseFloat(a.toFixed(2)) };
+	}
+
+	function hsvaToRgba(h, s, v, a = 1) {
+		h = (h % 360) / 360; s = Math.max(0, Math.min(100, s)) / 100; v = Math.max(0, Math.min(100, v)) / 100;
+		let r, g, b;
+		const i = Math.floor(h * 6);
+		const f = h * 6 - i;
+		const p = v * (1 - s);
+		const q = v * (1 - f * s);
+		const t = v * (1 - (1 - f) * s);
+		switch (i % 6) {
+			case 0: r = v; g = t; b = p; break;
+			case 1: r = q; g = v; b = p; break;
+			case 2: r = p; g = v; b = t; break;
+			case 3: r = p; g = q; b = v; break;
+			case 4: r = t; g = p; b = v; break;
+			case 5: r = v; g = p; b = q; break;
+			default: r = v; g = v; b = v;
+		}
+		return {
+			r: Math.round(r * 255),
+			g: Math.round(g * 255),
+			b: Math.round(b * 255),
+			a: parseFloat(Number(a).toFixed(2))
+		};
+	}
+
+	function formatColorOutput(hsva, format = 'HEXA') {
+		const rgba = hsvaToRgba(hsva.h, hsva.s, hsva.v, hsva.a);
+		if (format === 'RGBA') {
+			return `rgba(${rgba.r}, ${rgba.g}, ${rgba.b}, ${rgba.a})`;
+		}
+		if (format === 'HSLA') {
+			const l = (hsva.v / 100) * (1 - (hsva.s / 100) / 2);
+			const sl = l === 0 || l === 1 ? 0 : ((hsva.v / 100) - l) / Math.min(l, 1 - l);
+			return `hsla(${Math.round(hsva.h)}, ${Math.round(sl * 100)}%, ${Math.round(l * 100)}%, ${rgba.a})`;
+		}
+		const toHex = n => Math.max(0, Math.min(255, n)).toString(16).padStart(2, '0').toUpperCase();
+		if (rgba.a < 1) {
+			const alphaHex = Math.round(rgba.a * 255).toString(16).padStart(2, '0').toUpperCase();
+			return `#${toHex(rgba.r)}${toHex(rgba.g)}${toHex(rgba.b)}${alphaHex}`;
+		}
+		return `#${toHex(rgba.r)}${toHex(rgba.g)}${toHex(rgba.b)}`;
+	}
+
+	function ColorPickerControl({ label, value, onChange, defaultVal = 'transparent' }) {
+		const [isOpen, setIsOpen] = useState(false);
+		const [format, setFormat] = useState('HEXA'); // 'HEXA' | 'RGBA' | 'HSLA'
+		const [showPalette, setShowPalette] = useState(false);
+		const [customPresets, setCustomPresets] = useState(['#9333EA', '#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#111827', '#FFFFFF', '#000000']);
+		const popoverRef = useRef(null);
+		const swatchRef = useRef(null);
+
+		const hsva = parseColorToHsva(value || defaultVal);
+
+		useEffect(() => {
+			function handleClickOutside(e) {
+				if (isOpen && popoverRef.current && !popoverRef.current.contains(e.target) && swatchRef.current && !swatchRef.current.contains(e.target)) {
+					setIsOpen(false);
+				}
+			}
+			document.addEventListener('mousedown', handleClickOutside);
+			return () => document.removeEventListener('mousedown', handleClickOutside);
+		}, [isOpen]);
+
+		function updateHsva(newHsva) {
+			const next = { ...hsva, ...newHsva };
+			const formatted = formatColorOutput(next, format);
+			if (typeof onChange === 'function') {
+				onChange(formatted);
+			}
+		}
+
+		function handleSatValMouseDown(e) {
+			e.preventDefault();
+			const rect = e.currentTarget.getBoundingClientRect();
+			function handleMove(moveEvt) {
+				const x = Math.max(0, Math.min(rect.width, moveEvt.clientX - rect.left));
+				const y = Math.max(0, Math.min(rect.height, moveEvt.clientY - rect.top));
+				const s = Math.round((x / rect.width) * 100);
+				const v = Math.round((1 - y / rect.height) * 100);
+				updateHsva({ s, v });
+			}
+			handleMove(e);
+			function handleUp() {
+				window.removeEventListener('mousemove', handleMove);
+				window.removeEventListener('mouseup', handleUp);
+			}
+			window.addEventListener('mousemove', handleMove);
+			window.addEventListener('mouseup', handleUp);
+		}
+
+		function handleHueMouseDown(e) {
+			e.preventDefault();
+			const rect = e.currentTarget.getBoundingClientRect();
+			function handleMove(moveEvt) {
+				const x = Math.max(0, Math.min(rect.width, moveEvt.clientX - rect.left));
+				const h = Math.round((x / rect.width) * 360);
+				updateHsva({ h });
+			}
+			handleMove(e);
+			function handleUp() {
+				window.removeEventListener('mousemove', handleMove);
+				window.removeEventListener('mouseup', handleUp);
+			}
+			window.addEventListener('mousemove', handleMove);
+			window.addEventListener('mouseup', handleUp);
+		}
+
+		function handleAlphaMouseDown(e) {
+			e.preventDefault();
+			const rect = e.currentTarget.getBoundingClientRect();
+			function handleMove(moveEvt) {
+				const x = Math.max(0, Math.min(rect.width, moveEvt.clientX - rect.left));
+				const a = parseFloat((x / rect.width).toFixed(2));
+				updateHsva({ a });
+			}
+			handleMove(e);
+			function handleUp() {
+				window.removeEventListener('mousemove', handleMove);
+				window.removeEventListener('mouseup', handleUp);
+			}
+			window.addEventListener('mousemove', handleMove);
+			window.addEventListener('mouseup', handleUp);
+		}
+
+		async function handleEyeDropper() {
+			if (window.EyeDropper) {
+				try {
+					const eyeDropper = new window.EyeDropper();
+					const result = await eyeDropper.open();
+					if (result && result.sRGBHex && typeof onChange === 'function') {
+						onChange(result.sRGBHex);
+					}
+				} catch (err) {}
+			}
+		}
+
+		function cycleFormat() {
+			setFormat(prev => (prev === 'HEXA' ? 'RGBA' : prev === 'RGBA' ? 'HSLA' : 'HEXA'));
+		}
+
+		const currentColorText = formatColorOutput(hsva, format);
+		const pureColorRgb = hsvaToRgba(hsva.h, hsva.s, hsva.v, 1);
+
+		return h(
+			'div',
+			{ className: 'sppcfw-relative sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+			label && h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, label),
+			h(
+				'div',
+				{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
+				// Global Preset Globe Icon Button
+				h(
+					'button',
+					{
+						type: 'button',
+						className: 'sppcfw-w-7 sppcfw-h-7 sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-bg-[#111827] sppcfw-text-gray-400 hover:sppcfw-text-white hover:sppcfw-border-[#9333ea] sppcfw-transition-colors sppcfw-cursor-pointer',
+						title: 'Global Colors',
+						onClick: () => {
+							setShowPalette(!showPalette);
+							setIsOpen(true);
+						}
+					},
+					h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'public')
+				),
+				// Swatch Box Button (Checkerboard background + color fill)
+				h(
+					'div',
+					{
+						ref: swatchRef,
+						className: 'sppcfw-w-7 sppcfw-h-7 sppcfw-rounded sppcfw-border sppcfw-border-[#374151] hover:sppcfw-border-[#9333ea] sppcfw-cursor-pointer sppcfw-overflow-hidden sppcfw-relative sppcfw-checkerboard sppcfw-shadow-sm',
+						title: value || defaultVal,
+						onClick: () => setIsOpen(!isOpen)
+					},
+					h('div', {
+						className: 'sppcfw-w-full sppcfw-h-full',
+						style: { backgroundColor: value || defaultVal }
+					})
+				)
+			),
+
+			// Floating Popover matching Image 3
+			isOpen &&
+				h(
+					'div',
+					{
+						ref: popoverRef,
+						className: 'sppcfw-color-picker-popover sppcfw-absolute sppcfw-right-0 sppcfw-top-9 sppcfw-z-50 sppcfw-shadow-2xl'
+					},
+					// Header Bar
+					h(
+						'div',
+						{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between sppcfw-mb-2.5 sppcfw-pb-1.5 sppcfw-border-b sppcfw-border-gray-200' },
+						h('span', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-gray-800' }, 'Color Picker'),
+						h(
+							'div',
+							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-gray-500' },
+							h(
+								'button',
+								{
+									type: 'button',
+									className: 'hover:sppcfw-text-gray-900 sppcfw-cursor-pointer sppcfw-p-0.5',
+									title: 'Reset color',
+									onClick: () => {
+										if (typeof onChange === 'function') {
+											onChange(defaultVal === 'transparent' ? '' : defaultVal);
+										}
+									}
+								},
+								h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'restart_alt')
+							),
+							h(
+								'button',
+								{
+									type: 'button',
+									className: 'hover:sppcfw-text-gray-900 sppcfw-cursor-pointer sppcfw-p-0.5',
+									title: 'Add to custom presets',
+									onClick: () => {
+										if (!customPresets.includes(currentColorText)) {
+											setCustomPresets([...customPresets, currentColorText]);
+										}
+									}
+								},
+								h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'add')
+							),
+							h(
+								'button',
+								{
+									type: 'button',
+									className: `hover:sppcfw-text-gray-900 sppcfw-cursor-pointer sppcfw-p-0.5 ${showPalette ? 'sppcfw-text-[#9333ea]' : ''}`,
+									title: 'Saved colors',
+									onClick: () => setShowPalette(!showPalette)
+								},
+								h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'palette')
+							),
+							window.EyeDropper &&
+								h(
+									'button',
+									{
+										type: 'button',
+										className: 'hover:sppcfw-text-gray-900 sppcfw-cursor-pointer sppcfw-p-0.5',
+										title: 'Eyedropper tool',
+										onClick: handleEyeDropper
+									},
+									h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'colorize')
+								)
+						)
+					),
+
+					// 2D Saturation / Value Gradient Canvas Area
+					h(
+						'div',
+						{
+							className: 'sppcfw-relative sppcfw-h-28 sppcfw-w-full sppcfw-rounded sppcfw-cursor-crosshair sppcfw-overflow-hidden sppcfw-mb-2.5 sppcfw-border sppcfw-border-gray-300',
+							style: {
+								background: `linear-gradient(to bottom, transparent, #000000), linear-gradient(to right, #ffffff, hsl(${hsva.h}, 100%, 50%))`
+							},
+							onMouseDown: handleSatValMouseDown
+						},
+						h('div', {
+							className: 'sppcfw-absolute sppcfw-w-3.5 sppcfw-h-3.5 sppcfw-border-2 sppcfw-border-white sppcfw-rounded-full sppcfw-shadow-md sppcfw-pointer-events-none',
+							style: {
+								left: `${hsva.s}%`,
+								top: `${100 - hsva.v}%`,
+								transform: 'translate(-50%, -50%)',
+								backgroundColor: `rgb(${pureColorRgb.r}, ${pureColorRgb.g}, ${pureColorRgb.b})`
+							}
+						})
+					),
+
+					// Hue Rainbow Slider
+					h(
+						'div',
+						{
+							className: 'sppcfw-hue-slider sppcfw-mb-2.5',
+							onMouseDown: handleHueMouseDown
+						},
+						h('div', {
+							className: 'sppcfw-absolute sppcfw-w-3.5 sppcfw-h-3.5 sppcfw-bg-white sppcfw-border sppcfw-border-gray-400 sppcfw-rounded-full sppcfw-shadow sppcfw-pointer-events-none',
+							style: {
+								left: `${(hsva.h / 360) * 100}%`,
+								top: '50%',
+								transform: 'translate(-50%, -50%)'
+							}
+						})
+					),
+
+					// Alpha Opacity Slider
+					h(
+						'div',
+						{
+							className: 'sppcfw-alpha-slider sppcfw-checkerboard sppcfw-mb-3 sppcfw-border sppcfw-border-gray-200',
+							onMouseDown: handleAlphaMouseDown
+						},
+						h('div', {
+							className: 'sppcfw-w-full sppcfw-h-full sppcfw-rounded-full',
+							style: {
+								background: `linear-gradient(to right, transparent, rgb(${pureColorRgb.r}, ${pureColorRgb.g}, ${pureColorRgb.b}))`
+							}
+						}),
+						h('div', {
+							className: 'sppcfw-absolute sppcfw-w-3.5 sppcfw-h-3.5 sppcfw-bg-white sppcfw-border sppcfw-border-gray-400 sppcfw-rounded-full sppcfw-shadow sppcfw-pointer-events-none',
+							style: {
+								left: `${hsva.a * 100}%`,
+								top: '50%',
+								transform: 'translate(-50%, -50%)'
+							}
+						})
+					),
+
+					// Bottom Value Input & Format Switcher
+					h(
+						'div',
+						{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
+						h('input', {
+							type: 'text',
+							className: 'sppcfw-flex-1 sppcfw-bg-gray-50 sppcfw-border sppcfw-border-gray-300 sppcfw-rounded sppcfw-px-2 sppcfw-py-1 sppcfw-text-[11px] font-mono sppcfw-text-gray-900 focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
+							value: currentColorText,
+							onChange: e => {
+								const str = e.target.value;
+								if (str && typeof onChange === 'function') onChange(str);
+							}
+						}),
+						h(
+							'button',
+							{
+								type: 'button',
+								className: 'sppcfw-px-1.5 sppcfw-py-1 sppcfw-bg-gray-100 hover:sppcfw-bg-gray-200 sppcfw-border sppcfw-border-gray-300 sppcfw-rounded sppcfw-text-[10px] sppcfw-font-bold sppcfw-text-gray-700 sppcfw-cursor-pointer sppcfw-transition-colors',
+								onClick: cycleFormat,
+								title: 'Toggle Format (HEXA / RGBA / HSLA)'
+							},
+							format
+						)
+					),
+
+					// Palette Presets View (when active)
+					showPalette &&
+						h(
+							'div',
+							{ className: 'sppcfw-mt-2.5 sppcfw-pt-2.5 sppcfw-border-t sppcfw-border-gray-200' },
+							h('span', { className: 'sppcfw-text-[10px] sppcfw-font-bold sppcfw-text-gray-600 sppcfw-block sppcfw-mb-1.5' }, 'Palette Presets'),
+							h(
+								'div',
+								{ className: 'sppcfw-flex sppcfw-flex-wrap sppcfw-gap-1.5' },
+								customPresets.map(preset =>
+									h('button', {
+										key: preset,
+										type: 'button',
+										className: 'sppcfw-w-5 sppcfw-h-5 sppcfw-rounded sppcfw-border sppcfw-border-gray-300 hover:sppcfw-scale-110 sppcfw-transition-transform sppcfw-cursor-pointer',
+										style: { backgroundColor: preset },
+										onClick: () => {
+											if (typeof onChange === 'function') onChange(preset);
+										}
+									})
+								)
+							)
+						)
+				)
+		);
+	}
+
 	// 3b. Left Inspector & Modular Individual Edit Panels System
 	function LeftInspector({ deviceView = 'desktop', selectedElement, updateElementProperties, closeInspector, categories, products, sampleData, addColumnToContainer, duplicateColumn, removeElement, enablePlusMinus, setEnablePlusMinus, addToCartBtnText, setAddToCartBtnText, hidePrice, setHidePrice, handleToggleHidePrice }) {
 		const [activeTab, setActiveTab] = useState('layout'); // 'layout'/'content' | 'style' | 'advanced'
@@ -2310,6 +2730,8 @@
 		const [isRadiusLinked, setIsRadiusLinked] = useState(true);
 		const [isMarginLinked, setIsMarginLinked] = useState(true);
 		const [isPaddingLinked, setIsPaddingLinked] = useState(true);
+		const [bgTab, setBgTab] = useState('normal'); // 'normal' | 'hover'
+		const [codeTab, setCodeTab] = useState('html'); // 'html' | 'css' | 'js'
 
 		function toggleAccordion(key) {
 			setOpenAccordions(prev => ({ ...prev, [key]: !prev[key] }));
@@ -2400,6 +2822,7 @@
 		const isCustomImage = selectedElement.type === 'image';
 		const isHeading = selectedElement.type === 'heading';
 		const isTextEditor = selectedElement.type === 'text_editor';
+		const isHtmlCode = selectedElement.type === 'html_code' || selectedElement.type === 'custom_html' || selectedElement.type === 'html';
 		const isImage = isProductGallery || isCustomImage;
 
 		const typeLabels = {
@@ -2407,6 +2830,8 @@
 			column: 'Edit Column',
 			image: 'Edit Image',
 			product_gallery: 'Edit Product Gallery',
+			html_code: 'Edit HTML Element',
+			custom_html: 'Edit HTML Element',
 			heading: 'Edit Heading',
 			text_editor: 'Edit Text Editor',
 			product_title: 'Edit Product Title',
@@ -2574,32 +2999,8 @@
 			);
 		}
 
-		function renderColorPicker(label, value, onChange, defaultVal = '#000000') {
-			return h(
-				'div',
-				{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-				h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, label),
-				h(
-					'div',
-					{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2' },
-					h('input', {
-						type: 'color',
-						className: 'sppcfw-w-7 sppcfw-h-7 sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-cursor-pointer sppcfw-p-0.5',
-						value: value || defaultVal,
-						onChange: e => onChange(e.target.value),
-					}),
-					h(
-						'button',
-						{
-							type: 'button',
-							className: 'sppcfw-text-[10px] sppcfw-text-gray-400 hover:sppcfw-text-gray-200 sppcfw-underline sppcfw-cursor-pointer',
-							onClick: () => onChange(''),
-							title: 'Reset color',
-						},
-						'Reset'
-					)
-				)
-			);
+		function renderColorPicker(label, value, onChange, defaultVal = 'transparent') {
+			return h(ColorPickerControl, { label, value, onChange, defaultVal });
 		}
 
 		function renderAccordion(key, title, content, icon = null, badge = null) {
@@ -3647,8 +4048,10 @@
 		// 2. INDIVIDUAL STYLE PANELS
 		// ==========================================
 
-		// 2a. Container & Column Style Panel
+		// 2a. Container & Column Style Panel (Matching Image 1 & 2)
 		function renderContainerStyle() {
+			const currentBgType = getStyle(bgTab === 'normal' ? 'bg_type' : 'bg_hover_type') || 'classic';
+
 			return h(
 				'div',
 				{ className: 'sppcfw-space-y-4' },
@@ -3658,7 +4061,402 @@
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Background Color', getStyle('bg_color'), v => handleStyleChange('bg_color', v), '#ffffff')
+						// Normal | Hover Tabs (Image 1 & 2)
+						h(
+							'div',
+							{ className: 'sppcfw-flex sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-bg-[#111827] sppcfw-overflow-hidden sppcfw-p-0.5' },
+							h(
+								'button',
+								{
+									type: 'button',
+									className: `sppcfw-flex-1 sppcfw-py-1.5 sppcfw-text-xs sppcfw-font-semibold sppcfw-rounded-sm sppcfw-transition-colors sppcfw-cursor-pointer ${
+										bgTab === 'normal'
+											? 'sppcfw-bg-[#cbd5e1] sppcfw-text-gray-900 sppcfw-font-bold sppcfw-shadow-sm'
+											: 'sppcfw-text-gray-400 hover:sppcfw-text-white'
+									}`,
+									onClick: () => setBgTab('normal')
+								},
+								'Normal'
+							),
+							h(
+								'button',
+								{
+									type: 'button',
+									className: `sppcfw-flex-1 sppcfw-py-1.5 sppcfw-text-xs sppcfw-font-semibold sppcfw-rounded-sm sppcfw-transition-colors sppcfw-cursor-pointer ${
+										bgTab === 'hover'
+											? 'sppcfw-bg-[#cbd5e1] sppcfw-text-gray-900 sppcfw-font-bold sppcfw-shadow-sm'
+											: 'sppcfw-text-gray-400 hover:sppcfw-text-white'
+									}`,
+									onClick: () => setBgTab('hover')
+								},
+								'Hover'
+							)
+						),
+
+						// Background Type Selector
+						h(
+							'div',
+							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Background Type'),
+							h(
+								'div',
+								{ className: 'sppcfw-flex sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-bg-[#111827] sppcfw-overflow-hidden' },
+								// Classic (brush)
+								h(
+									'button',
+									{
+										type: 'button',
+										className: `sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-transition-colors sppcfw-cursor-pointer ${
+											currentBgType === 'classic' ? 'sppcfw-bg-[#374151] sppcfw-text-white' : 'sppcfw-text-gray-400 hover:sppcfw-text-white'
+										}`,
+										title: 'Classic',
+										onClick: () => handleStyleChange(bgTab === 'normal' ? 'bg_type' : 'bg_hover_type', 'classic')
+									},
+									h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'brush')
+								),
+								// Gradient (gradient icon)
+								h(
+									'button',
+									{
+										type: 'button',
+										className: `sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-border-l sppcfw-border-[#374151] sppcfw-transition-colors sppcfw-cursor-pointer ${
+											currentBgType === 'gradient' ? 'sppcfw-bg-[#374151] sppcfw-text-white' : 'sppcfw-text-gray-400 hover:sppcfw-text-white'
+										}`,
+										title: 'Gradient',
+										onClick: () => handleStyleChange(bgTab === 'normal' ? 'bg_type' : 'bg_hover_type', 'gradient')
+									},
+									h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'gradient')
+								)
+							)
+						),
+
+						// Content for Classic Type (Image 1 & 2)
+						currentBgType === 'classic' &&
+							h(
+								'div',
+								{ className: 'sppcfw-space-y-3.5' },
+								// Color
+								renderColorPicker(
+									'Color',
+									getStyle(bgTab === 'normal' ? 'bg_color' : 'bg_hover_color'),
+									v => handleStyleChange(bgTab === 'normal' ? 'bg_color' : 'bg_hover_color', v),
+									'transparent'
+								),
+
+								// Image (Image 1 & 2)
+								(() => {
+									const imgKey = bgTab === 'normal' ? 'bg_image' : 'bg_hover_image';
+									const currentImgUrl = getStyle(imgKey);
+									const currentRes = getStyle('bg_resolution') || 'Full';
+									const currentPos = getStyle('bg_position') || 'Center Center';
+									const currentAtt = getStyle('bg_attachment') || 'Default';
+									const currentRep = getStyle('bg_repeat') || 'No-repeat';
+									const currentSize = getStyle('bg_size') || 'Cover';
+
+									function openMediaPicker() {
+										if (typeof wp !== 'undefined' && wp.media) {
+											const frame = wp.media({
+												title: 'Select Background Image',
+												button: { text: 'Insert Background Image' },
+												multiple: false
+											});
+											frame.on('select', () => {
+												const attachment = frame.state().get('selection').first().toJSON();
+												if (attachment && attachment.url) {
+													const sizes = attachment.sizes || {};
+													const resKey = (getStyle('bg_resolution') || 'Full').toLowerCase();
+													const chosenUrl = (sizes[resKey] && sizes[resKey].url) ? sizes[resKey].url : attachment.url;
+													handleMultiStyleChange({
+														[imgKey]: chosenUrl,
+														[`${imgKey}_sizes`]: sizes,
+														[`${imgKey}_raw_url`]: attachment.url,
+														bg_position: getStyle('bg_position') || 'Center Center',
+														bg_repeat: getStyle('bg_repeat') || 'No-repeat',
+														bg_size: getStyle('bg_size') || 'Cover',
+													});
+												}
+											});
+											frame.open();
+										} else {
+											const url = prompt('Enter Background Image URL:', currentImgUrl || '');
+											if (url !== null && url.trim()) {
+												handleMultiStyleChange({
+													[imgKey]: url.trim(),
+													bg_position: getStyle('bg_position') || 'Center Center',
+													bg_repeat: getStyle('bg_repeat') || 'No-repeat',
+													bg_size: getStyle('bg_size') || 'Cover',
+												});
+											}
+										}
+									}
+
+									function removeImage() {
+										handleMultiStyleChange({
+											[imgKey]: '',
+											[`${imgKey}_sizes`]: null,
+											[`${imgKey}_raw_url`]: ''
+										});
+									}
+
+									function handleResolutionChange(newRes) {
+										const sizes = getStyle(`${imgKey}_sizes`) || {};
+										const rawUrl = getStyle(`${imgKey}_raw_url`) || currentImgUrl;
+										const newUrl = (sizes[newRes.toLowerCase()] && sizes[newRes.toLowerCase()].url) ? sizes[newRes.toLowerCase()].url : rawUrl;
+										handleMultiStyleChange({
+											bg_resolution: newRes,
+											[imgKey]: newUrl
+										});
+									}
+
+									return h(
+										'div',
+										{ className: 'sppcfw-space-y-3' },
+										// Header Row
+										h(
+											'div',
+											{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+											h(
+												'div',
+												{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
+												h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Image'),
+												h('span', { className: 'material-symbols-outlined sppcfw-text-xs sppcfw-text-gray-400' }, 'desktop_windows')
+											),
+											h(
+												'div',
+												{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
+												currentImgUrl &&
+													h(
+														'button',
+														{
+															type: 'button',
+															className: 'sppcfw-text-gray-400 hover:sppcfw-text-red-400 sppcfw-p-1 sppcfw-rounded hover:sppcfw-bg-red-950/40 sppcfw-transition-colors sppcfw-cursor-pointer sppcfw-flex sppcfw-items-center sppcfw-justify-center',
+															title: 'Remove Image',
+															onClick: e => {
+																e.stopPropagation();
+																removeImage();
+															}
+														},
+														h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'delete')
+													),
+												h('span', { className: 'material-symbols-outlined sppcfw-text-xs sppcfw-text-[#ddb8ff]' }, 'auto_awesome')
+											)
+										),
+
+										// Wide Image Upload Box
+										h(
+											'div',
+											{
+												className: 'sppcfw-relative sppcfw-w-full sppcfw-h-24 sppcfw-border sppcfw-border-[#374151] hover:sppcfw-border-[#9333ea] sppcfw-rounded-md sppcfw-bg-[#111827] sppcfw-overflow-hidden sppcfw-cursor-pointer sppcfw-transition-colors group',
+												onClick: openMediaPicker
+											},
+											currentImgUrl
+												? h(
+														'div',
+														{ className: 'sppcfw-w-full sppcfw-h-full sppcfw-relative' },
+														h('img', {
+															src: currentImgUrl,
+															alt: 'Background Preview',
+															className: 'sppcfw-w-full sppcfw-h-full sppcfw-object-cover'
+														}),
+														h(
+															'div',
+															{ className: 'sppcfw-absolute sppcfw-inset-0 sppcfw-bg-black/60 sppcfw-opacity-0 group-hover:sppcfw-opacity-100 sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-gap-2.5 sppcfw-transition-opacity' },
+															h(
+																'button',
+																{
+																	type: 'button',
+																	className: 'sppcfw-px-2.5 sppcfw-py-1 sppcfw-bg-[#9333ea] hover:sppcfw-bg-[#7e22ce] sppcfw-text-white sppcfw-rounded sppcfw-text-xs sppcfw-font-semibold sppcfw-shadow sppcfw-cursor-pointer',
+																	onClick: e => {
+																		e.stopPropagation();
+																		openMediaPicker();
+																	}
+																},
+																'Change'
+															),
+															h(
+																'button',
+																{
+																	type: 'button',
+																	className: 'sppcfw-px-2.5 sppcfw-py-1 sppcfw-bg-red-600 hover:sppcfw-bg-red-700 sppcfw-text-white sppcfw-rounded sppcfw-text-xs sppcfw-font-semibold sppcfw-shadow sppcfw-cursor-pointer',
+																	title: 'Delete Image',
+																	onClick: e => {
+																		e.stopPropagation();
+																		removeImage();
+																	}
+																},
+																'Remove'
+															)
+														)
+												  )
+												: h(
+														'div',
+														{ className: 'sppcfw-w-full sppcfw-h-full sppcfw-flex sppcfw-flex-col sppcfw-items-center sppcfw-justify-center sppcfw-gap-1 sppcfw-text-gray-400 group-hover:sppcfw-text-white' },
+														h('span', { className: 'material-symbols-outlined sppcfw-text-xl' }, 'add_photo_alternate'),
+														h('span', { className: 'sppcfw-text-[11px] sppcfw-font-medium' }, 'Choose Image')
+												  )
+										),
+
+										// If image is selected on Normal tab, show Resolution, Position, Attachment, Repeat, Display Size
+										bgTab === 'normal' && currentImgUrl &&
+											h(
+												'div',
+												{ className: 'sppcfw-space-y-3' },
+												// Image Resolution
+												h(
+													'div',
+													{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+													h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Image Resolution'),
+													h(
+														'select',
+														{
+															className: 'sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1 sppcfw-text-xs sppcfw-text-white sppcfw-w-36 focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
+															value: currentRes,
+															onChange: e => handleResolutionChange(e.target.value)
+														},
+														['Full', 'Large', 'Medium', 'Thumbnail'].map(r => h('option', { key: r, value: r }, r))
+													)
+												),
+												h('p', { className: 'sppcfw-text-[10px] sppcfw-italic sppcfw-text-gray-400 sppcfw-leading-tight' }, 'Image size settings don\'t apply to Dynamic Images.'),
+
+												h('hr', { className: 'sppcfw-border-[#374151] sppcfw-my-2' }),
+
+												// Position
+												h(
+													'div',
+													{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+													h(
+														'div',
+														{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
+														h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Position'),
+														h('span', { className: 'material-symbols-outlined sppcfw-text-xs sppcfw-text-gray-400' }, 'desktop_windows')
+													),
+													h(
+														'select',
+														{
+															className: 'sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1 sppcfw-text-xs sppcfw-text-white sppcfw-w-36 focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
+															value: currentPos,
+															onChange: e => handleStyleChange('bg_position', e.target.value)
+														},
+														['Default', 'Center Center', 'Center Left', 'Center Right', 'Top Center', 'Top Left', 'Top Right', 'Bottom Center', 'Bottom Left', 'Bottom Right', 'Custom'].map(p => h('option', { key: p, value: p }, p))
+													)
+												),
+												currentPos === 'Custom' &&
+													h(
+														'div',
+														{ className: 'sppcfw-space-y-2 sppcfw-pl-2 sppcfw-border-l sppcfw-border-[#374151]' },
+														renderControlHeader('X Position', true, '%', () => {}, ['%']),
+														renderSliderInput(getStyle('bg_pos_x') || '50%', v => handleStyleChange('bg_pos_x', v), 0, 100, 1, '%', '50'),
+														renderControlHeader('Y Position', true, '%', () => {}, ['%']),
+														renderSliderInput(getStyle('bg_pos_y') || '50%', v => handleStyleChange('bg_pos_y', v), 0, 100, 1, '%', '50')
+													),
+
+												// Attachment
+												h(
+													'div',
+													{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+													h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Attachment'),
+													h(
+														'select',
+														{
+															className: 'sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1 sppcfw-text-xs sppcfw-text-white sppcfw-w-36 focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
+															value: currentAtt,
+															onChange: e => handleStyleChange('bg_attachment', e.target.value)
+														},
+														['Default', 'Scroll', 'Fixed'].map(a => h('option', { key: a, value: a }, a))
+													)
+												),
+
+												// Repeat
+												h(
+													'div',
+													{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+													h(
+														'div',
+														{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
+														h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Repeat'),
+														h('span', { className: 'material-symbols-outlined sppcfw-text-xs sppcfw-text-gray-400' }, 'desktop_windows')
+													),
+													h(
+														'select',
+														{
+															className: 'sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1 sppcfw-text-xs sppcfw-text-white sppcfw-w-36 focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
+															value: currentRep,
+															onChange: e => handleStyleChange('bg_repeat', e.target.value)
+														},
+														['Default', 'No-repeat', 'Repeat', 'Repeat-x', 'Repeat-y'].map(r => h('option', { key: r, value: r }, r))
+													)
+												),
+
+												// Display Size
+												h(
+													'div',
+													{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+													h(
+														'div',
+														{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
+														h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Display Size'),
+														h('span', { className: 'material-symbols-outlined sppcfw-text-xs sppcfw-text-gray-400' }, 'desktop_windows')
+													),
+													h(
+														'select',
+														{
+															className: 'sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1 sppcfw-text-xs sppcfw-text-white sppcfw-w-36 focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
+															value: currentSize,
+															onChange: e => handleStyleChange('bg_size', e.target.value)
+														},
+														['Default', 'Auto', 'Cover', 'Contain', 'Custom'].map(s => h('option', { key: s, value: s }, s))
+													)
+												),
+												currentSize === 'Custom' &&
+													h(
+														'div',
+														{ className: 'sppcfw-space-y-1.5 sppcfw-pl-2 sppcfw-border-l sppcfw-border-[#374151]' },
+														renderControlHeader('Custom Scale Width', true, widthUnit, setWidthUnit, ['%', 'px', 'vw']),
+														renderSliderInput(getStyle('bg_custom_size') || '100%', v => handleStyleChange('bg_custom_size', v), 1, 200, 1, widthUnit, '100')
+													)
+											),
+
+										// Hover Transition Duration on Hover Tab
+										bgTab === 'hover' &&
+											h(
+												'div',
+												{ className: 'sppcfw-space-y-1.5' },
+												renderControlHeader('Transition Duration', true, 's', () => {}, ['s']),
+												renderSliderInput(getStyle('bg_hover_transition') || '0.3s', v => handleStyleChange('bg_hover_transition', v), 0.1, 3, 0.1, 's', '0.3')
+											)
+									);
+								})()
+							),
+
+						// Content for Gradient Type
+						currentBgType === 'gradient' &&
+							h(
+								'div',
+								{ className: 'sppcfw-space-y-3.5' },
+								renderColorPicker('Color 1', getStyle('bg_gradient_color1') || '#9333ea', v => handleStyleChange('bg_gradient_color1', v), '#9333ea'),
+								renderColorPicker('Color 2', getStyle('bg_gradient_color2') || '#3b82f6', v => handleStyleChange('bg_gradient_color2', v), '#3b82f6'),
+								h(
+									'div',
+									{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+									h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Gradient Type'),
+									h(
+										'select',
+										{
+											className: 'sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1 sppcfw-text-xs sppcfw-text-white sppcfw-w-36',
+											value: getStyle('bg_gradient_type') || 'Linear',
+											onChange: e => handleStyleChange('bg_gradient_type', e.target.value)
+										},
+										['Linear', 'Radial'].map(gt => h('option', { key: gt, value: gt }, gt))
+									)
+								),
+								getStyle('bg_gradient_type') !== 'Radial' &&
+									h(
+										'div',
+										{ className: 'sppcfw-space-y-1.5' },
+										renderControlHeader('Angle', true, 'deg', () => {}, ['deg']),
+										renderSliderInput(getStyle('bg_gradient_angle') || '180deg', v => handleStyleChange('bg_gradient_angle', v), 0, 360, 1, 'deg', '180')
+									)
+							)
 					)
 				),
 				renderAccordion(
@@ -4358,6 +5156,9 @@
 				case 'text_editor':
 				case 'product_short_desc':
 					return renderTypographyStyle();
+				case 'html_code':
+				case 'custom_html':
+					return renderGenericProductStyle();
 				case 'product_price':
 					return renderPriceStyle();
 				case 'product_add_to_cart':
@@ -4404,11 +5205,133 @@
 			if (isTextEditor) {
 				return renderTextEditorContent();
 			}
+			if (isHtmlCode) {
+				return renderHtmlCodeContent();
+			}
 			if (selectedElement.type === 'product_add_to_cart') {
 				return renderAddToCartContent();
 			}
 			// All other Product Elements have dedicated Dynamic Info Card
 			return renderProductElementDynamicCard();
+		}
+
+		// 1h-2. HTML / Code Element Content Panel (HTML, CSS, JS)
+		function renderHtmlCodeContent() {
+			const htmlVal = getSetting('html_content') !== undefined ? getSetting('html_content') : (getSetting('code') || '');
+			const cssVal = getSetting('custom_css') || '';
+			const jsVal = getSetting('custom_js') || '';
+
+			return h(
+				'div',
+				{ className: 'sppcfw-space-y-4' },
+				h(
+					'div',
+					{ className: 'sppcfw-bg-[#16202e] sppcfw-border sppcfw-border-[#3b4b62] sppcfw-rounded-lg sppcfw-p-3 sppcfw-space-y-1.5' },
+					h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-font-bold sppcfw-text-purple-300' },
+						h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'code'),
+						'Custom HTML, CSS & JavaScript'
+					),
+					h('p', { className: 'sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-leading-relaxed' },
+						'Write custom HTML code, inline styling, and JavaScript scripts. Shortcodes are also supported.'
+					)
+				),
+
+				// Code Language Switcher Tabs
+				h(
+					'div',
+					{ className: 'sppcfw-flex sppcfw-bg-[#111827] sppcfw-p-1 sppcfw-rounded-md sppcfw-border sppcfw-border-[#374151] sppcfw-gap-1' },
+					[
+						{ id: 'html', label: 'HTML', icon: 'html', color: 'sppcfw-text-cyan-400' },
+						{ id: 'css', label: 'CSS', icon: 'css', color: 'sppcfw-text-pink-400' },
+						{ id: 'js', label: 'JS', icon: 'javascript', color: 'sppcfw-text-amber-400' },
+					].map(tab =>
+						h(
+							'button',
+							{
+								key: tab.id,
+								type: 'button',
+								className: `sppcfw-flex-1 sppcfw-py-1.5 sppcfw-px-2 sppcfw-text-xs sppcfw-font-bold sppcfw-rounded sppcfw-transition-all sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-gap-1.5 sppcfw-cursor-pointer ${
+									codeTab === tab.id
+										? 'sppcfw-bg-[#374151] sppcfw-text-white sppcfw-shadow-sm'
+										: 'sppcfw-text-gray-400 hover:sppcfw-text-white'
+								}`,
+								onClick: () => setCodeTab(tab.id),
+							},
+							h('span', { className: `material-symbols-outlined sppcfw-text-sm ${tab.color}` }, tab.icon),
+							tab.label
+						)
+					)
+				),
+
+				// Code Tab: HTML
+				codeTab === 'html' &&
+					renderAccordion(
+						'html_editor',
+						'HTML Code / Markup',
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-2' },
+							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+								h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'HTML Code / Shortcodes'),
+								h('span', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400 font-mono' }, `${(htmlVal || '').length} chars`)
+							),
+							h('textarea', {
+								className: 'sppcfw-w-full sppcfw-h-48 sppcfw-bg-[#0b1120] sppcfw-border sppcfw-border-[#374151] focus:sppcfw-border-[#9333ea] sppcfw-rounded sppcfw-p-3 font-mono sppcfw-text-xs sppcfw-text-cyan-200 sppcfw-leading-relaxed focus:sppcfw-outline-none custom-scrollbar sppcfw-resize-y',
+								placeholder: '<div class="custom-box">\n  <h3>Special Offer</h3>\n  <p>Your custom content here...</p>\n</div>',
+								value: htmlVal,
+								onChange: e => handleSettingChange('html_content', e.target.value),
+								spellCheck: false,
+							}),
+							h('p', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400' }, 'Add your custom HTML tags, divs, images, or WooCommerce shortcodes.')
+						)
+					),
+
+				// Code Tab: CSS
+				codeTab === 'css' &&
+					renderAccordion(
+						'css_editor',
+						'Custom CSS Styles',
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-2' },
+							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+								h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'CSS Code'),
+								h('span', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400 font-mono' }, `${(cssVal || '').length} chars`)
+							),
+							h('textarea', {
+								className: 'sppcfw-w-full sppcfw-h-48 sppcfw-bg-[#0b1120] sppcfw-border sppcfw-border-[#374151] focus:sppcfw-border-[#9333ea] sppcfw-rounded sppcfw-p-3 font-mono sppcfw-text-xs sppcfw-text-pink-200 sppcfw-leading-relaxed focus:sppcfw-outline-none custom-scrollbar sppcfw-resize-y',
+								placeholder: '/* Custom CSS styles */\n.custom-box {\n  background: #f3f4f6;\n  padding: 16px;\n  border-radius: 8px;\n}',
+								value: cssVal,
+								onChange: e => handleSettingChange('custom_css', e.target.value),
+								spellCheck: false,
+							}),
+							h('p', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400' }, 'Enter CSS rules without <style> tags. These will be injected automatically.')
+						)
+					),
+
+				// Code Tab: JS
+				codeTab === 'js' &&
+					renderAccordion(
+						'js_editor',
+						'Custom JavaScript',
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-2' },
+							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+								h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'JavaScript Code'),
+								h('span', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400 font-mono' }, `${(jsVal || '').length} chars`)
+							),
+							h('textarea', {
+								className: 'sppcfw-w-full sppcfw-h-48 sppcfw-bg-[#0b1120] sppcfw-border sppcfw-border-[#374151] focus:sppcfw-border-[#9333ea] sppcfw-rounded sppcfw-p-3 font-mono sppcfw-text-xs sppcfw-text-amber-200 sppcfw-leading-relaxed focus:sppcfw-outline-none custom-scrollbar sppcfw-resize-y',
+								placeholder: '// Custom JavaScript\ndocument.addEventListener("DOMContentLoaded", function() {\n  console.log("Custom script ready");\n});',
+								value: jsVal,
+								onChange: e => handleSettingChange('custom_js', e.target.value),
+								spellCheck: false,
+							}),
+							h('p', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400' }, 'Enter JavaScript code without <script> tags. It will execute on the frontend.')
+						)
+					)
+			);
 		}
 
 		// 1h. Add to Cart Content Panel
@@ -5210,6 +6133,72 @@
 		);
 	}
 
+	// Helper to compute CSS background style object from element styles
+	function computeBackgroundStyles(styles, deviceView = 'desktop') {
+		if (!styles) return {};
+		const bgType = getResponsiveProp(styles, 'bg_type', deviceView) || 'classic';
+		const bgObj = {};
+		if (bgType === 'gradient') {
+			const c1 = getResponsiveProp(styles, 'bg_gradient_color1', deviceView) || '#9333ea';
+			const c2 = getResponsiveProp(styles, 'bg_gradient_color2', deviceView) || '#3b82f6';
+			const gType = (getResponsiveProp(styles, 'bg_gradient_type', deviceView) || 'linear').toLowerCase();
+			const angle = getResponsiveProp(styles, 'bg_gradient_angle', deviceView) || '180deg';
+			if (gType === 'radial') {
+				bgObj.backgroundImage = `radial-gradient(circle, ${c1}, ${c2})`;
+			} else {
+				const angleVal = String(angle).includes('deg') ? angle : `${angle}deg`;
+				bgObj.backgroundImage = `linear-gradient(${angleVal}, ${c1}, ${c2})`;
+			}
+		} else {
+			const bgColor = getResponsiveProp(styles, 'bg_color', deviceView);
+			if (bgColor && bgColor !== 'transparent') {
+				bgObj.backgroundColor = bgColor;
+			}
+			const bgImage = getResponsiveProp(styles, 'bg_image', deviceView);
+			if (bgImage) {
+				bgObj.backgroundImage = `url("${bgImage}")`;
+
+				// Position
+				const bgPos = getResponsiveProp(styles, 'bg_position', deviceView) || 'Center Center';
+				if (bgPos === 'Custom') {
+					const posX = getResponsiveProp(styles, 'bg_pos_x', deviceView) || '50%';
+					const posY = getResponsiveProp(styles, 'bg_pos_y', deviceView) || '50%';
+					bgObj.backgroundPosition = `${posX} ${posY}`;
+				} else if (bgPos !== 'Default') {
+					bgObj.backgroundPosition = bgPos.toLowerCase();
+				} else {
+					bgObj.backgroundPosition = 'center center';
+				}
+
+				// Attachment
+				const bgAtt = getResponsiveProp(styles, 'bg_attachment', deviceView);
+				if (bgAtt && bgAtt !== 'Default') {
+					bgObj.backgroundAttachment = bgAtt.toLowerCase();
+				}
+
+				// Repeat
+				const bgRep = getResponsiveProp(styles, 'bg_repeat', deviceView) || 'No-repeat';
+				if (bgRep !== 'Default') {
+					bgObj.backgroundRepeat = bgRep.toLowerCase();
+				} else {
+					bgObj.backgroundRepeat = 'no-repeat';
+				}
+
+				// Display Size
+				const bgSize = getResponsiveProp(styles, 'bg_size', deviceView) || 'Cover';
+				if (bgSize === 'Custom') {
+					const customSize = getResponsiveProp(styles, 'bg_custom_size', deviceView) || '100%';
+					bgObj.backgroundSize = customSize;
+				} else if (bgSize !== 'Default') {
+					bgObj.backgroundSize = bgSize.toLowerCase();
+				} else {
+					bgObj.backgroundSize = 'cover';
+				}
+			}
+		}
+		return bgObj;
+	}
+
 	// Canvas Container Renderer
 	function CanvasContainerRenderer({ container, cIdx, elements, setElements, selectedElementId, setSelectedElementId, removeElement, sampleData, pageSettings, addWidgetToTarget, addColumnToContainer, duplicateColumn, openElementsTab, openStructureChooser, deviceView = 'desktop' }) {
 		const isSelected = selectedElementId === container.id;
@@ -5252,7 +6241,7 @@
 			borderRadius = generalRad;
 		}
 
-		const bgColor = getResponsiveProp(container.styles, 'bg_color', deviceView) || 'transparent';
+		const bgStyles = computeBackgroundStyles(container.styles, deviceView);
 		const isGrid = getResponsiveProp(container.settings, 'flex_direction', deviceView) === 'grid';
 		const flexDir = getResponsiveProp(container.settings, 'flex_direction', deviceView) || 'row';
 		const justifyContent = getResponsiveProp(container.settings, 'justify_content', deviceView) || 'flex-start';
@@ -5333,7 +6322,8 @@
 					maxWidth: widthMode === 'boxed' ? boxedWidth : '100%',
 					width: '100%',
 					minHeight: minHeight,
-					backgroundColor: bgColor,
+					backgroundColor: 'transparent',
+					...bgStyles,
 					borderStyle: hasBorder ? borderType : 'dashed',
 					borderWidth: borderWidth,
 					borderColor: borderColor,
@@ -5504,6 +6494,8 @@
 			colBorderRadius = colGeneralRad;
 		}
 
+		const colBgStyles = computeBackgroundStyles(column.styles, deviceView);
+
 		return h(
 			'div',
 			{
@@ -5527,7 +6519,8 @@
 					justifyContent: justifyContent,
 					alignItems: alignItems,
 					gap: gap,
-					backgroundColor: getResponsiveProp(column.styles, 'bg_color', deviceView) || 'transparent',
+					backgroundColor: 'transparent',
+					...colBgStyles,
 					borderStyle: colHasBorder ? colBorderType : 'dashed',
 					borderColor: colHasBorder ? (getResponsiveProp(column.styles, 'border_color', deviceView) || '#d1d5db') : (isSelected ? '#9333ea' : '#d1d5db'),
 					borderWidth: colHasBorder ? (getResponsiveProp(column.styles, 'border_width', deviceView) || '1px') : '1px',
@@ -5860,6 +6853,35 @@
 						},
 					},
 					textContent
+				);
+			}
+			case 'html_code':
+			case 'custom_html': {
+				const htmlContent = settings.html_content !== undefined ? settings.html_content : (settings.code || '');
+				const customCss = settings.custom_css || '';
+
+				if (!htmlContent && !customCss) {
+					return h(
+						'div',
+						{
+							className: 'sppcfw-p-4 sppcfw-border sppcfw-border-dashed sppcfw-border-[#374151] sppcfw-rounded-lg sppcfw-text-center sppcfw-bg-[#111827]/40 sppcfw-text-gray-400 sppcfw-space-y-1',
+						},
+						h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-font-bold sppcfw-text-purple-400' },
+							h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'code'),
+							'HTML Element'
+						),
+						h('div', { className: 'sppcfw-text-[11px] sppcfw-text-gray-500' }, 'Click to add HTML, CSS, and JS code')
+					);
+				}
+
+				return h(
+					'div',
+					{ className: 'sppcfw-custom-html-live-block sppcfw-w-full' },
+					customCss && h('style', { dangerouslySetInnerHTML: { __html: customCss } }),
+					h('div', {
+						className: 'sppcfw-custom-html-inner',
+						dangerouslySetInnerHTML: { __html: htmlContent }
+					})
 				);
 			}
 			case 'product_price': {

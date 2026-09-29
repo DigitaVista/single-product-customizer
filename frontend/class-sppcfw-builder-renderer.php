@@ -814,9 +814,66 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					}
 
 					if ('product_add_to_cart' !== $type) {
-						$bg_color = $this->sppcfw_get_device_prop($styles, 'bg_color', $device, '');
-						if (!empty($bg_color) && 'transparent' !== $bg_color) {
-							$css .= 'background-color: ' . esc_attr($bg_color) . ' !important;';
+						$bg_type = $this->sppcfw_get_device_prop($styles, 'bg_type', $device, 'classic');
+						if ('gradient' === $bg_type) {
+							$c1 = $this->sppcfw_get_device_prop($styles, 'bg_gradient_color1', $device, '#9333ea');
+							$c2 = $this->sppcfw_get_device_prop($styles, 'bg_gradient_color2', $device, '#3b82f6');
+							$g_type = strtolower((string) $this->sppcfw_get_device_prop($styles, 'bg_gradient_type', $device, 'linear'));
+							$angle = (string) $this->sppcfw_get_device_prop($styles, 'bg_gradient_angle', $device, '180deg');
+							if (false === strpos($angle, 'deg')) {
+								$angle .= 'deg';
+							}
+							if ('radial' === $g_type) {
+								$css .= 'background-image: radial-gradient(circle, ' . esc_attr($c1) . ', ' . esc_attr($c2) . ') !important;';
+							} else {
+								$css .= 'background-image: linear-gradient(' . esc_attr($angle) . ', ' . esc_attr($c1) . ', ' . esc_attr($c2) . ') !important;';
+							}
+						} else {
+							$bg_color = $this->sppcfw_get_device_prop($styles, 'bg_color', $device, '');
+							if (!empty($bg_color) && 'transparent' !== $bg_color) {
+								$css .= 'background-color: ' . esc_attr($bg_color) . ' !important;';
+							}
+							$bg_image = $this->sppcfw_get_device_prop($styles, 'bg_image', $device, '');
+							if (!empty($bg_image)) {
+								$css .= 'background-image: url("' . esc_url($bg_image) . '") !important;';
+								$bg_pos = $this->sppcfw_get_device_prop($styles, 'bg_position', $device, 'Center Center');
+								if ('Custom' === $bg_pos) {
+									$pos_x = $this->sppcfw_get_device_prop($styles, 'bg_pos_x', $device, '50%');
+									$pos_y = $this->sppcfw_get_device_prop($styles, 'bg_pos_y', $device, '50%');
+									$css .= 'background-position: ' . esc_attr($pos_x) . ' ' . esc_attr($pos_y) . ' !important;';
+								} elseif (!empty($bg_pos) && 'Default' !== $bg_pos) {
+									$css .= 'background-position: ' . esc_attr(strtolower($bg_pos)) . ' !important;';
+								} else {
+									$css .= 'background-position: center center !important;';
+								}
+
+								$bg_att = $this->sppcfw_get_device_prop($styles, 'bg_attachment', $device, '');
+								if (!empty($bg_att) && 'Default' !== $bg_att) {
+									$css .= 'background-attachment: ' . esc_attr(strtolower($bg_att)) . ' !important;';
+								}
+
+								$bg_rep = $this->sppcfw_get_device_prop($styles, 'bg_repeat', $device, 'No-repeat');
+								if (!empty($bg_rep) && 'Default' !== $bg_rep) {
+									$css .= 'background-repeat: ' . esc_attr(strtolower($bg_rep)) . ' !important;';
+								} else {
+									$css .= 'background-repeat: no-repeat !important;';
+								}
+
+								$bg_size = $this->sppcfw_get_device_prop($styles, 'bg_size', $device, 'Cover');
+								if ('Custom' === $bg_size) {
+									$custom_size = $this->sppcfw_get_device_prop($styles, 'bg_custom_size', $device, '100%');
+									$css .= 'background-size: ' . esc_attr($custom_size) . ' !important;';
+								} elseif (!empty($bg_size) && 'Default' !== $bg_size) {
+									$css .= 'background-size: ' . esc_attr(strtolower($bg_size)) . ' !important;';
+								} else {
+									$css .= 'background-size: cover !important;';
+								}
+							}
+						}
+
+						$bg_hover_trans = $this->sppcfw_get_device_prop($styles, 'bg_hover_transition', $device, '');
+						if (!empty($bg_hover_trans)) {
+							$css .= 'transition: all ' . esc_attr($bg_hover_trans) . ' ease !important;';
 						}
 
 						$font_size = $this->sppcfw_get_device_prop($styles, 'font_size', $device, '');
@@ -957,6 +1014,22 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						$css .= ".sppcfw-el-{$id} .sppcfw-price-wrapper, .sppcfw-el-{$id} .price { text-align: " . esc_attr($alignment) . " !important; justify-content: {$align_justify} !important; }";
 					}
 					$css .= '}';
+
+					// Hover background rule for non-cart elements
+					if ('product_add_to_cart' !== $type) {
+						$bg_hover_color = $this->sppcfw_get_device_prop($styles, 'bg_hover_color', $device, '');
+						$bg_hover_image = $this->sppcfw_get_device_prop($styles, 'bg_hover_image', $device, '');
+						if ((!empty($bg_hover_color) && 'transparent' !== $bg_hover_color) || !empty($bg_hover_image)) {
+							$css .= ".sppcfw-el-{$id}:hover {";
+							if (!empty($bg_hover_color) && 'transparent' !== $bg_hover_color) {
+								$css .= 'background-color: ' . esc_attr($bg_hover_color) . ' !important;';
+							}
+							if (!empty($bg_hover_image)) {
+								$css .= 'background-image: url("' . esc_url($bg_hover_image) . '") !important;';
+							}
+							$css .= '}';
+						}
+					}
 
 					// Product Price specific styling rules (isolated and matching canvas preview)
 					if ('product_price' === $type) {
@@ -1311,6 +1384,26 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					$content = isset($settings['text_content']) && '' !== $settings['text_content'] ? wp_kses_post($settings['text_content']) : esc_html__('Add your custom description or paragraph content here...', 'single-product-customizer');
 					echo '<' . $tag . ' class="sppcfw-custom-text-block' . $el_class . '">' . nl2br($content) . '</' . $tag . '>';
 					break;
+				case 'html_code':
+				case 'custom_html':
+				case 'html':
+					$settings = isset($el['settings']) ? $el['settings'] : array();
+					$html = isset($settings['html_content']) ? $settings['html_content'] : (isset($settings['code']) ? $settings['code'] : '');
+					$css = isset($settings['custom_css']) ? $settings['custom_css'] : '';
+					$js = isset($settings['custom_js']) ? $settings['custom_js'] : '';
+
+					echo '<div class="sppcfw-custom-html-wrapper' . $el_class . '">';
+					if (!empty($css)) {
+						echo '<style>' . $css . '</style>';
+					}
+					if (!empty($html)) {
+						echo do_shortcode($html);
+					}
+					if (!empty($js)) {
+						echo '<script>' . $js . '</script>';
+					}
+					echo '</div>';
+					break;
 				case 'product_price':
 					$basic = get_option('sppcfw_basic', array());
 					$is_price_hidden = (is_array($basic) && isset($basic['hide_product_price']) && 'on' === $basic['hide_product_price']);
@@ -1470,8 +1563,15 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					echo '<div class="sppcfw-gallery-main-frame' . ($enable_zoom ? ' sppcfw-zoom-enabled' : '') . '">';
 					echo '<img src="' . esc_url($first_image['main']) . '" data-zoom-src="' . esc_url($first_image['full']) . '" data-full-src="' . esc_url($first_image['full']) . '" alt="' . esc_attr($first_image['alt']) . '" class="sppcfw-gallery-main-img" style="max-width:100%;height:auto;display:block;" />';
 
-					if ($enable_lightbox) {
-						echo '<button type="button" class="sppcfw-gallery-lightbox-btn" title="' . esc_attr__('View full image', 'single-product-customizer') . '"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>';
+					if ($enable_zoom || $enable_lightbox) {
+						echo '<div class="sppcfw-gallery-actions-bar" style="position:absolute;top:10px;right:10px;z-index:10;display:flex;align-items:center;gap:6px;">';
+						if ($enable_zoom) {
+							echo '<span class="sppcfw-gallery-action-badge" title="' . esc_attr__('Zoom on hover', 'single-product-customizer') . '" style="background:rgba(255,255,255,0.9);border:1px solid rgba(0,0,0,0.1);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#374151;backdrop-filter:blur(4px);box-shadow:0 2px 6px rgba(0,0,0,0.1);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></span>';
+						}
+						if ($enable_lightbox) {
+							echo '<button type="button" class="sppcfw-gallery-lightbox-btn" title="' . esc_attr__('View full image', 'single-product-customizer') . '"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>';
+						}
+						echo '</div>';
 					}
 
 					echo '</div>';  // close sppcfw-gallery-main-frame
