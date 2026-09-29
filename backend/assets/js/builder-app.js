@@ -232,10 +232,10 @@
 				border_color: 'transparent',
 				border_width: '0px',
 				border_radius: '0px',
-				padding_top: '0px',
-				padding_right: '0px',
-				padding_bottom: '0px',
-				padding_left: '0px',
+				padding_top: '10px',
+				padding_right: '10px',
+				padding_bottom: '10px',
+				padding_left: '10px',
 				margin_top: '0px',
 				margin_right: '0px',
 				margin_bottom: '0px',
@@ -248,10 +248,10 @@
 				margin_right: '0px',
 				margin_bottom: '0px',
 				margin_left: '0px',
-				padding_top: '0px',
-				padding_right: '0px',
-				padding_bottom: '0px',
-				padding_left: '0px',
+				padding_top: '10px',
+				padding_right: '10px',
+				padding_bottom: '10px',
+				padding_left: '10px',
 			},
 		};
 	}
@@ -2498,13 +2498,17 @@
 				const val = rawVal !== '' ? rawVal + unit : '';
 				if (isLinked) {
 					onChangeFour({
+						[prefix]: val,
 						[`${prefix}_top`]: val,
 						[`${prefix}_right`]: val,
 						[`${prefix}_bottom`]: val,
 						[`${prefix}_left`]: val,
 					});
 				} else {
-					onChangeFour({ [`${prefix}_${side}`]: val });
+					onChangeFour({
+						[prefix]: '',
+						[`${prefix}_${side}`]: val
+					});
 				}
 			}
 
@@ -2515,7 +2519,9 @@
 					'ul',
 					{ className: 'sppcfw-grid sppcfw-grid-cols-5 sppcfw-flex-1' },
 					sides.map(side => {
-						const sideVal = getValueFn(`${prefix}_${side}`) || '';
+						const specificVal = getValueFn(`${prefix}_${side}`);
+						const fallbackVal = getValueFn(prefix);
+						const sideVal = (specificVal !== undefined && specificVal !== '') ? specificVal : (fallbackVal !== undefined && fallbackVal !== '' ? fallbackVal : '');
 						const num = sideVal !== '' && sideVal !== undefined ? parseFloat(sideVal) : '';
 						return h(
 							'li',
@@ -3670,7 +3676,22 @@
 								{
 									className: 'sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1 sppcfw-text-xs sppcfw-text-white sppcfw-w-36',
 									value: getStyle('border_type') || 'None',
-									onChange: e => handleStyleChange('border_type', e.target.value),
+									onChange: e => {
+										const val = e.target.value;
+										const currentW = getStyle('border_width');
+										const updates = { border_type: val };
+										if (val !== 'None') {
+											if (!currentW || currentW === '0px' || currentW === '0') {
+												updates.border_width = val === 'Double' ? '3px' : '1px';
+											} else if (val === 'Double' && (parseFloat(currentW) < 3 || currentW === '1px' || currentW === '2px')) {
+												updates.border_width = '3px';
+											}
+											if (!getStyle('border_color') || getStyle('border_color') === 'transparent') {
+												updates.border_color = '#374151';
+											}
+										}
+										handleMultiStyleChange(updates);
+									},
 								},
 								['None', 'Solid', 'Double', 'Dotted', 'Dashed'].map(bt => h('option', { key: bt, value: bt }, bt))
 							)
@@ -3680,8 +3701,8 @@
 								'div',
 								{ className: 'sppcfw-space-y-3' },
 								renderControlHeader('Border Width', true, widthUnit, setWidthUnit, ['px']),
-								renderSliderInput(getStyle('border_width') || '1px', v => handleStyleChange('border_width', v), 1, 20, 1, 'px'),
-								renderColorPicker('Border Color', getStyle('border_color'), v => handleStyleChange('border_color', v), '#374151')
+								renderSliderInput(getStyle('border_width') || (getStyle('border_type') === 'Double' ? '3px' : '1px'), v => handleStyleChange('border_width', v), 1, 20, 1, 'px'),
+								renderColorPicker('Border Color', getStyle('border_color') || '#374151', v => handleStyleChange('border_color', v), '#374151')
 							),
 						h(
 							'div',
@@ -5199,21 +5220,38 @@
 		const isFullWidth = rawWidthMode === 'full' || boxedWidth === '100%' || advWidthMode === 'Full Width (100%)';
 		const widthMode = isFullWidth ? 'full' : 'boxed';
 
-		const padTop = getResponsiveProp(container.advanced, 'padding_top', deviceView) || getResponsiveProp(container.styles, 'padding_top', deviceView) || '0px';
-		const padRight = getResponsiveProp(container.advanced, 'padding_right', deviceView) || getResponsiveProp(container.styles, 'padding_right', deviceView) || '0px';
-		const padBottom = getResponsiveProp(container.advanced, 'padding_bottom', deviceView) || getResponsiveProp(container.styles, 'padding_bottom', deviceView) || '0px';
-		const padLeft = getResponsiveProp(container.advanced, 'padding_left', deviceView) || getResponsiveProp(container.styles, 'padding_left', deviceView) || '0px';
+		const padTop = getResponsiveProp(container.advanced, 'padding_top', deviceView) || getResponsiveProp(container.styles, 'padding_top', deviceView) || '10px';
+		const padRight = getResponsiveProp(container.advanced, 'padding_right', deviceView) || getResponsiveProp(container.styles, 'padding_right', deviceView) || '10px';
+		const padBottom = getResponsiveProp(container.advanced, 'padding_bottom', deviceView) || getResponsiveProp(container.styles, 'padding_bottom', deviceView) || '10px';
+		const padLeft = getResponsiveProp(container.advanced, 'padding_left', deviceView) || getResponsiveProp(container.styles, 'padding_left', deviceView) || '10px';
 
 		const marTop = getResponsiveProp(container.advanced, 'margin_top', deviceView) || getResponsiveProp(container.styles, 'margin_top', deviceView) || '0px';
 		const marRight = widthMode === 'boxed' ? 'auto' : getResponsiveProp(container.advanced, 'margin_right', deviceView) || getResponsiveProp(container.styles, 'margin_right', deviceView) || '0px';
-		const marBottom = getResponsiveProp(container.advanced, 'margin_bottom', deviceView) || getResponsiveProp(container.styles, 'margin_bottom', deviceView) || '0px';
+		const marBottom = getResponsiveProp(container.advanced, 'margin_bottom', deviceView) || getResponsiveProp(container.styles, 'margin_bottom', deviceView) || '16px';
 		const marLeft = widthMode === 'boxed' ? 'auto' : getResponsiveProp(container.advanced, 'margin_left', deviceView) || getResponsiveProp(container.styles, 'margin_left', deviceView) || '0px';
 
 		const borderType = (getResponsiveProp(container.styles, 'border_type', deviceView) || 'none').toLowerCase();
 		const hasBorder = borderType !== 'none';
-		const borderWidth = hasBorder ? (getResponsiveProp(container.styles, 'border_width', deviceView) || '1px') : '0px';
-		const borderColor = hasBorder ? (getResponsiveProp(container.styles, 'border_color', deviceView) || '#e5e7eb') : 'transparent';
-		const borderRadius = getResponsiveProp(container.styles, 'border_radius', deviceView) || '0px';
+		const borderWidth = hasBorder ? (getResponsiveProp(container.styles, 'border_width', deviceView) || '1px') : ((isSelected || isContainerDragOver) ? '2px' : '1px');
+		const borderColor = hasBorder ? (getResponsiveProp(container.styles, 'border_color', deviceView) || '#cbd5e1') : (isContainerDragOver ? '#9333ea' : (isSelected ? '#9333ea' : '#cbd5e1'));
+
+		const radTop = getResponsiveProp(container.styles, 'border_radius_top', deviceView);
+		const radRight = getResponsiveProp(container.styles, 'border_radius_right', deviceView);
+		const radBottom = getResponsiveProp(container.styles, 'border_radius_bottom', deviceView);
+		const radLeft = getResponsiveProp(container.styles, 'border_radius_left', deviceView);
+		const generalRad = getResponsiveProp(container.styles, 'border_radius', deviceView);
+
+		let borderRadius = '8px';
+		if ((radTop !== undefined && radTop !== '') || (radRight !== undefined && radRight !== '') || (radBottom !== undefined && radBottom !== '') || (radLeft !== undefined && radLeft !== '')) {
+			const t = (radTop !== undefined && radTop !== '') ? radTop : (generalRad || '0px');
+			const r = (radRight !== undefined && radRight !== '') ? radRight : (generalRad || '0px');
+			const b = (radBottom !== undefined && radBottom !== '') ? radBottom : (generalRad || '0px');
+			const l = (radLeft !== undefined && radLeft !== '') ? radLeft : (generalRad || '0px');
+			borderRadius = `${t} ${r} ${b} ${l}`;
+		} else if (generalRad !== undefined && generalRad !== '') {
+			borderRadius = generalRad;
+		}
+
 		const bgColor = getResponsiveProp(container.styles, 'bg_color', deviceView) || 'transparent';
 		const isGrid = getResponsiveProp(container.settings, 'flex_direction', deviceView) === 'grid';
 		const flexDir = getResponsiveProp(container.settings, 'flex_direction', deviceView) || 'row';
@@ -5289,14 +5327,14 @@
 					setSelectedElementId(container.id);
 				},
 				className: `sppcfw-builder-container-item sppcfw-relative sppcfw-tab-group sppcfw-transition-all sppcfw-rounded-lg ${
-					isContainerDragOver ? 'sppcfw-border-2 sppcfw-border-dashed sppcfw-border-[#9333ea] sppcfw-bg-[#faf5ff] ' : isSelected ? 'sppcfw-border-2 sppcfw-border-[#9333ea] sppcfw-ring-[#9333ea]/30' : 'sppcfw-border-[#e5e7eb] hover:sppcfw-border-[#9333ea]/50'
+					isContainerDragOver ? 'is-drag-over sppcfw-bg-[#faf5ff]' : isSelected ? 'is-selected' : ''
 				} ${container.advanced && container.advanced.custom_class ? container.advanced.custom_class : ''}`,
 				style: {
 					maxWidth: widthMode === 'boxed' ? boxedWidth : '100%',
 					width: '100%',
 					minHeight: minHeight,
 					backgroundColor: bgColor,
-					borderStyle: hasBorder ? borderType : 'none',
+					borderStyle: hasBorder ? borderType : 'dashed',
 					borderWidth: borderWidth,
 					borderColor: borderColor,
 					borderRadius: borderRadius,
@@ -5447,6 +5485,25 @@
 			}
 		}
 
+		const colBorderType = (getResponsiveProp(column.styles, 'border_type', deviceView) || 'none').toLowerCase();
+		const colHasBorder = colBorderType !== 'none';
+		const colRadTop = getResponsiveProp(column.styles, 'border_radius_top', deviceView);
+		const colRadRight = getResponsiveProp(column.styles, 'border_radius_right', deviceView);
+		const colRadBottom = getResponsiveProp(column.styles, 'border_radius_bottom', deviceView);
+		const colRadLeft = getResponsiveProp(column.styles, 'border_radius_left', deviceView);
+		const colGeneralRad = getResponsiveProp(column.styles, 'border_radius', deviceView);
+
+		let colBorderRadius = '4px';
+		if ((colRadTop !== undefined && colRadTop !== '') || (colRadRight !== undefined && colRadRight !== '') || (colRadBottom !== undefined && colRadBottom !== '') || (colRadLeft !== undefined && colRadLeft !== '')) {
+			const t = (colRadTop !== undefined && colRadTop !== '') ? colRadTop : (colGeneralRad || '0px');
+			const r = (colRadRight !== undefined && colRadRight !== '') ? colRadRight : (colGeneralRad || '0px');
+			const b = (colRadBottom !== undefined && colRadBottom !== '') ? colRadBottom : (colGeneralRad || '0px');
+			const l = (colRadLeft !== undefined && colRadLeft !== '') ? colRadLeft : (colGeneralRad || '0px');
+			colBorderRadius = `${t} ${r} ${b} ${l}`;
+		} else if (colGeneralRad !== undefined && colGeneralRad !== '') {
+			colBorderRadius = colGeneralRad;
+		}
+
 		return h(
 			'div',
 			{
@@ -5457,8 +5514,8 @@
 				onDragOver: handleColumnDragOver,
 				onDragLeave: handleColumnDragLeave,
 				onDrop: handleColumnDrop,
-				className: `builder-column-item sppcfw-flex-1 sppcfw-min-w-[180px] sppcfw-border sppcfw-border-dashed sppcfw-rounded sppcfw-p-3 sppcfw-relative sppcfw-transition-all sppcfw-min-h-[120px] ${
-					isColumnDragOver ? 'sppcfw-border-2 sppcfw-border-dashed sppcfw-border-[#9333ea] sppcfw-bg-[#faf5ff]' : isSelected ? 'sppcfw-border-[#9333ea] sppcfw-bg-[#faf5ff] sppcfw-ring-2 sppcfw-ring-[#9333ea]/30' : 'sppcfw-border-[#d1d5db] hover:sppcfw-border-[#9333ea]/50 sppcfw-bg-[#f9fafb]'
+				className: `builder-column-item sppcfw-flex-1 sppcfw-min-w-[180px] sppcfw-p-3 sppcfw-relative sppcfw-transition-all sppcfw-min-h-[120px] ${
+					isColumnDragOver ? 'is-drag-over sppcfw-bg-[#faf5ff]' : isSelected ? 'is-selected' : 'sppcfw-bg-[#f9fafb]'
 				}`,
 				style: {
 					flex: flexWidth === '100%' ? '1 1 100%' : `1 1 calc(${flexWidth} - 16px)`,
@@ -5471,9 +5528,10 @@
 					alignItems: alignItems,
 					gap: gap,
 					backgroundColor: getResponsiveProp(column.styles, 'bg_color', deviceView) || 'transparent',
-					borderColor: getResponsiveProp(column.styles, 'border_color', deviceView) || '#d1d5db',
-					borderWidth: getResponsiveProp(column.styles, 'border_width', deviceView) || '1px',
-					borderRadius: getResponsiveProp(column.styles, 'border_radius', deviceView) || '4px',
+					borderStyle: colHasBorder ? colBorderType : 'dashed',
+					borderColor: colHasBorder ? (getResponsiveProp(column.styles, 'border_color', deviceView) || '#d1d5db') : (isSelected ? '#9333ea' : '#d1d5db'),
+					borderWidth: colHasBorder ? (getResponsiveProp(column.styles, 'border_width', deviceView) || '1px') : '1px',
+					borderRadius: colBorderRadius,
 					paddingTop: getResponsiveProp(column.advanced, 'padding_top', deviceView) || getResponsiveProp(column.styles, 'padding_top', deviceView) || '12px',
 					paddingRight: getResponsiveProp(column.advanced, 'padding_right', deviceView) || getResponsiveProp(column.styles, 'padding_right', deviceView) || '12px',
 					paddingBottom: getResponsiveProp(column.advanced, 'padding_bottom', deviceView) || getResponsiveProp(column.styles, 'padding_bottom', deviceView) || '12px',

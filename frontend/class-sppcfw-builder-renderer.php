@@ -860,20 +860,19 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						}
 
 						$border_radius = $this->sppcfw_get_device_prop($styles, 'border_radius', $device, '');
-						if (!empty($border_radius) && '0px' !== $border_radius && '0' !== $border_radius) {
+						$rad_t = $this->sppcfw_get_device_prop($styles, 'border_radius_top', $device, '');
+						$rad_r = $this->sppcfw_get_device_prop($styles, 'border_radius_right', $device, '');
+						$rad_b = $this->sppcfw_get_device_prop($styles, 'border_radius_bottom', $device, '');
+						$rad_l = $this->sppcfw_get_device_prop($styles, 'border_radius_left', $device, '');
+
+						if ('' !== $rad_t || '' !== $rad_r || '' !== $rad_b || '' !== $rad_l) {
+							$t = ('' !== $rad_t && null !== $rad_t) ? $rad_t : (!empty($border_radius) ? $border_radius : '0px');
+							$r = ('' !== $rad_r && null !== $rad_r) ? $rad_r : (!empty($border_radius) ? $border_radius : '0px');
+							$b = ('' !== $rad_b && null !== $rad_b) ? $rad_b : (!empty($border_radius) ? $border_radius : '0px');
+							$l = ('' !== $rad_l && null !== $rad_l) ? $rad_l : (!empty($border_radius) ? $border_radius : '0px');
+							$css .= "border-radius: {$t} {$r} {$b} {$l} !important;";
+						} elseif (!empty($border_radius) && '0px' !== $border_radius && '0' !== $border_radius) {
 							$css .= 'border-radius: ' . esc_attr($border_radius) . ' !important;';
-						} else {
-							$rad_t = $this->sppcfw_get_device_prop($styles, 'border_radius_top', $device, '');
-							$rad_r = $this->sppcfw_get_device_prop($styles, 'border_radius_right', $device, '');
-							$rad_b = $this->sppcfw_get_device_prop($styles, 'border_radius_bottom', $device, '');
-							$rad_l = $this->sppcfw_get_device_prop($styles, 'border_radius_left', $device, '');
-							if ((!empty($rad_t) && '0px' !== $rad_t) || (!empty($rad_r) && '0px' !== $rad_r) || (!empty($rad_b) && '0px' !== $rad_b) || (!empty($rad_l) && '0px' !== $rad_l)) {
-								$t = !empty($rad_t) ? $rad_t : '0px';
-								$r = !empty($rad_r) ? $rad_r : '0px';
-								$b = !empty($rad_b) ? $rad_b : '0px';
-								$l = !empty($rad_l) ? $rad_l : '0px';
-								$css .= "border-radius: {$t} {$r} {$b} {$l} !important;";
-							}
 						}
 
 						// Padding: Check $advanced first, then $styles

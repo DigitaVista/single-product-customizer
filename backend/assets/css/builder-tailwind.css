@@ -77,6 +77,53 @@
   outline-offset: -2px;
 }
 
+/* Flexbox Container Canvas Item */
+.sppcfw-builder-container-item {
+  position: relative;
+  padding: 10px;
+  transition:
+    outline 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+.sppcfw-builder-container-item:hover {
+  outline: 1.5px dashed rgba(147, 51, 234, 0.5);
+  outline-offset: -1px;
+}
+.sppcfw-builder-container-item.is-selected {
+  outline: 2px solid #9333ea;
+  outline-offset: -1px;
+  box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.15);
+}
+.sppcfw-builder-container-item.is-drag-over {
+  outline: 2px dashed #9333ea !important;
+  background-color: #faf5ff !important;
+}
+
+/* Column Canvas Item */
+.builder-column-item {
+  position: relative;
+  transition:
+    outline 0.15s ease,
+    border-color 0.15s ease,
+    box-shadow 0.15s ease,
+    background-color 0.15s ease;
+}
+.builder-column-item:hover {
+  outline: 1.5px dashed rgba(147, 51, 234, 0.5);
+  outline-offset: -1px;
+}
+.builder-column-item.is-selected {
+  outline: 2px solid #9333ea;
+  outline-offset: -1px;
+  box-shadow: 0 0 0 3px rgba(147, 51, 234, 0.15);
+}
+.builder-column-item.is-drag-over {
+  outline: 2px dashed #9333ea !important;
+  background-color: #faf5ff !important;
+}
+
 /* Selected Element Toolbar Badge - Consistent Height Across All Elements */
 .sppcfw-selection-badge {
   height: 20px !important;
