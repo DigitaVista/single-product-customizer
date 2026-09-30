@@ -9,7 +9,7 @@
 (function () {
 	'use strict';
 
-	const { createElement: h, useState, useEffect, useRef } = window.wp.element;
+	const { createElement: h, useState, useEffect, useRef, Component } = window.wp.element;
 
 	// Helper for AJAX post
 	function apiPost(action, data) {
@@ -255,6 +255,159 @@
 				padding_left: '10px',
 			},
 		};
+	}
+
+	// Syntax Validation Utility Functions for Code Studio
+	function validateHtmlSyntax(htmlStr) {
+		if (!htmlStr || typeof htmlStr !== 'string' || !htmlStr.trim()) return null;
+
+		// 1. Check for unclosed script or style tags
+		const scriptOpenCount = (htmlStr.match(/<script\b[^>]*>/gi) || []).length;
+		const scriptCloseCount = (htmlStr.match(/<\/script>/gi) || []).length;
+		if (scriptOpenCount !== scriptCloseCount) {
+			return `Unclosed <script> tag detected (${scriptOpenCount} opened, ${scriptCloseCount} closed).`;
+		}
+
+		const styleOpenCount = (htmlStr.match(/<style\b[^>]*>/gi) || []).length;
+		const styleCloseCount = (htmlStr.match(/<\/style>/gi) || []).length;
+		if (styleOpenCount !== styleCloseCount) {
+			return `Unclosed <style> tag detected (${styleOpenCount} opened, ${styleCloseCount} closed).`;
+		}
+
+		// 2. Strip comments, script, and style blocks before tag hierarchy validation
+		let sanitized = htmlStr
+			.replace(/<!--[\s\S]*?-->/g, '')
+			.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '')
+			.replace(/<style\b[^<]*(?:(?!<\/style>)<[^<]*)*<\/style>/gi, '');
+
+		// 3. Void tags and SVG self-closing elements that don't need closing tag
+		const voidTags = new Set([
+			'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input', 'link', 'meta', 'param', 'source', 'track', 'wbr', '!doctype',
+			'path', 'circle', 'rect', 'polygon', 'polyline', 'line', 'ellipse', 'use', 'stop'
+		]);
+
+		const tagRegex = /<\/?([a-zA-Z0-9\-]+)(?:\s+[^>]*?)?(\/?)>/g;
+		const stack = [];
+		let match;
+
+		while ((match = tagRegex.exec(sanitized)) !== null) {
+			const fullTag = match[0];
+			const tagName = match[1].toLowerCase();
+			const isSelfClosing = match[2] === '/' || fullTag.endsWith('/>') || voidTags.has(tagName);
+			const isClosing = fullTag.startsWith('</');
+
+			if (voidTags.has(tagName)) {
+				continue;
+			}
+
+			if (isClosing) {
+				if (stack.length === 0) {
+					return `Unexpected closing tag </${tagName}> without matching opening tag.`;
+				}
+				const lastTag = stack.pop();
+				if (lastTag !== tagName) {
+					return `Mismatched tag: expected </${lastTag}> but found </${tagName}>.`;
+				}
+			} else if (!isSelfClosing) {
+				stack.push(tagName);
+			}
+		}
+
+		if (stack.length > 0) {
+			return `Unclosed tag(s) detected: <${stack.join('>, <')}>. Please close all HTML tags.`;
+		}
+
+		// 4. Check for unclosed shortcode brackets e.g. [shortcode
+		const openShortcodeCount = (htmlStr.match(/\[[a-zA-Z0-9_\-]+(?:\s+[^\]]*)?/g) || []).length;
+		const closeShortcodeCount = (htmlStr.match(/\]/g) || []).length;
+		if (openShortcodeCount > closeShortcodeCount) {
+			return `Unclosed WordPress shortcode bracket detected (missing "]").`;
+		}
+
+		return null;
+	}
+
+	function validateCssSyntax(cssStr) {
+		if (!cssStr || typeof cssStr !== 'string' || !cssStr.trim()) return null;
+
+		let braceCount = 0;
+		let inComment = false;
+		let inSingleQuote = false;
+		let inDoubleQuote = false;
+
+		for (let i = 0; i < cssStr.length; i++) {
+			const char = cssStr[i];
+			const nextChar = cssStr[i + 1];
+
+			if (inComment) {
+				if (char === '*' && nextChar === '/') {
+					inComment = false;
+					i++;
+				}
+				continue;
+			}
+			if (char === '/' && nextChar === '*') {
+				inComment = true;
+				i++;
+				continue;
+			}
+			if (char === "'" && !inDoubleQuote) inSingleQuote = !inSingleQuote;
+			if (char === '"' && !inSingleQuote) inDoubleQuote = !inDoubleQuote;
+
+			if (!inSingleQuote && !inDoubleQuote) {
+				if (char === '{') braceCount++;
+				if (char === '}') braceCount--;
+				if (braceCount < 0) {
+					return 'Unexpected closing brace "}" without opening "{"';
+				}
+			}
+		}
+
+		if (inComment) return 'Unclosed comment block "/*" (missing "*/")';
+		if (inSingleQuote || inDoubleQuote) return 'Unclosed quote string in CSS rules';
+		if (braceCount > 0) return `Missing ${braceCount} closing brace(s) "}" in CSS`;
+
+		return null;
+	}
+
+	function validateJsSyntax(jsStr) {
+		if (!jsStr || typeof jsStr !== 'string' || !jsStr.trim()) return null;
+
+		try {
+			new Function('container', 'widgetId', jsStr);
+			return null;
+		} catch (err) {
+			return err.message || 'JavaScript Syntax Error';
+		}
+	}
+
+	function validateAllElements(elementList) {
+		const errors = [];
+		function traverse(nodes) {
+			if (!Array.isArray(nodes)) return;
+			nodes.forEach(node => {
+				if (node.type === 'html_code' || node.type === 'custom_html' || node.type === 'html') {
+					const settings = node.settings || {};
+					const html = settings.html_content !== undefined ? settings.html_content : (settings.code || '');
+					const css = settings.custom_css || '';
+					const js = settings.custom_js || '';
+
+					const htmlErr = validateHtmlSyntax(html);
+					if (htmlErr) errors.push(`HTML Error in "${node.label || 'HTML Element'}": ${htmlErr}`);
+
+					const cssErr = validateCssSyntax(css);
+					if (cssErr) errors.push(`CSS Error in "${node.label || 'HTML Element'}": ${cssErr}`);
+
+					const jsErr = validateJsSyntax(js);
+					if (jsErr) errors.push(`JavaScript Error in "${node.label || 'HTML Element'}": ${jsErr}`);
+				}
+				if (node.children && Array.isArray(node.children)) {
+					traverse(node.children);
+				}
+			});
+		}
+		traverse(elementList);
+		return errors;
 	}
 
 	// Interactive Step-by-Step Layout Structure Selector Component (Matching Image 1 & 2)
@@ -1189,15 +1342,27 @@
 			}
 
 			const newId = 'el-' + widgetType + '-' + Date.now();
+			let initialSettings = {
+				scope: 'global',
+				alignment: 'left',
+			};
+
+			if (widgetType === 'html_code' || widgetType === 'custom_html') {
+				initialSettings = {
+					scope: 'global',
+					alignment: 'left',
+					html_content: '<div class="sppcfw-promo-banner">\n  <div class="sppcfw-promo-icon">⚡</div>\n  <div class="sppcfw-promo-text">\n    <h4>Special Limited Time Offer</h4>\n    <p>Enjoy free expedited shipping &amp; 30-day money-back guarantee.</p>\n  </div>\n</div>',
+					custom_css: '/* Custom HTML Element Styles */\n.sppcfw-promo-banner {\n  display: flex;\n  align-items: center;\n  gap: 12px;\n  background: linear-gradient(135deg, #f8fafc 0%, #ede9fe 100%);\n  border: 1px solid #c4b5fd;\n  border-radius: 8px;\n  padding: 14px 18px;\n  box-shadow: 0 1px 3px rgba(0,0,0,0.05);\n}\n.sppcfw-promo-icon {\n  font-size: 24px;\n  line-height: 1;\n}\n.sppcfw-promo-text h4 {\n  margin: 0 0 4px 0;\n  font-size: 14px;\n  font-weight: 700;\n  color: #581c87;\n}\n.sppcfw-promo-text p {\n  margin: 0;\n  font-size: 12px;\n  color: #4b5563;\n  line-height: 1.4;\n}',
+					custom_js: '// Custom JavaScript for this element\n// This script runs automatically on page load\nconsole.log("SPPCFW Custom HTML element loaded.");',
+				};
+			}
+
 			const newElement = {
 				id: newId,
 				type: widgetType,
 				label: name || widgetType,
 				metaKey: metaKey || null,
-				settings: {
-					scope: 'global',
-					alignment: 'left',
-				},
+				settings: initialSettings,
 				styles: {
 					font_family: 'Inter',
 					font_size: '16px',
@@ -1246,6 +1411,15 @@
 		}
 
 		function saveTemplate() {
+			const validationErrors = validateAllElements(elements);
+			if (validationErrors.length > 0) {
+				setIsSaving(false);
+				const firstErr = validationErrors[0];
+				setStatusMessage('⚠️ ' + firstErr);
+				alert('Cannot save or publish template due to syntax errors:\n\n' + validationErrors.join('\n\n') + '\n\nPlease fix the errors in your HTML / CSS / JS code before saving.');
+				return;
+			}
+
 			setIsSaving(true);
 			const currentStatus = (pageSettings && pageSettings.status) ? pageSettings.status.toLowerCase() : 'published';
 			const isDraft = currentStatus === 'draft';
@@ -1303,6 +1477,14 @@
 
 		// Helper to open live product preview in a new browser tab with auto-save
 		function handlePreview() {
+			const validationErrors = validateAllElements(elements);
+			if (validationErrors.length > 0) {
+				const firstErr = validationErrors[0];
+				setStatusMessage('⚠️ ' + firstErr);
+				alert('Cannot preview template due to syntax errors:\n\n' + validationErrors.join('\n\n') + '\n\nPlease fix the errors before previewing.');
+				return;
+			}
+
 			let targetProduct = null;
 			if (selectedProductId && Array.isArray(products)) {
 				targetProduct = products.find(p => String(p.id) === String(selectedProductId));
@@ -1718,7 +1900,18 @@
 				h(
 					'div',
 					{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2.5' },
-					statusMessage && h('span', { className: 'sppcfw-text-xs sppcfw-text-[#10b981] sppcfw-font-medium' }, statusMessage),
+					statusMessage &&
+						h(
+							'span',
+							{
+								className: `sppcfw-text-xs sppcfw-font-medium ${
+									statusMessage.includes('⚠️') || statusMessage.includes('Failed') || statusMessage.includes('Cannot') || statusMessage.includes('Error')
+										? 'sppcfw-text-red-400 sppcfw-font-bold'
+										: 'sppcfw-text-[#10b981]'
+								}`,
+							},
+							statusMessage
+						),
 
 					// Layers / Structure Icon Button
 					h(
@@ -2742,6 +2935,9 @@
 		const [openAccordions, setOpenAccordions] = useState({
 			general: true,
 			items: true,
+			html_editor: true,
+			css_editor: true,
+			js_editor: true,
 			typography: true,
 			colors: true,
 			image: true,
@@ -2777,12 +2973,17 @@
 		const [isPaddingLinked, setIsPaddingLinked] = useState(true);
 		const [bgTab, setBgTab] = useState('normal'); // 'normal' | 'hover'
 		const [codeTab, setCodeTab] = useState('html'); // 'html' | 'css' | 'js'
+		const [copiedTab, setCopiedTab] = useState(null);
 
 		function toggleAccordion(key) {
 			setOpenAccordions(prev => ({ ...prev, [key]: !prev[key] }));
 		}
 
-		function getSetting(key) {
+		function getSetting(key, isFixed = false) {
+			const isCodeField = key === 'html_content' || key === 'custom_css' || key === 'custom_js' || key === 'code';
+			if (isFixed || isCodeField) {
+				return selectedElement.settings ? selectedElement.settings[key] : undefined;
+			}
 			return getResponsiveProp(selectedElement.settings, key, deviceView);
 		}
 
@@ -2801,8 +3002,9 @@
 			return getResponsiveProp(selectedElement.styles, key, deviceView);
 		}
 
-		function handleSettingChange(key, value) {
-			const targetKey = getDeviceKey(key, deviceView);
+		function handleSettingChange(key, value, isFixed = false) {
+			const isCodeField = key === 'html_content' || key === 'custom_css' || key === 'custom_js' || key === 'code';
+			const targetKey = (isFixed || isCodeField) ? key : getDeviceKey(key, deviceView);
 			const updated = {
 				...selectedElement,
 				settings: { ...selectedElement.settings, [targetKey]: value },
@@ -2908,6 +3110,8 @@
 			? 'format_size'
 			: isTextEditor
 			? 'edit_note'
+			: isHtmlCode
+			? 'code'
 			: 'widgets';
 
 		function renderControlHeader(label, showDeviceIcon = true, unitValue = null, onUnitChange = null, units = null) {
@@ -5269,49 +5473,128 @@
 			const cssVal = getSetting('custom_css') || '';
 			const jsVal = getSetting('custom_js') || '';
 
+			const htmlError = validateHtmlSyntax(htmlVal);
+			const cssError = validateCssSyntax(cssVal);
+			const jsError = validateJsSyntax(jsVal);
+
+			const handleCopy = (text, tabKey) => {
+				if (navigator && navigator.clipboard && navigator.clipboard.writeText) {
+					navigator.clipboard.writeText(text || '');
+					setCopiedTab(tabKey);
+					setTimeout(() => setCopiedTab(null), 2000);
+				}
+			};
+
+			const handleKeyDownTab = (e, settingKey) => {
+				if (e.key === 'Tab') {
+					e.preventDefault();
+					const start = e.target.selectionStart;
+					const end = e.target.selectionEnd;
+					const val = e.target.value;
+					const newVal = val.substring(0, start) + '  ' + val.substring(end);
+					handleSettingChange(settingKey, newVal);
+					setTimeout(() => {
+						if (e.target) {
+							e.target.selectionStart = e.target.selectionEnd = start + 2;
+						}
+					}, 0);
+				}
+			};
+
+			const activeVal = codeTab === 'html' ? htmlVal : codeTab === 'css' ? cssVal : jsVal;
+			const charCount = (activeVal || '').length;
+			const lineCount = activeVal ? activeVal.split('\n').length : 1;
+
 			return h(
 				'div',
 				{ className: 'sppcfw-space-y-4' },
+
+				// Code Studio Hero Card
 				h(
 					'div',
-					{ className: 'sppcfw-bg-[#16202e] sppcfw-border sppcfw-border-[#3b4b62] sppcfw-rounded-lg sppcfw-p-3 sppcfw-space-y-1.5' },
-					h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-font-bold sppcfw-text-purple-300' },
-						h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'code'),
-						'Custom HTML, CSS & JavaScript'
+					{ className: 'sppcfw-p-3.5 sppcfw-rounded-xl sppcfw-bg-gradient-to-br sppcfw-from-[#18182f] sppcfw-to-[#121c2a] sppcfw-border sppcfw-border-[#3b4b62] sppcfw-shadow-sm sppcfw-space-y-1.5' },
+					h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+						h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2 sppcfw-text-xs sppcfw-font-bold sppcfw-text-purple-300' },
+							h('div', { className: 'sppcfw-w-6 sppcfw-h-6 sppcfw-rounded-md sppcfw-bg-purple-500/20 sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-text-purple-300' },
+								h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'code')
+							),
+							'Custom Code Studio'
+						),
+						h('span', { className: 'sppcfw-px-2 sppcfw-py-0.5 sppcfw-text-[10px] sppcfw-font-bold sppcfw-rounded-full sppcfw-bg-emerald-500/15 sppcfw-text-emerald-400 sppcfw-border sppcfw-border-emerald-500/30' }, '● Live Preview')
 					),
 					h('p', { className: 'sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-leading-relaxed' },
-						'Write custom HTML code, inline styling, and JavaScript scripts. Shortcodes are also supported.'
+						'Write custom HTML markup, scoped CSS rules, and JavaScript logic. Code is rendered and executed in real-time in the canvas preview.'
 					)
 				),
 
 				// Code Language Switcher Tabs
 				h(
 					'div',
-					{ className: 'sppcfw-flex sppcfw-bg-[#111827] sppcfw-p-1 sppcfw-rounded-md sppcfw-border sppcfw-border-[#374151] sppcfw-gap-1' },
+					{ className: 'sppcfw-flex sppcfw-bg-[#111827] sppcfw-p-1 sppcfw-rounded-lg sppcfw-border sppcfw-border-[#374151] sppcfw-gap-1' },
 					[
-						{ id: 'html', label: 'HTML', icon: 'html', color: 'sppcfw-text-cyan-400' },
-						{ id: 'css', label: 'CSS', icon: 'css', color: 'sppcfw-text-pink-400' },
-						{ id: 'js', label: 'JS', icon: 'javascript', color: 'sppcfw-text-amber-400' },
+						{ id: 'html', label: 'HTML Markup', icon: 'html', color: 'sppcfw-text-cyan-400', activeClass: 'sppcfw-bg-cyan-500/20 sppcfw-text-cyan-300 sppcfw-border-cyan-500/40', hasError: !!htmlError },
+						{ id: 'css', label: 'CSS Styles', icon: 'css', color: 'sppcfw-text-pink-400', activeClass: 'sppcfw-bg-pink-500/20 sppcfw-text-pink-300 sppcfw-border-pink-500/40', hasError: !!cssError },
+						{ id: 'js', label: 'JavaScript', icon: 'javascript', color: 'sppcfw-text-amber-400', activeClass: 'sppcfw-bg-amber-500/20 sppcfw-text-amber-300 sppcfw-border-amber-500/40', hasError: !!jsError },
 					].map(tab =>
 						h(
 							'button',
 							{
 								key: tab.id,
 								type: 'button',
-								className: `sppcfw-flex-1 sppcfw-py-1.5 sppcfw-px-2 sppcfw-text-xs sppcfw-font-bold sppcfw-rounded sppcfw-transition-all sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-gap-1.5 sppcfw-cursor-pointer ${
+								className: `sppcfw-flex-1 sppcfw-py-1.5 sppcfw-px-2 sppcfw-text-xs sppcfw-font-bold sppcfw-rounded-md sppcfw-transition-all sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-gap-1.5 sppcfw-cursor-pointer sppcfw-border ${
 									codeTab === tab.id
-										? 'sppcfw-bg-[#374151] sppcfw-text-white sppcfw-shadow-sm'
-										: 'sppcfw-text-gray-400 hover:sppcfw-text-white'
-								}`,
+										? tab.activeClass + ' sppcfw-shadow-sm'
+										: 'sppcfw-border-transparent sppcfw-text-gray-400 hover:sppcfw-text-white hover:sppcfw-bg-[#1f2937]'
+								} ${tab.hasError ? 'sppcfw-border-red-500/60 sppcfw-bg-red-950/20' : ''}`,
 								onClick: () => setCodeTab(tab.id),
 							},
 							h('span', { className: `material-symbols-outlined sppcfw-text-sm ${tab.color}` }, tab.icon),
-							tab.label
+							tab.label,
+							tab.hasError && h('span', { className: 'sppcfw-text-[10px] sppcfw-leading-none sppcfw-text-red-400 font-bold sppcfw-animate-pulse', title: 'Syntax Error in this tab' }, '⚠️')
 						)
 					)
 				),
 
-				// Code Tab: HTML
+				// Editor Actions & Stats Bar
+				h(
+					'div',
+					{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between sppcfw-text-[11px] sppcfw-text-gray-400 sppcfw-px-0.5' },
+					h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2 font-mono sppcfw-text-[10px] sppcfw-text-gray-400' },
+						h('span', { className: 'sppcfw-px-1.5 sppcfw-py-0.5 sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded' }, `${charCount} chars`),
+						h('span', { className: 'sppcfw-px-1.5 sppcfw-py-0.5 sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded' }, `${lineCount} lines`)
+					),
+					h(
+						'div',
+						{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
+						h(
+							'button',
+							{
+								type: 'button',
+								className: 'sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded sppcfw-bg-[#16202e] sppcfw-border sppcfw-border-[#374151] hover:sppcfw-border-purple-400 sppcfw-text-[10px] sppcfw-font-bold sppcfw-text-gray-300 hover:sppcfw-text-white sppcfw-transition-all sppcfw-flex sppcfw-items-center sppcfw-gap-1 sppcfw-cursor-pointer',
+								onClick: () => handleCopy(activeVal, codeTab),
+								title: 'Copy Code',
+							},
+							h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, copiedTab === codeTab ? 'check' : 'content_copy'),
+							copiedTab === codeTab ? 'Copied!' : 'Copy'
+						),
+						h(
+							'button',
+							{
+								type: 'button',
+								className: 'sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded sppcfw-bg-[#16202e] sppcfw-border sppcfw-border-[#374151] hover:sppcfw-border-red-500 sppcfw-text-[10px] sppcfw-font-bold sppcfw-text-gray-400 hover:sppcfw-text-red-300 sppcfw-transition-all sppcfw-cursor-pointer',
+								onClick: () => {
+									if (codeTab === 'html') handleSettingChange('html_content', '');
+									else if (codeTab === 'css') handleSettingChange('custom_css', '');
+									else if (codeTab === 'js') handleSettingChange('custom_js', '');
+								},
+								title: 'Clear code',
+							},
+							'Clear'
+						)
+					)
+				),
+
+				// Code Tab: HTML Editor
 				codeTab === 'html' &&
 					renderAccordion(
 						'html_editor',
@@ -5319,22 +5602,44 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-2' },
-							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-								h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'HTML Code / Shortcodes'),
-								h('span', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400 font-mono' }, `${(htmlVal || '').length} chars`)
-							),
 							h('textarea', {
-								className: 'sppcfw-w-full sppcfw-h-48 sppcfw-bg-[#0b1120] sppcfw-border sppcfw-border-[#374151] focus:sppcfw-border-[#9333ea] sppcfw-rounded sppcfw-p-3 font-mono sppcfw-text-xs sppcfw-text-cyan-200 sppcfw-leading-relaxed focus:sppcfw-outline-none custom-scrollbar sppcfw-resize-y',
-								placeholder: '<div class="custom-box">\n  <h3>Special Offer</h3>\n  <p>Your custom content here...</p>\n</div>',
+								className: `sppcfw-w-full sppcfw-h-56 sppcfw-rounded-lg sppcfw-p-3 font-mono sppcfw-text-xs sppcfw-leading-relaxed focus:sppcfw-outline-none custom-scrollbar sppcfw-resize-y ${
+									htmlError
+										? 'sppcfw-border-2 sppcfw-border-red-500 sppcfw-ring-1 sppcfw-ring-red-500 sppcfw-bg-[#1a0c0e] sppcfw-text-red-200'
+										: 'sppcfw-bg-[#090d16] sppcfw-border sppcfw-border-[#374151] focus:sppcfw-border-cyan-400 focus:sppcfw-ring-1 focus:sppcfw-ring-cyan-400 sppcfw-text-cyan-200'
+								}`,
+								placeholder: '<div class="custom-card">\n  <h3>Your Heading</h3>\n  <p>Your HTML content...</p>\n</div>',
 								value: htmlVal,
 								onChange: e => handleSettingChange('html_content', e.target.value),
+								onKeyDown: e => handleKeyDownTab(e, 'html_content'),
 								spellCheck: false,
+								autoCapitalize: 'off',
+								autoComplete: 'off',
+								autoCorrect: 'off',
 							}),
-							h('p', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400' }, 'Add your custom HTML tags, divs, images, or WooCommerce shortcodes.')
+							htmlError &&
+								h(
+									'div',
+									{ className: 'sppcfw-p-2.5 sppcfw-bg-red-950/60 sppcfw-border sppcfw-border-red-500/70 sppcfw-rounded-md sppcfw-text-[11px] sppcfw-text-red-200 sppcfw-flex sppcfw-items-start sppcfw-gap-2 sppcfw-shadow-sm' },
+									h('span', { className: 'material-symbols-outlined sppcfw-text-sm sppcfw-text-red-400 sppcfw-shrink-0 sppcfw-mt-0.5' }, 'error'),
+									h(
+										'div',
+										{ className: 'sppcfw-space-y-0.5 sppcfw-flex-1' },
+										h('div', { className: 'sppcfw-font-bold sppcfw-text-red-300' }, 'HTML Code Error (Fix to allow Save/Publish)'),
+										h('div', { className: 'sppcfw-text-[10px] sppcfw-text-red-200/90 font-mono' }, htmlError)
+									)
+								),
+							h('div', { className: 'sppcfw-p-2.5 sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded-md sppcfw-text-[11px] sppcfw-text-gray-400 sppcfw-space-y-1' },
+								h('div', { className: 'sppcfw-font-bold sppcfw-text-cyan-300 sppcfw-flex sppcfw-items-center sppcfw-gap-1' },
+									h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, 'info'),
+									'HTML & Shortcode Tips'
+								),
+								h('p', { className: 'sppcfw-text-[10px] sppcfw-leading-relaxed' }, 'You can include standard HTML tags, svg icons, inline tags, or WordPress / WooCommerce shortcodes (e.g. [add_to_cart id="..."], [product_categories]).')
+							)
 						)
 					),
 
-				// Code Tab: CSS
+				// Code Tab: CSS Editor
 				codeTab === 'css' &&
 					renderAccordion(
 						'css_editor',
@@ -5342,22 +5647,44 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-2' },
-							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-								h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'CSS Code'),
-								h('span', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400 font-mono' }, `${(cssVal || '').length} chars`)
-							),
 							h('textarea', {
-								className: 'sppcfw-w-full sppcfw-h-48 sppcfw-bg-[#0b1120] sppcfw-border sppcfw-border-[#374151] focus:sppcfw-border-[#9333ea] sppcfw-rounded sppcfw-p-3 font-mono sppcfw-text-xs sppcfw-text-pink-200 sppcfw-leading-relaxed focus:sppcfw-outline-none custom-scrollbar sppcfw-resize-y',
-								placeholder: '/* Custom CSS styles */\n.custom-box {\n  background: #f3f4f6;\n  padding: 16px;\n  border-radius: 8px;\n}',
+								className: `sppcfw-w-full sppcfw-h-56 sppcfw-rounded-lg sppcfw-p-3 font-mono sppcfw-text-xs sppcfw-leading-relaxed focus:sppcfw-outline-none custom-scrollbar sppcfw-resize-y ${
+									cssError
+										? 'sppcfw-border-2 sppcfw-border-red-500 sppcfw-ring-1 sppcfw-ring-red-500 sppcfw-bg-[#1a0c0e] sppcfw-text-red-200'
+										: 'sppcfw-bg-[#090d16] sppcfw-border sppcfw-border-[#374151] focus:sppcfw-border-pink-400 focus:sppcfw-ring-1 focus:sppcfw-ring-pink-400 sppcfw-text-pink-200'
+								}`,
+								placeholder: '/* Custom CSS Styles */\n.custom-card {\n  background: #f8fafc;\n  padding: 16px;\n  border-radius: 8px;\n}',
 								value: cssVal,
 								onChange: e => handleSettingChange('custom_css', e.target.value),
+								onKeyDown: e => handleKeyDownTab(e, 'custom_css'),
 								spellCheck: false,
+								autoCapitalize: 'off',
+								autoComplete: 'off',
+								autoCorrect: 'off',
 							}),
-							h('p', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400' }, 'Enter CSS rules without <style> tags. These will be injected automatically.')
+							cssError &&
+								h(
+									'div',
+									{ className: 'sppcfw-p-2.5 sppcfw-bg-red-950/60 sppcfw-border sppcfw-border-red-500/70 sppcfw-rounded-md sppcfw-text-[11px] sppcfw-text-red-200 sppcfw-flex sppcfw-items-start sppcfw-gap-2 sppcfw-shadow-sm' },
+									h('span', { className: 'material-symbols-outlined sppcfw-text-sm sppcfw-text-red-400 sppcfw-shrink-0 sppcfw-mt-0.5' }, 'error'),
+									h(
+										'div',
+										{ className: 'sppcfw-space-y-0.5 sppcfw-flex-1' },
+										h('div', { className: 'sppcfw-font-bold sppcfw-text-red-300' }, 'CSS Syntax Error (Fix to allow Save/Publish)'),
+										h('div', { className: 'sppcfw-text-[10px] sppcfw-text-red-200/90 font-mono' }, cssError)
+									)
+								),
+							h('div', { className: 'sppcfw-p-2.5 sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded-md sppcfw-text-[11px] sppcfw-text-gray-400 sppcfw-space-y-1' },
+								h('div', { className: 'sppcfw-font-bold sppcfw-text-pink-300 sppcfw-flex sppcfw-items-center sppcfw-gap-1' },
+									h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, 'brush'),
+									'CSS Rules Tips'
+								),
+								h('p', { className: 'sppcfw-text-[10px] sppcfw-leading-relaxed' }, 'Enter pure CSS without <style> tags. Styles apply instantly to the canvas preview and the frontend.')
+							)
 						)
 					),
 
-				// Code Tab: JS
+				// Code Tab: JS Editor
 				codeTab === 'js' &&
 					renderAccordion(
 						'js_editor',
@@ -5365,18 +5692,40 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-2' },
-							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-								h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'JavaScript Code'),
-								h('span', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400 font-mono' }, `${(jsVal || '').length} chars`)
-							),
 							h('textarea', {
-								className: 'sppcfw-w-full sppcfw-h-48 sppcfw-bg-[#0b1120] sppcfw-border sppcfw-border-[#374151] focus:sppcfw-border-[#9333ea] sppcfw-rounded sppcfw-p-3 font-mono sppcfw-text-xs sppcfw-text-amber-200 sppcfw-leading-relaxed focus:sppcfw-outline-none custom-scrollbar sppcfw-resize-y',
-								placeholder: '// Custom JavaScript\ndocument.addEventListener("DOMContentLoaded", function() {\n  console.log("Custom script ready");\n});',
+								className: `sppcfw-w-full sppcfw-h-56 sppcfw-rounded-lg sppcfw-p-3 font-mono sppcfw-text-xs sppcfw-leading-relaxed focus:sppcfw-outline-none custom-scrollbar sppcfw-resize-y ${
+									jsError
+										? 'sppcfw-border-2 sppcfw-border-red-500 sppcfw-ring-1 sppcfw-ring-red-500 sppcfw-bg-[#1a0c0e] sppcfw-text-red-200'
+										: 'sppcfw-bg-[#090d16] sppcfw-border sppcfw-border-[#374151] focus:sppcfw-border-amber-400 focus:sppcfw-ring-1 focus:sppcfw-ring-amber-400 sppcfw-text-amber-200'
+								}`,
+								placeholder: '// Custom JavaScript\n// Variable "container" refers to this element root\nconsole.log("Custom script ready");',
 								value: jsVal,
 								onChange: e => handleSettingChange('custom_js', e.target.value),
+								onKeyDown: e => handleKeyDownTab(e, 'custom_js'),
 								spellCheck: false,
+								autoCapitalize: 'off',
+								autoComplete: 'off',
+								autoCorrect: 'off',
 							}),
-							h('p', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400' }, 'Enter JavaScript code without <script> tags. It will execute on the frontend.')
+							jsError &&
+								h(
+									'div',
+									{ className: 'sppcfw-p-2.5 sppcfw-bg-red-950/60 sppcfw-border sppcfw-border-red-500/70 sppcfw-rounded-md sppcfw-text-[11px] sppcfw-text-red-200 sppcfw-flex sppcfw-items-start sppcfw-gap-2 sppcfw-shadow-sm' },
+									h('span', { className: 'material-symbols-outlined sppcfw-text-sm sppcfw-text-red-400 sppcfw-shrink-0 sppcfw-mt-0.5' }, 'error'),
+									h(
+										'div',
+										{ className: 'sppcfw-space-y-0.5 sppcfw-flex-1' },
+										h('div', { className: 'sppcfw-font-bold sppcfw-text-red-300' }, 'JavaScript Syntax Error (Fix to allow Save/Publish)'),
+										h('div', { className: 'sppcfw-text-[10px] sppcfw-text-red-200/90 font-mono' }, jsError)
+									)
+								),
+							h('div', { className: 'sppcfw-p-2.5 sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded-md sppcfw-text-[11px] sppcfw-text-gray-400 sppcfw-space-y-1' },
+								h('div', { className: 'sppcfw-font-bold sppcfw-text-amber-300 sppcfw-flex sppcfw-items-center sppcfw-gap-1' },
+									h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, 'terminal'),
+									'JavaScript Execution Tips'
+								),
+								h('p', { className: 'sppcfw-text-[10px] sppcfw-leading-relaxed' }, 'Enter pure JavaScript without <script> tags. The "container" argument is available to scope queries to this element.')
+							)
 						)
 					)
 			);
@@ -6854,6 +7203,8 @@
 
 		const isWidgetHidden = isElementHiddenOnDevice(widget, deviceView);
 
+		const isHtmlWidget = widget.type === 'html_code' || widget.type === 'custom_html' || widget.type === 'html';
+
 		return h(
 			'div',
 			{
@@ -6867,23 +7218,23 @@
 					e.stopPropagation();
 					setSelectedElementId(widget.id);
 				},
-				className: `widget-canvas-item sppcfw-p-3 sppcfw-rounded sppcfw-cursor-grab active:sppcfw-cursor-grabbing sppcfw-relative sppcfw-tab-group ${
+				className: `widget-canvas-item ${isHtmlWidget ? 'sppcfw-p-0' : 'sppcfw-p-3'} sppcfw-rounded sppcfw-cursor-grab active:sppcfw-cursor-grabbing sppcfw-relative sppcfw-tab-group ${
 					isSelected ? 'is-selected sppcfw-ring-2 sppcfw-ring-[#9333ea]' : ''
 				} ${isWidgetHidden ? 'sppcfw-hidden-device-preview' : ''} ${widget.advanced && widget.advanced.custom_class ? widget.advanced.custom_class : ''}`,
 				style: {
-					color: widget.type === 'product_add_to_cart' ? 'inherit' : (getResponsiveProp(widget.styles, 'text_color', deviceView) || 'inherit'),
-					fontFamily: widget.type === 'product_add_to_cart' ? 'inherit' : ((getResponsiveProp(widget.styles, 'font_family', deviceView) && getResponsiveProp(widget.styles, 'font_family', deviceView) !== 'Inherit') ? getResponsiveProp(widget.styles, 'font_family', deviceView) : 'inherit'),
-					fontSize: widget.type === 'product_add_to_cart' ? 'inherit' : (getResponsiveProp(widget.styles, 'font_size', deviceView) || 'inherit'),
-					fontWeight: widget.type === 'product_add_to_cart' ? 'inherit' : ((getResponsiveProp(widget.styles, 'font_weight', deviceView) && getResponsiveProp(widget.styles, 'font_weight', deviceView) !== 'Default') ? getResponsiveProp(widget.styles, 'font_weight', deviceView) : 'inherit'),
-					lineHeight: getResponsiveProp(widget.styles, 'line_height', deviceView) || 'inherit',
-					backgroundColor: widget.type === 'product_add_to_cart' ? 'transparent' : (getResponsiveProp(widget.styles, 'bg_color', deviceView) || 'transparent'),
-					borderColor: widget.type === 'product_add_to_cart' ? 'transparent' : (getResponsiveProp(widget.styles, 'border_color', deviceView) || 'transparent'),
-					borderWidth: widget.type === 'product_add_to_cart' ? '0px' : (getResponsiveProp(widget.styles, 'border_width', deviceView) || '0px'),
-					borderRadius: widget.type === 'product_add_to_cart' ? '0px' : (getResponsiveProp(widget.styles, 'border_radius', deviceView) || '0px'),
-					paddingTop: getResponsiveProp(widget.advanced, 'padding_top', deviceView) || (widget.type === 'product_add_to_cart' ? '0px' : (getResponsiveProp(widget.styles, 'padding_top', deviceView) || '0px')),
-					paddingRight: getResponsiveProp(widget.advanced, 'padding_right', deviceView) || (widget.type === 'product_add_to_cart' ? '0px' : (getResponsiveProp(widget.styles, 'padding_right', deviceView) || '0px')),
-					paddingBottom: getResponsiveProp(widget.advanced, 'padding_bottom', deviceView) || (widget.type === 'product_add_to_cart' ? '0px' : (getResponsiveProp(widget.styles, 'padding_bottom', deviceView) || '0px')),
-					paddingLeft: getResponsiveProp(widget.advanced, 'padding_left', deviceView) || (widget.type === 'product_add_to_cart' ? '0px' : (getResponsiveProp(widget.styles, 'padding_left', deviceView) || '0px')),
+					color: (widget.type === 'product_add_to_cart' || isHtmlWidget) ? 'inherit' : (getResponsiveProp(widget.styles, 'text_color', deviceView) || 'inherit'),
+					fontFamily: (widget.type === 'product_add_to_cart' || isHtmlWidget) ? 'inherit' : ((getResponsiveProp(widget.styles, 'font_family', deviceView) && getResponsiveProp(widget.styles, 'font_family', deviceView) !== 'Inherit') ? getResponsiveProp(widget.styles, 'font_family', deviceView) : 'inherit'),
+					fontSize: (widget.type === 'product_add_to_cart' || isHtmlWidget) ? 'inherit' : (getResponsiveProp(widget.styles, 'font_size', deviceView) || 'inherit'),
+					fontWeight: (widget.type === 'product_add_to_cart' || isHtmlWidget) ? 'inherit' : ((getResponsiveProp(widget.styles, 'font_weight', deviceView) && getResponsiveProp(widget.styles, 'font_weight', deviceView) !== 'Default') ? getResponsiveProp(widget.styles, 'font_weight', deviceView) : 'inherit'),
+					lineHeight: (widget.type === 'product_add_to_cart' || isHtmlWidget) ? 'inherit' : (getResponsiveProp(widget.styles, 'line_height', deviceView) || 'inherit'),
+					backgroundColor: (widget.type === 'product_add_to_cart' || isHtmlWidget) ? 'transparent' : (getResponsiveProp(widget.styles, 'bg_color', deviceView) || 'transparent'),
+					borderColor: (widget.type === 'product_add_to_cart' || isHtmlWidget) ? 'transparent' : (getResponsiveProp(widget.styles, 'border_color', deviceView) || 'transparent'),
+					borderWidth: (widget.type === 'product_add_to_cart' || isHtmlWidget) ? '0px' : (getResponsiveProp(widget.styles, 'border_width', deviceView) || '0px'),
+					borderRadius: (widget.type === 'product_add_to_cart' || isHtmlWidget) ? '0px' : (getResponsiveProp(widget.styles, 'border_radius', deviceView) || '0px'),
+					paddingTop: getResponsiveProp(widget.advanced, 'padding_top', deviceView) || ((widget.type === 'product_add_to_cart' || isHtmlWidget) ? '0px' : (getResponsiveProp(widget.styles, 'padding_top', deviceView) || '0px')),
+					paddingRight: getResponsiveProp(widget.advanced, 'padding_right', deviceView) || ((widget.type === 'product_add_to_cart' || isHtmlWidget) ? '0px' : (getResponsiveProp(widget.styles, 'padding_right', deviceView) || '0px')),
+					paddingBottom: getResponsiveProp(widget.advanced, 'padding_bottom', deviceView) || ((widget.type === 'product_add_to_cart' || isHtmlWidget) ? '0px' : (getResponsiveProp(widget.styles, 'padding_bottom', deviceView) || '0px')),
+					paddingLeft: getResponsiveProp(widget.advanced, 'padding_left', deviceView) || ((widget.type === 'product_add_to_cart' || isHtmlWidget) ? '0px' : (getResponsiveProp(widget.styles, 'padding_left', deviceView) || '0px')),
 					marginTop: getResponsiveProp(widget.advanced, 'margin_top', deviceView) || getResponsiveProp(widget.styles, 'margin_top', deviceView) || '0px',
 					marginRight: getResponsiveProp(widget.advanced, 'margin_right', deviceView) || getResponsiveProp(widget.styles, 'margin_right', deviceView) || '0px',
 					marginBottom: getResponsiveProp(widget.advanced, 'margin_bottom', deviceView) || getResponsiveProp(widget.styles, 'margin_bottom', deviceView) || '0px',
@@ -6936,6 +7287,172 @@
 				),
 
 			renderLiveWidgetContent(widget, sampleData, pageSettings, deviceView)
+		);
+	}
+
+	// Isolated Error Boundary for custom code widgets
+	class HtmlErrorBoundary extends Component {
+		constructor(props) {
+			super(props);
+			this.state = { hasError: false, error: null };
+		}
+		static getDerivedStateFromError(error) {
+			return { hasError: true, error: error };
+		}
+		componentDidCatch(error, errorInfo) {
+			console.warn('Isolated error caught in HTML Element widget:', error, errorInfo);
+		}
+		render() {
+			if (this.state.hasError) {
+				return h(
+					'div',
+					{
+						className: 'sppcfw-p-3.5 sppcfw-border-2 sppcfw-border-dashed sppcfw-border-red-500/80 sppcfw-bg-red-950/40 sppcfw-rounded-lg sppcfw-space-y-1.5 sppcfw-text-red-300 sppcfw-w-full sppcfw-overflow-hidden sppcfw-shadow-sm',
+					},
+					h(
+						'div',
+						{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2 sppcfw-font-bold sppcfw-text-xs sppcfw-text-red-400' },
+						h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'error'),
+						'HTML Element Broken (Isolated)'
+					),
+					h(
+						'p',
+						{ className: 'sppcfw-text-[11px] sppcfw-text-red-200/90 font-mono sppcfw-bg-black/50 sppcfw-p-2 sppcfw-rounded sppcfw-break-words' },
+						this.state.error ? (this.state.error.message || String(this.state.error)) : 'Render Error in this HTML Element'
+					),
+					h(
+						'div',
+						{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-[10px] sppcfw-text-gray-400 sppcfw-pt-0.5' },
+						h('span', { className: 'material-symbols-outlined sppcfw-text-xs sppcfw-text-emerald-400' }, 'verified_user'),
+						'Error isolated to this section. All other widgets and layout continue to render normally.'
+					)
+				);
+			}
+			return this.props.children;
+		}
+	}
+
+	// Real-time sandboxed live preview for HTML, CSS, and JS Element
+	function CustomHtmlLiveWidget({ widget, settings, deviceView }) {
+		const containerRef = useRef(null);
+		const htmlContent = settings && settings.html_content !== undefined ? settings.html_content : ((settings && settings.code) || '');
+		const customCss = (settings && settings.custom_css) || '';
+		const customJs = (settings && settings.custom_js) || '';
+
+		const htmlError = validateHtmlSyntax(htmlContent);
+		const cssError = validateCssSyntax(customCss);
+		const jsError = validateJsSyntax(customJs);
+
+		useEffect(() => {
+			if (!containerRef.current) return;
+			if (htmlError || cssError || jsError) return;
+
+			// Handle embedded scripts in HTML markup
+			try {
+				const scriptEls = containerRef.current.querySelectorAll('script');
+				scriptEls.forEach(oldScript => {
+					try {
+						const newScript = document.createElement('script');
+						Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+						newScript.text = oldScript.innerHTML;
+						oldScript.parentNode.replaceChild(newScript, oldScript);
+					} catch (e) {
+						console.warn('Error evaluating inline HTML script:', e);
+					}
+				});
+			} catch (e) {}
+
+			// Execute Custom JS field
+			if (customJs && customJs.trim()) {
+				try {
+					const runUserJs = new Function('container', 'widgetId', `
+						const root = container;
+						const widget = container;
+						const $ = (typeof window.jQuery !== "undefined") ? window.jQuery : (window.$ || null);
+						
+						// Allow DOMContentLoaded and load listeners to fire immediately in live preview
+						const originalAddEventListener = window.addEventListener;
+						const addEventListener = function(type, fn, opts) {
+							if (type === "DOMContentLoaded" || type === "load") {
+								try { fn.call(window, new Event(type)); } catch(err) { console.warn(err); }
+							} else {
+								originalAddEventListener.call(window, type, fn, opts);
+							}
+						};
+
+						try {
+							${customJs}
+						} catch (runtimeErr) {
+							console.warn("SPPCFW Live JS runtime notice:", runtimeErr);
+						}
+					`);
+
+					runUserJs(containerRef.current, widget ? widget.id : '');
+				} catch (syntaxErr) {
+					console.warn('SPPCFW Custom JS syntax notice:', syntaxErr);
+				}
+			}
+		}, [customJs, htmlContent, htmlError, cssError, jsError]);
+
+		if (!htmlContent && !customCss && !customJs) {
+			return h(
+				'div',
+				{
+					className: 'sppcfw-p-6 sppcfw-border-2 sppcfw-border-dashed sppcfw-border-[#3b4b62] sppcfw-rounded-xl sppcfw-text-center sppcfw-bg-[#111827]/60 sppcfw-text-[#d9e3f6] sppcfw-space-y-2',
+				},
+				h('div', { className: 'sppcfw-w-9 sppcfw-h-9 sppcfw-rounded-lg sppcfw-bg-purple-500/20 sppcfw-text-purple-300 sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-mx-auto' },
+					h('span', { className: 'material-symbols-outlined sppcfw-text-lg' }, 'code')
+				),
+				h('div', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-purple-200' }, 'Custom HTML Element'),
+				h('div', { className: 'sppcfw-text-[11px] sppcfw-text-gray-400 sppcfw-max-w-xs sppcfw-mx-auto' }, 'Click to write custom HTML markup, CSS styling, and JavaScript logic.')
+			);
+		}
+
+		// If syntax error is present, display isolated broken error box only inside this element
+		if (htmlError || cssError || jsError) {
+			const activeError = htmlError || cssError || jsError;
+			const errorType = htmlError ? 'HTML Syntax Error' : cssError ? 'CSS Syntax Error' : 'JavaScript Syntax Error';
+			return h(
+				'div',
+				{
+					className: 'sppcfw-p-3.5 sppcfw-border-2 sppcfw-border-dashed sppcfw-border-red-500/80 sppcfw-bg-red-950/30 sppcfw-rounded-lg sppcfw-space-y-1.5 sppcfw-text-red-300 sppcfw-w-full sppcfw-overflow-hidden sppcfw-shadow-sm sppcfw-animate-in sppcfw-fade-in',
+				},
+				h(
+					'div',
+					{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2 sppcfw-font-bold sppcfw-text-xs sppcfw-text-red-400' },
+					h('span', { className: 'material-symbols-outlined sppcfw-text-base sppcfw-text-red-400' }, 'error'),
+					`${errorType} (Element Broken)`
+				),
+				h(
+					'p',
+					{ className: 'sppcfw-text-[11px] sppcfw-text-red-200/90 font-mono sppcfw-bg-black/50 sppcfw-p-2 sppcfw-rounded sppcfw-border sppcfw-border-red-500/30 sppcfw-break-words' },
+					activeError
+				),
+				h(
+					'div',
+					{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-[10px] sppcfw-text-gray-400 sppcfw-pt-0.5' },
+					h('span', { className: 'material-symbols-outlined sppcfw-text-xs sppcfw-text-emerald-400' }, 'verified_user'),
+					'Error isolated to this section. All other sections and page layout remain intact.'
+				)
+			);
+		}
+
+		return h(
+			'div',
+			{
+				ref: containerRef,
+				className: `sppcfw-custom-html-live-block sppcfw-custom-html-${widget ? widget.id : 'widget'} sppcfw-w-full sppcfw-relative`,
+				'data-widget-id': widget ? widget.id : '',
+			},
+			(customCss && !cssError) ? h('style', {
+				key: 'live-css-' + (widget ? widget.id : 'css'),
+				type: 'text/css',
+				dangerouslySetInnerHTML: { __html: customCss }
+			}) : null,
+			h('div', {
+				className: 'sppcfw-custom-html-inner sppcfw-w-full',
+				dangerouslySetInnerHTML: { __html: htmlContent }
+			})
 		);
 	}
 
@@ -7020,31 +7537,10 @@
 			}
 			case 'html_code':
 			case 'custom_html': {
-				const htmlContent = settings.html_content !== undefined ? settings.html_content : (settings.code || '');
-				const customCss = settings.custom_css || '';
-
-				if (!htmlContent && !customCss) {
-					return h(
-						'div',
-						{
-							className: 'sppcfw-p-4 sppcfw-border sppcfw-border-dashed sppcfw-border-[#374151] sppcfw-rounded-lg sppcfw-text-center sppcfw-bg-[#111827]/40 sppcfw-text-gray-400 sppcfw-space-y-1',
-						},
-						h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-font-bold sppcfw-text-purple-400' },
-							h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'code'),
-							'HTML Element'
-						),
-						h('div', { className: 'sppcfw-text-[11px] sppcfw-text-gray-500' }, 'Click to add HTML, CSS, and JS code')
-					);
-				}
-
 				return h(
-					'div',
-					{ className: 'sppcfw-custom-html-live-block sppcfw-w-full' },
-					customCss && h('style', { dangerouslySetInnerHTML: { __html: customCss } }),
-					h('div', {
-						className: 'sppcfw-custom-html-inner',
-						dangerouslySetInnerHTML: { __html: htmlContent }
-					})
+					HtmlErrorBoundary,
+					{ key: el.id },
+					h(CustomHtmlLiveWidget, { widget: el, settings: settings || {}, deviceView: deviceView })
 				);
 			}
 			case 'product_price': {

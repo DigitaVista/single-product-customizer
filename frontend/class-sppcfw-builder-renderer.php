@@ -1396,10 +1396,12 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 			$type = isset($el['type']) ? $el['type'] : '';
 			$id = isset($el['id']) ? esc_attr($el['id']) : '';
 			$el_class = !empty($id) ? ' sppcfw-el-' . $id : '';
+			$settings = isset($el['settings']) && is_array($el['settings']) ? $el['settings'] : array();
+			$styles = isset($el['styles']) && is_array($el['styles']) ? $el['styles'] : array();
+			$advanced = isset($el['advanced']) && is_array($el['advanced']) ? $el['advanced'] : array();
 
 			switch ($type) {
 				case 'product_title':
-					$settings = isset($el['settings']) ? $el['settings'] : array();
 					$tag = !empty($settings['html_tag']) ? sanitize_key($settings['html_tag']) : 'h1';
 					$valid_tags = array('h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'span', 'p');
 					if (!in_array($tag, $valid_tags, true)) {
@@ -1415,7 +1417,6 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					echo '<' . $tag . ' class="product_title entry-title' . $el_class . '">' . $title_html . '</' . $tag . '>';
 					break;
 				case 'heading':
-					$settings = isset($el['settings']) ? $el['settings'] : array();
 					$tag = !empty($settings['html_tag']) ? sanitize_key($settings['html_tag']) : 'h2';
 					$valid_tags = array('h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'div', 'span', 'p');
 					if (!in_array($tag, $valid_tags, true)) {
@@ -1434,7 +1435,6 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					echo '</' . $tag . '>';
 					break;
 				case 'text_editor':
-					$settings = isset($el['settings']) ? $el['settings'] : array();
 					$tag = !empty($settings['html_tag']) ? sanitize_key($settings['html_tag']) : 'div';
 					$valid_tags = array('div', 'p', 'span');
 					if (!in_array($tag, $valid_tags, true)) {
@@ -1446,20 +1446,19 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				case 'html_code':
 				case 'custom_html':
 				case 'html':
-					$settings = isset($el['settings']) ? $el['settings'] : array();
 					$html = isset($settings['html_content']) ? $settings['html_content'] : (isset($settings['code']) ? $settings['code'] : '');
 					$css = isset($settings['custom_css']) ? $settings['custom_css'] : '';
 					$js = isset($settings['custom_js']) ? $settings['custom_js'] : '';
 
 					echo '<div class="sppcfw-custom-html-wrapper' . $el_class . '">';
 					if (!empty($css)) {
-						echo '<style>' . $css . '</style>';
+						echo '<style type="text/css">' . $css . '</style>';
 					}
 					if (!empty($html)) {
 						echo do_shortcode($html);
 					}
 					if (!empty($js)) {
-						echo '<script>' . $js . '</script>';
+						echo '<script type="text/javascript">' . $js . '</script>';
 					}
 					echo '</div>';
 					break;
