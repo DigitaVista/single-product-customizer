@@ -577,6 +577,20 @@
 		return null;
 	}
 
+	function findRootContainer(tree, targetId) {
+		for (const cont of tree) {
+			if (cont.id === targetId) return cont;
+			if (findElementInTree([cont], targetId)) return cont;
+		}
+		return null;
+	}
+
+	function isDescendantOf(tree, ancestorId, targetId) {
+		const ancestor = findElementInTree(tree, ancestorId);
+		if (!ancestor || !ancestor.children) return false;
+		return !!findElementInTree(ancestor.children, targetId);
+	}
+
 	function updateElementInTree(tree, targetId, updateFn) {
 		return tree.map(el => {
 			if (el.id === targetId) {
@@ -640,6 +654,27 @@
 	function moveElementInTree(tree, sourceId, targetParentId, targetSlot) {
 		const elementToMove = findElementInTree(tree, sourceId);
 		if (!elementToMove) return tree;
+
+		// Guard: Flexbox container can NEVER be nested inside another container or column
+		if (elementToMove.type === 'container') {
+			targetParentId = null;
+		}
+
+		// Guard: Column can NEVER be nested inside another column or widget
+		if (elementToMove.type === 'column') {
+			if (targetParentId) {
+				const targetParentEl = findElementInTree(tree, targetParentId);
+				if (targetParentEl && targetParentEl.type === 'column') {
+					const parentContainer = findParentInTree(tree, targetParentId);
+					targetParentId = parentContainer ? parentContainer.id : null;
+				}
+			}
+		}
+
+		// Guard: Prevent moving an element into its own descendant
+		if (targetParentId && isDescendantOf(tree, sourceId, targetParentId)) {
+			return tree;
+		}
 
 		const sourceParent = findParentInTree(tree, sourceId);
 		const sourceParentId = sourceParent ? sourceParent.id : null;
@@ -5944,6 +5979,20 @@
 						ref: contentRef,
 						className: 'sppcfw-p-2 sppcfw-overflow-y-auto custom-scrollbar sppcfw-space-y-1',
 						style: { height: `${contentHeight}px`, maxHeight: '400px', minHeight: '100px' },
+						onDragOver: e => {
+							e.preventDefault();
+						},
+						onDrop: e => {
+							e.preventDefault();
+							const textData = e.dataTransfer.getData('text/plain');
+							if (textData && textData.indexOf('structure_move:') === 0) {
+								const sourceId = textData.replace('structure_move:', '');
+								const sourceElement = findElementInTree(elements, sourceId);
+								if (sourceElement && sourceElement.type === 'container') {
+									setElements(prev => moveElementInTree(prev, sourceId, null, prev.length));
+								}
+							}
+						},
 					},
 					elements.length === 0
 						? h('div', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af] sppcfw-text-center sppcfw-py-4' }, 'No elements on canvas')
@@ -5985,6 +6034,7 @@
 		function handleDragStart(e) {
 			e.stopPropagation();
 			e.dataTransfer.setData('text/plain', 'structure_move:' + item.id);
+			e.dataTransfer.effectAllowed = 'move';
 			window.__sppcfw_dragged_id = item.id;
 		}
 
@@ -5996,6 +6046,7 @@
 		function handleDragOver(e) {
 			e.preventDefault();
 			e.stopPropagation();
+			e.dataTransfer.dropEffect = 'move';
 			if (window.__sppcfw_dragged_id === item.id) {
 				if (dropIndicator !== null) setDropIndicator(null);
 				return;
@@ -6018,19 +6069,72 @@
 		function handleDrop(e) {
 			e.preventDefault();
 			e.stopPropagation();
-			const pos = dropIndicator;
+			const rect = e.currentTarget.getBoundingClientRect();
+			const pos = dropIndicator || (e.clientY < rect.top + rect.height / 2 ? 'top' : 'bottom');
 			setDropIndicator(null);
 			window.__sppcfw_dragged_id = null;
 
 			const textData = e.dataTransfer.getData('text/plain');
 			if (textData && textData.indexOf('structure_move:') === 0) {
 				const sourceId = textData.replace('structure_move:', '');
-				if (sourceId && sourceId !== item.id) {
-					if (item.type === 'container' || item.type === 'column') {
+				if (!sourceId || sourceId === item.id) return;
+
+				const sourceElement = findElementInTree(elements, sourceId);
+				if (!sourceElement) return;
+
+				if (sourceElement.type === 'container') {
+					// Containers can ONLY reorder at root level (never nested in container or column)
+					if (item.type === 'container') {
+						const targetIndex = pos === 'bottom' ? index + 1 : index;
+						setElements(prev => moveElementInTree(prev, sourceId, null, targetIndex));
+					} else {
+						const rootCont = findRootContainer(elements, item.id);
+						const rootIdx = elements.findIndex(el => el.id === (rootCont ? rootCont.id : item.id));
+						if (rootIdx !== -1) {
+							const targetIndex = pos === 'bottom' ? rootIdx + 1 : rootIdx;
+							setElements(prev => moveElementInTree(prev, sourceId, null, targetIndex));
+						}
+					}
+				} else if (sourceElement.type === 'column') {
+					// Columns can ONLY live inside a container (never inside another column or widget)
+					if (item.type === 'column') {
+						// Dropped on a sibling column
+						const targetParentId = parentId;
+						const targetIndex = pos === 'bottom' ? index + 1 : index;
+						setElements(prev => moveElementInTree(prev, sourceId, targetParentId, targetIndex));
+					} else if (item.type === 'container') {
+						// Dropped onto container header -> place inside this container
 						const targetParentId = item.id;
-						const targetIndex = item.children ? item.children.length : 0;
+						const targetIndex = pos === 'top' ? 0 : (item.children ? item.children.length : 0);
 						setElements(prev => moveElementInTree(prev, sourceId, targetParentId, targetIndex));
 					} else {
+						// Dropped on a widget inside some column -> place before/after that column
+						const targetCol = findParentInTree(elements, item.id);
+						if (targetCol) {
+							const targetCont = findParentInTree(elements, targetCol.id);
+							if (targetCont && targetCont.children) {
+								const colIdx = targetCont.children.findIndex(c => c.id === targetCol.id);
+								const targetParentId = targetCont.id;
+								const targetIndex = pos === 'bottom' ? colIdx + 1 : colIdx;
+								setElements(prev => moveElementInTree(prev, sourceId, targetParentId, targetIndex));
+							}
+						}
+					}
+				} else {
+					// Widgets (can live inside columns or containers)
+					if (item.type === 'container') {
+						if (item.children && item.children.length > 0) {
+							const targetCol = pos === 'top' ? item.children[0] : item.children[item.children.length - 1];
+							const targetParentId = targetCol.id;
+							const targetIndex = pos === 'top' ? 0 : (targetCol.children ? targetCol.children.length : 0);
+							setElements(prev => moveElementInTree(prev, sourceId, targetParentId, targetIndex));
+						}
+					} else if (item.type === 'column') {
+						const targetParentId = item.id;
+						const targetIndex = pos === 'top' ? 0 : (item.children ? item.children.length : 0);
+						setElements(prev => moveElementInTree(prev, sourceId, targetParentId, targetIndex));
+					} else {
+						// Target is another widget
 						const targetParentId = parentId;
 						const targetIndex = pos === 'bottom' ? index + 1 : index;
 						setElements(prev => moveElementInTree(prev, sourceId, targetParentId, targetIndex));
@@ -6064,37 +6168,38 @@
 		return h(
 			'div',
 			{
-				draggable: true,
-				onDragStart: handleDragStart,
-				onDragEnd: handleDragEnd,
-				onDragOver: handleDragOver,
-				onDragLeave: handleDragLeave,
-				onDrop: handleDrop,
 				className: 'sppcfw-select-none sppcfw-relative',
 			},
-			dropIndicator === 'top' &&
-				h('div', { className: 'sppcfw-absolute -top-0.5 sppcfw-left-0 sppcfw-right-0 sppcfw-h-0.5 sppcfw-bg-[#9333ea] sppcfw-rounded-full sppcfw-z-30 sppcfw-shadow-[0_0_6px_#9333ea] sppcfw-pointer-events-none' }),
-			dropIndicator === 'bottom' &&
-				h('div', { className: 'sppcfw-absolute -bottom-0.5 sppcfw-left-0 sppcfw-right-0 sppcfw-h-0.5 sppcfw-bg-[#9333ea] sppcfw-rounded-full sppcfw-z-30 sppcfw-shadow-[0_0_6px_#9333ea] sppcfw-pointer-events-none' }),
 			h(
 				'div',
 				{
+					draggable: true,
+					onDragStart: handleDragStart,
+					onDragEnd: handleDragEnd,
+					onDragOver: handleDragOver,
+					onDragLeave: handleDragLeave,
+					onDrop: handleDrop,
 					onClick: e => {
 						e.stopPropagation();
 						setSelectedElementId(item.id);
 					},
-					className: `sppcfw-flex sppcfw-items-center sppcfw-justify-between sppcfw-p-1.5 sppcfw-rounded sppcfw-cursor-pointer sppcfw-text-xs sppcfw-transition-colors ${
+					className: `sppcfw-flex sppcfw-items-center sppcfw-justify-between sppcfw-p-1.5 sppcfw-rounded sppcfw-cursor-pointer sppcfw-text-xs sppcfw-transition-colors sppcfw-relative ${
 						isSelected ? 'sppcfw-bg-[#9333ea] sppcfw-text-white sppcfw-font-bold' : 'hover:sppcfw-bg-[#212b39] sppcfw-text-[#cfc2d7]'
 					}`,
 				},
+				dropIndicator === 'top' &&
+					h('div', { className: 'sppcfw-absolute -top-1 sppcfw-left-0 sppcfw-right-0 sppcfw-h-[3px] sppcfw-bg-[#c084fc] sppcfw-rounded-full sppcfw-z-30 sppcfw-shadow-[0_0_8px_#c084fc] sppcfw-pointer-events-none' }),
+				dropIndicator === 'bottom' &&
+					h('div', { className: 'sppcfw-absolute -bottom-1 sppcfw-left-0 sppcfw-right-0 sppcfw-h-[3px] sppcfw-bg-[#c084fc] sppcfw-rounded-full sppcfw-z-30 sppcfw-shadow-[0_0_8px_#c084fc] sppcfw-pointer-events-none' }),
 				h(
 					'div',
-					{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-overflow-hidden' },
+					{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-overflow-hidden sppcfw-flex-1 sppcfw-mr-2' },
 					hasChildren &&
 						h(
 							'button',
 							{
-								className: 'sppcfw-text-xs hover:sppcfw-text-white',
+								type: 'button',
+								className: 'sppcfw-text-xs hover:sppcfw-text-white sppcfw-w-4 sppcfw-h-4 sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-flex-shrink-0',
 								onClick: e => {
 									e.stopPropagation();
 									setIsCollapsed(!isCollapsed);
@@ -6102,12 +6207,12 @@
 							},
 							isCollapsed ? '▶' : '▼'
 						),
-					h('span', { className: 'material-symbols-outlined sppcfw-text-base sppcfw-text-[#ddb8ff]' }, getItemIcon()),
+					h('span', { className: 'material-symbols-outlined sppcfw-text-base sppcfw-text-[#ddb8ff] sppcfw-flex-shrink-0' }, getItemIcon()),
 					h('span', { className: 'sppcfw-font-semibold sppcfw-truncate' }, item.label)
 				),
 				h(
 					'span',
-					{ className: 'sppcfw-text-[9px] font-mono sppcfw-opacity-80 sppcfw-uppercase sppcfw-px-1 sppcfw-rounded sppcfw-bg-[#091421]' },
+					{ className: 'sppcfw-text-[9px] font-mono sppcfw-opacity-80 sppcfw-uppercase sppcfw-px-1.5 sppcfw-py-0.5 sppcfw-rounded sppcfw-bg-[#091421] sppcfw-flex-shrink-0' },
 					item.type === 'container' ? (item.settings && item.settings.width_mode === 'boxed' ? 'Boxed' : 'Full') : item.type === 'column' ? (item.settings && item.settings.flex_width ? item.settings.flex_width : 'Col') : item.type
 				)
 			),
