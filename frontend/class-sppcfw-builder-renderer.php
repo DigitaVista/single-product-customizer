@@ -533,6 +533,17 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 			';
 
 			if (!empty($layout) && is_array($layout)) {
+				$custom_css .= '
+					@media (min-width: 1025px) {
+						.sppcfw-hide-desktop { display: none !important; }
+					}
+					@media (min-width: 768px) and (max-width: 1024px) {
+						.sppcfw-hide-tablet { display: none !important; }
+					}
+					@media (max-width: 767px) {
+						.sppcfw-hide-mobile { display: none !important; }
+					}
+				';
 				$custom_css .= $this->sppcfw_generate_recursive_styles($layout, 'desktop');
 				$tablet_css = $this->sppcfw_generate_recursive_styles($layout, 'tablet');
 				if (!empty($tablet_css)) {
@@ -711,6 +722,41 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				};
 
 				if ($id) {
+					// Responsive Visibility Rules
+					$hide_desktop = !empty($advanced['hide_on_desktop']);
+					$hide_tablet = !empty($advanced['hide_on_tablet']);
+					$hide_mobile = !empty($advanced['hide_on_mobile']);
+
+					if ('desktop' === $device) {
+						if ($hide_desktop) {
+							$css .= ".sppcfw-el-{$id} { display: none !important; }";
+						}
+					} elseif ('tablet' === $device) {
+						if ($hide_tablet) {
+							$css .= ".sppcfw-el-{$id} { display: none !important; }";
+						} elseif ($hide_desktop && !$hide_tablet) {
+							if ('container' === $type) {
+								$css .= ".sppcfw-el-{$id} { display: block !important; }";
+							} elseif ('column' === $type) {
+								$css .= ".sppcfw-el-{$id} { display: flex !important; }";
+							} else {
+								$css .= ".sppcfw-el-{$id} { display: block !important; }";
+							}
+						}
+					} elseif ('mobile' === $device) {
+						if ($hide_mobile) {
+							$css .= ".sppcfw-el-{$id} { display: none !important; }";
+						} elseif (($hide_desktop || $hide_tablet) && !$hide_mobile) {
+							if ('container' === $type) {
+								$css .= ".sppcfw-el-{$id} { display: block !important; }";
+							} elseif ('column' === $type) {
+								$css .= ".sppcfw-el-{$id} { display: flex !important; }";
+							} else {
+								$css .= ".sppcfw-el-{$id} { display: block !important; }";
+							}
+						}
+					}
+
 					$css .= ".sppcfw-el-{$id} {";
 					if ('container' === $type) {
 						$width_mode = $this->sppcfw_get_device_prop($settings, 'width_mode', $device, 'boxed');
@@ -1287,13 +1333,27 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				$id = isset($el['id']) ? esc_attr($el['id']) : '';
 				$settings = isset($el['settings']) ? $el['settings'] : array();
 				$advanced = isset($el['advanced']) ? $el['advanced'] : array();
-				$css_class = !empty($advanced['custom_class']) ? esc_attr($advanced['custom_class']) : '';
+				$custom_classes = !empty($advanced['custom_class']) ? esc_attr($advanced['custom_class']) : (!empty($advanced['css_classes']) ? esc_attr($advanced['css_classes']) : '');
+				$custom_id = !empty($advanced['css_id']) ? ' id="' . esc_attr($advanced['css_id']) . '"' : '';
+
+				$hide_classes = '';
+				if (!empty($advanced['hide_on_desktop'])) {
+					$hide_classes .= ' sppcfw-hide-desktop';
+				}
+				if (!empty($advanced['hide_on_tablet'])) {
+					$hide_classes .= ' sppcfw-hide-tablet';
+				}
+				if (!empty($advanced['hide_on_mobile'])) {
+					$hide_classes .= ' sppcfw-hide-mobile';
+				}
+
+				$combined_class = ' sppcfw-el-' . $id . $hide_classes . (!empty($custom_classes) ? ' ' . $custom_classes : '');
 
 				if ('container' === $type) {
 					$is_full_width = (isset($settings['width_mode']) && 'full' === $settings['width_mode']) || (isset($settings['boxed_width']) && '100%' === $settings['boxed_width']) || (isset($advanced['width_mode']) && 'Full Width (100%)' === $advanced['width_mode']);
 					$width_mode = $is_full_width ? 'full' : 'boxed';
 
-					echo '<div class="sppcfw-builder-section sppcfw-container-' . esc_attr($width_mode) . ' sppcfw-el-' . $id . (!empty($css_class) ? ' ' . $css_class : '') . '">';
+					echo '<div' . $custom_id . ' class="sppcfw-builder-section sppcfw-container-' . esc_attr($width_mode) . $combined_class . '">';
 					echo '<div class="sppcfw-flex-row">';
 					if (!empty($el['children'])) {
 						$this->sppcfw_render_elements_recursive($el['children']);
@@ -1301,15 +1361,14 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					echo '</div>';
 					echo '</div>';
 				} elseif ('column' === $type) {
-					echo '<div class="sppcfw-column sppcfw-el-' . $id . ' ' . $css_class . '">';
+					echo '<div' . $custom_id . ' class="sppcfw-column' . $combined_class . '">';
 					if (!empty($el['children'])) {
 						$this->sppcfw_render_elements_recursive($el['children']);
 					}
 					echo '</div>';
 				} else {
 					// Render Widget
-					$widget_el_class = ' sppcfw-el-' . $id;
-					echo '<div class="sppcfw-widget-item' . $widget_el_class . (!empty($css_class) ? ' ' . $css_class : '') . '">';
+					echo '<div' . $custom_id . ' class="sppcfw-widget-item' . $combined_class . '">';
 					$this->sppcfw_render_single_widget($el);
 					echo '</div>';
 				}

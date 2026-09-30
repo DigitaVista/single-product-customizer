@@ -591,6 +591,15 @@
 		return !!findElementInTree(ancestor.children, targetId);
 	}
 
+	function isElementHiddenOnDevice(el, deviceView) {
+		if (!el || !el.advanced) return false;
+		const adv = el.advanced;
+		if (deviceView === 'desktop' && (adv.hide_on_desktop === true || adv.hide_on_desktop === 'true' || adv.hide_on_desktop === 1 || adv.hide_on_desktop === '1')) return true;
+		if (deviceView === 'tablet' && (adv.hide_on_tablet === true || adv.hide_on_tablet === 'true' || adv.hide_on_tablet === 1 || adv.hide_on_tablet === '1')) return true;
+		if (deviceView === 'mobile' && (adv.hide_on_mobile === true || adv.hide_on_mobile === 'true' || adv.hide_on_mobile === 1 || adv.hide_on_mobile === '1')) return true;
+		return false;
+	}
+
 	function updateElementInTree(tree, targetId, updateFn) {
 		return tree.map(el => {
 			if (el.id === targetId) {
@@ -1448,6 +1457,7 @@
 						removeElement,
 						openElementsTab,
 						closeStructure: () => setIsStructureOpen(false),
+						deviceView,
 					})
 			),
 
@@ -2780,7 +2790,10 @@
 			return getResponsiveProp(selectedElement.styles, key, deviceView);
 		}
 
-		function getAdvanced(key) {
+		function getAdvanced(key, isFixed = false) {
+			if (isFixed) {
+				return selectedElement.advanced ? selectedElement.advanced[key] : undefined;
+			}
 			const advVal = getResponsiveProp(selectedElement.advanced, key, deviceView);
 			if (advVal !== undefined && advVal !== null && advVal !== '') {
 				return advVal;
@@ -2819,8 +2832,8 @@
 			updateElementProperties(updated);
 		}
 
-		function handleAdvancedChange(key, value) {
-			const targetKey = getDeviceKey(key, deviceView);
+		function handleAdvancedChange(key, value, isFixed = false) {
+			const targetKey = isFixed ? key : getDeviceKey(key, deviceView);
 			const updatedStyles = { ...selectedElement.styles };
 			if (key.indexOf('margin_') === 0 || key.indexOf('padding_') === 0) {
 				updatedStyles[targetKey] = value;
@@ -5538,8 +5551,8 @@
 							h('input', {
 								type: 'number',
 								className: 'sppcfw-w-24 sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1 sppcfw-text-xs sppcfw-text-center sppcfw-text-white focus:sppcfw-outline-none',
-								value: getAdvanced('z_index') || '',
-								onChange: e => handleAdvancedChange('z_index', e.target.value),
+								value: getAdvanced('z_index', true) || '',
+								onChange: e => handleAdvancedChange('z_index', e.target.value, true),
 							})
 						),
 						h(
@@ -5549,9 +5562,9 @@
 							h('input', {
 								type: 'text',
 								className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none',
-								value: getAdvanced('css_id') || '',
+								value: getAdvanced('css_id', true) || '',
 								placeholder: 'e.g. my-custom-id',
-								onChange: e => handleAdvancedChange('css_id', e.target.value),
+								onChange: e => handleAdvancedChange('css_id', e.target.value, true),
 							})
 						),
 						h(
@@ -5561,11 +5574,11 @@
 							h('input', {
 								type: 'text',
 								className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none',
-								value: getAdvanced('css_classes') || (getAdvanced('custom_class') || ''),
+								value: getAdvanced('css_classes', true) || (getAdvanced('custom_class', true) || ''),
 								placeholder: 'e.g. custom-class-1 custom-class-2',
 								onChange: e => {
-									handleAdvancedChange('css_classes', e.target.value);
-									handleAdvancedChange('custom_class', e.target.value);
+									handleAdvancedChange('css_classes', e.target.value, true);
+									handleAdvancedChange('custom_class', e.target.value, true);
 								},
 							})
 						)
@@ -5585,12 +5598,12 @@
 							h(
 								'div',
 								{ key: res.key, className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, res.label),
+								h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, res.label),
 								h('input', {
 									type: 'checkbox',
 									className: 'sppcfw-accent-[#9333ea] sppcfw-w-4 sppcfw-h-4 sppcfw-cursor-pointer',
-									checked: !!getAdvanced(res.key),
-									onChange: e => handleAdvancedChange(res.key, e.target.checked),
+									checked: !!getAdvanced(res.key, true),
+									onChange: e => handleAdvancedChange(res.key, e.target.checked, true),
 								})
 							)
 						)
@@ -5806,7 +5819,7 @@
 	}
 
 	// 5. Right Floating Structure Panel (Dockable Window - Draggable bounded to workspace & Vertically Resizable)
-	function FloatingStructurePanel({ elements, setElements, selectedElementId, setSelectedElementId, removeElement, openElementsTab, closeStructure }) {
+	function FloatingStructurePanel({ elements, setElements, selectedElementId, setSelectedElementId, removeElement, openElementsTab, closeStructure, deviceView = 'desktop' }) {
 		const [isCollapsed, setIsCollapsed] = useState(false);
 		const [position, setPosition] = useState({ top: 16, left: null, right: 16 });
 		const [isDragging, setIsDragging] = useState(false);
@@ -6006,6 +6019,7 @@
 									setElements,
 									selectedElementId,
 									setSelectedElementId,
+									deviceView,
 								})
 						  )
 				),
@@ -6025,11 +6039,13 @@
 	}
 
 	// Recursive Structure Tree Node Component
-	function StructureTreeNode({ item, index, parentId, elements, setElements, selectedElementId, setSelectedElementId }) {
+	function StructureTreeNode({ item, index, parentId, elements, setElements, selectedElementId, setSelectedElementId, deviceView = 'desktop' }) {
 		const isSelected = selectedElementId === item.id;
 		const hasChildren = item.children && item.children.length > 0;
 		const [isCollapsed, setIsCollapsed] = useState(false);
 		const [dropIndicator, setDropIndicator] = useState(null);
+
+		const isHiddenOnCurrent = isElementHiddenOnDevice(item, deviceView);
 
 		function handleDragStart(e) {
 			e.stopPropagation();
@@ -6184,7 +6200,7 @@
 						setSelectedElementId(item.id);
 					},
 					className: `sppcfw-flex sppcfw-items-center sppcfw-justify-between sppcfw-p-1.5 sppcfw-rounded sppcfw-cursor-pointer sppcfw-text-xs sppcfw-transition-colors sppcfw-relative ${
-						isSelected ? 'sppcfw-bg-[#9333ea] sppcfw-text-white sppcfw-font-bold' : 'hover:sppcfw-bg-[#212b39] sppcfw-text-[#cfc2d7]'
+						isSelected ? 'sppcfw-bg-[#9333ea] sppcfw-text-white sppcfw-font-bold' : isHiddenOnCurrent ? 'hover:sppcfw-bg-[#212b39] sppcfw-text-gray-400 sppcfw-opacity-70' : 'hover:sppcfw-bg-[#212b39] sppcfw-text-[#cfc2d7]'
 					}`,
 				},
 				dropIndicator === 'top' &&
@@ -6208,7 +6224,12 @@
 							isCollapsed ? '▶' : '▼'
 						),
 					h('span', { className: 'material-symbols-outlined sppcfw-text-base sppcfw-text-[#ddb8ff] sppcfw-flex-shrink-0' }, getItemIcon()),
-					h('span', { className: 'sppcfw-font-semibold sppcfw-truncate' }, item.label)
+					h('span', { className: 'sppcfw-font-semibold sppcfw-truncate' }, item.label),
+					isHiddenOnCurrent &&
+						h('span', {
+							className: 'material-symbols-outlined sppcfw-text-xs sppcfw-text-amber-400 sppcfw-flex-shrink-0',
+							title: `Hidden on ${deviceView}`,
+						}, 'visibility_off')
 				),
 				h(
 					'span',
@@ -6232,6 +6253,7 @@
 							setElements,
 							selectedElementId,
 							setSelectedElementId,
+							deviceView,
 						})
 					)
 				)
@@ -6408,6 +6430,8 @@
 			}
 		}
 
+		const isContainerHidden = isElementHiddenOnDevice(container, deviceView);
+
 		return h(
 			'div',
 			{
@@ -6422,7 +6446,7 @@
 				},
 				className: `sppcfw-builder-container-item sppcfw-relative sppcfw-tab-group sppcfw-transition-all sppcfw-rounded-lg ${
 					isContainerDragOver ? 'is-drag-over sppcfw-bg-[#faf5ff]' : isSelected ? 'is-selected' : ''
-				} ${container.advanced && container.advanced.custom_class ? container.advanced.custom_class : ''}`,
+				} ${isContainerHidden ? 'sppcfw-hidden-device-preview' : ''} ${container.advanced && container.advanced.custom_class ? container.advanced.custom_class : ''}`,
 				style: {
 					maxWidth: widthMode === 'boxed' ? boxedWidth : '100%',
 					width: '100%',
@@ -6443,6 +6467,16 @@
 					marginLeft: marLeft,
 				},
 			},
+
+			isContainerHidden &&
+				h(
+					'div',
+					{
+						className: 'sppcfw-absolute sppcfw-top-1.5 sppcfw-left-1.5 sppcfw-bg-gray-900/90 sppcfw-text-amber-300 sppcfw-text-[10px] sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded sppcfw-flex sppcfw-items-center sppcfw-gap-1 sppcfw-z-20 sppcfw-pointer-events-none sppcfw-border sppcfw-border-amber-500/50 sppcfw-shadow-sm',
+					},
+					h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, 'visibility_off'),
+					`Hidden on ${deviceView.charAt(0).toUpperCase() + deviceView.slice(1)}`
+				),
 
 			// Toolbar Badge & Handles
 			isSelected &&
@@ -6600,6 +6634,7 @@
 		}
 
 		const colBgStyles = computeBackgroundStyles(column.styles, deviceView);
+		const isColHidden = isElementHiddenOnDevice(column, deviceView);
 
 		return h(
 			'div',
@@ -6613,7 +6648,7 @@
 				onDrop: handleColumnDrop,
 				className: `builder-column-item sppcfw-flex-1 sppcfw-min-w-[180px] sppcfw-p-3 sppcfw-relative sppcfw-transition-all sppcfw-min-h-[120px] ${
 					isColumnDragOver ? 'is-drag-over sppcfw-bg-[#faf5ff]' : isSelected ? 'is-selected' : 'sppcfw-bg-[#f9fafb]'
-				}`,
+				} ${isColHidden ? 'sppcfw-hidden-device-preview' : ''}`,
 				style: {
 					flex: flexWidth === '100%' ? '1 1 100%' : `1 1 calc(${flexWidth} - 16px)`,
 					width: flexWidth === '100%' ? '100%' : undefined,
@@ -6691,6 +6726,16 @@
 						},
 						'✕'
 					)
+				),
+
+			isColHidden &&
+				h(
+					'div',
+					{
+						className: 'sppcfw-absolute sppcfw-top-1.5 sppcfw-left-1.5 sppcfw-bg-gray-900/90 sppcfw-text-amber-300 sppcfw-text-[10px] sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded sppcfw-flex sppcfw-items-center sppcfw-gap-1 sppcfw-z-20 sppcfw-pointer-events-none sppcfw-border sppcfw-border-amber-500/50 sppcfw-shadow-sm',
+					},
+					h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, 'visibility_off'),
+					`Hidden on ${deviceView.charAt(0).toUpperCase() + deviceView.slice(1)}`
 				),
 
 			column.children && column.children.length > 0
@@ -6807,6 +6852,8 @@
 			}
 		}
 
+		const isWidgetHidden = isElementHiddenOnDevice(widget, deviceView);
+
 		return h(
 			'div',
 			{
@@ -6822,7 +6869,7 @@
 				},
 				className: `widget-canvas-item sppcfw-p-3 sppcfw-rounded sppcfw-cursor-grab active:sppcfw-cursor-grabbing sppcfw-relative sppcfw-tab-group ${
 					isSelected ? 'is-selected sppcfw-ring-2 sppcfw-ring-[#9333ea]' : ''
-				} ${widget.advanced && widget.advanced.custom_class ? widget.advanced.custom_class : ''}`,
+				} ${isWidgetHidden ? 'sppcfw-hidden-device-preview' : ''} ${widget.advanced && widget.advanced.custom_class ? widget.advanced.custom_class : ''}`,
 				style: {
 					color: widget.type === 'product_add_to_cart' ? 'inherit' : (getResponsiveProp(widget.styles, 'text_color', deviceView) || 'inherit'),
 					fontFamily: widget.type === 'product_add_to_cart' ? 'inherit' : ((getResponsiveProp(widget.styles, 'font_family', deviceView) && getResponsiveProp(widget.styles, 'font_family', deviceView) !== 'Inherit') ? getResponsiveProp(widget.styles, 'font_family', deviceView) : 'inherit'),
@@ -6875,6 +6922,17 @@
 						},
 						'✕'
 					)
+				),
+
+			isWidgetHidden &&
+				!isSelected &&
+				h(
+					'div',
+					{
+						className: 'sppcfw-absolute sppcfw-top-1 sppcfw-right-1 sppcfw-bg-gray-900/90 sppcfw-text-amber-300 sppcfw-text-[10px] sppcfw-px-1.5 sppcfw-py-0.5 sppcfw-rounded sppcfw-flex sppcfw-items-center sppcfw-gap-1 sppcfw-z-10 sppcfw-pointer-events-none sppcfw-border sppcfw-border-amber-500/50 sppcfw-shadow-sm',
+					},
+					h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, 'visibility_off'),
+					`Hidden on ${deviceView.charAt(0).toUpperCase() + deviceView.slice(1)}`
 				),
 
 			renderLiveWidgetContent(widget, sampleData, pageSettings, deviceView)
