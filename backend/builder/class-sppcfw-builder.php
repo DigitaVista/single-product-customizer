@@ -414,6 +414,61 @@ if (!class_exists('SPPCFW_Builder')) {
 				);
 			}
 
+			// 4. Variations / Attributes
+			$variations_data = array();
+			if ($product->is_type('variable')) {
+				$variation_attributes = $product->get_variation_attributes();
+				if (!empty($variation_attributes)) {
+					foreach ($variation_attributes as $attr_name => $options) {
+						$variations_data[] = array(
+							'name'    => $attr_name,
+							'label'   => wc_attribute_label($attr_name),
+							'options' => array_values($options),
+						);
+					}
+				}
+			}
+
+			// 5. Related Products
+			$related_products = array();
+			if (function_exists('wc_get_related_products')) {
+				$rel_ids = wc_get_related_products($product_id, 4);
+				if (!empty($rel_ids)) {
+					foreach ($rel_ids as $r_id) {
+						$r_prod = wc_get_product($r_id);
+						if ($r_prod) {
+							$r_img_id = $r_prod->get_image_id();
+							$r_img = $r_img_id ? wp_get_attachment_image_url($r_img_id, 'woocommerce_thumbnail') : wc_placeholder_img_src();
+							$related_products[] = array(
+								'id'        => $r_id,
+								'title'     => $r_prod->get_name(),
+								'price'     => wc_price($r_prod->get_price()),
+								'image_url' => $r_img ? $r_img : '',
+							);
+						}
+					}
+				}
+			}
+
+			// 6. Upsell Products
+			$upsell_products = array();
+			$up_ids = $product->get_upsell_ids();
+			if (!empty($up_ids)) {
+				foreach ($up_ids as $u_id) {
+					$u_prod = wc_get_product($u_id);
+					if ($u_prod) {
+						$u_img_id = $u_prod->get_image_id();
+						$u_img = $u_img_id ? wp_get_attachment_image_url($u_img_id, 'woocommerce_thumbnail') : wc_placeholder_img_src();
+						$upsell_products[] = array(
+							'id'        => $u_id,
+							'title'     => $u_prod->get_name(),
+							'price'     => wc_price($u_prod->get_price()),
+							'image_url' => $u_img ? $u_img : '',
+						);
+					}
+				}
+			}
+
 			$data = array(
 				'id' => $product->get_id(),
 				'title' => $product->get_name(),
@@ -437,6 +492,9 @@ if (!class_exists('SPPCFW_Builder')) {
 				'description' => $product->get_description(),
 				'categories' => !empty($cat_names) && !is_wp_error($cat_names) ? implode(', ', $cat_names) : '',
 				'tags' => !empty($tag_names) && !is_wp_error($tag_names) ? implode(', ', $tag_names) : '',
+				'variations' => $variations_data,
+				'related_products' => $related_products,
+				'upsell_products' => $upsell_products,
 				'meta_groups' => $meta_groups,
 			);
 

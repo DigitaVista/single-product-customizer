@@ -17,7 +17,30 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 		 */
 		public function __construct()
 		{
-			add_action('wp', array($this, 'sppcfw_maybe_init_frontend_override'));
+			add_action('wp', array($this, 'sppcfw_maybe_init_frontend_override'), 5);
+			add_filter('woocommerce_has_block_template', array($this, 'sppcfw_disable_block_template_for_builder'), 999, 2);
+		}
+
+		/**
+		 * Disable WooCommerce block template in Full Site Editing (FSE) block themes
+		 * so the single product builder template renders cleanly without duplicate block elements.
+		 *
+		 * @param bool   $has_template  Whether template exists.
+		 * @param string $template_name Template name.
+		 * @return bool
+		 */
+		public function sppcfw_disable_block_template_for_builder($has_template, $template_name)
+		{
+			if ('single-product' === $template_name) {
+				$is_preview = isset($_GET['sppcfw_preview']) && isset($_GET['template_id']) && current_user_can('manage_options');
+				$enable_builder = (int) get_option('sppcfw_enable_single_product_builder', 0);
+				$enable_quick_checkout = (int) get_option('sppcfw_enable_quick_checkout', 0);
+
+				if ($is_preview || (!empty($enable_builder) && empty($enable_quick_checkout))) {
+					return false;
+				}
+			}
+			return $has_template;
 		}
 
 		/**
@@ -66,10 +89,10 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 
 			// Hook into WooCommerce single product summary to render builder layout
 			add_action('woocommerce_before_single_product_summary', array($this, 'sppcfw_render_builder_template'), 5);
-			// Remove default WooCommerce breadcrumb and sidebar when custom builder template is active
+
+			// 1. Core WooCommerce hooks
 			remove_action('woocommerce_before_main_content', 'woocommerce_breadcrumb', 20);
 			remove_action('woocommerce_sidebar', 'woocommerce_get_sidebar', 10);
-			// Remove default WooCommerce single product hooks to avoid duplication when custom template is active
 			remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10);
 			remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20);
 			remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_title', 5);
@@ -82,6 +105,50 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 			remove_action('woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 10);
 			remove_action('woocommerce_after_single_product_summary', 'woocommerce_upsell_display', 15);
 			remove_action('woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20);
+
+			// 2. Astra Theme Compatibility
+			add_filter('astra_woo_single_product_structure', '__return_empty_array', 999);
+			add_filter('astra_woo_related_products', '__return_false', 999);
+			remove_action('woocommerce_single_product_summary', 'woocommerce_breadcrumb', 2);
+			remove_all_actions('astra_woo_single_title_before');
+			remove_all_actions('astra_woo_single_title_after');
+			remove_all_actions('astra_woo_single_price_before');
+			remove_all_actions('astra_woo_single_price_after');
+			remove_all_actions('astra_woo_single_rating_before');
+			remove_all_actions('astra_woo_single_rating_after');
+			remove_all_actions('astra_woo_single_short_description_before');
+			remove_all_actions('astra_woo_single_short_description_after');
+			remove_all_actions('astra_woo_single_add_to_cart_before');
+			remove_all_actions('astra_woo_single_add_to_cart_after');
+			remove_all_actions('astra_woo_single_category_before');
+			remove_all_actions('astra_woo_single_category_after');
+
+			// 3. Kadence Theme Compatibility
+			remove_all_actions('kadence_single_product_navigation');
+			remove_all_actions('kadence_single_product_before');
+			remove_all_actions('kadence_single_product_after');
+
+			// 4. OceanWP Theme Compatibility
+			remove_action('woocommerce_before_single_product_summary', 'oceanwp_product_next_prev_nav', 10);
+			remove_action('woocommerce_before_single_product_summary', 'oceanwp_woo_single_product_floating_bar', 10);
+			remove_all_actions('ocean_before_single_product');
+			remove_all_actions('ocean_after_single_product');
+			remove_all_actions('ocean_before_single_product_summary');
+			remove_all_actions('ocean_after_single_product_summary');
+
+			// 5. Storefront Theme Compatibility
+			remove_action('woocommerce_before_single_product_summary', 'storefront_single_product_pagination', 5);
+			remove_action('storefront_after_footer', 'storefront_sticky_single_add_to_cart', 999);
+			remove_action('woocommerce_after_single_product_summary', 'storefront_single_product_pagination', 30);
+
+			// 6. Flatsome Theme Compatibility
+			remove_all_actions('flatsome_single_product_summary_top');
+			remove_all_actions('flatsome_single_product_summary_middle');
+			remove_all_actions('flatsome_single_product_summary_bottom');
+
+			// 7. Woodmart Theme Compatibility
+			remove_all_actions('woodmart_before_single_product_summary');
+			remove_all_actions('woodmart_after_single_product_summary');
 		}
 
 		/**

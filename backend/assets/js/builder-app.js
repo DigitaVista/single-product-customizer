@@ -43,6 +43,22 @@
 		description: 'Full product description placeholder detailing extensive technical specifications and features.',
 		categories: 'Clothing, Featured',
 		tags: 'Customizer, Premium',
+		variations: [
+			{ name: 'pa_color', label: 'Color', options: ['Black', 'Purple', 'Blue'] },
+			{ name: 'pa_size', label: 'Size', options: ['S', 'M', 'L', 'XL'] }
+		],
+		related_products: [
+			{ id: 1, title: 'Demo Related Product 1', price: '$19.99', image_url: '' },
+			{ id: 2, title: 'Demo Related Product 2', price: '$29.99', image_url: '' },
+			{ id: 3, title: 'Demo Related Product 3', price: '$39.99', image_url: '' },
+			{ id: 4, title: 'Demo Related Product 4', price: '$49.99', image_url: '' }
+		],
+		upsell_products: [
+			{ id: 1, title: 'Demo Upsell Product 1', price: '$24.99', image_url: '' },
+			{ id: 2, title: 'Demo Upsell Product 2', price: '$34.99', image_url: '' },
+			{ id: 3, title: 'Demo Upsell Product 3', price: '$44.99', image_url: '' },
+			{ id: 4, title: 'Demo Upsell Product 4', price: '$54.99', image_url: '' }
+		]
 	};
 
 	// Atomic Elements Definitions (Image 1)
@@ -8037,6 +8053,117 @@
 					h('span', { className: 'sppcfw-px-4 sppcfw-py-1 sppcfw-text-sm sppcfw-font-bold sppcfw-text-[#111827]' }, '1'),
 					h('button', { className: 'sppcfw-px-3 sppcfw-py-1 sppcfw-font-bold', style: { backgroundColor: pmbBg, color: pmbColor } }, '+')
 				);
+			case 'variation_swatches': {
+				const variationsList = (safeSample && safeSample.variations && safeSample.variations.length > 0)
+					? safeSample.variations
+					: [
+							{ name: 'pa_color', label: 'Color', options: ['Black', 'Purple', 'Blue'] },
+							{ name: 'pa_size', label: 'Size', options: ['S', 'M', 'L', 'XL'] }
+					  ];
+
+				const colorHexMap = {
+					'black': '#111827',
+					'purple': '#9333ea',
+					'blue': '#3b82f6',
+					'red': '#ef4444',
+					'green': '#10b981',
+					'yellow': '#f59e0b',
+					'white': '#ffffff',
+					'gray': '#6b7280',
+					'grey': '#6b7280',
+					'pink': '#ec4899',
+					'orange': '#f97316'
+				};
+
+				return h(
+					'div',
+					{ className: 'sppcfw-border sppcfw-border-[#e5e7eb] sppcfw-rounded-lg sppcfw-p-3.5 sppcfw-bg-[#f9fafb] sppcfw-space-y-3 sppcfw-my-1' },
+					h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2 sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#111827]' },
+						h('span', { className: 'material-symbols-outlined sppcfw-text-sm sppcfw-text-[#9333ea]' }, 'grid_view'),
+						'Product Variations & Swatches'
+					),
+					h(
+						'div',
+						{ className: 'sppcfw-space-y-2.5' },
+						variationsList.map((attr, aIdx) => {
+							const isColor = (attr.name && attr.name.toLowerCase().includes('color')) || (attr.label && attr.label.toLowerCase().includes('color'));
+							return h(
+								'div',
+								{ key: attr.name || aIdx, className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2' },
+								h('span', { className: 'sppcfw-text-xs sppcfw-font-medium sppcfw-w-16 sppcfw-text-gray-700' }, `${attr.label || attr.name}:`),
+								h(
+									'div',
+									{ className: 'sppcfw-flex sppcfw-gap-1.5 sppcfw-flex-wrap' },
+									(attr.options || []).map((opt, oIdx) => {
+										if (isColor) {
+											const optLower = String(opt).toLowerCase().trim();
+											const hexColor = colorHexMap[optLower] || '#9333ea';
+											return h('span', {
+												key: opt,
+												title: opt,
+												className: `sppcfw-w-6 sppcfw-h-6 sppcfw-rounded-full sppcfw-border-2 sppcfw-shadow-sm sppcfw-cursor-pointer sppcfw-inline-block ${oIdx === 0 ? 'sppcfw-border-[#9333ea] sppcfw-ring-2 sppcfw-ring-[#9333ea]/30' : 'sppcfw-border-white'}`,
+												style: { backgroundColor: hexColor }
+											});
+										}
+										return h(
+											'span',
+											{
+												key: opt,
+												className: `sppcfw-px-2.5 sppcfw-py-0.5 sppcfw-text-xs sppcfw-rounded sppcfw-border sppcfw-cursor-pointer ${oIdx === 0 ? 'sppcfw-border-[#9333ea] sppcfw-bg-[#9333ea] sppcfw-text-white sppcfw-font-bold' : 'sppcfw-border-[#d1d5db] sppcfw-bg-white sppcfw-text-gray-700'}`
+											},
+											opt
+										);
+									})
+								)
+							);
+						})
+					)
+				);
+			}
+			case 'related_products':
+			case 'upsell_products': {
+				const isRelated = el.type === 'related_products';
+				const titleText = isRelated ? 'Related products' : 'You may also like…';
+				const rawList = isRelated ? (safeSample && safeSample.related_products) : (safeSample && safeSample.upsell_products);
+				const productList = (rawList && rawList.length > 0)
+					? rawList
+					: [1, 2, 3, 4].map(idx => ({
+							id: idx,
+							title: `${isRelated ? 'Related' : 'Upsell'} Product ${idx}`,
+							price: `$${(19.99 * idx).toFixed(2)}`,
+							image_url: ''
+					  }));
+
+				return h(
+					'div',
+					{ className: 'sppcfw-w-full sppcfw-space-y-3 sppcfw-my-2' },
+					h('h2', { className: 'sppcfw-text-base sppcfw-font-bold sppcfw-text-[#111827]' }, titleText),
+					h(
+						'div',
+						{ className: 'sppcfw-grid sppcfw-grid-cols-2 md:sppcfw-grid-cols-4 sppcfw-gap-3' },
+						productList.slice(0, 4).map((prodItem, idx) =>
+							h(
+								'div',
+								{ key: prodItem.id || idx, className: 'sppcfw-border sppcfw-border-[#e5e7eb] sppcfw-rounded-lg sppcfw-p-2.5 sppcfw-bg-white sppcfw-space-y-1.5 sppcfw-shadow-sm sppcfw-flex sppcfw-flex-col sppcfw-justify-between' },
+								h(
+									'div',
+									{ className: 'sppcfw-space-y-1.5' },
+									h(
+										'div',
+										{ className: 'sppcfw-w-full sppcfw-h-24 sppcfw-bg-[#f3f4f6] sppcfw-rounded sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-text-gray-400 sppcfw-overflow-hidden' },
+										prodItem.image_url
+											? h('img', { src: prodItem.image_url, alt: prodItem.title, className: 'sppcfw-w-full sppcfw-h-full sppcfw-object-cover' })
+											: h('span', { className: 'material-symbols-outlined sppcfw-text-2xl' }, 'shopping_bag')
+									),
+									h('div', { className: 'sppcfw-text-[11px] sppcfw-font-semibold sppcfw-text-[#111827] sppcfw-truncate', title: prodItem.title }, prodItem.title),
+									h('div', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#9333ea]', dangerouslySetInnerHTML: typeof prodItem.price === 'string' && prodItem.price.includes('<') ? { __html: prodItem.price } : undefined }, typeof prodItem.price === 'string' && prodItem.price.includes('<') ? undefined : prodItem.price)
+								),
+								h('div', { className: 'sppcfw-w-full sppcfw-py-1 sppcfw-bg-[#f3f4f6] sppcfw-text-center sppcfw-rounded sppcfw-text-[10px] sppcfw-font-bold sppcfw-text-gray-700 sppcfw-mt-2' }, 'Add to cart')
+							)
+						)
+					)
+				);
+			}
 			default:
 				return h('div', { className: 'sppcfw-p-3 sppcfw-border sppcfw-border-dashed sppcfw-text-xs sppcfw-text-[#6b7280]' }, el.label);
 		}
