@@ -952,22 +952,6 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						$css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading, .sppcfw-el-{$id} a { color: " . esc_attr($text_color) . ' !important; }';
 					}
 
-					// Product Price specific color styles
-					$price_color = $this->sppcfw_get_device_prop($styles, 'price_color', $device, $text_color);
-					if (!empty($price_color)) {
-						$css .= ".sppcfw-el-{$id} .price, .sppcfw-el-{$id} .price .amount, .sppcfw-el-{$id} .woocommerce-Price-amount, .sppcfw-el-{$id} .sppcfw-price-wrapper { color: " . esc_attr($price_color) . ' !important; }';
-					}
-
-					$sale_price_color = $this->sppcfw_get_device_prop($styles, 'sale_price_color', $device, '');
-					if (!empty($sale_price_color)) {
-						$css .= ".sppcfw-el-{$id} .price ins, .sppcfw-el-{$id} .price ins .amount, .sppcfw-el-{$id} .price ins .woocommerce-Price-amount, .sppcfw-el-{$id} ins, .sppcfw-el-{$id} ins .amount { color: " . esc_attr($sale_price_color) . ' !important; }';
-					}
-
-					$reg_price_color = $this->sppcfw_get_device_prop($styles, 'regular_price_color', $device, '');
-					if (!empty($reg_price_color)) {
-						$css .= ".sppcfw-el-{$id} .price del, .sppcfw-el-{$id} .price del .amount, .sppcfw-el-{$id} del, .sppcfw-el-{$id} del .amount { color: " . esc_attr($reg_price_color) . ' !important; }';
-					}
-
 					// Product Rating specific styles
 					if ('product_rating' === $type) {
 						$star_color = $this->sppcfw_get_device_prop($styles, 'star_color', $device, '');
@@ -1254,8 +1238,8 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 
 						$css .= ".sppcfw-el-{$id} .sppcfw-price-wrapper, .sppcfw-el-{$id} .price, .sppcfw-el-{$id} p.price { display: flex !important; align-items: center !important; flex-wrap: wrap !important; gap: 8px !important; margin: 0 !important; padding: 0 !important; line-height: 1.2 !important; justify-content: {$price_justify} !important; text-align: {$price_align} !important; }";
 
-						// Single Price (not on sale)
-						$css .= ".sppcfw-el-{$id} .price, .sppcfw-el-{$id} .price > .amount, .sppcfw-el-{$id} .price > .woocommerce-Price-amount, .sppcfw-el-{$id} .price:not(:has(ins)) .amount, .sppcfw-el-{$id} .price:not(:has(ins)) { color: " . esc_attr($price_color) . " !important; font-size: " . esc_attr($price_font_size) . " !important; font-weight: " . esc_attr($price_font_weight) . " !important; }";
+						// Main Price Color (Standard prices & variable price ranges)
+						$css .= ".sppcfw-el-{$id} .price, .sppcfw-el-{$id} .price *, .sppcfw-el-{$id} .woocommerce-Price-amount, .sppcfw-el-{$id} .woocommerce-Price-amount *, .sppcfw-el-{$id} .sppcfw-price-wrapper, .sppcfw-el-{$id} .sppcfw-price-wrapper * { color: " . esc_attr($price_color) . " !important; font-size: " . esc_attr($price_font_size) . " !important; font-weight: " . esc_attr($price_font_weight) . " !important; }";
 
 						// Regular Price (del - strikethrough)
 						$show_reg = !isset($settings['show_regular_price']) || true === $settings['show_regular_price'] || 'true' === $settings['show_regular_price'] || 1 === $settings['show_regular_price'] || '1' === $settings['show_regular_price'] || 'on' === $settings['show_regular_price'];
@@ -1266,13 +1250,11 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						if (!$show_reg) {
 							$css .= ".sppcfw-el-{$id} .price del, .sppcfw-el-{$id} del { display: none !important; }";
 						} else {
-							$css .= ".sppcfw-el-{$id} .price del, .sppcfw-el-{$id} .price del .amount, .sppcfw-el-{$id} .price del .woocommerce-Price-amount, .sppcfw-el-{$id} del, .sppcfw-el-{$id} del .amount, .sppcfw-el-{$id} del .woocommerce-Price-amount { display: inline-block !important; text-decoration: line-through !important; -webkit-text-decoration-line: line-through !important; color: " . esc_attr($reg_price_color) . " !important; font-size: calc(" . esc_attr($price_font_size) . " * 0.8) !important; font-weight: 400 !important; opacity: 0.75 !important; }";
-							$css .= ".sppcfw-el-{$id} .price del bdi, .sppcfw-el-{$id} del bdi, .sppcfw-el-{$id} .price del span, .sppcfw-el-{$id} del span { text-decoration: line-through !important; -webkit-text-decoration-line: line-through !important; color: inherit !important; }";
+							$css .= ".sppcfw-el-{$id} .price del, .sppcfw-el-{$id} .price del *, .sppcfw-el-{$id} del, .sppcfw-el-{$id} del * { color: " . esc_attr($reg_price_color) . " !important; font-size: calc(" . esc_attr($price_font_size) . " * 0.8) !important; font-weight: 400 !important; opacity: 0.75 !important; text-decoration: line-through !important; -webkit-text-decoration-line: line-through !important; }";
 						}
 
 						// Sale Price (ins)
-						$css .= ".sppcfw-el-{$id} .price ins, .sppcfw-el-{$id} .price ins .amount, .sppcfw-el-{$id} .price ins .woocommerce-Price-amount, .sppcfw-el-{$id} ins, .sppcfw-el-{$id} ins .amount, .sppcfw-el-{$id} ins .woocommerce-Price-amount { display: inline-block !important; text-decoration: none !important; -webkit-text-decoration-line: none !important; color: " . esc_attr($sale_price_color) . " !important; font-size: " . esc_attr($price_font_size) . " !important; font-weight: " . esc_attr($price_font_weight) . " !important; }";
-						$css .= ".sppcfw-el-{$id} .price ins bdi, .sppcfw-el-{$id} ins bdi, .sppcfw-el-{$id} .price ins span, .sppcfw-el-{$id} ins span { text-decoration: none !important; color: inherit !important; }";
+						$css .= ".sppcfw-el-{$id} .price ins, .sppcfw-el-{$id} .price ins *, .sppcfw-el-{$id} ins, .sppcfw-el-{$id} ins * { color: " . esc_attr($sale_price_color) . " !important; font-size: " . esc_attr($price_font_size) . " !important; font-weight: " . esc_attr($price_font_weight) . " !important; text-decoration: none !important; -webkit-text-decoration-line: none !important; }";
 
 						// Sale Badge styling
 						$css .= ".sppcfw-el-{$id} .sppcfw-price-sale-badge { background-color: " . esc_attr($sale_price_color) . " !important; color: #ffffff !important; font-size: 11px !important; padding: 2px 8px !important; border-radius: 4px !important; font-weight: 700 !important; text-transform: uppercase !important; display: inline-block !important; line-height: 1.2 !important; margin-left: 4px !important; }";
@@ -1442,17 +1424,17 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 							$css .= ".sppcfw-el-{$id} button.webfwc_variation_button.button { min-height: " . esc_attr($swatch_size) . ' !important; }';
 						}
 						if (!empty($swatch_border_radius)) {
-							$css .= ".sppcfw-el-{$id} .sppcfw-swatch-item, .sppcfw-el-{$id} button.webfwc_variation_button { border-radius: " . esc_attr($swatch_border_radius) . ' !important; }';
+							$css .= ".sppcfw-el-{$id} .sppcfw-swatch-item, .sppcfw-el-{$id} button.webfwc_variation_button, .sppcfw-el-{$id} button.webfwc_variation_button.color, .sppcfw-el-{$id} button.webfwc_variation_button.button { border-radius: " . esc_attr($swatch_border_radius) . ' !important; }';
+						} else {
+							// Swatch shape classes fallback when no custom border radius is set
+							$css .= ".sppcfw-el-{$id}.sppcfw-swatch-shape-circle button.webfwc_variation_button.color, .sppcfw-el-{$id} .sppcfw-swatch-shape-circle button.webfwc_variation_button.color { border-radius: 50% !important; }";
+							$css .= ".sppcfw-el-{$id}.sppcfw-swatch-shape-circle button.webfwc_variation_button.button, .sppcfw-el-{$id} .sppcfw-swatch-shape-circle button.webfwc_variation_button.button { border-radius: 9999px !important; }";
+							$css .= ".sppcfw-el-{$id}.sppcfw-swatch-shape-rounded button.webfwc_variation_button, .sppcfw-el-{$id} .sppcfw-swatch-shape-rounded button.webfwc_variation_button { border-radius: 6px !important; }";
+							$css .= ".sppcfw-el-{$id}.sppcfw-swatch-shape-square button.webfwc_variation_button, .sppcfw-el-{$id} .sppcfw-swatch-shape-square button.webfwc_variation_button { border-radius: 2px !important; }";
 						}
 						if (!empty($swatch_gap)) {
 							$css .= ".sppcfw-el-{$id} .sppcfw-swatches-container, .sppcfw-el-{$id} .cu_button_el, .sppcfw-el-{$id} table.variations td.value { gap: " . esc_attr($swatch_gap) . ' !important; }';
 						}
-
-						// Swatch shape classes
-						$css .= ".sppcfw-el-{$id}.sppcfw-swatch-shape-circle button.webfwc_variation_button.color, .sppcfw-el-{$id} .sppcfw-swatch-shape-circle button.webfwc_variation_button.color { border-radius: 50% !important; }";
-						$css .= ".sppcfw-el-{$id}.sppcfw-swatch-shape-circle button.webfwc_variation_button.button, .sppcfw-el-{$id} .sppcfw-swatch-shape-circle button.webfwc_variation_button.button { border-radius: 9999px !important; }";
-						$css .= ".sppcfw-el-{$id}.sppcfw-swatch-shape-rounded button.webfwc_variation_button, .sppcfw-el-{$id} .sppcfw-swatch-shape-rounded button.webfwc_variation_button { border-radius: 6px !important; }";
-						$css .= ".sppcfw-el-{$id}.sppcfw-swatch-shape-square button.webfwc_variation_button, .sppcfw-el-{$id} .sppcfw-swatch-shape-square button.webfwc_variation_button { border-radius: 2px !important; }";
 
 						// Show/hide labels & reset link
 						$css .= ".sppcfw-el-{$id}.sppcfw-hide-var-labels table.variations th.label, .sppcfw-el-{$id}.sppcfw-hide-var-labels table.variations label, .sppcfw-el-{$id} .sppcfw-hide-var-labels table.variations th.label { display: none !important; }";

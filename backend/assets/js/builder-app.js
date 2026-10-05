@@ -2694,6 +2694,10 @@
 		const swatchRef = useRef(null);
 
 		const hsva = parseColorToHsva(value || defaultVal);
+		const hsvaRef = useRef(hsva);
+		useEffect(() => {
+			hsvaRef.current = hsva;
+		}, [value, defaultVal]);
 
 		useEffect(() => {
 			function handleClickOutside(e) {
@@ -2706,7 +2710,9 @@
 		}, [isOpen]);
 
 		function updateHsva(newHsva) {
-			const next = { ...hsva, ...newHsva };
+			const base = hsvaRef.current || hsva;
+			const next = { ...base, ...newHsva };
+			hsvaRef.current = next;
 			const formatted = formatColorOutput(next, format);
 			if (typeof onChange === 'function') {
 				onChange(formatted);
@@ -2715,8 +2721,9 @@
 
 		function handleSatValMouseDown(e) {
 			e.preventDefault();
-			const rect = e.currentTarget.getBoundingClientRect();
+			const target = e.currentTarget;
 			function handleMove(moveEvt) {
+				const rect = target.getBoundingClientRect();
 				const x = Math.max(0, Math.min(rect.width, moveEvt.clientX - rect.left));
 				const y = Math.max(0, Math.min(rect.height, moveEvt.clientY - rect.top));
 				const s = Math.round((x / rect.width) * 100);
@@ -2734,11 +2741,17 @@
 
 		function handleHueMouseDown(e) {
 			e.preventDefault();
-			const rect = e.currentTarget.getBoundingClientRect();
+			const target = e.currentTarget;
 			function handleMove(moveEvt) {
+				const rect = target.getBoundingClientRect();
 				const x = Math.max(0, Math.min(rect.width, moveEvt.clientX - rect.left));
 				const h = Math.round((x / rect.width) * 360);
-				updateHsva({ h });
+				const curr = hsvaRef.current || hsva;
+				const updates = { h };
+				// If color is currently pure black or very dark, boost saturation & value so hue shows vibrant color immediately
+				if (curr.v < 30) updates.v = 90;
+				if (curr.s < 20) updates.s = 85;
+				updateHsva(updates);
 			}
 			handleMove(e);
 			function handleUp() {
@@ -2751,8 +2764,9 @@
 
 		function handleAlphaMouseDown(e) {
 			e.preventDefault();
-			const rect = e.currentTarget.getBoundingClientRect();
+			const target = e.currentTarget;
 			function handleMove(moveEvt) {
+				const rect = target.getBoundingClientRect();
 				const x = Math.max(0, Math.min(rect.width, moveEvt.clientX - rect.left));
 				const a = parseFloat((x / rect.width).toFixed(2));
 				updateHsva({ a });
@@ -4952,9 +4966,8 @@
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Price Color', getStyle('text_color') || getStyle('price_color'), v => {
-							handleStyleChange('text_color', v);
-							handleStyleChange('price_color', v);
+						renderColorPicker('Price Color', getStyle('price_color') || getStyle('text_color'), v => {
+							handleMultiStyleChange({ price_color: v, text_color: v });
 						}, '#9333ea'),
 						renderColorPicker('Regular Price Color', getStyle('regular_price_color'), v => handleStyleChange('regular_price_color', v), '#9ca3af'),
 						renderColorPicker('Sale Price Color', getStyle('sale_price_color'), v => handleStyleChange('sale_price_color', v), '#ef4444'),
@@ -5145,13 +5158,13 @@
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
 							renderControlHeader('Swatch Size', true, widthUnit, setWidthUnit, ['px']),
-							renderSliderInput(getStyle('swatch_size') || '26px', v => handleStyleChange('swatch_size', v), 18, 50, 1, 'px', '26')
+							renderSliderInput(getStyle('swatch_size') || '36px', v => handleStyleChange('swatch_size', v), 18, 80, 1, widthUnit, '36')
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
 							renderControlHeader('Swatch Border Radius', true, radiusUnit, setRadiusUnit, ['px', '%']),
-							renderSliderInput(getStyle('swatch_border_radius') || '6px', v => handleStyleChange('swatch_border_radius', v), 0, 50, 1, 'px', '6')
+							renderSliderInput(getStyle('swatch_border_radius') || '4px', v => handleStyleChange('swatch_border_radius', v), 0, 50, 1, radiusUnit, '4')
 						),
 						h(
 							'div',
@@ -5176,8 +5189,7 @@
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						renderColorPicker('Star Color (Filled)', getStyle('star_color') || getStyle('text_color'), v => {
-							handleStyleChange('star_color', v);
-							handleStyleChange('text_color', v);
+							handleMultiStyleChange({ star_color: v, text_color: v });
 						}, '#f59e0b'),
 						renderColorPicker('Empty Star Color', getStyle('empty_star_color'), v => handleStyleChange('empty_star_color', v), '#d1d5db'),
 						h(
@@ -7755,9 +7767,9 @@
 					'div',
 					{ className: `sppcfw-flex sppcfw-items-center sppcfw-flex-wrap sppcfw-gap-3 ${alignClass}` },
 					h('div', {
-						className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-font-extrabold sppcfw-transition-all sppcfw-price-display [&_del]:sppcfw-opacity-60 [&_del]:sppcfw-font-normal [&_del]:sppcfw-text-gray-400 [&_ins]:sppcfw-no-underline',
+						className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-font-extrabold sppcfw-transition-all sppcfw-price-display [&_del]:sppcfw-opacity-70 [&_del]:sppcfw-font-normal [&_del]:sppcfw-text-gray-400 [&_del]:sppcfw-line-through [&_ins]:sppcfw-no-underline [&_span]:!sppcfw-text-inherit [&_bdi]:!sppcfw-text-inherit [&_.woocommerce-Price-amount]:!sppcfw-text-inherit [&_.woocommerce-Price-currencySymbol]:!sppcfw-text-inherit',
 						style: {
-							color: isOnSale ? salePriceColor : priceColor,
+							color: priceColor,
 							fontSize: fontSize,
 							fontWeight: fontWeight
 						},
@@ -7768,9 +7780,9 @@
 							'span',
 							{
 								className: 'sppcfw-text-white sppcfw-text-xs sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded sppcfw-font-bold sppcfw-uppercase sppcfw-shadow-sm sppcfw-tracking-wide',
-								style: { backgroundColor: salePriceColor }
+								style: { backgroundColor: salePriceColor || '#ef4444' }
 							},
-							'Sale'
+							settings.sale_badge_text || 'Sale'
 						)
 				);
 			}
@@ -8077,7 +8089,10 @@
 				const varLabelColor = getResponsiveProp(styles, 'var_label_color', deviceView) || '#111827';
 				const varLabelSize = getResponsiveProp(styles, 'var_label_size', deviceView) || '13px';
 				const swatchSize = getResponsiveProp(styles, 'swatch_size', deviceView) || '36px';
-				const swatchRadius = swatchShape === 'circle' ? '50%' : (swatchShape === 'square' ? '2px' : (getResponsiveProp(styles, 'swatch_border_radius', deviceView) || '4px'));
+				const customRadius = getResponsiveProp(styles, 'swatch_border_radius', deviceView);
+				const swatchRadius = (customRadius !== undefined && customRadius !== null && customRadius !== '')
+					? customRadius
+					: (swatchShape === 'circle' ? '50%' : (swatchShape === 'square' ? '2px' : '6px'));
 				const activeSwatchColor = getResponsiveProp(styles, 'active_swatch_color', deviceView) || '#007cba';
 				const swatchGap = getResponsiveProp(styles, 'swatch_gap', deviceView) || '8px';
 
@@ -8163,7 +8178,7 @@
 												{ className: 'value sppcfw-py-2.5 sppcfw-px-3.5 sppcfw-align-middle' },
 												h(
 													'div',
-													{ className: 'cu_button_el sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-flex-wrap' },
+													{ className: 'cu_button_el sppcfw-flex sppcfw-items-center sppcfw-flex-wrap', style: { gap: swatchGap } },
 													(attr.options || []).map((opt) => {
 														const isActive = selectedOpt === opt;
 														if (isColor) {
@@ -8184,10 +8199,11 @@
 																	className: `webfwc_variation_button color ${isActive ? 'selected' : ''}`,
 																	style: {
 																		backgroundColor: hexColor,
-																		width: swatchSize || '34px',
-																		height: swatchSize || '34px',
-																		minWidth: swatchSize || '34px',
-																		borderRadius: swatchShape === 'circle' ? '50%' : (swatchShape === 'square' ? '2px' : '4px'),
+																		width: swatchSize,
+																		height: swatchSize,
+																		minWidth: swatchSize,
+																		minHeight: swatchSize,
+																		borderRadius: swatchRadius,
 																		border: '2px solid #ffffff',
 																		boxShadow: isActive ? `0 0 0 2px ${activeSwatchColor || '#007cba'}` : '0 0 0 1px #ddd',
 																		position: 'relative',
@@ -8228,11 +8244,11 @@
 																},
 																className: `webfwc_variation_button button ${isActive ? 'selected' : ''}`,
 																style: {
-																	borderRadius: swatchShape === 'circle' ? '20px' : (swatchShape === 'square' ? '2px' : '4px'),
+																	borderRadius: swatchRadius,
 																	boxShadow: isActive ? `0 0 0 2px ${activeSwatchColor || '#007cba'}` : '0 0 0 1px #ddd',
 																	border: '2px solid #ffffff',
 																	padding: '6px 14px',
-																	minHeight: '34px',
+																	minHeight: swatchSize,
 																	minWidth: '40px',
 																	position: 'relative',
 																	background: isActive ? '#ffffff' : '#f3f4f6',
