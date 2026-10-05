@@ -693,6 +693,148 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					padding: 4px 8px !important;
 					line-height: 1 !important;
 				}
+
+				/* Related & Upsell Products Cards & Layout */
+				.sppcfw-related-wrapper,
+				.sppcfw-upsell-wrapper {
+					width: 100% !important;
+					max-width: 100% !important;
+					box-sizing: border-box !important;
+					margin-top: 16px !important;
+					margin-bottom: 24px !important;
+					clear: both !important;
+				}
+				.sppcfw-related-heading {
+					font-size: 18px !important;
+					font-weight: 700 !important;
+					color: #111827 !important;
+					margin: 0 0 16px 0 !important;
+					line-height: 1.3 !important;
+					text-align: left !important;
+				}
+				.sppcfw-products-grid {
+					display: grid !important;
+					gap: 16px !important;
+					width: 100% !important;
+					box-sizing: border-box !important;
+				}
+				.sppcfw-card-product {
+					background: #ffffff !important;
+					border: 1px solid #e5e7eb !important;
+					border-radius: 8px !important;
+					padding: 10px !important;
+					box-shadow: 0 1px 3px rgba(0,0,0,0.05) !important;
+					display: flex !important;
+					flex-direction: column !important;
+					justify-content: space-between !important;
+					position: relative !important;
+					box-sizing: border-box !important;
+					transition: transform 0.2s ease, box-shadow 0.2s ease !important;
+					overflow: hidden !important;
+				}
+				.sppcfw-card-product:hover {
+					box-shadow: 0 4px 12px rgba(0,0,0,0.08) !important;
+					transform: translateY(-2px) !important;
+				}
+				.sppcfw-card-thumb-link {
+					display: flex !important;
+					align-items: center !important;
+					justify-content: center !important;
+					width: 100% !important;
+					background: #f3f4f6 !important;
+					border-radius: 6px !important;
+					overflow: hidden !important;
+					position: relative !important;
+					text-decoration: none !important;
+				}
+				.sppcfw-card-thumb-link img {
+					width: 100% !important;
+					height: 100% !important;
+					object-fit: cover !important;
+					display: block !important;
+					transition: transform 0.3s ease !important;
+				}
+				.sppcfw-card-product:hover .sppcfw-card-thumb-link img {
+					transform: scale(1.04) !important;
+				}
+				.sppcfw-card-sale-badge {
+					position: absolute !important;
+					top: 8px !important;
+					left: 8px !important;
+					background: #ef4444 !important;
+					color: #ffffff !important;
+					font-size: 10px !important;
+					font-weight: 700 !important;
+					padding: 2px 8px !important;
+					border-radius: 9999px !important;
+					text-transform: uppercase !important;
+					z-index: 2 !important;
+					line-height: 1.2 !important;
+				}
+				.sppcfw-card-info {
+					padding: 8px 0 0 0 !important;
+					flex-grow: 1 !important;
+				}
+				.sppcfw-card-title {
+					font-size: 13px !important;
+					font-weight: 600 !important;
+					color: #111827 !important;
+					margin: 0 0 4px 0 !important;
+					line-height: 1.3 !important;
+					text-decoration: none !important;
+					display: -webkit-box !important;
+					-webkit-line-clamp: 2 !important;
+					-webkit-box-orient: vertical !important;
+					overflow: hidden !important;
+				}
+				.sppcfw-card-title:hover {
+					color: #9333ea !important;
+				}
+				.sppcfw-card-price {
+					font-size: 13px !important;
+					font-weight: 700 !important;
+					color: #9333ea !important;
+					margin: 0 0 8px 0 !important;
+					line-height: 1.2 !important;
+				}
+				.sppcfw-card-price del {
+					opacity: 0.6 !important;
+					font-weight: normal !important;
+					margin-right: 4px !important;
+					text-decoration: line-through !important;
+				}
+				.sppcfw-card-price ins {
+					text-decoration: none !important;
+				}
+				.sppcfw-card-button {
+					background: #f3f4f6 !important;
+					color: #374151 !important;
+					font-size: 11px !important;
+					font-weight: 700 !important;
+					text-align: center !important;
+					border-radius: 6px !important;
+					padding: 8px 12px !important;
+					width: 100% !important;
+					display: block !important;
+					text-decoration: none !important;
+					border: 1px solid #e5e7eb !important;
+					box-sizing: border-box !important;
+					transition: all 0.15s ease !important;
+					cursor: pointer !important;
+					margin-top: auto !important;
+				}
+				.sppcfw-card-button:hover {
+					background: #9333ea !important;
+					color: #ffffff !important;
+					border-color: #9333ea !important;
+				}
+
+				@media (max-width: 767px) {
+					.sppcfw-products-grid {
+						grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+						gap: 10px !important;
+					}
+				}
 			';
 
 			if (!empty($layout) && is_array($layout)) {
@@ -1537,6 +1679,16 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						$css .= ".sppcfw-el-{$id} .sppcfw-gallery-carousel-slide { flex: 0 0 calc((100% - (" . ($cols - 1) . " * 8px)) / {$cols}) !important; }";
 						$css .= ".sppcfw-el-{$id} .sppcfw-gallery-main-container { justify-content: {$justify} !important; }";
 					}
+
+					if ('related_products' === $type || 'upsell_products' === $type) {
+						$default_cols = ('mobile' === $device ? 2 : ('tablet' === $device ? 3 : 4));
+						$cols = intval($this->sppcfw_get_device_prop($settings, 'columns', $device, $default_cols));
+						if ($cols < 1 || $cols > 6) {
+							$cols = $default_cols;
+						}
+						$css .= ".sppcfw-el-{$id} .sppcfw-products-grid, .sppcfw-el-{$id}.sppcfw-products-block .sppcfw-products-grid, .sppcfw-el-{$id} ul.products, .sppcfw-el-{$id} .products { display: grid !important; grid-template-columns: repeat({$cols}, minmax(0, 1fr)) !important; gap: 16px !important; }";
+						$css .= ".sppcfw-el-{$id} .sppcfw-card-product, .sppcfw-el-{$id} ul.products li.product, .sppcfw-el-{$id} .products .product { width: 100% !important; margin: 0 !important; float: none !important; }";
+					}
 				}
 
 				if (!empty($el['children']) && is_array($el['children'])) {
@@ -2196,14 +2348,110 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					echo '</div>';
 					break;
 				case 'related_products':
-					echo '<div class="sppcfw-related-wrapper' . $el_class . '">';
-					woocommerce_output_related_products();
-					echo '</div>';
-					break;
 				case 'upsell_products':
-					echo '<div class="sppcfw-upsell-wrapper' . $el_class . '">';
-					woocommerce_upsell_display();
-					echo '</div>';
+					$is_related = ('related_products' === $type);
+					$settings = isset($el['settings']) ? $el['settings'] : array();
+					$columns = !empty($settings['columns']) ? intval($settings['columns']) : 4;
+					if ($columns < 1 || $columns > 6) {
+						$columns = 4;
+					}
+					$posts_per_page = !empty($settings['posts_per_page']) ? intval($settings['posts_per_page']) : $columns;
+					if (!empty($settings['posts_per_page_tablet'])) {
+						$posts_per_page = max($posts_per_page, intval($settings['posts_per_page_tablet']));
+					}
+					if (!empty($settings['posts_per_page_mobile'])) {
+						$posts_per_page = max($posts_per_page, intval($settings['posts_per_page_mobile']));
+					}
+					$default_title = $is_related ? __('Related products', 'woocommerce') : __('You may also like…', 'woocommerce');
+					$title = isset($settings['title']) ? $settings['title'] : $default_title;
+
+					$product_id = $product->get_id();
+					if ($is_related) {
+						$item_ids = wc_get_related_products($product_id, $posts_per_page, $product->get_upsell_ids());
+					} else {
+						$item_ids = $product->get_upsell_ids();
+						if (!empty($item_ids) && count($item_ids) > $posts_per_page) {
+							$item_ids = array_slice($item_ids, 0, $posts_per_page);
+						}
+					}
+
+					// Fallback query if no related products configured
+					if (empty($item_ids)) {
+						$cat_ids = wp_get_post_terms($product_id, 'product_cat', array('fields' => 'ids'));
+						$query_args = array(
+							'post_type'      => 'product',
+							'post_status'    => 'publish',
+							'posts_per_page' => $posts_per_page,
+							'post__not_in'   => array($product_id),
+							'fields'         => 'ids',
+							'orderby'        => !empty($settings['orderby']) ? sanitize_key($settings['orderby']) : 'rand',
+						);
+						if (!empty($cat_ids) && !is_wp_error($cat_ids)) {
+							$query_args['tax_query'] = array(
+								array(
+									'taxonomy' => 'product_cat',
+									'field'    => 'term_id',
+									'terms'    => $cat_ids,
+								),
+							);
+						}
+						$fallback_query = new WP_Query($query_args);
+						$item_ids = $fallback_query->posts;
+					}
+
+					$wrapper_class = $is_related ? 'sppcfw-related-wrapper' : 'sppcfw-upsell-wrapper';
+
+					echo '<div class="' . esc_attr($wrapper_class) . $el_class . ' sppcfw-products-block" data-cols="' . esc_attr($columns) . '">';
+					if (!empty($title)) {
+						echo '<h2 class="sppcfw-related-heading">' . esc_html($title) . '</h2>';
+					}
+
+					if (!empty($item_ids)) {
+						echo '<div class="sppcfw-products-grid sppcfw-cols-' . esc_attr($columns) . '">';
+						foreach ($item_ids as $item_id) {
+							$item_prod = wc_get_product($item_id);
+							if (!$item_prod || !$item_prod->is_visible()) {
+								continue;
+							}
+							$item_url = $item_prod->get_permalink();
+							$item_name = $item_prod->get_name();
+							$item_img_id = $item_prod->get_image_id();
+							$item_img_url = $item_img_id ? wp_get_attachment_image_url($item_img_id, 'woocommerce_thumbnail') : wc_placeholder_img_src('woocommerce_thumbnail');
+							$item_price_html = $item_prod->get_price_html();
+							$item_is_sale = $item_prod->is_on_sale();
+
+							echo '<div class="sppcfw-card-product">';
+							echo '<a href="' . esc_url($item_url) . '" class="sppcfw-card-thumb-link">';
+							if ($item_is_sale) {
+								echo '<span class="sppcfw-card-sale-badge">' . esc_html__('Sale!', 'woocommerce') . '</span>';
+							}
+							echo '<img src="' . esc_url($item_img_url) . '" alt="' . esc_attr($item_name) . '" loading="lazy" />';
+							echo '</a>';
+
+							echo '<div class="sppcfw-card-info">';
+							echo '<a href="' . esc_url($item_url) . '" class="sppcfw-card-title">' . esc_html($item_name) . '</a>';
+							if (!empty($item_price_html)) {
+								echo '<div class="sppcfw-card-price">' . wp_kses_post($item_price_html) . '</div>';
+							}
+							echo '</div>';
+
+							// Add to cart / View product button
+							$btn_text = $item_prod->add_to_cart_text();
+							$btn_url = $item_prod->add_to_cart_url();
+							$btn_class = 'sppcfw-card-button';
+							if ($item_prod->is_type('simple') && $item_prod->is_purchasable() && $item_prod->is_in_stock()) {
+								$btn_class .= ' ajax_add_to_cart add_to_cart_button';
+								echo '<a href="' . esc_url($btn_url) . '" data-quantity="1" data-product_id="' . esc_attr($item_id) . '" data-product_sku="' . esc_attr($item_prod->get_sku()) . '" class="' . esc_attr($btn_class) . '" rel="nofollow">' . esc_html($btn_text) . '</a>';
+							} else {
+								echo '<a href="' . esc_url($item_url) . '" class="' . esc_attr($btn_class) . '">' . esc_html($btn_text) . '</a>';
+							}
+
+							echo '</div>'; // close sppcfw-card-product
+						}
+						echo '</div>'; // close sppcfw-products-grid
+					}
+
+					echo '</div>'; // close wrapper
 					break;
 				default:
 					break;

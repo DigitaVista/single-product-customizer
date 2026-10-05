@@ -3205,6 +3205,7 @@
 			: 'widgets';
 
 		function renderControlHeader(label, showDeviceIcon = true, unitValue = null, onUnitChange = null, units = null) {
+			const deviceIcon = deviceView === 'mobile' ? 'smartphone' : (deviceView === 'tablet' ? 'tablet_mac' : 'desktop_windows');
 			return h(
 				'div',
 				{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between sppcfw-text-xs sppcfw-text-[#e5e7eb] sppcfw-font-medium sppcfw-mb-1.5' },
@@ -3212,7 +3213,7 @@
 					'div',
 					{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
 					label,
-					showDeviceIcon && h('span', { className: 'material-symbols-outlined sppcfw-text-[13px] sppcfw-text-gray-400', title: deviceView }, 'desktop_windows')
+					showDeviceIcon && h('span', { className: 'material-symbols-outlined sppcfw-text-[13px] sppcfw-text-purple-400', title: `Responsive: ${deviceView}` }, deviceIcon)
 				),
 				units && onUnitChange && h(
 					'div',
@@ -5585,8 +5586,119 @@
 			if (selectedElement.type === 'product_add_to_cart') {
 				return renderAddToCartContent();
 			}
+			if (selectedElement.type === 'related_products' || selectedElement.type === 'upsell_products') {
+				return renderRelatedProductsContent();
+			}
 			// All other Product Elements have dedicated Dynamic Info Card
 			return renderProductElementDynamicCard();
+		}
+
+		// 1i. Related & Upsell Products Content Panel
+		function renderRelatedProductsContent() {
+			const isRelated = selectedElement.type === 'related_products';
+			const defaultTitle = isRelated ? 'Related products' : 'You may also like…';
+			const titleVal = getSetting('title', true) !== undefined ? getSetting('title', true) : defaultTitle;
+			const defaultCols = deviceView === 'mobile' ? 2 : (deviceView === 'tablet' ? 3 : 4);
+			const columnsVal = parseInt(getSetting('columns'), 10) || defaultCols;
+			const limitVal = parseInt(getSetting('posts_per_page'), 10) || columnsVal;
+			const orderbyVal = getSetting('orderby', true) || 'rand';
+			const orderVal = getSetting('order', true) || 'desc';
+
+			return h(
+				'div',
+				{ className: 'sppcfw-space-y-4' },
+				renderAccordion(
+					'related_content_general',
+					isRelated ? 'Related Products Settings' : 'Upsell Products Settings',
+					h(
+						'div',
+						{ className: 'sppcfw-space-y-4' },
+						// Section Heading Title
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, 'Section Heading Title'),
+							h('input', {
+								type: 'text',
+								className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
+								value: titleVal,
+								placeholder: defaultTitle,
+								onChange: e => handleSettingChange('title', e.target.value, true),
+							})
+						),
+
+						// Columns Selector (1 to 6)
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							renderControlHeader('Columns', true),
+							renderButtonGroup(
+								[
+									{ value: 1, label: '1' },
+									{ value: 2, label: '2' },
+									{ value: 3, label: '3' },
+									{ value: 4, label: '4' },
+									{ value: 5, label: '5' },
+									{ value: 6, label: '6' },
+								],
+								columnsVal,
+								v => handleSettingChange('columns', Number(v))
+							)
+						),
+
+						// Limit / Posts Per Page
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							renderControlHeader('Products Count (Limit)', true),
+							h('input', {
+								type: 'number',
+								min: 1,
+								max: 24,
+								className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
+								value: limitVal,
+								onChange: e => handleSettingChange('posts_per_page', Math.max(1, parseInt(e.target.value, 10) || 4)),
+							})
+						),
+
+						// Order By
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, 'Order By'),
+							h(
+								'select',
+								{
+									className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-2 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
+									value: orderbyVal,
+									onChange: e => handleSettingChange('orderby', e.target.value, true),
+								},
+								h('option', { value: 'rand' }, 'Random (Default)'),
+								h('option', { value: 'date' }, 'Date / Latest'),
+								h('option', { value: 'title' }, 'Title / Alphabetical'),
+								h('option', { value: 'price' }, 'Price'),
+								h('option', { value: 'popularity' }, 'Popularity / Sales'),
+								h('option', { value: 'rating' }, 'Top Rated')
+							)
+						),
+
+						// Order Direction
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, 'Order Direction'),
+							renderButtonGroup(
+								[
+									{ value: 'desc', label: 'DESC' },
+									{ value: 'asc', label: 'ASC' },
+								],
+								orderVal,
+								v => handleSettingChange('order', v, true)
+							)
+						)
+					)
+				)
+			);
 		}
 
 		// 1h-2. HTML / Code Element Content Panel (HTML, CSS, JS)
@@ -8713,25 +8825,38 @@
 			case 'related_products':
 			case 'upsell_products': {
 				const isRelated = el.type === 'related_products';
-				const titleText = isRelated ? 'Related products' : 'You may also like…';
+				const defaultTitle = isRelated ? 'Related products' : 'You may also like…';
+				const titleText = (el.settings && el.settings.title !== undefined) ? el.settings.title : defaultTitle;
+				const defaultCols = deviceView === 'mobile' ? 2 : (deviceView === 'tablet' ? 3 : 4);
+				const columns = parseInt(getResponsiveProp(el.settings, 'columns', deviceView), 10) || defaultCols;
+				const limit = parseInt(getResponsiveProp(el.settings, 'posts_per_page', deviceView), 10) || columns;
+
 				const rawList = isRelated ? (safeSample && safeSample.related_products) : (safeSample && safeSample.upsell_products);
-				const productList = (rawList && rawList.length > 0)
+				const sampleItems = (rawList && rawList.length > 0)
 					? rawList
-					: [1, 2, 3, 4].map(idx => ({
+					: [1, 2, 3, 4, 5, 6, 7, 8].map(idx => ({
 							id: idx,
 							title: `${isRelated ? 'Related' : 'Upsell'} Product ${idx}`,
 							price: `$${(19.99 * idx).toFixed(2)}`,
 							image_url: ''
 					  }));
 
+				const productList = sampleItems.slice(0, Math.max(1, limit));
+
+				const gridColsStyle = {
+					display: 'grid',
+					gridTemplateColumns: `repeat(${columns}, minmax(0, 1fr))`,
+					gap: '12px'
+				};
+
 				return h(
 					'div',
 					{ className: 'sppcfw-w-full sppcfw-space-y-3 sppcfw-my-2' },
-					h('h2', { className: 'sppcfw-text-base sppcfw-font-bold sppcfw-text-[#111827]' }, titleText),
+					titleText && h('h2', { className: 'sppcfw-text-base sppcfw-font-bold sppcfw-text-[#111827]' }, titleText),
 					h(
 						'div',
-						{ className: 'sppcfw-grid sppcfw-grid-cols-2 md:sppcfw-grid-cols-4 sppcfw-gap-3' },
-						productList.slice(0, 4).map((prodItem, idx) =>
+						{ className: 'sppcfw-grid sppcfw-gap-3', style: gridColsStyle },
+						productList.map((prodItem, idx) =>
 							h(
 								'div',
 								{ key: prodItem.id || idx, className: 'sppcfw-border sppcfw-border-[#e5e7eb] sppcfw-rounded-lg sppcfw-p-2.5 sppcfw-bg-white sppcfw-space-y-1.5 sppcfw-shadow-sm sppcfw-flex sppcfw-flex-col sppcfw-justify-between' },
@@ -8740,7 +8865,7 @@
 									{ className: 'sppcfw-space-y-1.5' },
 									h(
 										'div',
-										{ className: 'sppcfw-w-full sppcfw-h-24 sppcfw-bg-[#f3f4f6] sppcfw-rounded sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-text-gray-400 sppcfw-overflow-hidden' },
+										{ className: 'sppcfw-w-full sppcfw-bg-[#f3f4f6] sppcfw-rounded sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-text-gray-400 sppcfw-overflow-hidden' },
 										prodItem.image_url
 											? h('img', { src: prodItem.image_url, alt: prodItem.title, className: 'sppcfw-w-full sppcfw-h-full sppcfw-object-cover' })
 											: h('span', { className: 'material-symbols-outlined sppcfw-text-2xl' }, 'shopping_bag')
