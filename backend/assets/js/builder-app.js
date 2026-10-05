@@ -1545,9 +1545,67 @@
 			});
 		}
 
-		const effectiveSampleData = (selectedProductId && productData)
-			? { ...CANVAS_STATIC_DATA, ...productData }
-			: CANVAS_STATIC_DATA;
+		const [activeCanvasImage, setActiveCanvasImage] = useState(null);
+		const [activeVariationAttrs, setActiveVariationAttrs] = useState({});
+
+		useEffect(() => {
+			setActiveVariationAttrs({});
+			setActiveCanvasImage(null);
+		}, [selectedProductId]);
+
+		const effectiveSampleData = {
+			...((selectedProductId && productData) ? { ...CANVAS_STATIC_DATA, ...productData } : CANVAS_STATIC_DATA),
+			activeCanvasImage: activeCanvasImage,
+			activeVariationAttrs: activeVariationAttrs,
+			onSelectVariationOption: (attrKey, optValue) => {
+				const nextAttrs = { ...activeVariationAttrs, [attrKey]: optValue };
+				setActiveVariationAttrs(nextAttrs);
+
+				const currentProd = (selectedProductId && productData) ? productData : CANVAS_STATIC_DATA;
+				const availVars = (currentProd && currentProd.available_variations) || [];
+
+				let matchedVar = null;
+				for (const v of availVars) {
+					if (v.attributes) {
+						let match = true;
+						for (const k in v.attributes) {
+							const cleanK = k.replace('attribute_', '').replace('pa_', '').toLowerCase();
+							const vVal = (v.attributes[k] || '').toLowerCase();
+							if (vVal === '') continue; // wildcard
+
+							const chosen = (nextAttrs[cleanK] || nextAttrs['attribute_' + cleanK] || nextAttrs['pa_' + cleanK] || nextAttrs[k] || '').toLowerCase();
+							if (chosen && vVal !== chosen) {
+								match = false;
+								break;
+							}
+						}
+						if (match) {
+							matchedVar = v;
+							break;
+						}
+					}
+				}
+
+				if (matchedVar && matchedVar.image_url) {
+					setActiveCanvasImage(matchedVar.image_url);
+				} else {
+					// Fallback: check if any gallery image contains the color/option name
+					const gUrls = (currentProd && currentProd.gallery_urls) || [];
+					const optLower = String(optValue).toLowerCase();
+					const matchG = gUrls.find(u => u.toLowerCase().includes(optLower));
+					if (matchG) {
+						setActiveCanvasImage(matchG);
+					}
+				}
+			},
+			onSelectCanvasImage: (imgUrl) => {
+				setActiveCanvasImage(imgUrl);
+			},
+			onResetVariation: () => {
+				setActiveVariationAttrs({});
+				setActiveCanvasImage(null);
+			}
+		};
 
 		return h(
 			'div',
@@ -7764,7 +7822,7 @@
 					objectFit: imgStyles.object_fit || 'contain',
 				};
 
-				const mainImgSrc = safeSample.image_url || staticFallback.image_url || '';
+				const mainImgSrc = safeSample.activeCanvasImage || safeSample.image_url || staticFallback.image_url || '';
 				const galleryUrls = Array.isArray(safeSample.gallery_urls) && safeSample.gallery_urls.length > 0
 					? safeSample.gallery_urls
 					: (mainImgSrc ? [mainImgSrc] : []);
@@ -7847,13 +7905,20 @@
 										{
 											className: 'sppcfw-flex sppcfw-gap-2 sppcfw-overflow-hidden sppcfw-w-full sppcfw-py-1'
 										},
-										galleryUrls.map((gUrl, gIdx) =>
-											h(
+										galleryUrls.map((gUrl, gIdx) => {
+											const isThumbActive = gUrl === mainImgSrc || (gIdx === 0 && !safeSample.activeCanvasImage);
+											return h(
 												'div',
 												{
 													key: 'g-thumb-car-' + gIdx,
+													onClick: (e) => {
+														e.stopPropagation();
+														if (typeof safeSample.onSelectCanvasImage === 'function') {
+															safeSample.onSelectCanvasImage(gUrl);
+														}
+													},
 													className: `sppcfw-border sppcfw-rounded sppcfw-overflow-hidden sppcfw-cursor-pointer sppcfw-transition-all sppcfw-p-1 sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-shrink-0 ${
-														gIdx === 0 ? 'sppcfw-border-[#9333ea] sppcfw-ring-1 sppcfw-ring-[#9333ea]' : 'sppcfw-border-[#e5e7eb] hover:sppcfw-border-[#9333ea]'
+														isThumbActive ? 'sppcfw-border-[#9333ea] sppcfw-ring-1 sppcfw-ring-[#9333ea]' : 'sppcfw-border-[#e5e7eb] hover:sppcfw-border-[#9333ea]'
 													}`,
 													style: {
 														width: `calc((100% - (${cols} - 1) * 8px) / ${cols})`,
@@ -7865,8 +7930,8 @@
 													alt: `Gallery thumbnail ${gIdx + 1}`,
 													className: 'sppcfw-max-h-16 sppcfw-w-full sppcfw-object-contain sppcfw-rounded-sm'
 												})
-											)
-										)
+											);
+										})
 									),
 									imgSettings.show_carousel_arrows !== false &&
 										h(
@@ -7888,13 +7953,20 @@
 											gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))`
 										}
 									},
-									galleryUrls.map((gUrl, gIdx) =>
-										h(
+									galleryUrls.map((gUrl, gIdx) => {
+										const isThumbActive = gUrl === mainImgSrc || (gIdx === 0 && !safeSample.activeCanvasImage);
+										return h(
 											'div',
 											{
 												key: 'g-thumb-grid-' + gIdx,
+												onClick: (e) => {
+													e.stopPropagation();
+													if (typeof safeSample.onSelectCanvasImage === 'function') {
+														safeSample.onSelectCanvasImage(gUrl);
+													}
+												},
 												className: `sppcfw-border sppcfw-rounded sppcfw-overflow-hidden sppcfw-cursor-pointer sppcfw-transition-all sppcfw-p-1 sppcfw-flex sppcfw-items-center sppcfw-justify-center ${
-													gIdx === 0 ? 'sppcfw-border-[#9333ea] sppcfw-ring-1 sppcfw-ring-[#9333ea]' : 'sppcfw-border-[#e5e7eb] hover:sppcfw-border-[#9333ea]'
+													isThumbActive ? 'sppcfw-border-[#9333ea] sppcfw-ring-1 sppcfw-ring-[#9333ea]' : 'sppcfw-border-[#e5e7eb] hover:sppcfw-border-[#9333ea]'
 												}`
 											},
 											h('img', {
@@ -7902,8 +7974,8 @@
 												alt: `Gallery thumbnail ${gIdx + 1}`,
 												className: 'sppcfw-max-h-16 sppcfw-w-full sppcfw-object-contain sppcfw-rounded-sm'
 											})
-										)
-									)
+										);
+									})
 							  )
 						)
 				);
@@ -8055,6 +8127,10 @@
 							{ className: 'sppcfw-space-y-3 sppcfw-pb-2' },
 							safeSample.variations.map((attr, aIdx) => {
 								const isColor = (attr.name && attr.name.toLowerCase().includes('color')) || (attr.label && attr.label.toLowerCase().includes('color'));
+								const attrKey = attr.name || attr.label || `attr_${aIdx}`;
+								const cleanKey = String(attrKey).replace('attribute_', '').replace('pa_', '');
+								const selectedOpt = (safeSample.activeVariationAttrs && (safeSample.activeVariationAttrs[cleanKey] || safeSample.activeVariationAttrs[attrKey] || safeSample.activeVariationAttrs[attr.name] || safeSample.activeVariationAttrs[attr.label])) || (attr.options && attr.options[0]);
+
 								return h(
 									'div',
 									{ key: attr.name || aIdx, className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-flex-wrap' },
@@ -8071,13 +8147,19 @@
 										'div',
 										{ className: 'sppcfw-flex sppcfw-flex-wrap', style: { gap: swatchGap } },
 										(attr.options || []).map((opt, oIdx) => {
+											const isActive = selectedOpt === opt;
 											if (isColor) {
 												const optLower = String(opt).toLowerCase().trim();
 												const hexColor = colorHexMap[optLower] || '#9333ea';
-												const isActive = oIdx === 0;
 												return h('span', {
 													key: opt,
 													title: opt,
+													onClick: (e) => {
+														e.stopPropagation();
+														if (typeof safeSample.onSelectVariationOption === 'function') {
+															safeSample.onSelectVariationOption(cleanKey, opt);
+														}
+													},
 													className: `sppcfw-border-2 sppcfw-shadow-sm sppcfw-cursor-pointer sppcfw-inline-block sppcfw-transition-all`,
 													style: {
 														backgroundColor: hexColor,
@@ -8085,15 +8167,20 @@
 														height: swatchSize,
 														borderRadius: swatchRadius,
 														borderColor: isActive ? activeSwatchColor : '#e5e7eb',
-														boxShadow: isActive ? `0 0 0 2px ${activeSwatchColor}33` : 'none',
+														boxShadow: isActive ? `0 0 0 2px ${activeSwatchColor}55` : 'none',
 													}
 												});
 											}
-											const isActive = oIdx === 0;
 											return h(
 												'span',
 												{
 													key: opt,
+													onClick: (e) => {
+														e.stopPropagation();
+														if (typeof safeSample.onSelectVariationOption === 'function') {
+															safeSample.onSelectVariationOption(cleanKey, opt);
+														}
+													},
 													className: 'sppcfw-px-3 sppcfw-py-1 sppcfw-text-xs sppcfw-cursor-pointer sppcfw-transition-all sppcfw-inline-flex sppcfw-items-center sppcfw-justify-center',
 													style: {
 														borderRadius: swatchRadius,
@@ -8116,7 +8203,16 @@
 								h(
 									'div',
 									{ className: 'sppcfw-pt-1' },
-									h('button', { type: 'button', className: 'sppcfw-text-[11px] sppcfw-text-[#9333ea] hover:sppcfw-underline sppcfw-font-medium sppcfw-cursor-pointer' }, '✕ Clear selection')
+									h('button', {
+										type: 'button',
+										onClick: (e) => {
+											e.stopPropagation();
+											if (typeof safeSample.onResetVariation === 'function') {
+												safeSample.onResetVariation();
+											}
+										},
+										className: 'sppcfw-text-[11px] sppcfw-text-[#9333ea] hover:sppcfw-underline sppcfw-font-medium sppcfw-cursor-pointer'
+									}, '✕ Clear selection')
 								)
 						),
 
@@ -8126,6 +8222,10 @@
 							'div',
 							{ className: 'sppcfw-space-y-3 sppcfw-pb-2' },
 							safeSample.variations.map((attr, aIdx) => {
+								const attrKey = attr.name || attr.label || `attr_${aIdx}`;
+								const cleanKey = String(attrKey).replace('attribute_', '').replace('pa_', '');
+								const selectedOpt = (safeSample.activeVariationAttrs && (safeSample.activeVariationAttrs[cleanKey] || safeSample.activeVariationAttrs[attrKey] || safeSample.activeVariationAttrs[attr.name] || safeSample.activeVariationAttrs[attr.label])) || '';
+
 								return h(
 									'div',
 									{ key: attr.name || aIdx, className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-3' },
@@ -8141,7 +8241,13 @@
 									h(
 										'select',
 										{
-											className: 'sppcfw-bg-[#ffffff] sppcfw-border sppcfw-border-[#d1d5db] sppcfw-rounded sppcfw-px-3 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-[#111827] focus:sppcfw-outline-none focus:sppcfw-ring-1 focus:sppcfw-ring-[#9333ea] sppcfw-w-48'
+											className: 'sppcfw-bg-[#ffffff] sppcfw-border sppcfw-border-[#d1d5db] sppcfw-rounded sppcfw-px-3 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-[#111827] focus:sppcfw-outline-none focus:sppcfw-ring-1 focus:sppcfw-ring-[#9333ea] sppcfw-w-48',
+											value: selectedOpt,
+											onChange: (e) => {
+												if (typeof safeSample.onSelectVariationOption === 'function') {
+													safeSample.onSelectVariationOption(cleanKey, e.target.value);
+												}
+											}
 										},
 										h('option', { value: '' }, `Choose an option`),
 										(attr.options || []).map(opt => h('option', { key: opt, value: opt }, opt))
@@ -8152,7 +8258,16 @@
 								h(
 									'div',
 									{ className: 'sppcfw-pt-1' },
-									h('button', { type: 'button', className: 'sppcfw-text-[11px] sppcfw-text-[#9333ea] hover:sppcfw-underline sppcfw-font-medium sppcfw-cursor-pointer' }, '✕ Clear selection')
+									h('button', {
+										type: 'button',
+										onClick: (e) => {
+											e.stopPropagation();
+											if (typeof safeSample.onResetVariation === 'function') {
+												safeSample.onResetVariation();
+											}
+										},
+										className: 'sppcfw-text-[11px] sppcfw-text-[#9333ea] hover:sppcfw-underline sppcfw-font-medium sppcfw-cursor-pointer'
+									}, '✕ Clear selection')
 								)
 						),
 
@@ -8181,10 +8296,25 @@
 									{ className: 'sppcfw-divide-y sppcfw-divide-[#e5e7eb] sppcfw-bg-white' },
 									(function() {
 										if (safeSample && safeSample.available_variations && safeSample.available_variations.length > 0) {
-											return safeSample.available_variations.map((vRow, rIdx) =>
-												h(
+											return safeSample.available_variations.map((vRow, rIdx) => {
+												const isRowSelected = safeSample.activeCanvasImage === vRow.image_url || (rIdx === 0 && !safeSample.activeCanvasImage);
+												return h(
 													'tr',
-													{ key: vRow.variation_id || rIdx, className: rIdx === 0 ? 'sppcfw-bg-[#faf5ff]' : '' },
+													{
+														key: vRow.variation_id || rIdx,
+														onClick: () => {
+															if (vRow.image_url && typeof safeSample.onSelectCanvasImage === 'function') {
+																safeSample.onSelectCanvasImage(vRow.image_url);
+															}
+															if (vRow.attributes && typeof safeSample.onSelectVariationOption === 'function') {
+																for (const k in vRow.attributes) {
+																	const cK = k.replace('attribute_', '').replace('pa_', '');
+																	safeSample.onSelectVariationOption(cK, vRow.attributes[k]);
+																}
+															}
+														},
+														className: `sppcfw-cursor-pointer hover:sppcfw-bg-purple-50/50 sppcfw-transition-colors ${isRowSelected ? 'sppcfw-bg-[#faf5ff]' : ''}`
+													},
 													h('td', { className: 'sppcfw-p-2.5 sppcfw-font-medium sppcfw-text-[#111827]' }, vRow.name),
 													h('td', { className: 'sppcfw-p-2.5 sppcfw-font-bold sppcfw-text-[#9333ea]' }, vRow.price || safeSample.price || '$49.99'),
 													h('td', { className: `sppcfw-p-2.5 sppcfw-font-medium ${vRow.is_in_stock === false ? 'sppcfw-text-red-500' : 'sppcfw-text-green-600'}` }, vRow.stock || 'In Stock'),
@@ -8195,11 +8325,12 @@
 															type: 'radio',
 															name: 'builder_demo_variation_radio',
 															className: 'sppcfw-accent-[#9333ea] sppcfw-cursor-pointer',
-															defaultChecked: rIdx === 0
+															checked: isRowSelected,
+															onChange: () => {}
 														})
 													)
-												)
-											);
+												);
+											});
 										}
 										let combinations = [];
 										if (safeSample && safeSample.variations && safeSample.variations.length > 0) {

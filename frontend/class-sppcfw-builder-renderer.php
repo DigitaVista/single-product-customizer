@@ -766,6 +766,55 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						});
 					}
 					initSppcfwGalleries();
+
+					// Sync variation selection with product gallery
+					if (typeof jQuery !== 'undefined') {
+						jQuery(document).on('found_variation', 'form.variations_form', function(event, variation) {
+							if (variation && variation.image && (variation.image.full_src || variation.image.src || variation.image.url)) {
+								var newMain = variation.image.full_src || variation.image.src || variation.image.url;
+								var mainImgs = document.querySelectorAll('.sppcfw-gallery-main-img');
+								var thumbs = document.querySelectorAll('.sppcfw-gallery-carousel-slide, .sppcfw-gallery-grid-thumb');
+								mainImgs.forEach(function(img) {
+									img.style.opacity = '0.3';
+									setTimeout(function() {
+										img.src = newMain;
+										img.setAttribute('data-zoom-src', newMain);
+										img.setAttribute('data-full-src', newMain);
+										img.style.opacity = '1';
+									}, 60);
+								});
+								thumbs.forEach(function(t) {
+									t.classList.remove('is-active');
+									var mSrc = t.getAttribute('data-main-src') || '';
+									var fSrc = t.getAttribute('data-full-src') || '';
+									if (mSrc === newMain || fSrc === newMain || (variation.image.thumb_src && mSrc === variation.image.thumb_src)) {
+										t.classList.add('is-active');
+									}
+								});
+							}
+						});
+
+						jQuery(document).on('reset_data', 'form.variations_form', function() {
+							var thumbs = document.querySelectorAll('.sppcfw-gallery-carousel-slide, .sppcfw-gallery-grid-thumb');
+							var mainImgs = document.querySelectorAll('.sppcfw-gallery-main-img');
+							var first = thumbs[0];
+							if (first) {
+								thumbs.forEach(function(t) { t.classList.remove('is-active'); });
+								first.classList.add('is-active');
+								var origMain = first.getAttribute('data-main-src');
+								var origFull = first.getAttribute('data-full-src');
+								if (origMain) {
+									mainImgs.forEach(function(img) {
+										img.src = origMain;
+										if (origFull) {
+											img.setAttribute('data-zoom-src', origFull);
+											img.setAttribute('data-full-src', origFull);
+										}
+									});
+								}
+							}
+						});
+					}
 				});
 			";
 			wp_register_script('sppcfw-builder-frontend-gallery', '', array(), false, true);

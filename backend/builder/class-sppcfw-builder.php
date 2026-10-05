@@ -448,6 +448,15 @@ if (!class_exists('SPPCFW_Builder')) {
 								$attr_labels[] = $term_name ? $term_name : $attr_v;
 							}
 						}
+						$var_img = '';
+						if (!empty($var['image']['full_src'])) {
+							$var_img = $var['image']['full_src'];
+						} elseif (!empty($var['image']['src'])) {
+							$var_img = $var['image']['src'];
+						} elseif (!empty($var['image']['url'])) {
+							$var_img = $var['image']['url'];
+						}
+
 						$available_vars_list[] = array(
 							'variation_id' => $var['variation_id'],
 							'name'         => !empty($attr_labels) ? implode(' / ', $attr_labels) : __('Variation', 'single-product-customizer') . ' #' . $var['variation_id'],
@@ -455,6 +464,7 @@ if (!class_exists('SPPCFW_Builder')) {
 							'price'        => !empty($var['price_html']) ? strip_tags($var['price_html']) : wc_price($var['display_price']),
 							'stock'        => $var['is_in_stock'] ? __('In Stock', 'single-product-customizer') : __('Out of Stock', 'single-product-customizer'),
 							'is_in_stock'  => $var['is_in_stock'],
+							'image_url'    => $var_img,
 							'attributes'   => $var['attributes'],
 						);
 					}
