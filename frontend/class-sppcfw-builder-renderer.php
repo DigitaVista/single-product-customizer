@@ -1259,6 +1259,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						$css .= ".sppcfw-el-{$id}.sppcfw-add-to-cart-wrapper, .sppcfw-el-{$id} { background: transparent !important; background-color: transparent !important; border: none !important; padding: 0 !important; width: 100% !important; text-align: {$align_text} !important; }";
 						$css .= ".sppcfw-el-{$id} form.cart, .sppcfw-el-{$id} .variations_form { display: flex !important; flex-wrap: wrap !important; align-items: center !important; gap: {$gap_val} !important; margin: 0 !important; padding: 0 !important; background: transparent !important; background-color: transparent !important; border: none !important; justify-content: {$justify} !important; }";
 						$css .= ".sppcfw-el-{$id} form.cart table.variations { width: 100% !important; margin-bottom: 12px !important; background: transparent !important; }";
+						$css .= ".sppcfw-el-{$id}.sppcfw-var-display-table form.cart table.variations, .sppcfw-el-{$id} .sppcfw-var-display-table form.cart table.variations, .sppcfw-el-{$id}.sppcfw-var-display-table .single_variation_wrap .woocommerce-variation-price, .sppcfw-el-{$id}.sppcfw-var-display-table .single_variation_wrap .woocommerce-variation-availability { display: none !important; }";
 
 						// Quantity wrapper & buttons styling (isolated from Add to Cart button styles)
 						$css .= ".sppcfw-el-{$id} form.cart .quantity, .sppcfw-el-{$id} .variations_form .quantity, .sppcfw-el-{$id} .quantity, .sppcfw-el-{$id} .quantity.buttons_added { display: inline-flex !important; align-items: center !important; margin: 0 !important; float: none !important; border: 1px solid {$qty_border} !important; border-color: {$qty_border} !important; border-radius: 4px !important; overflow: hidden !important; background-color: {$qty_bg} !important; background: {$qty_bg} !important; height: 42px !important; box-sizing: border-box !important; gap: 0 !important; }";
@@ -1307,6 +1308,33 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 							}
 							$css .= 'opacity: 0.95 !important;';
 							$css .= '}';
+						}
+
+						// Variation Swatches & Attributes styling
+						$var_label_color = $this->sppcfw_get_device_prop($styles, 'var_label_color', $device, '');
+						$var_label_size = $this->sppcfw_get_device_prop($styles, 'var_label_size', $device, '');
+						$swatch_size = $this->sppcfw_get_device_prop($styles, 'swatch_size', $device, '');
+						$swatch_border_radius = $this->sppcfw_get_device_prop($styles, 'swatch_border_radius', $device, '');
+						$active_swatch_color = $this->sppcfw_get_device_prop($styles, 'active_swatch_color', $device, '');
+						$swatch_gap = $this->sppcfw_get_device_prop($styles, 'swatch_gap', $device, '');
+
+						if (!empty($var_label_color)) {
+							$css .= ".sppcfw-el-{$id} table.variations label, .sppcfw-el-{$id} table.variations .label { color: " . esc_attr($var_label_color) . ' !important; }';
+						}
+						if (!empty($var_label_size)) {
+							$css .= ".sppcfw-el-{$id} table.variations label, .sppcfw-el-{$id} table.variations .label { font-size: " . esc_attr($var_label_size) . ' !important; }';
+						}
+						if (!empty($active_swatch_color)) {
+							$css .= ".sppcfw-el-{$id} .sppcfw-swatch-item.selected, .sppcfw-el-{$id} .sppcfw-swatch-item.active { border-color: " . esc_attr($active_swatch_color) . ' !important; outline-color: ' . esc_attr($active_swatch_color) . ' !important; }';
+						}
+						if (!empty($swatch_size)) {
+							$css .= ".sppcfw-el-{$id} .sppcfw-swatch-item { width: " . esc_attr($swatch_size) . ' !important; height: ' . esc_attr($swatch_size) . ' !important; }';
+						}
+						if (!empty($swatch_border_radius)) {
+							$css .= ".sppcfw-el-{$id} .sppcfw-swatch-item { border-radius: " . esc_attr($swatch_border_radius) . ' !important; }';
+						}
+						if (!empty($swatch_gap)) {
+							$css .= ".sppcfw-el-{$id} .sppcfw-swatches-container, .sppcfw-el-{$id} table.variations td.value { gap: " . esc_attr($swatch_gap) . ' !important; }';
 						}
 					}
 
@@ -1787,6 +1815,9 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					break;
 				case 'product_add_to_cart':
 					$custom_class = !empty($advanced['custom_class']) ? ' ' . esc_attr($advanced['custom_class']) : '';
+					$var_display_type = !empty($settings['variation_display_type']) ? $settings['variation_display_type'] : 'swatches';
+					$swatch_shape = !empty($settings['swatch_shape']) ? $settings['swatch_shape'] : 'circle';
+					$show_labels = isset($settings['show_attribute_labels']) && false === $settings['show_attribute_labels'] ? ' sppcfw-hide-var-labels' : '';
 					$cart_btn_text = '';
 					$basic = get_option('sppcfw_basic', array());
 					if (is_array($basic) && !empty($basic['add_to_cart_button_text'])) {
@@ -1795,7 +1826,122 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						$cart_btn_text = $settings['button_text'];
 					}
 
-					echo '<div class="sppcfw-add-to-cart-wrapper sppcfw-el-' . $id . $custom_class . '">';
+					$var_classes = ' sppcfw-var-display-' . esc_attr($var_display_type) . ' sppcfw-swatch-shape-' . esc_attr($swatch_shape) . $show_labels;
+
+					echo '<div class="sppcfw-add-to-cart-wrapper sppcfw-el-' . $id . $var_classes . $custom_class . '">';
+
+					if ('table' === $var_display_type && $product && $product->is_type('variable')) {
+						$available_variations = $product->get_available_variations();
+						if (!empty($available_variations)) {
+							echo '<div class="sppcfw-variation-table-container sppcfw-mb-4" style="width:100%;border:1px solid #e5e7eb;border-radius:8px;overflow:hidden;margin-bottom:16px;">';
+							echo '<table class="sppcfw-variation-table-grid" style="width:100%;border-collapse:collapse;font-size:13px;text-align:left;">';
+							echo '<thead style="background:#f9fafb;border-bottom:1px solid #e5e7eb;color:#4b5563;font-weight:600;">';
+							echo '<tr>';
+							echo '<th style="padding:10px 12px;">' . esc_html__('Variation', 'single-product-customizer') . '</th>';
+							echo '<th style="padding:10px 12px;">' . esc_html__('Price', 'single-product-customizer') . '</th>';
+							echo '<th style="padding:10px 12px;">' . esc_html__('Stock', 'single-product-customizer') . '</th>';
+							echo '<th style="padding:10px 12px;text-align:center;">' . esc_html__('Select', 'single-product-customizer') . '</th>';
+							echo '</tr>';
+							echo '</thead>';
+							echo '<tbody style="background:#ffffff;">';
+							foreach ($available_variations as $idx => $var) {
+								$attr_labels = array();
+								if (!empty($var['attributes'])) {
+									foreach ($var['attributes'] as $attr_k => $attr_v) {
+										$clean_slug = str_replace('attribute_', '', $attr_k);
+										$term_name = $attr_v;
+										if (taxonomy_exists($clean_slug)) {
+											$term = get_term_by('slug', $attr_v, $clean_slug);
+											if ($term && !is_wp_error($term)) {
+												$term_name = $term->name;
+											}
+										}
+										$attr_labels[] = $term_name ? $term_name : $attr_v;
+									}
+								}
+								$var_name = !empty($attr_labels) ? implode(' / ', $attr_labels) : __('Variation', 'single-product-customizer') . ' #' . $var['variation_id'];
+								$price_html = !empty($var['price_html']) ? $var['price_html'] : wc_price($var['display_price']);
+								$is_in_stock = $var['is_in_stock'];
+								$stock_text = $is_in_stock ? __('In Stock', 'single-product-customizer') : __('Out of Stock', 'single-product-customizer');
+								$stock_color = $is_in_stock ? '#10b981' : '#ef4444';
+								$is_first = (0 === $idx);
+								$row_bg = $is_first ? 'background:#faf5ff;' : '';
+								$attr_json = esc_attr(wp_json_encode($var['attributes']));
+
+								echo '<tr class="sppcfw-var-grid-row' . ($is_first ? ' is-selected' : '') . '" data-variation-id="' . esc_attr($var['variation_id']) . '" data-attributes="' . $attr_json . '" style="border-bottom:1px solid #f3f4f6;cursor:pointer;' . $row_bg . '">';
+								echo '<td style="padding:10px 12px;font-weight:500;color:#111827;">' . esc_html($var_name) . '</td>';
+								echo '<td style="padding:10px 12px;font-weight:bold;color:#9333ea;">' . wp_kses_post($price_html) . '</td>';
+								echo '<td style="padding:10px 12px;font-weight:500;color:' . esc_attr($stock_color) . ';">' . esc_html($stock_text) . '</td>';
+								echo '<td style="padding:10px 12px;text-align:center;"><input type="radio" name="sppcfw_var_radio_' . esc_attr($id) . '" class="sppcfw-var-radio" value="' . esc_attr($var['variation_id']) . '" ' . checked($is_first, true, false) . ' style="accent-color:#9333ea;cursor:pointer;" /></td>';
+								echo '</tr>';
+							}
+							echo '</tbody>';
+							echo '</table>';
+							echo '</div>';
+
+							// Script to sync table selection with WooCommerce variations form
+							echo '<script>
+							(function() {
+								function initVarTableSync() {
+									var wrapper = document.querySelector(".sppcfw-el-' . esc_js($id) . '");
+									if (!wrapper) return;
+									var form = wrapper.querySelector("form.variations_form");
+									var rows = wrapper.querySelectorAll(".sppcfw-var-grid-row");
+									if (!form || !rows.length) return;
+
+									function selectRow(row) {
+										rows.forEach(function(r) {
+											r.classList.remove("is-selected");
+											r.style.backgroundColor = "";
+											var rad = r.querySelector("input.sppcfw-var-radio");
+											if (rad) rad.checked = false;
+										});
+										row.classList.add("is-selected");
+										row.style.backgroundColor = "#faf5ff";
+										var radio = row.querySelector("input.sppcfw-var-radio");
+										if (radio) radio.checked = true;
+
+										var attrData = row.getAttribute("data-attributes");
+										if (attrData) {
+											try {
+												var attrs = JSON.parse(attrData);
+												for (var k in attrs) {
+													var select = form.querySelector(\'select[name="\' + k + \'"]\');
+													if (select) {
+														select.value = attrs[k];
+														if (typeof jQuery !== "undefined") {
+															jQuery(select).trigger("change");
+														} else {
+															select.dispatchEvent(new Event("change", { bubbles: true }));
+														}
+													}
+												}
+											} catch(e) {}
+										}
+									}
+
+									rows.forEach(function(row) {
+										row.addEventListener("click", function(e) {
+											selectRow(row);
+										});
+									});
+
+									// Initial trigger for first row
+									var first = rows[0];
+									if (first) {
+										setTimeout(function() { selectRow(first); }, 150);
+									}
+								}
+								if (document.readyState === "loading") {
+									document.addEventListener("DOMContentLoaded", initVarTableSync);
+								} else {
+									initVarTableSync();
+								}
+							})();
+							</script>';
+						}
+					}
+
 					ob_start();
 					woocommerce_template_single_add_to_cart();
 					$cart_html = ob_get_clean();

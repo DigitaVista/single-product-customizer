@@ -39,7 +39,7 @@
 		stock_text: 'In Stock',
 		rating_count: 5,
 		image_url: window.SPPCFWBuilderConfig ? window.SPPCFWBuilderConfig.plugin_url + 'backend/resources/images/features-img.webp' : '',
-		short_description: 'This is a product short description placeholder for designing your WooCommerce single product page layout.',
+		short_description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
 		description: 'Full product description placeholder detailing extensive technical specifications and features.',
 		categories: 'Clothing, Featured',
 		tags: 'Customizer, Premium',
@@ -84,7 +84,6 @@
 		{ type: 'product_short_desc', name: 'Short Description', icon: 'description' },
 		{ type: 'product_description', name: 'Full Description & Tabs', icon: 'toc' },
 		{ type: 'product_meta', name: 'Product Meta', icon: 'inventory_2' },
-		{ type: 'variation_swatches', name: 'Variation Table', icon: 'grid_view' },
 		{ type: 'custom_message', name: 'Custom Message', icon: 'campaign' },
 		{ type: 'plus_minus_buttons', name: 'Plus/Minus Stepper', icon: 'exposure' },
 		{ type: 'related_products', name: 'Related Products', icon: 'grid_on' },
@@ -2951,6 +2950,9 @@
 		const [openAccordions, setOpenAccordions] = useState({
 			general: true,
 			items: true,
+			cart_general: true,
+			variation_settings: true,
+			variation_style: true,
 			html_editor: true,
 			css_editor: true,
 			js_editor: true,
@@ -3272,7 +3274,7 @@
 		}
 
 		function renderAccordion(key, title, content, icon = null, badge = null) {
-			const isOpen = !!openAccordions[key];
+			const isOpen = openAccordions[key] !== undefined ? !!openAccordions[key] : true;
 			return h(
 				'div',
 				{ key: key, className: 'sppcfw-border-b sppcfw-border-[#374151] sppcfw-pb-4 sppcfw-space-y-3.5' },
@@ -5066,6 +5068,40 @@
 							)
 						)
 					)
+				),
+				renderAccordion(
+					'variation_style',
+					'Variation & Swatches Style',
+					h(
+						'div',
+						{ className: 'sppcfw-space-y-3.5' },
+						renderColorPicker('Attribute Label Color', getStyle('var_label_color'), v => handleStyleChange('var_label_color', v), '#374151'),
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							renderControlHeader('Attribute Label Size', true, fontSizeUnit, setFontSizeUnit, ['px']),
+							renderSliderInput(getStyle('var_label_size') || '12px', v => handleStyleChange('var_label_size', v), 10, 24, 1, 'px', '12')
+						),
+						renderColorPicker('Active Swatch Accent Color', getStyle('active_swatch_color'), v => handleStyleChange('active_swatch_color', v), '#9333ea'),
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							renderControlHeader('Swatch Size', true, widthUnit, setWidthUnit, ['px']),
+							renderSliderInput(getStyle('swatch_size') || '26px', v => handleStyleChange('swatch_size', v), 18, 50, 1, 'px', '26')
+						),
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							renderControlHeader('Swatch Border Radius', true, radiusUnit, setRadiusUnit, ['px', '%']),
+							renderSliderInput(getStyle('swatch_border_radius') || '6px', v => handleStyleChange('swatch_border_radius', v), 0, 50, 1, 'px', '6')
+						),
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							renderControlHeader('Swatch Items Gap', true, widthUnit, setWidthUnit, ['px']),
+							renderSliderInput(getStyle('swatch_gap') || '8px', v => handleStyleChange('swatch_gap', v), 0, 30, 1, 'px', '8')
+						)
+					)
 				)
 			);
 		}
@@ -5749,12 +5785,17 @@
 
 		// 1h. Add to Cart Content Panel
 		function renderAddToCartContent() {
+			const varDisplayType = getSetting('variation_display_type') || 'swatches';
+			const swatchShape = getSetting('swatch_shape') || 'circle';
+			const showLabels = getSetting('show_attribute_labels') !== false;
+			const showReset = !!getSetting('show_variation_reset');
+
 			return h(
 				'div',
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'cart_general',
-					'Quantity & Cart Settings',
+					'Quantity & Button Settings',
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
@@ -5806,6 +5847,67 @@
 										value: val,
 									});
 								},
+							})
+						)
+					)
+				),
+				renderAccordion(
+					'variation_settings',
+					'Variation Display Settings',
+					h(
+						'div',
+						{ className: 'sppcfw-space-y-3.5' },
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-1.5' },
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, 'Variation Display Mode'),
+							h(
+								'select',
+								{
+									className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-2 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
+									value: varDisplayType,
+									onChange: e => handleSettingChange('variation_display_type', e.target.value),
+								},
+								h('option', { value: 'swatches' }, '🎨 Color & Label Swatches'),
+								h('option', { value: 'dropdown' }, '📋 WooCommerce Default Dropdowns'),
+								h('option', { value: 'table' }, '📊 Variation Table / Grid')
+							)
+						),
+						varDisplayType === 'swatches' &&
+							h(
+								'div',
+								{ className: 'sppcfw-space-y-1.5' },
+								h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, 'Swatch Shape'),
+								renderButtonGroup(
+									[
+										{ value: 'circle', label: 'Circle' },
+										{ value: 'rounded', label: 'Rounded' },
+										{ value: 'square', label: 'Square' },
+									],
+									swatchShape,
+									v => handleSettingChange('swatch_shape', v)
+								)
+							),
+						h(
+							'div',
+							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Show Attribute Labels (Color, Size)'),
+							h('input', {
+								type: 'checkbox',
+								className: 'sppcfw-accent-[#9333ea] sppcfw-w-4 sppcfw-h-4 sppcfw-cursor-pointer',
+								checked: showLabels,
+								onChange: e => handleSettingChange('show_attribute_labels', e.target.checked),
+							})
+						),
+						h(
+							'div',
+							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Show Variation Clear / Reset Link'),
+							h('input', {
+								type: 'checkbox',
+								className: 'sppcfw-accent-[#9333ea] sppcfw-w-4 sppcfw-h-4 sppcfw-cursor-pointer',
+								checked: showReset,
+								onChange: e => handleSettingChange('show_variation_reset', e.target.checked),
 							})
 						)
 					)
@@ -7914,30 +8016,264 @@
 				const isPlusMinusOn = (settings && settings.enable_plus_minus_button === 'on') ||
 					(typeof window !== 'undefined' && window.SPPCFWBuilderConfig && window.SPPCFWBuilderConfig.basic_settings && window.SPPCFWBuilderConfig.basic_settings.enable_plus_minus_button === 'on');
 
+				const hasVariations = safeSample && safeSample.variations && safeSample.variations.length > 0;
+				const varDisplayType = (settings && settings.variation_display_type) || 'swatches';
+				const swatchShape = (settings && settings.swatch_shape) || 'circle';
+				const showLabels = settings && settings.show_attribute_labels !== undefined ? settings.show_attribute_labels : true;
+				const showReset = !!(settings && settings.show_variation_reset);
+
+				// Swatches & Variation Styles
+				const varLabelColor = getResponsiveProp(styles, 'var_label_color', deviceView) || '#374151';
+				const varLabelSize = getResponsiveProp(styles, 'var_label_size', deviceView) || '12px';
+				const swatchSize = getResponsiveProp(styles, 'swatch_size', deviceView) || '26px';
+				const swatchRadius = swatchShape === 'circle' ? '9999px' : (swatchShape === 'square' ? '2px' : (getResponsiveProp(styles, 'swatch_border_radius', deviceView) || '6px'));
+				const activeSwatchColor = getResponsiveProp(styles, 'active_swatch_color', deviceView) || '#9333ea';
+				const swatchGap = getResponsiveProp(styles, 'swatch_gap', deviceView) || '8px';
+
+				const colorHexMap = {
+					'black': '#111827',
+					'purple': '#9333ea',
+					'blue': '#3b82f6',
+					'red': '#ef4444',
+					'green': '#10b981',
+					'yellow': '#f59e0b',
+					'white': '#ffffff',
+					'gray': '#6b7280',
+					'grey': '#6b7280',
+					'pink': '#ec4899',
+					'orange': '#f97316'
+				};
+
 				return h(
 					'div',
-					{ className: `sppcfw-flex sppcfw-items-center ${alignFlex}`, style: { gap: gapVal } },
-					isPlusMinusOn
-						? h(
-								'div',
-								{ className: 'sppcfw-flex sppcfw-items-center sppcfw-border sppcfw-rounded sppcfw-overflow-hidden', style: { borderColor: qtyBorder, backgroundColor: qtyBg } },
-								h('button', { type: 'button', className: 'sppcfw-w-8 sppcfw-h-10 sppcfw-font-bold sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-border-r sppcfw-cursor-pointer sppcfw-select-none', style: { backgroundColor: qtyBtnBg, color: qtyBtnColor, borderRightColor: qtyBorder } }, '-'),
-								h('input', { type: 'number', defaultValue: 1, min: 1, className: 'sppcfw-w-12 sppcfw-h-10 sppcfw-text-center sppcfw-font-bold sppcfw-border-0 sppcfw-outline-none focus:sppcfw-ring-0', style: { backgroundColor: qtyBg, color: qtyColor } }),
-								h('button', { type: 'button', className: 'sppcfw-w-8 sppcfw-h-10 sppcfw-font-bold sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-border-l sppcfw-cursor-pointer sppcfw-select-none', style: { backgroundColor: qtyBtnBg, color: qtyBtnColor, borderLeftColor: qtyBorder } }, '+')
-						  )
-						: h('input', { type: 'number', defaultValue: 1, min: 1, className: 'sppcfw-w-16 sppcfw-p-2 sppcfw-border sppcfw-rounded sppcfw-text-center sppcfw-font-bold', style: { borderColor: qtyBorder, backgroundColor: qtyBg, color: qtyColor } }),
-					h('button', {
-						className: 'sppcfw-shadow sppcfw-transition-all',
-						style: {
-							backgroundColor: btnBg,
-							color: btnColor,
-							borderRadius: btnRadius,
-							fontSize: btnFontSize,
-							fontWeight: btnFontWeight !== 'Default' ? btnFontWeight : 'bold',
-							fontFamily: btnFontFamily && btnFontFamily !== 'Inherit' ? `${btnFontFamily}, sans-serif` : undefined,
-							padding: btnPadding,
-						}
-					}, btnLabel)
+					{ className: 'sppcfw-space-y-4 sppcfw-w-full' },
+
+					// 1. Variation Section (Swatches Mode)
+					hasVariations && varDisplayType === 'swatches' &&
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-3 sppcfw-pb-2' },
+							safeSample.variations.map((attr, aIdx) => {
+								const isColor = (attr.name && attr.name.toLowerCase().includes('color')) || (attr.label && attr.label.toLowerCase().includes('color'));
+								return h(
+									'div',
+									{ key: attr.name || aIdx, className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-flex-wrap' },
+									showLabels &&
+										h(
+											'span',
+											{
+												className: 'sppcfw-font-semibold sppcfw-w-16 sppcfw-shrink-0',
+												style: { color: varLabelColor, fontSize: varLabelSize }
+											},
+											`${attr.label || attr.name}:`
+										),
+									h(
+										'div',
+										{ className: 'sppcfw-flex sppcfw-flex-wrap', style: { gap: swatchGap } },
+										(attr.options || []).map((opt, oIdx) => {
+											if (isColor) {
+												const optLower = String(opt).toLowerCase().trim();
+												const hexColor = colorHexMap[optLower] || '#9333ea';
+												const isActive = oIdx === 0;
+												return h('span', {
+													key: opt,
+													title: opt,
+													className: `sppcfw-border-2 sppcfw-shadow-sm sppcfw-cursor-pointer sppcfw-inline-block sppcfw-transition-all`,
+													style: {
+														backgroundColor: hexColor,
+														width: swatchSize,
+														height: swatchSize,
+														borderRadius: swatchRadius,
+														borderColor: isActive ? activeSwatchColor : '#e5e7eb',
+														boxShadow: isActive ? `0 0 0 2px ${activeSwatchColor}33` : 'none',
+													}
+												});
+											}
+											const isActive = oIdx === 0;
+											return h(
+												'span',
+												{
+													key: opt,
+													className: 'sppcfw-px-3 sppcfw-py-1 sppcfw-text-xs sppcfw-cursor-pointer sppcfw-transition-all sppcfw-inline-flex sppcfw-items-center sppcfw-justify-center',
+													style: {
+														borderRadius: swatchRadius,
+														borderColor: isActive ? activeSwatchColor : '#d1d5db',
+														borderWidth: '1px',
+														borderStyle: 'solid',
+														backgroundColor: isActive ? activeSwatchColor : '#ffffff',
+														color: isActive ? '#ffffff' : '#374151',
+														fontWeight: isActive ? 'bold' : 'normal',
+														minHeight: swatchSize,
+													}
+												},
+												opt
+											);
+										})
+									)
+								);
+							}),
+							showReset &&
+								h(
+									'div',
+									{ className: 'sppcfw-pt-1' },
+									h('button', { type: 'button', className: 'sppcfw-text-[11px] sppcfw-text-[#9333ea] hover:sppcfw-underline sppcfw-font-medium sppcfw-cursor-pointer' }, '✕ Clear selection')
+								)
+						),
+
+					// 2. Variation Section (Dropdown Mode)
+					hasVariations && varDisplayType === 'dropdown' &&
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-3 sppcfw-pb-2' },
+							safeSample.variations.map((attr, aIdx) => {
+								return h(
+									'div',
+									{ key: attr.name || aIdx, className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-3' },
+									showLabels &&
+										h(
+											'label',
+											{
+												className: 'sppcfw-font-semibold sppcfw-w-16 sppcfw-shrink-0',
+												style: { color: varLabelColor, fontSize: varLabelSize }
+											},
+											`${attr.label || attr.name}:`
+										),
+									h(
+										'select',
+										{
+											className: 'sppcfw-bg-[#ffffff] sppcfw-border sppcfw-border-[#d1d5db] sppcfw-rounded sppcfw-px-3 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-[#111827] focus:sppcfw-outline-none focus:sppcfw-ring-1 focus:sppcfw-ring-[#9333ea] sppcfw-w-48'
+										},
+										h('option', { value: '' }, `Choose an option`),
+										(attr.options || []).map(opt => h('option', { key: opt, value: opt }, opt))
+									)
+								);
+							}),
+							showReset &&
+								h(
+									'div',
+									{ className: 'sppcfw-pt-1' },
+									h('button', { type: 'button', className: 'sppcfw-text-[11px] sppcfw-text-[#9333ea] hover:sppcfw-underline sppcfw-font-medium sppcfw-cursor-pointer' }, '✕ Clear selection')
+								)
+						),
+
+					// 3. Variation Section (Table / Grid Mode)
+					hasVariations && varDisplayType === 'table' &&
+						h(
+							'div',
+							{ className: 'sppcfw-border sppcfw-border-[#e5e7eb] sppcfw-rounded-lg sppcfw-overflow-hidden sppcfw-mb-3 sppcfw-shadow-xs' },
+							h(
+								'table',
+								{ className: 'sppcfw-w-full sppcfw-text-xs sppcfw-text-left' },
+								h(
+									'thead',
+									{ className: 'sppcfw-bg-[#f9fafb] sppcfw-border-b sppcfw-border-[#e5e7eb] sppcfw-text-[#4b5563] sppcfw-font-semibold' },
+									h(
+										'tr',
+										null,
+										h('th', { className: 'sppcfw-p-2.5' }, 'Variation'),
+										h('th', { className: 'sppcfw-p-2.5' }, 'Price'),
+										h('th', { className: 'sppcfw-p-2.5' }, 'Stock'),
+										h('th', { className: 'sppcfw-p-2.5 sppcfw-text-center' }, 'Select')
+									)
+								),
+								h(
+									'tbody',
+									{ className: 'sppcfw-divide-y sppcfw-divide-[#e5e7eb] sppcfw-bg-white' },
+									(function() {
+										if (safeSample && safeSample.available_variations && safeSample.available_variations.length > 0) {
+											return safeSample.available_variations.map((vRow, rIdx) =>
+												h(
+													'tr',
+													{ key: vRow.variation_id || rIdx, className: rIdx === 0 ? 'sppcfw-bg-[#faf5ff]' : '' },
+													h('td', { className: 'sppcfw-p-2.5 sppcfw-font-medium sppcfw-text-[#111827]' }, vRow.name),
+													h('td', { className: 'sppcfw-p-2.5 sppcfw-font-bold sppcfw-text-[#9333ea]' }, vRow.price || safeSample.price || '$49.99'),
+													h('td', { className: `sppcfw-p-2.5 sppcfw-font-medium ${vRow.is_in_stock === false ? 'sppcfw-text-red-500' : 'sppcfw-text-green-600'}` }, vRow.stock || 'In Stock'),
+													h(
+														'td',
+														{ className: 'sppcfw-p-2.5 sppcfw-text-center' },
+														h('input', {
+															type: 'radio',
+															name: 'builder_demo_variation_radio',
+															className: 'sppcfw-accent-[#9333ea] sppcfw-cursor-pointer',
+															defaultChecked: rIdx === 0
+														})
+													)
+												)
+											);
+										}
+										let combinations = [];
+										if (safeSample && safeSample.variations && safeSample.variations.length > 0) {
+											const attr1 = safeSample.variations[0];
+											const attr2 = safeSample.variations[1];
+											if (attr1 && attr2) {
+												(attr1.options || []).forEach(o1 => {
+													(attr2.options || []).slice(0, 2).forEach(o2 => {
+														combinations.push({ name: `${o1} / ${o2}`, price: safeSample.price || '$49.99', stock: 'In Stock' });
+													});
+												});
+											} else if (attr1) {
+												(attr1.options || []).forEach(o1 => {
+													combinations.push({ name: String(o1), price: safeSample.price || '$49.99', stock: 'In Stock' });
+												});
+											}
+										}
+										if (combinations.length === 0) {
+											combinations = [
+												{ name: 'Black / M', price: safeSample.price || '$49.99', stock: 'In Stock' },
+												{ name: 'Purple / L', price: safeSample.price || '$54.99', stock: 'In Stock' },
+												{ name: 'Blue / XL', price: safeSample.price || '$59.99', stock: '2 Left' }
+											];
+										}
+										return combinations.slice(0, 5).map((vRow, rIdx) =>
+											h(
+												'tr',
+												{ key: rIdx, className: rIdx === 0 ? 'sppcfw-bg-[#faf5ff]' : '' },
+												h('td', { className: 'sppcfw-p-2.5 sppcfw-font-medium sppcfw-text-[#111827]' }, vRow.name),
+												h('td', { className: 'sppcfw-p-2.5 sppcfw-font-bold sppcfw-text-[#9333ea]' }, vRow.price),
+												h('td', { className: 'sppcfw-p-2.5 sppcfw-text-green-600 sppcfw-font-medium' }, vRow.stock),
+												h(
+													'td',
+													{ className: 'sppcfw-p-2.5 sppcfw-text-center' },
+													h('input', {
+														type: 'radio',
+														name: 'builder_demo_variation_radio',
+														className: 'sppcfw-accent-[#9333ea] sppcfw-cursor-pointer',
+														defaultChecked: rIdx === 0
+													})
+												)
+											)
+										);
+									})()
+								)
+							)
+						),
+
+					// 4. Quantity & Add to Cart Button Row
+					h(
+						'div',
+						{ className: `sppcfw-flex sppcfw-items-center ${alignFlex}`, style: { gap: gapVal } },
+						isPlusMinusOn
+							? h(
+									'div',
+									{ className: 'sppcfw-flex sppcfw-items-center sppcfw-border sppcfw-rounded sppcfw-overflow-hidden', style: { borderColor: qtyBorder, backgroundColor: qtyBg } },
+									h('button', { type: 'button', className: 'sppcfw-w-8 sppcfw-h-10 sppcfw-font-bold sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-border-r sppcfw-cursor-pointer sppcfw-select-none', style: { backgroundColor: qtyBtnBg, color: qtyBtnColor, borderRightColor: qtyBorder } }, '-'),
+									h('input', { type: 'number', defaultValue: 1, min: 1, className: 'sppcfw-w-12 sppcfw-h-10 sppcfw-text-center sppcfw-font-bold sppcfw-border-0 sppcfw-outline-none focus:sppcfw-ring-0', style: { backgroundColor: qtyBg, color: qtyColor } }),
+									h('button', { type: 'button', className: 'sppcfw-w-8 sppcfw-h-10 sppcfw-font-bold sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-border-l sppcfw-cursor-pointer sppcfw-select-none', style: { backgroundColor: qtyBtnBg, color: qtyBtnColor, borderLeftColor: qtyBorder } }, '+')
+							  )
+							: h('input', { type: 'number', defaultValue: 1, min: 1, className: 'sppcfw-w-16 sppcfw-p-2 sppcfw-border sppcfw-rounded sppcfw-text-center sppcfw-font-bold', style: { borderColor: qtyBorder, backgroundColor: qtyBg, color: qtyColor } }),
+						h('button', {
+							className: 'sppcfw-shadow sppcfw-transition-all',
+							style: {
+								backgroundColor: btnBg,
+								color: btnColor,
+								borderRadius: btnRadius,
+								fontSize: btnFontSize,
+								fontWeight: btnFontWeight !== 'Default' ? btnFontWeight : 'bold',
+								fontFamily: btnFontFamily && btnFontFamily !== 'Inherit' ? `${btnFontFamily}, sans-serif` : undefined,
+								padding: btnPadding,
+							}
+						}, btnLabel)
+					)
 				);
 			}
 			case 'product_rating': {

@@ -429,6 +429,38 @@ if (!class_exists('SPPCFW_Builder')) {
 				}
 			}
 
+			$available_vars_list = array();
+			if ($product->is_type('variable')) {
+				$available_variations = $product->get_available_variations();
+				if (!empty($available_variations)) {
+					foreach ($available_variations as $var) {
+						$attr_labels = array();
+						if (!empty($var['attributes'])) {
+							foreach ($var['attributes'] as $attr_k => $attr_v) {
+								$clean_slug = str_replace('attribute_', '', $attr_k);
+								$term_name = $attr_v;
+								if (taxonomy_exists($clean_slug)) {
+									$term = get_term_by('slug', $attr_v, $clean_slug);
+									if ($term && !is_wp_error($term)) {
+										$term_name = $term->name;
+									}
+								}
+								$attr_labels[] = $term_name ? $term_name : $attr_v;
+							}
+						}
+						$available_vars_list[] = array(
+							'variation_id' => $var['variation_id'],
+							'name'         => !empty($attr_labels) ? implode(' / ', $attr_labels) : __('Variation', 'single-product-customizer') . ' #' . $var['variation_id'],
+							'sku'          => $var['sku'] ? $var['sku'] : '',
+							'price'        => !empty($var['price_html']) ? strip_tags($var['price_html']) : wc_price($var['display_price']),
+							'stock'        => $var['is_in_stock'] ? __('In Stock', 'single-product-customizer') : __('Out of Stock', 'single-product-customizer'),
+							'is_in_stock'  => $var['is_in_stock'],
+							'attributes'   => $var['attributes'],
+						);
+					}
+				}
+			}
+
 			// 5. Related Products
 			$related_products = array();
 			if (function_exists('wc_get_related_products')) {
@@ -491,8 +523,8 @@ if (!class_exists('SPPCFW_Builder')) {
 				'short_description' => $product->get_short_description(),
 				'description' => $product->get_description(),
 				'categories' => !empty($cat_names) && !is_wp_error($cat_names) ? implode(', ', $cat_names) : '',
-				'tags' => !empty($tag_names) && !is_wp_error($tag_names) ? implode(', ', $tag_names) : '',
 				'variations' => $variations_data,
+				'available_variations' => $available_vars_list,
 				'related_products' => $related_products,
 				'upsell_products' => $upsell_products,
 				'meta_groups' => $meta_groups,
