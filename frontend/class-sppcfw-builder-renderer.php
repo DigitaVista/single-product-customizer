@@ -476,31 +476,80 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					min-height: auto !important;
 				}
 
-				.sppcfw-gallery-lightbox-btn {
+				/* Hide WooCommerce native gallery trigger so it does not conflict or duplicate */
+				.woocommerce-product-gallery__trigger {
+					display: none !important;
+					opacity: 0 !important;
+					visibility: hidden !important;
+					pointer-events: none !important;
+				}
+
+				.sppcfw-gallery-actions-bar {
 					position: absolute !important;
-					top: 10px !important;
-					right: 10px !important;
-					z-index: 10 !important;
-					background: rgba(255,255,255,0.9) !important;
-					border: 1px solid rgba(0,0,0,0.1) !important;
-					border-radius: 50% !important;
-					width: 32px !important;
-					height: 32px !important;
+					top: 12px !important;
+					right: 12px !important;
+					z-index: 20 !important;
 					display: flex !important;
+					align-items: center !important;
+					gap: 6px !important;
+					opacity: 0.8 !important;
+					transition: opacity 0.2s ease !important;
+					pointer-events: auto !important;
+				}
+
+				.sppcfw-gallery-actions-bar:hover {
+					opacity: 1 !important;
+				}
+
+				.sppcfw-gallery-action-badge,
+				.sppcfw-gallery-lightbox-btn {
+					position: relative !important;
+					top: auto !important;
+					right: auto !important;
+					left: auto !important;
+					bottom: auto !important;
+					background: rgba(255, 255, 255, 0.9) !important;
+					backdrop-filter: blur(4px) !important;
+					-webkit-backdrop-filter: blur(4px) !important;
+					border: 1px solid rgba(0, 0, 0, 0.08) !important;
+					border-radius: 9999px !important;
+					width: 28px !important;
+					height: 28px !important;
+					min-width: 28px !important;
+					min-height: 28px !important;
+					max-width: 28px !important;
+					max-height: 28px !important;
+					padding: 0 !important;
+					margin: 0 !important;
+					display: inline-flex !important;
 					align-items: center !important;
 					justify-content: center !important;
 					cursor: pointer !important;
 					color: #374151 !important;
-					backdrop-filter: blur(4px) !important;
-					box-shadow: 0 2px 6px rgba(0,0,0,0.1) !important;
+					box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
+					line-height: 1 !important;
 					transition: all 0.2s ease !important;
-					padding: 0 !important;
+					box-sizing: border-box !important;
+					outline: none !important;
+					appearance: none !important;
+					-webkit-appearance: none !important;
 				}
 
+				.sppcfw-gallery-action-badge:hover,
 				.sppcfw-gallery-lightbox-btn:hover {
 					background: #ffffff !important;
 					color: #111827 !important;
+					box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15) !important;
 					transform: scale(1.05) !important;
+				}
+
+				.sppcfw-gallery-action-badge svg,
+				.sppcfw-gallery-lightbox-btn svg {
+					width: 14px !important;
+					height: 14px !important;
+					display: block !important;
+					stroke: currentColor !important;
+					fill: none !important;
 				}
 
 				.sppcfw-gallery-carousel-wrapper {
@@ -1820,12 +1869,12 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					echo '<img src="' . esc_url($first_image['main']) . '" data-zoom-src="' . esc_url($first_image['full']) . '" data-full-src="' . esc_url($first_image['full']) . '" alt="' . esc_attr($first_image['alt']) . '" class="sppcfw-gallery-main-img" style="max-width:100%;height:auto;display:block;" />';
 
 					if ($enable_zoom || $enable_lightbox) {
-						echo '<div class="sppcfw-gallery-actions-bar" style="position:absolute;top:10px;right:10px;z-index:10;display:flex;align-items:center;gap:6px;">';
+						echo '<div class="sppcfw-gallery-actions-bar">';
 						if ($enable_zoom) {
-							echo '<span class="sppcfw-gallery-action-badge" title="' . esc_attr__('Zoom on hover', 'single-product-customizer') . '" style="background:rgba(255,255,255,0.9);border:1px solid rgba(0,0,0,0.1);border-radius:50%;width:30px;height:30px;display:flex;align-items:center;justify-content:center;color:#374151;backdrop-filter:blur(4px);box-shadow:0 2px 6px rgba(0,0,0,0.1);"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg></span>';
+							echo '<span class="sppcfw-gallery-action-badge" title="' . esc_attr__('Zoom', 'single-product-customizer') . '"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="7"/><line x1="21" y1="21" x2="15.8" y2="15.8"/><line x1="10.5" y1="7.5" x2="10.5" y2="13.5"/><line x1="7.5" y1="10.5" x2="13.5" y2="10.5"/></svg></span>';
 						}
 						if ($enable_lightbox) {
-							echo '<button type="button" class="sppcfw-gallery-lightbox-btn" title="' . esc_attr__('View full image', 'single-product-customizer') . '"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></button>';
+							echo '<button type="button" class="sppcfw-gallery-lightbox-btn" title="' . esc_attr__('Lightbox', 'single-product-customizer') . '"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg></button>';
 						}
 						echo '</div>';
 					}
