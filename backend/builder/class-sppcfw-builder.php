@@ -457,12 +457,26 @@ if (!class_exists('SPPCFW_Builder')) {
 							$var_img = $var['image']['url'];
 						}
 
+						$var_price_html = !empty($var['price_html']) ? $var['price_html'] : wc_price($var['display_price']);
+						// Remove screen reader text so only visual price is rendered
+						$var_price_clean = preg_replace('/<span class=["\']screen-reader-text["\'][^>]*>.*?<\/span>/is', '', $var_price_html);
+
+						$stock_text = '';
+						if (!empty($var['availability_html'])) {
+							$stock_text = wp_strip_all_tags($var['availability_html']);
+						} elseif ($var['is_in_stock']) {
+							$stock_text = __('In Stock', 'single-product-customizer');
+						} else {
+							$stock_text = __('Out of Stock', 'single-product-customizer');
+						}
+
 						$available_vars_list[] = array(
 							'variation_id' => $var['variation_id'],
 							'name'         => !empty($attr_labels) ? implode(' / ', $attr_labels) : __('Variation', 'single-product-customizer') . ' #' . $var['variation_id'],
 							'sku'          => $var['sku'] ? $var['sku'] : '',
-							'price'        => !empty($var['price_html']) ? strip_tags($var['price_html']) : wc_price($var['display_price']),
-							'stock'        => $var['is_in_stock'] ? __('In Stock', 'single-product-customizer') : __('Out of Stock', 'single-product-customizer'),
+							'price'        => $var_price_clean,
+							'price_html'   => $var_price_clean,
+							'stock'        => $stock_text,
 							'is_in_stock'  => $var['is_in_stock'],
 							'image_url'    => $var_img,
 							'attributes'   => $var['attributes'],
@@ -511,10 +525,13 @@ if (!class_exists('SPPCFW_Builder')) {
 				}
 			}
 
+			$price_html_clean = preg_replace('/<span class=["\']screen-reader-text["\'][^>]*>.*?<\/span>/is', '', $product->get_price_html());
+
 			$data = array(
 				'id' => $product->get_id(),
 				'title' => $product->get_name(),
 				'price' => wc_price($product->get_price()),
+				'price_html' => $price_html_clean,
 				'regular_price' => wc_price($product->get_regular_price()),
 				'sale_price' => $product->get_sale_price() ? wc_price($product->get_sale_price()) : '',
 				'on_sale' => $product->is_on_sale(),

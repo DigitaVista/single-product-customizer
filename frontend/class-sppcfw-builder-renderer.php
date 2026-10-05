@@ -1353,7 +1353,21 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 
 						$css .= ".sppcfw-el-{$id}.sppcfw-add-to-cart-wrapper, .sppcfw-el-{$id} { background: transparent !important; background-color: transparent !important; border: none !important; padding: 0 !important; width: 100% !important; text-align: {$align_text} !important; }";
 						$css .= ".sppcfw-el-{$id} form.cart, .sppcfw-el-{$id} .variations_form { display: flex !important; flex-wrap: wrap !important; align-items: center !important; gap: {$gap_val} !important; margin: 0 !important; padding: 0 !important; background: transparent !important; background-color: transparent !important; border: none !important; justify-content: {$justify} !important; }";
-						$css .= ".sppcfw-el-{$id} form.cart table.variations { width: 100% !important; margin-bottom: 12px !important; background: transparent !important; }";
+						$css .= ".sppcfw-el-{$id} form.cart table.variations { width: 100% !important; border-collapse: separate !important; border-spacing: 0 8px !important; margin-bottom: 12px !important; background: transparent !important; }";
+						$css .= ".sppcfw-el-{$id} form.cart table.variations tr { background: #f9fafb !important; border-radius: 6px !important; }";
+						$css .= ".sppcfw-el-{$id} form.cart table.variations th.label, .sppcfw-el-{$id} form.cart table.variations .label { text-align: left !important; padding: 10px 14px !important; font-weight: 700 !important; font-size: 13px !important; color: #111827 !important; width: 130px !important; vertical-align: middle !important; border: none !important; }";
+						$css .= ".sppcfw-el-{$id} form.cart table.variations td.value { padding: 10px 14px !important; vertical-align: middle !important; border: none !important; }";
+						$css .= ".sppcfw-el-{$id} .single_variation_wrap { width: 100% !important; }";
+						$css .= ".sppcfw-el-{$id} .single_variation_wrap .woocommerce-variation-add-to-cart, .sppcfw-el-{$id} form.cart:not(.variations_form) { display: flex !important; align-items: center !important; gap: {$gap_val} !important; justify-content: {$justify} !important; }";
+						$css .= ".sppcfw-el-{$id} .single_variation_wrap a.reset_variations { display: inline-block !important; margin-bottom: 10px !important; color: #4b5563 !important; font-size: 12px !important; text-decoration: none !important; }";
+						$css .= ".sppcfw-el-{$id} .single_variation_wrap a.reset_variations:hover { color: #9333ea !important; text-decoration: underline !important; }";
+						$css .= ".sppcfw-el-{$id} .woocommerce-variation.single_variation { margin-bottom: 12px !important; }";
+						$css .= ".sppcfw-el-{$id} .woocommerce-variation-price { font-size: 18px !important; font-weight: 800 !important; color: #111827 !important; margin-bottom: 4px !important; }";
+						$css .= ".sppcfw-el-{$id} .woocommerce-variation-price del { opacity: 0.6 !important; font-weight: normal !important; margin-right: 8px !important; text-decoration: line-through !important; }";
+						$css .= ".sppcfw-el-{$id} .woocommerce-variation-price ins { text-decoration: none !important; }";
+						$css .= ".sppcfw-el-{$id} .woocommerce-variation-availability { font-size: 13px !important; font-weight: 600 !important; }";
+						$css .= ".sppcfw-el-{$id} .woocommerce-variation-availability .stock.in-stock, .sppcfw-el-{$id} .woocommerce-variation-availability p.in-stock { color: #16a34a !important; }";
+						$css .= ".sppcfw-el-{$id} .woocommerce-variation-availability .stock.out-of-stock, .sppcfw-el-{$id} .woocommerce-variation-availability p.out-of-stock { color: #ef4444 !important; }";
 						$css .= ".sppcfw-el-{$id}.sppcfw-var-display-table form.cart table.variations, .sppcfw-el-{$id} .sppcfw-var-display-table form.cart table.variations, .sppcfw-el-{$id}.sppcfw-var-display-table .single_variation_wrap .woocommerce-variation-price, .sppcfw-el-{$id}.sppcfw-var-display-table .single_variation_wrap .woocommerce-variation-availability { display: none !important; }";
 
 						// Quantity wrapper & buttons styling (isolated from Add to Cart button styles)

@@ -7747,48 +7747,27 @@
 				const rawSale = safeSample.sale_price || staticFallback.sale_price || '';
 				const hasRegular = !!rawReg;
 				const hasSale = !!rawSale;
-				const isOnSale = (safeSample.on_sale || (hasSale && hasRegular && rawSale !== rawReg)) && hasSale;
+				const isOnSale = !!safeSample.on_sale || ((hasSale && hasRegular && rawSale !== rawReg) && hasSale);
 
-				const displaySinglePrice = safeSample.price || rawReg || rawSale || staticFallback.price || '$49.99';
+				const displayPriceHtml = safeSample.price_html || safeSample.price || rawSale || rawReg || staticFallback.price || '$49.99';
 
 				return h(
 					'div',
 					{ className: `sppcfw-flex sppcfw-items-center sppcfw-flex-wrap sppcfw-gap-3 ${alignClass}` },
-					isOnSale
-						? h(
-								'div',
-								{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2.5' },
-								showRegularPrice &&
-									h(
-										'span',
-										{
-											className: 'sppcfw-line-through sppcfw-opacity-70 sppcfw-transition-all',
-											style: { color: regularPriceColor, fontSize: `calc(${fontSize} * 0.8)`, fontWeight: '400' },
-											dangerouslySetInnerHTML: { __html: rawReg }
-										}
-									),
-								h(
-									'span',
-									{
-										className: 'sppcfw-font-extrabold sppcfw-transition-all',
-										style: { color: salePriceColor, fontSize: fontSize, fontWeight: fontWeight },
-										dangerouslySetInnerHTML: { __html: rawSale || displaySinglePrice }
-									}
-								)
-						  )
-						: h(
-								'span',
-								{
-									className: 'sppcfw-font-extrabold sppcfw-transition-all',
-									style: { color: priceColor, fontSize: fontSize, fontWeight: fontWeight },
-									dangerouslySetInnerHTML: { __html: displaySinglePrice }
-								}
-						  ),
+					h('div', {
+						className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-font-extrabold sppcfw-transition-all sppcfw-price-display [&_del]:sppcfw-opacity-60 [&_del]:sppcfw-font-normal [&_del]:sppcfw-text-gray-400 [&_ins]:sppcfw-no-underline',
+						style: {
+							color: isOnSale ? salePriceColor : priceColor,
+							fontSize: fontSize,
+							fontWeight: fontWeight
+						},
+						dangerouslySetInnerHTML: { __html: displayPriceHtml }
+					}),
 					isOnSale && showSaleBadge &&
 						h(
 							'span',
 							{
-								className: 'sppcfw-text-white sppcfw-text-xs sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded sppcfw-font-bold sppcfw-uppercase sppcfw-shadow-sm',
+								className: 'sppcfw-text-white sppcfw-text-xs sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded sppcfw-font-bold sppcfw-uppercase sppcfw-shadow-sm sppcfw-tracking-wide',
 								style: { backgroundColor: salePriceColor }
 							},
 							'Sale'
@@ -8095,11 +8074,11 @@
 				const showReset = !!(settings && settings.show_variation_reset);
 
 				// Swatches & Variation Styles
-				const varLabelColor = getResponsiveProp(styles, 'var_label_color', deviceView) || '#374151';
-				const varLabelSize = getResponsiveProp(styles, 'var_label_size', deviceView) || '12px';
-				const swatchSize = getResponsiveProp(styles, 'swatch_size', deviceView) || '26px';
-				const swatchRadius = swatchShape === 'circle' ? '9999px' : (swatchShape === 'square' ? '2px' : (getResponsiveProp(styles, 'swatch_border_radius', deviceView) || '6px'));
-				const activeSwatchColor = getResponsiveProp(styles, 'active_swatch_color', deviceView) || '#9333ea';
+				const varLabelColor = getResponsiveProp(styles, 'var_label_color', deviceView) || '#111827';
+				const varLabelSize = getResponsiveProp(styles, 'var_label_size', deviceView) || '13px';
+				const swatchSize = getResponsiveProp(styles, 'swatch_size', deviceView) || '36px';
+				const swatchRadius = swatchShape === 'circle' ? '50%' : (swatchShape === 'square' ? '2px' : (getResponsiveProp(styles, 'swatch_border_radius', deviceView) || '4px'));
+				const activeSwatchColor = getResponsiveProp(styles, 'active_swatch_color', deviceView) || '#007cba';
 				const swatchGap = getResponsiveProp(styles, 'swatch_gap', deviceView) || '8px';
 
 				const colorHexMap = {
@@ -8116,103 +8095,198 @@
 					'orange': '#f97316'
 				};
 
+				// Find matched variation
+				const availVars = (safeSample && safeSample.available_variations) || [];
+				const activeAttrs = (safeSample && safeSample.activeVariationAttrs) || {};
+				let matchedVar = null;
+
+				if (availVars.length > 0) {
+					for (const v of availVars) {
+						if (v.attributes) {
+							let match = true;
+							for (const k in v.attributes) {
+								const cleanK = k.replace('attribute_', '').replace('pa_', '').toLowerCase();
+								const vVal = (v.attributes[k] || '').toLowerCase();
+								if (vVal === '') continue; // wildcard
+								const chosen = (activeAttrs[cleanK] || activeAttrs['attribute_' + cleanK] || activeAttrs['pa_' + cleanK] || activeAttrs[k] || '').toLowerCase();
+								if (chosen && vVal !== chosen) {
+									match = false;
+									break;
+								}
+							}
+							if (match) {
+								matchedVar = v;
+								break;
+							}
+						}
+					}
+					if (!matchedVar && availVars.length > 0) {
+						matchedVar = availVars[0];
+					}
+				}
+
 				return h(
 					'div',
-					{ className: 'sppcfw-space-y-4 sppcfw-w-full' },
+					{ className: 'sppcfw-space-y-3 sppcfw-w-full' },
 
 					// 1. Variation Section (Swatches Mode)
 					hasVariations && varDisplayType === 'swatches' &&
 						h(
 							'div',
-							{ className: 'sppcfw-space-y-3 sppcfw-pb-2' },
-							safeSample.variations.map((attr, aIdx) => {
-								const isColor = (attr.name && attr.name.toLowerCase().includes('color')) || (attr.label && attr.label.toLowerCase().includes('color'));
-								const attrKey = attr.name || attr.label || `attr_${aIdx}`;
-								const cleanKey = String(attrKey).replace('attribute_', '').replace('pa_', '');
-								const selectedOpt = (safeSample.activeVariationAttrs && (safeSample.activeVariationAttrs[cleanKey] || safeSample.activeVariationAttrs[attrKey] || safeSample.activeVariationAttrs[attr.name] || safeSample.activeVariationAttrs[attr.label])) || (attr.options && attr.options[0]);
+							{ className: 'sppcfw-w-full sppcfw-mb-2' },
+							h(
+								'table',
+								{ className: 'variations sppcfw-w-full', style: { borderCollapse: 'separate', borderSpacing: '0 8px' } },
+								h(
+									'tbody',
+									null,
+									safeSample.variations.map((attr, aIdx) => {
+										const isColor = (attr.name && attr.name.toLowerCase().includes('color')) || (attr.label && attr.label.toLowerCase().includes('color'));
+										const attrKey = attr.name || attr.label || `attr_${aIdx}`;
+										const cleanKey = String(attrKey).replace('attribute_', '').replace('pa_', '');
+										const selectedOpt = (safeSample.activeVariationAttrs && (safeSample.activeVariationAttrs[cleanKey] || safeSample.activeVariationAttrs[attrKey] || safeSample.activeVariationAttrs[attr.name] || safeSample.activeVariationAttrs[attr.label])) || (attr.options && attr.options[0]);
 
-								return h(
-									'div',
-									{ key: attr.name || aIdx, className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-flex-wrap' },
-									showLabels &&
-										h(
-											'span',
-											{
-												className: 'sppcfw-font-semibold sppcfw-w-16 sppcfw-shrink-0',
-												style: { color: varLabelColor, fontSize: varLabelSize }
-											},
-											`${attr.label || attr.name}:`
-										),
-									h(
-										'div',
-										{ className: 'sppcfw-flex sppcfw-flex-wrap', style: { gap: swatchGap } },
-										(attr.options || []).map((opt, oIdx) => {
-											const isActive = selectedOpt === opt;
-											if (isColor) {
-												const optLower = String(opt).toLowerCase().trim();
-												const hexColor = colorHexMap[optLower] || '#9333ea';
-												return h('span', {
-													key: opt,
-													title: opt,
-													onClick: (e) => {
-														e.stopPropagation();
-														if (typeof safeSample.onSelectVariationOption === 'function') {
-															safeSample.onSelectVariationOption(cleanKey, opt);
-														}
+										return h(
+											'tr',
+											{ key: attr.name || aIdx, className: 'sppcfw-bg-[#f9fafb] sppcfw-rounded-md' },
+											showLabels &&
+												h(
+													'th',
+													{
+														className: 'label sppcfw-text-left sppcfw-py-2.5 sppcfw-px-3.5 sppcfw-font-bold sppcfw-text-xs sppcfw-w-32 sppcfw-align-middle sppcfw-text-[#111827]',
+														style: { color: varLabelColor, fontSize: varLabelSize }
 													},
-													className: `sppcfw-border-2 sppcfw-shadow-sm sppcfw-cursor-pointer sppcfw-inline-block sppcfw-transition-all`,
-													style: {
-														backgroundColor: hexColor,
-														width: swatchSize,
-														height: swatchSize,
-														borderRadius: swatchRadius,
-														borderColor: isActive ? activeSwatchColor : '#e5e7eb',
-														boxShadow: isActive ? `0 0 0 2px ${activeSwatchColor}55` : 'none',
-													}
-												});
-											}
-											return h(
-												'span',
-												{
-													key: opt,
-													onClick: (e) => {
-														e.stopPropagation();
-														if (typeof safeSample.onSelectVariationOption === 'function') {
-															safeSample.onSelectVariationOption(cleanKey, opt);
+													`${attr.label || attr.name}`
+												),
+											h(
+												'td',
+												{ className: 'value sppcfw-py-2.5 sppcfw-px-3.5 sppcfw-align-middle' },
+												h(
+													'div',
+													{ className: 'cu_button_el sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-flex-wrap' },
+													(attr.options || []).map((opt) => {
+														const isActive = selectedOpt === opt;
+														if (isColor) {
+															const optLower = String(opt).toLowerCase().trim();
+															const hexColor = colorHexMap[optLower] || (optLower.startsWith('#') ? optLower : '#3b82f6');
+															return h(
+																'button',
+																{
+																	type: 'button',
+																	key: opt,
+																	title: opt,
+																	onClick: (e) => {
+																		e.stopPropagation();
+																		if (typeof safeSample.onSelectVariationOption === 'function') {
+																			safeSample.onSelectVariationOption(cleanKey, opt);
+																		}
+																	},
+																	className: `webfwc_variation_button color ${isActive ? 'selected' : ''}`,
+																	style: {
+																		backgroundColor: hexColor,
+																		width: swatchSize || '34px',
+																		height: swatchSize || '34px',
+																		minWidth: swatchSize || '34px',
+																		borderRadius: swatchShape === 'circle' ? '50%' : (swatchShape === 'square' ? '2px' : '4px'),
+																		border: '2px solid #ffffff',
+																		boxShadow: isActive ? `0 0 0 2px ${activeSwatchColor || '#007cba'}` : '0 0 0 1px #ddd',
+																		position: 'relative',
+																		cursor: 'pointer',
+																		display: 'inline-flex',
+																		alignItems: 'center',
+																		justifyContent: 'center',
+																		transition: 'all 0.2s ease',
+																		padding: 0,
+																		outline: 'none',
+																	}
+																},
+																isActive
+																	? h('span', {
+																			style: {
+																				display: 'block',
+																				width: '12px',
+																				height: '6px',
+																				borderLeft: '2.5px solid #10b981',
+																				borderBottom: '2.5px solid #10b981',
+																				transform: 'rotate(-45deg)',
+																				marginTop: '-2px',
+																			}
+																	  })
+																	: null
+															);
 														}
-													},
-													className: 'sppcfw-px-3 sppcfw-py-1 sppcfw-text-xs sppcfw-cursor-pointer sppcfw-transition-all sppcfw-inline-flex sppcfw-items-center sppcfw-justify-center',
-													style: {
-														borderRadius: swatchRadius,
-														borderColor: isActive ? activeSwatchColor : '#d1d5db',
-														borderWidth: '1px',
-														borderStyle: 'solid',
-														backgroundColor: isActive ? activeSwatchColor : '#ffffff',
-														color: isActive ? '#ffffff' : '#374151',
-														fontWeight: isActive ? 'bold' : 'normal',
-														minHeight: swatchSize,
-													}
-												},
-												opt
-											);
-										})
-									)
-								);
-							}),
-							showReset &&
+														return h(
+															'button',
+															{
+																type: 'button',
+																key: opt,
+																onClick: (e) => {
+																	e.stopPropagation();
+																	if (typeof safeSample.onSelectVariationOption === 'function') {
+																		safeSample.onSelectVariationOption(cleanKey, opt);
+																	}
+																},
+																className: `webfwc_variation_button button ${isActive ? 'selected' : ''}`,
+																style: {
+																	borderRadius: swatchShape === 'circle' ? '20px' : (swatchShape === 'square' ? '2px' : '4px'),
+																	boxShadow: isActive ? `0 0 0 2px ${activeSwatchColor || '#007cba'}` : '0 0 0 1px #ddd',
+																	border: '2px solid #ffffff',
+																	padding: '6px 14px',
+																	minHeight: '34px',
+																	minWidth: '40px',
+																	position: 'relative',
+																	background: isActive ? '#ffffff' : '#f3f4f6',
+																	color: isActive ? '#111827' : '#374151',
+																	cursor: 'pointer',
+																	fontSize: '13px',
+																	fontWeight: '600',
+																	display: 'inline-flex',
+																	alignItems: 'center',
+																	justifyContent: 'center',
+																	gap: '6px',
+																	transition: 'all 0.2s ease',
+																	outline: 'none',
+																}
+															},
+															[
+																h('span', { key: 'txt' }, opt),
+																isActive
+																	? h('span', {
+																			key: 'chk',
+																			style: {
+																				display: 'inline-block',
+																				width: '9px',
+																				height: '5px',
+																				borderLeft: '2px solid #10b981',
+																				borderBottom: '2px solid #10b981',
+																				transform: 'rotate(-45deg)',
+																				marginLeft: '1px',
+																				marginBottom: '1px',
+																			}
+																	  })
+																	: null
+															]
+														);
+													})
+												)
+											)
+										);
+									})
+								)
+							),
+							(showReset || Object.keys(safeSample.activeVariationAttrs || {}).length > 0) &&
 								h(
 									'div',
-									{ className: 'sppcfw-pt-1' },
-									h('button', {
-										type: 'button',
+									{ className: 'sppcfw-pt-1.5 sppcfw-pb-1' },
+									h('a', {
 										onClick: (e) => {
 											e.stopPropagation();
 											if (typeof safeSample.onResetVariation === 'function') {
 												safeSample.onResetVariation();
 											}
 										},
-										className: 'sppcfw-text-[11px] sppcfw-text-[#9333ea] hover:sppcfw-underline sppcfw-font-medium sppcfw-cursor-pointer'
-									}, '✕ Clear selection')
+										className: 'sppcfw-text-[12px] sppcfw-text-[#4b5563] hover:sppcfw-text-[#9333ea] sppcfw-font-medium sppcfw-cursor-pointer sppcfw-inline-block hover:sppcfw-underline'
+									}, 'Clear')
 								)
 						),
 
@@ -8220,54 +8294,65 @@
 					hasVariations && varDisplayType === 'dropdown' &&
 						h(
 							'div',
-							{ className: 'sppcfw-space-y-3 sppcfw-pb-2' },
-							safeSample.variations.map((attr, aIdx) => {
-								const attrKey = attr.name || attr.label || `attr_${aIdx}`;
-								const cleanKey = String(attrKey).replace('attribute_', '').replace('pa_', '');
-								const selectedOpt = (safeSample.activeVariationAttrs && (safeSample.activeVariationAttrs[cleanKey] || safeSample.activeVariationAttrs[attrKey] || safeSample.activeVariationAttrs[attr.name] || safeSample.activeVariationAttrs[attr.label])) || '';
+							{ className: 'sppcfw-w-full sppcfw-mb-2' },
+							h(
+								'table',
+								{ className: 'variations sppcfw-w-full', style: { borderCollapse: 'separate', borderSpacing: '0 8px' } },
+								h(
+									'tbody',
+									null,
+									safeSample.variations.map((attr, aIdx) => {
+										const attrKey = attr.name || attr.label || `attr_${aIdx}`;
+										const cleanKey = String(attrKey).replace('attribute_', '').replace('pa_', '');
+										const selectedOpt = (safeSample.activeVariationAttrs && (safeSample.activeVariationAttrs[cleanKey] || safeSample.activeVariationAttrs[attrKey] || safeSample.activeVariationAttrs[attr.name] || safeSample.activeVariationAttrs[attr.label])) || '';
 
-								return h(
-									'div',
-									{ key: attr.name || aIdx, className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-3' },
-									showLabels &&
-										h(
-											'label',
-											{
-												className: 'sppcfw-font-semibold sppcfw-w-16 sppcfw-shrink-0',
-												style: { color: varLabelColor, fontSize: varLabelSize }
-											},
-											`${attr.label || attr.name}:`
-										),
-									h(
-										'select',
-										{
-											className: 'sppcfw-bg-[#ffffff] sppcfw-border sppcfw-border-[#d1d5db] sppcfw-rounded sppcfw-px-3 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-[#111827] focus:sppcfw-outline-none focus:sppcfw-ring-1 focus:sppcfw-ring-[#9333ea] sppcfw-w-48',
-											value: selectedOpt,
-											onChange: (e) => {
-												if (typeof safeSample.onSelectVariationOption === 'function') {
-													safeSample.onSelectVariationOption(cleanKey, e.target.value);
-												}
-											}
-										},
-										h('option', { value: '' }, `Choose an option`),
-										(attr.options || []).map(opt => h('option', { key: opt, value: opt }, opt))
-									)
-								);
-							}),
-							showReset &&
+										return h(
+											'tr',
+											{ key: attr.name || aIdx, className: 'sppcfw-bg-[#f9fafb] sppcfw-rounded-md' },
+											showLabels &&
+												h(
+													'th',
+													{
+														className: 'label sppcfw-text-left sppcfw-py-2.5 sppcfw-px-3.5 sppcfw-font-bold sppcfw-text-xs sppcfw-w-32 sppcfw-align-middle sppcfw-text-[#111827]',
+														style: { color: varLabelColor, fontSize: varLabelSize }
+													},
+													`${attr.label || attr.name}`
+												),
+											h(
+												'td',
+												{ className: 'value sppcfw-py-2.5 sppcfw-px-3.5 sppcfw-align-middle' },
+												h(
+													'select',
+													{
+														className: 'sppcfw-bg-[#ffffff] sppcfw-border sppcfw-border-[#d1d5db] sppcfw-rounded sppcfw-px-3 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-[#111827] focus:sppcfw-outline-none focus:sppcfw-ring-1 focus:sppcfw-ring-[#9333ea] sppcfw-w-48',
+														value: selectedOpt,
+														onChange: (e) => {
+															if (typeof safeSample.onSelectVariationOption === 'function') {
+																safeSample.onSelectVariationOption(cleanKey, e.target.value);
+															}
+														}
+													},
+													h('option', { value: '' }, `Choose an option`),
+													(attr.options || []).map(opt => h('option', { key: opt, value: opt }, opt))
+												)
+											)
+										);
+									})
+								)
+							),
+							(showReset || Object.keys(safeSample.activeVariationAttrs || {}).length > 0) &&
 								h(
 									'div',
-									{ className: 'sppcfw-pt-1' },
-									h('button', {
-										type: 'button',
+									{ className: 'sppcfw-pt-1.5 sppcfw-pb-1' },
+									h('a', {
 										onClick: (e) => {
 											e.stopPropagation();
 											if (typeof safeSample.onResetVariation === 'function') {
 												safeSample.onResetVariation();
 											}
 										},
-										className: 'sppcfw-text-[11px] sppcfw-text-[#9333ea] hover:sppcfw-underline sppcfw-font-medium sppcfw-cursor-pointer'
-									}, '✕ Clear selection')
+										className: 'sppcfw-text-[12px] sppcfw-text-[#4b5563] hover:sppcfw-text-[#9333ea] sppcfw-font-medium sppcfw-cursor-pointer sppcfw-inline-block hover:sppcfw-underline'
+									}, 'Clear')
 								)
 						),
 
@@ -8316,7 +8401,10 @@
 														className: `sppcfw-cursor-pointer hover:sppcfw-bg-purple-50/50 sppcfw-transition-colors ${isRowSelected ? 'sppcfw-bg-[#faf5ff]' : ''}`
 													},
 													h('td', { className: 'sppcfw-p-2.5 sppcfw-font-medium sppcfw-text-[#111827]' }, vRow.name),
-													h('td', { className: 'sppcfw-p-2.5 sppcfw-font-bold sppcfw-text-[#9333ea]' }, vRow.price || safeSample.price || '$49.99'),
+													h('td', {
+														className: 'sppcfw-p-2.5 sppcfw-font-bold sppcfw-text-[#9333ea] sppcfw-var-price-cell',
+														dangerouslySetInnerHTML: { __html: vRow.price || safeSample.price || '$49.99' }
+													}),
 													h('td', { className: `sppcfw-p-2.5 sppcfw-font-medium ${vRow.is_in_stock === false ? 'sppcfw-text-red-500' : 'sppcfw-text-green-600'}` }, vRow.stock || 'In Stock'),
 													h(
 														'td',
@@ -8360,7 +8448,10 @@
 												'tr',
 												{ key: rIdx, className: rIdx === 0 ? 'sppcfw-bg-[#faf5ff]' : '' },
 												h('td', { className: 'sppcfw-p-2.5 sppcfw-font-medium sppcfw-text-[#111827]' }, vRow.name),
-												h('td', { className: 'sppcfw-p-2.5 sppcfw-font-bold sppcfw-text-[#9333ea]' }, vRow.price),
+												h('td', {
+													className: 'sppcfw-p-2.5 sppcfw-font-bold sppcfw-text-[#9333ea] sppcfw-var-price-cell',
+													dangerouslySetInnerHTML: { __html: vRow.price || '$49.99' }
+												}),
 												h('td', { className: 'sppcfw-p-2.5 sppcfw-text-green-600 sppcfw-font-medium' }, vRow.stock),
 												h(
 													'td',
@@ -8377,6 +8468,22 @@
 									})()
 								)
 							)
+						),
+
+					// 3.5 Matched Variation Price & Stock Info (Single Variation Wrap)
+					hasVariations && varDisplayType !== 'table' && matchedVar && (matchedVar.price || matchedVar.stock) &&
+						h(
+							'div',
+							{ className: 'woocommerce-variation single_variation sppcfw-space-y-1 sppcfw-my-2.5' },
+							matchedVar.price &&
+								h('div', {
+									className: 'woocommerce-variation-price sppcfw-text-lg sppcfw-font-extrabold sppcfw-text-[#111827] [&_del]:sppcfw-opacity-60 [&_del]:sppcfw-font-normal [&_del]:sppcfw-text-gray-400 [&_del]:sppcfw-mr-2 [&_del]:sppcfw-line-through [&_ins]:sppcfw-no-underline',
+									dangerouslySetInnerHTML: { __html: matchedVar.price }
+								}),
+							matchedVar.stock &&
+								h('div', {
+									className: `woocommerce-variation-availability sppcfw-text-xs sppcfw-font-semibold ${matchedVar.is_in_stock === false ? 'sppcfw-text-red-500' : 'sppcfw-text-[#16a34a]'}`
+								}, matchedVar.stock)
 						),
 
 					// 4. Quantity & Add to Cart Button Row
