@@ -226,6 +226,33 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 		}
 
 		/**
+		 * Helper to find variation display type in layout tree.
+		 */
+		private function sppcfw_find_var_display_type($elements)
+		{
+			if (!is_array($elements)) {
+				return null;
+			}
+			foreach ($elements as $el) {
+				if (isset($el['type'])) {
+					if ($el['type'] === 'product_add_to_cart') {
+						return isset($el['settings']['variation_display_type']) ? $el['settings']['variation_display_type'] : 'swatches';
+					}
+					if ($el['type'] === 'variation_swatches') {
+						return 'swatches';
+					}
+				}
+				if (!empty($el['children']) && is_array($el['children'])) {
+					$found = $this->sppcfw_find_var_display_type($el['children']);
+					if ($found !== null) {
+						return $found;
+					}
+				}
+			}
+			return null;
+		}
+
+		/**
 		 * Enqueue frontend dynamic styles for builder widgets & containers.
 		 *
 		 * @return void
@@ -233,6 +260,25 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 		public function sppcfw_enqueue_frontend_builder_styles()
 		{
 			$layout = isset($this->matched_template['layout']) ? $this->matched_template['layout'] : array();
+
+			// Ensure variation switcher assets are enqueued if template uses swatches
+			$var_type = $this->sppcfw_find_var_display_type($layout);
+			if ('swatches' === $var_type || (null === $var_type && isset(SPPCFW_ADVANCED['enable_variation_switcher']) && 'on' === SPPCFW_ADVANCED['enable_variation_switcher'])) {
+				wp_enqueue_script(
+					'sppcfw-variation-switcher-js',
+					SPPCFW_DIR_URL . 'frontend/advanced/variation-switcher/variation-switcher.js',
+					array('jquery'),
+					SPPCFW_VERSION,
+					true
+				);
+				wp_enqueue_style(
+					'variation-switcher-css',
+					SPPCFW_DIR_URL . 'frontend/advanced/variation-switcher/variation-switcher.css',
+					null,
+					SPPCFW_VERSION,
+					'all'
+				);
+			}
 
 			$custom_css = '
 				.sppcfw-builder-frontend-wrapper { width: 100% !important; max-width: 100% !important; float: none !important; clear: both !important; box-sizing: border-box !important; }
@@ -1319,23 +1365,35 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						$swatch_gap = $this->sppcfw_get_device_prop($styles, 'swatch_gap', $device, '');
 
 						if (!empty($var_label_color)) {
-							$css .= ".sppcfw-el-{$id} table.variations label, .sppcfw-el-{$id} table.variations .label { color: " . esc_attr($var_label_color) . ' !important; }';
+							$css .= ".sppcfw-el-{$id} table.variations label, .sppcfw-el-{$id} table.variations .label, .sppcfw-el-{$id} table.variations th { color: " . esc_attr($var_label_color) . ' !important; }';
 						}
 						if (!empty($var_label_size)) {
-							$css .= ".sppcfw-el-{$id} table.variations label, .sppcfw-el-{$id} table.variations .label { font-size: " . esc_attr($var_label_size) . ' !important; }';
+							$css .= ".sppcfw-el-{$id} table.variations label, .sppcfw-el-{$id} table.variations .label, .sppcfw-el-{$id} table.variations th { font-size: " . esc_attr($var_label_size) . ' !important; }';
 						}
 						if (!empty($active_swatch_color)) {
-							$css .= ".sppcfw-el-{$id} .sppcfw-swatch-item.selected, .sppcfw-el-{$id} .sppcfw-swatch-item.active { border-color: " . esc_attr($active_swatch_color) . ' !important; outline-color: ' . esc_attr($active_swatch_color) . ' !important; }';
+							$css .= ".sppcfw-el-{$id} .sppcfw-swatch-item.selected, .sppcfw-el-{$id} .sppcfw-swatch-item.active, .sppcfw-el-{$id} button.webfwc_variation_button.selected { border-color: " . esc_attr($active_swatch_color) . ' !important; box-shadow: 0 0 0 2px ' . esc_attr($active_swatch_color) . ' !important; outline-color: ' . esc_attr($active_swatch_color) . ' !important; }';
+							$css .= ".sppcfw-el-{$id} button.webfwc_variation_button:hover { border-color: " . esc_attr($active_swatch_color) . ' !important; box-shadow: 0 0 0 1px ' . esc_attr($active_swatch_color) . ' !important; }';
 						}
 						if (!empty($swatch_size)) {
-							$css .= ".sppcfw-el-{$id} .sppcfw-swatch-item { width: " . esc_attr($swatch_size) . ' !important; height: ' . esc_attr($swatch_size) . ' !important; }';
+							$css .= ".sppcfw-el-{$id} .sppcfw-swatch-item, .sppcfw-el-{$id} button.webfwc_variation_button.color { width: " . esc_attr($swatch_size) . ' !important; height: ' . esc_attr($swatch_size) . ' !important; min-width: ' . esc_attr($swatch_size) . ' !important; min-height: ' . esc_attr($swatch_size) . ' !important; }';
+							$css .= ".sppcfw-el-{$id} button.webfwc_variation_button.button { min-height: " . esc_attr($swatch_size) . ' !important; }';
 						}
 						if (!empty($swatch_border_radius)) {
-							$css .= ".sppcfw-el-{$id} .sppcfw-swatch-item { border-radius: " . esc_attr($swatch_border_radius) . ' !important; }';
+							$css .= ".sppcfw-el-{$id} .sppcfw-swatch-item, .sppcfw-el-{$id} button.webfwc_variation_button { border-radius: " . esc_attr($swatch_border_radius) . ' !important; }';
 						}
 						if (!empty($swatch_gap)) {
-							$css .= ".sppcfw-el-{$id} .sppcfw-swatches-container, .sppcfw-el-{$id} table.variations td.value { gap: " . esc_attr($swatch_gap) . ' !important; }';
+							$css .= ".sppcfw-el-{$id} .sppcfw-swatches-container, .sppcfw-el-{$id} .cu_button_el, .sppcfw-el-{$id} table.variations td.value { gap: " . esc_attr($swatch_gap) . ' !important; }';
 						}
+
+						// Swatch shape classes
+						$css .= ".sppcfw-el-{$id}.sppcfw-swatch-shape-circle button.webfwc_variation_button.color, .sppcfw-el-{$id} .sppcfw-swatch-shape-circle button.webfwc_variation_button.color { border-radius: 50% !important; }";
+						$css .= ".sppcfw-el-{$id}.sppcfw-swatch-shape-circle button.webfwc_variation_button.button, .sppcfw-el-{$id} .sppcfw-swatch-shape-circle button.webfwc_variation_button.button { border-radius: 9999px !important; }";
+						$css .= ".sppcfw-el-{$id}.sppcfw-swatch-shape-rounded button.webfwc_variation_button, .sppcfw-el-{$id} .sppcfw-swatch-shape-rounded button.webfwc_variation_button { border-radius: 6px !important; }";
+						$css .= ".sppcfw-el-{$id}.sppcfw-swatch-shape-square button.webfwc_variation_button, .sppcfw-el-{$id} .sppcfw-swatch-shape-square button.webfwc_variation_button { border-radius: 2px !important; }";
+
+						// Show/hide labels & reset link
+						$css .= ".sppcfw-el-{$id}.sppcfw-hide-var-labels table.variations th.label, .sppcfw-el-{$id}.sppcfw-hide-var-labels table.variations label, .sppcfw-el-{$id} .sppcfw-hide-var-labels table.variations th.label { display: none !important; }";
+						$css .= ".sppcfw-el-{$id}.sppcfw-hide-var-reset a.reset_variations, .sppcfw-el-{$id} .sppcfw-hide-var-reset a.reset_variations { display: none !important; }";
 					}
 
 
@@ -1818,6 +1876,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					$var_display_type = !empty($settings['variation_display_type']) ? $settings['variation_display_type'] : 'swatches';
 					$swatch_shape = !empty($settings['swatch_shape']) ? $settings['swatch_shape'] : 'circle';
 					$show_labels = isset($settings['show_attribute_labels']) && false === $settings['show_attribute_labels'] ? ' sppcfw-hide-var-labels' : '';
+					$show_reset = empty($settings['show_variation_reset']) ? ' sppcfw-hide-var-reset' : '';
 					$cart_btn_text = '';
 					$basic = get_option('sppcfw_basic', array());
 					if (is_array($basic) && !empty($basic['add_to_cart_button_text'])) {
@@ -1826,7 +1885,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						$cart_btn_text = $settings['button_text'];
 					}
 
-					$var_classes = ' sppcfw-var-display-' . esc_attr($var_display_type) . ' sppcfw-swatch-shape-' . esc_attr($swatch_shape) . $show_labels;
+					$var_classes = ' sppcfw-var-display-' . esc_attr($var_display_type) . ' sppcfw-swatch-shape-' . esc_attr($swatch_shape) . $show_labels . $show_reset;
 
 					echo '<div class="sppcfw-add-to-cart-wrapper sppcfw-el-' . $id . $var_classes . $custom_class . '">';
 

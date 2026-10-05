@@ -35,6 +35,85 @@ if( !class_exists("Sppcfw_Variation_Switcher")){
         }
 
         public function is_enabled(){
+            // 1. Check if Single Product Customizer builder template is active for this product or preview
+            $product_id = get_the_ID();
+            if (!$product_id && isset($_GET['product_id'])) {
+                $product_id = absint($_GET['product_id']);
+            }
+            if (!$product_id && isset($GLOBALS['product']) && is_object($GLOBALS['product'])) {
+                $product_id = $GLOBALS['product']->get_id();
+            }
+
+            if ($product_id) {
+                $matched = null;
+                $templates = get_option('sppcfw_builder_templates', array());
+
+                if (isset($_GET['sppcfw_preview']) && isset($_GET['template_id']) && current_user_can('manage_options')) {
+                    $preview_id = sanitize_text_field($_GET['template_id']);
+                    if (isset($templates[$preview_id]) && !empty($templates[$preview_id]['layout'])) {
+                        $matched = $templates[$preview_id];
+                    }
+                }
+
+                if (empty($matched)) {
+                    if (empty($templates)) {
+                        $legacy = get_option('sppcfw_builder_template', array());
+                        if (!empty($legacy) && !empty($legacy['layout'])) {
+                            $matched = $legacy;
+                        }
+                    } else {
+                        $product_cats = wp_get_post_terms($product_id, 'product_cat', array('fields' => 'ids'));
+                        $category_match = array();
+                        $entire_match = array();
+
+                        foreach ($templates as $tpl) {
+                            if (empty($tpl['layout']) || (isset($tpl['status']) && in_array(strtolower($tpl['status']), array('draft', 'trash'), true))) {
+                                continue;
+                            }
+                            $conditions = isset($tpl['conditions']) ? $tpl['conditions'] : array();
+                            $scope = isset($conditions['scope']) ? $conditions['scope'] : 'entire';
+
+                            $tpl_prod_id = isset($tpl['selected_product_id']) ? $tpl['selected_product_id'] : (isset($tpl['page_settings']['selected_product_id']) ? $tpl['page_settings']['selected_product_id'] : '');
+                            if (!empty($tpl_prod_id) && (int) $tpl_prod_id === (int) $product_id) {
+                                $matched = $tpl;
+                                break;
+                            }
+
+                            if ('product' === $scope) {
+                                $selected_prods = isset($conditions['product_ids']) ? (array) $conditions['product_ids'] : array();
+                                if (in_array($product_id, $selected_prods, true) || in_array((string) $product_id, $selected_prods, true)) {
+                                    $matched = $tpl;
+                                    break;
+                                }
+                            } elseif ('category' === $scope) {
+                                $selected_cats = isset($conditions['category_ids']) ? (array) $conditions['category_ids'] : array();
+                                if (!empty(array_intersect($selected_cats, $product_cats))) {
+                                    $category_match = $tpl;
+                                }
+                            } elseif ('entire' === $scope) {
+                                $entire_match = $tpl;
+                            }
+                        }
+
+                        if (empty($matched)) {
+                            if (!empty($category_match)) {
+                                $matched = $category_match;
+                            } elseif (!empty($entire_match)) {
+                                $matched = $entire_match;
+                            }
+                        }
+                    }
+                }
+
+                if (!empty($matched) && !empty($matched['layout'])) {
+                    $display_type = $this->find_variation_display_type_in_layout($matched['layout']);
+                    if ($display_type !== null) {
+                        return ('swatches' === $display_type) ? 1 : 0;
+                    }
+                }
+            }
+
+            // 2. Global setting fallback
             $enabled=0;
             if(isset(SPPCFW_ADVANCED['enable_variation_switcher'])){
                 if(SPPCFW_ADVANCED['enable_variation_switcher']==='on'){
@@ -42,6 +121,29 @@ if( !class_exists("Sppcfw_Variation_Switcher")){
                 }
             }
             return $enabled;
+        }
+
+        private function find_variation_display_type_in_layout($elements) {
+            if (!is_array($elements)) {
+                return null;
+            }
+            foreach ($elements as $el) {
+                if (isset($el['type'])) {
+                    if ($el['type'] === 'product_add_to_cart') {
+                        return isset($el['settings']['variation_display_type']) ? $el['settings']['variation_display_type'] : 'swatches';
+                    }
+                    if ($el['type'] === 'variation_swatches') {
+                        return 'swatches';
+                    }
+                }
+                if (!empty($el['children']) && is_array($el['children'])) {
+                    $found = $this->find_variation_display_type_in_layout($el['children']);
+                    if ($found !== null) {
+                        return $found;
+                    }
+                }
+            }
+            return null;
         }
 
         public function sppcfw_get_attribute_type($attribute_name){
@@ -139,6 +241,29 @@ if( !class_exists("Sppcfw_Variation_Switcher")){
                 $select .= '<option value="">' . esc_html__("Choose one", "single-product-customizer") . '</option>';
                 $button = '';
 
+                $color_map = array(
+                    'black'   => '#111827',
+                    'white'   => '#ffffff',
+                    'red'     => '#ef4444',
+                    'blue'    => '#3b82f6',
+                    'green'   => '#10b981',
+                    'yellow'  => '#f59e0b',
+                    'purple'  => '#9333ea',
+                    'pink'    => '#ec4899',
+                    'orange'  => '#f97316',
+                    'gray'    => '#6b7280',
+                    'grey'    => '#6b7280',
+                    'navy'    => '#1e3a8a',
+                    'brown'   => '#78350f',
+                    'gold'    => '#eab308',
+                    'silver'  => '#9ca3af',
+                    'teal'    => '#14b8a6',
+                    'olive'   => '#84cc16',
+                    'maroon'  => '#881337',
+                    'cyan'    => '#06b6d4',
+                    'beige'   => '#f5f5dc',
+                );
+
                 foreach ($options as $option) {
                     // Get option slug and label
                     $option_slug = '';
@@ -162,9 +287,26 @@ if( !class_exists("Sppcfw_Variation_Switcher")){
                     // Get meta value for the attribute type
                     $option_meta = $this->sppcfw_get_attribute_type_meta_value($option_slug, $attribute, $product_id);
 
-                    switch ($attributes_type) {
+                    $curr_type = $attributes_type;
+                    $is_color_attr = (stripos($attribute, 'color') !== false || stripos($attribute_name, 'color') !== false);
+                    if ($curr_type === 'color' || $is_color_attr) {
+                        if (empty($option_meta)) {
+                            $slug_clean = strtolower(sanitize_title($option_slug));
+                            if (isset($color_map[$slug_clean])) {
+                                $option_meta = $color_map[$slug_clean];
+                            } elseif (preg_match('/^#[a-f0-9]{3,6}$/i', $option_slug)) {
+                                $option_meta = $option_slug;
+                            }
+                        }
+                        if (!empty($option_meta)) {
+                            $curr_type = 'color';
+                        }
+                    }
+
+                    switch ($curr_type) {
                         case 'color':
-                            $button .= '<button data-val="' . esc_attr($option_slug) . '" class="webfwc_variation_button color" data-bg-color="' . esc_attr($option_meta) . '" type="button" data-attr="' . esc_attr($attribute) . '" title="' . esc_attr($option_label) . '"></button>';
+                            $bg_style = !empty($option_meta) ? ' style="background-color:' . esc_attr($option_meta) . ';"' : '';
+                            $button .= '<button data-val="' . esc_attr($option_slug) . '" class="webfwc_variation_button color" data-bg-color="' . esc_attr($option_meta) . '"' . $bg_style . ' type="button" data-attr="' . esc_attr($attribute) . '" title="' . esc_attr($option_label) . '"></button>';
                             break;
 
                         case 'icon':
