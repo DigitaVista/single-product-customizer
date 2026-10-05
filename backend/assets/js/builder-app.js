@@ -8760,77 +8760,284 @@
 	}
 
 	// 6. Display Conditions Modal Component
-	function DisplayConditionsModal({ displayConditions, setDisplayConditions, categories, products, closeModal, saveTemplate }) {
+	function DisplayConditionsModal({ displayConditions, setDisplayConditions, categories = [], products = [], closeModal, saveTemplate }) {
+		const [searchCat, setSearchCat] = useState('');
+		const [searchProd, setSearchProd] = useState('');
+
+		const currentScope = displayConditions.scope || 'entire';
+		const selectedCategoryIds = Array.isArray(displayConditions.category_ids) ? displayConditions.category_ids.map(Number) : [];
+		const selectedProductIds = Array.isArray(displayConditions.product_ids) ? displayConditions.product_ids.map(Number) : [];
+
+		function handleScopeChange(scope) {
+			setDisplayConditions(prev => ({ ...prev, scope }));
+		}
+
+		function toggleCategory(catId) {
+			const idNum = Number(catId);
+			const exists = selectedCategoryIds.includes(idNum);
+			const updated = exists ? selectedCategoryIds.filter(id => id !== idNum) : [...selectedCategoryIds, idNum];
+			setDisplayConditions(prev => ({ ...prev, category_ids: updated }));
+		}
+
+		function selectAllCategories() {
+			setDisplayConditions(prev => ({ ...prev, category_ids: categories.map(c => Number(c.id)) }));
+		}
+
+		function clearCategories() {
+			setDisplayConditions(prev => ({ ...prev, category_ids: [] }));
+		}
+
+		function toggleProduct(prodId) {
+			const idNum = Number(prodId);
+			const exists = selectedProductIds.includes(idNum);
+			const updated = exists ? selectedProductIds.filter(id => id !== idNum) : [...selectedProductIds, idNum];
+			setDisplayConditions(prev => ({ ...prev, product_ids: updated }));
+		}
+
+		function selectAllProducts() {
+			setDisplayConditions(prev => ({ ...prev, product_ids: products.map(p => Number(p.id)) }));
+		}
+
+		function clearProducts() {
+			setDisplayConditions(prev => ({ ...prev, product_ids: [] }));
+		}
+
+		const filteredCategories = categories.filter(cat => {
+			if (!searchCat.trim()) return true;
+			const term = searchCat.toLowerCase();
+			return (cat.name || '').toLowerCase().includes(term) || (cat.slug || '').toLowerCase().includes(term);
+		});
+
+		const filteredProducts = products.filter(prod => {
+			if (!searchProd.trim()) return true;
+			const term = searchProd.toLowerCase();
+			return (prod.title || '').toLowerCase().includes(term) || String(prod.id).includes(term);
+		});
+
 		return h(
 			'div',
 			{ className: 'sppcfw-fixed sppcfw-inset-0 sppcfw-bg-black/70 sppcfw-backdrop-blur-sm sppcfw-z-50 sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-p-4' },
 			h(
 				'div',
-				{ className: 'sppcfw-bg-[#16202e] sppcfw-border sppcfw-border-[#4d4354] sppcfw-rounded-lg sppcfw-w-full sppcfw-max-w-lg sppcfw-shadow-2xl sppcfw-p-6 sppcfw-text-[#d9e3f6]' },
+				{ className: 'sppcfw-bg-[#16202e] sppcfw-border sppcfw-border-[#4d4354] sppcfw-rounded-xl sppcfw-w-full sppcfw-max-w-xl sppcfw-shadow-2xl sppcfw-p-6 sppcfw-text-[#d9e3f6] sppcfw-flex sppcfw-flex-col sppcfw-max-h-[90vh]' },
+				// Header
 				h(
 					'div',
-					{ className: 'sppcfw-flex sppcfw-justify-between sppcfw-items-center sppcfw-border-b sppcfw-border-[#374151] sppcfw-pb-3 sppcfw-mb-4' },
+					{ className: 'sppcfw-flex sppcfw-justify-between sppcfw-items-center sppcfw-border-b sppcfw-border-[#374151] sppcfw-pb-3.5 sppcfw-mb-4' },
 					h('h3', { className: 'sppcfw-text-lg sppcfw-font-bold sppcfw-text-white sppcfw-flex sppcfw-items-center sppcfw-gap-2' }, h('span', { className: 'material-symbols-outlined sppcfw-text-[#9333ea]' }, 'tune'), 'Publish Display Conditions'),
-					h('button', { className: 'sppcfw-text-[#cfc2d7] hover:sppcfw-text-white sppcfw-font-bold', onClick: closeModal }, '✕')
+					h('button', { className: 'sppcfw-text-[#cfc2d7] hover:sppcfw-text-white sppcfw-font-bold sppcfw-cursor-pointer sppcfw-text-base', onClick: closeModal }, '✕')
 				),
 
+				// Body
 				h(
 					'div',
-					{ className: 'sppcfw-space-y-4 sppcfw-mb-6' },
+					{ className: 'sppcfw-space-y-4 sppcfw-overflow-y-auto sppcfw-pr-1 sppcfw-flex-1 sppcfw-mb-4' },
 					h('p', { className: 'sppcfw-text-xs sppcfw-text-[#cfc2d7]' }, 'Choose where your single product page builder template will be applied:'),
+
+					// Radio Scopes
 					h(
 						'div',
-						{ className: 'sppcfw-space-y-3' },
+						{ className: 'sppcfw-space-y-2 sppcfw-bg-[#111827] sppcfw-p-3 sppcfw-rounded-lg sppcfw-border sppcfw-border-[#374151]' },
+						// Option 1: Entire Website
 						h(
 							'label',
-							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2 sppcfw-text-sm sppcfw-cursor-pointer' },
+							{ className: `sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-text-sm sppcfw-cursor-pointer sppcfw-p-2 sppcfw-rounded-md sppcfw-transition-colors ${currentScope === 'entire' ? 'sppcfw-bg-[#9333ea]/15 sppcfw-border sppcfw-border-[#9333ea]/40' : 'hover:sppcfw-bg-[#1f2937]'}` },
 							h('input', {
 								type: 'radio',
 								name: 'condition_scope',
 								value: 'entire',
-								checked: displayConditions.scope === 'entire',
-								onChange: () => setDisplayConditions({ ...displayConditions, scope: 'entire' }),
+								className: 'sppcfw-text-[#9333ea] focus:sppcfw-ring-[#9333ea]',
+								checked: currentScope === 'entire',
+								onChange: () => handleScopeChange('entire'),
 							}),
-							h('span', { className: 'sppcfw-font-semibold' }, 'Entire Website'),
+							h('span', { className: 'sppcfw-font-semibold sppcfw-text-white' }, 'Entire Website'),
 							h('span', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af]' }, '(All Single Product Pages)')
 						),
+
+						// Option 2: Specific Category
 						h(
 							'label',
-							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2 sppcfw-text-sm sppcfw-cursor-pointer' },
+							{ className: `sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-text-sm sppcfw-cursor-pointer sppcfw-p-2 sppcfw-rounded-md sppcfw-transition-colors ${currentScope === 'category' ? 'sppcfw-bg-[#9333ea]/15 sppcfw-border sppcfw-border-[#9333ea]/40' : 'hover:sppcfw-bg-[#1f2937]'}` },
 							h('input', {
 								type: 'radio',
 								name: 'condition_scope',
 								value: 'category',
-								checked: displayConditions.scope === 'category',
-								onChange: () => setDisplayConditions({ ...displayConditions, scope: 'category' }),
+								className: 'sppcfw-text-[#9333ea] focus:sppcfw-ring-[#9333ea]',
+								checked: currentScope === 'category',
+								onChange: () => handleScopeChange('category'),
 							}),
-							h('span', { className: 'sppcfw-font-semibold' }, 'Specific Category'),
+							h('span', { className: 'sppcfw-font-semibold sppcfw-text-white' }, 'Specific Category'),
 							h('span', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af]' }, '(Category-Based Scope)')
 						),
+
+						// Option 3: Specific Product
 						h(
 							'label',
-							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2 sppcfw-text-sm sppcfw-cursor-pointer' },
+							{ className: `sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-text-sm sppcfw-cursor-pointer sppcfw-p-2 sppcfw-rounded-md sppcfw-transition-colors ${currentScope === 'product' ? 'sppcfw-bg-[#9333ea]/15 sppcfw-border sppcfw-border-[#9333ea]/40' : 'hover:sppcfw-bg-[#1f2937]'}` },
 							h('input', {
 								type: 'radio',
 								name: 'condition_scope',
 								value: 'product',
-								checked: displayConditions.scope === 'product',
-								onChange: () => setDisplayConditions({ ...displayConditions, scope: 'product' }),
+								className: 'sppcfw-text-[#9333ea] focus:sppcfw-ring-[#9333ea]',
+								checked: currentScope === 'product',
+								onChange: () => handleScopeChange('product'),
 							}),
-							h('span', { className: 'sppcfw-font-semibold' }, 'Specific Product / Separate Page'),
+							h('span', { className: 'sppcfw-font-semibold sppcfw-text-white' }, 'Specific Product / Separate Page'),
 							h('span', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af]' }, '(Product-Based Scope)')
 						)
-					)
+					),
+
+					// Conditional Content: Categories Selector
+					currentScope === 'category' &&
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-2.5 sppcfw-bg-[#111827] sppcfw-p-3.5 sppcfw-rounded-lg sppcfw-border sppcfw-border-[#374151]' },
+							h(
+								'div',
+								{ className: 'sppcfw-flex sppcfw-justify-between sppcfw-items-center' },
+								h('label', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-white sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
+									h('span', { className: 'material-symbols-outlined sppcfw-text-sm sppcfw-text-[#9333ea]' }, 'category'),
+									'Select Categories to apply:',
+									h('span', { className: 'sppcfw-text-[11px] sppcfw-font-semibold sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded-full sppcfw-bg-[#9333ea]/20 sppcfw-text-[#ddb8ff]' }, `${selectedCategoryIds.length} selected`)
+								),
+								h(
+									'div',
+									{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2' },
+									h('button', { type: 'button', onClick: selectAllCategories, className: 'sppcfw-text-[11px] sppcfw-text-[#9333ea] hover:sppcfw-underline sppcfw-cursor-pointer' }, 'Select All'),
+									h('span', { className: 'sppcfw-text-gray-500 sppcfw-text-xs' }, '|'),
+									h('button', { type: 'button', onClick: clearCategories, className: 'sppcfw-text-[11px] sppcfw-text-gray-400 hover:sppcfw-underline sppcfw-cursor-pointer' }, 'Clear')
+								)
+							),
+
+							// Category search input
+							h(
+								'div',
+								{ className: 'sppcfw-relative' },
+								h('span', { className: 'material-symbols-outlined sppcfw-absolute sppcfw-left-2.5 sppcfw-top-1/2 sppcfw--translate-y-1/2 sppcfw-text-xs sppcfw-text-gray-400' }, 'search'),
+								h('input', {
+									type: 'text',
+									value: searchCat,
+									onChange: e => setSearchCat(e.target.value),
+									placeholder: 'Filter categories by name...',
+									className: 'sppcfw-w-full sppcfw-bg-[#1f2937] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded-md sppcfw-pl-8 sppcfw-pr-3 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white sppcfw-placeholder-gray-400 focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]'
+								})
+							),
+
+							// Category list
+							h(
+								'div',
+								{ className: 'sppcfw-max-h-48 sppcfw-overflow-y-auto sppcfw-space-y-1 sppcfw-pr-1 sppcfw-rounded-md sppcfw-border sppcfw-border-[#1f2937] sppcfw-p-1' },
+								filteredCategories.length === 0
+									? h('div', { className: 'sppcfw-py-4 sppcfw-text-center sppcfw-text-xs sppcfw-text-gray-400' }, 'No categories found.')
+									: filteredCategories.map(cat => {
+											const isSelected = selectedCategoryIds.includes(Number(cat.id));
+											return h(
+												'label',
+												{
+													key: cat.id,
+													className: `sppcfw-flex sppcfw-items-center sppcfw-justify-between sppcfw-p-2 sppcfw-rounded sppcfw-cursor-pointer sppcfw-text-xs sppcfw-transition-all ${
+														isSelected ? 'sppcfw-bg-[#9333ea]/20 sppcfw-border sppcfw-border-[#9333ea]/40 sppcfw-text-white' : 'hover:sppcfw-bg-[#1f2937] sppcfw-text-[#cfc2d7]'
+													}`
+												},
+												h(
+													'div',
+													{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2.5' },
+													h('input', {
+														type: 'checkbox',
+														checked: isSelected,
+														onChange: () => toggleCategory(cat.id),
+														className: 'sppcfw-rounded sppcfw-text-[#9333ea] focus:sppcfw-ring-[#9333ea] sppcfw-cursor-pointer'
+													}),
+													h('span', { className: 'sppcfw-font-medium' }, cat.name)
+												),
+												cat.slug && h('span', { className: 'sppcfw-text-[10px] sppcfw-font-mono sppcfw-text-gray-400' }, cat.slug)
+											);
+									  })
+							)
+						),
+
+					// Conditional Content: Products Selector
+					currentScope === 'product' &&
+						h(
+							'div',
+							{ className: 'sppcfw-space-y-2.5 sppcfw-bg-[#111827] sppcfw-p-3.5 sppcfw-rounded-lg sppcfw-border sppcfw-border-[#374151]' },
+							h(
+								'div',
+								{ className: 'sppcfw-flex sppcfw-justify-between sppcfw-items-center' },
+								h('label', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-white sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
+									h('span', { className: 'material-symbols-outlined sppcfw-text-sm sppcfw-text-[#9333ea]' }, 'shopping_bag'),
+									'Select Products to apply:',
+									h('span', { className: 'sppcfw-text-[11px] sppcfw-font-semibold sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded-full sppcfw-bg-[#9333ea]/20 sppcfw-text-[#ddb8ff]' }, `${selectedProductIds.length} selected`)
+								),
+								h(
+									'div',
+									{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2' },
+									h('button', { type: 'button', onClick: selectAllProducts, className: 'sppcfw-text-[11px] sppcfw-text-[#9333ea] hover:sppcfw-underline sppcfw-cursor-pointer' }, 'Select All'),
+									h('span', { className: 'sppcfw-text-gray-500 sppcfw-text-xs' }, '|'),
+									h('button', { type: 'button', onClick: clearProducts, className: 'sppcfw-text-[11px] sppcfw-text-gray-400 hover:sppcfw-underline sppcfw-cursor-pointer' }, 'Clear')
+								)
+							),
+
+							// Product search input
+							h(
+								'div',
+								{ className: 'sppcfw-relative' },
+								h('span', { className: 'material-symbols-outlined sppcfw-absolute sppcfw-left-2.5 sppcfw-top-1/2 sppcfw--translate-y-1/2 sppcfw-text-xs sppcfw-text-gray-400' }, 'search'),
+								h('input', {
+									type: 'text',
+									value: searchProd,
+									onChange: e => setSearchProd(e.target.value),
+									placeholder: 'Search products by title or ID...',
+									className: 'sppcfw-w-full sppcfw-bg-[#1f2937] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded-md sppcfw-pl-8 sppcfw-pr-3 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white sppcfw-placeholder-gray-400 focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]'
+								})
+							),
+
+							// Product list
+							h(
+								'div',
+								{ className: 'sppcfw-max-h-52 sppcfw-overflow-y-auto sppcfw-space-y-1 sppcfw-pr-1 sppcfw-rounded-md sppcfw-border sppcfw-border-[#1f2937] sppcfw-p-1' },
+								filteredProducts.length === 0
+									? h('div', { className: 'sppcfw-py-4 sppcfw-text-center sppcfw-text-xs sppcfw-text-gray-400' }, 'No products found.')
+									: filteredProducts.map(prod => {
+											const isSelected = selectedProductIds.includes(Number(prod.id));
+											return h(
+												'label',
+												{
+													key: prod.id,
+													className: `sppcfw-flex sppcfw-items-center sppcfw-justify-between sppcfw-p-2 sppcfw-rounded sppcfw-cursor-pointer sppcfw-text-xs sppcfw-transition-all ${
+														isSelected ? 'sppcfw-bg-[#9333ea]/20 sppcfw-border sppcfw-border-[#9333ea]/40 sppcfw-text-white' : 'hover:sppcfw-bg-[#1f2937] sppcfw-text-[#cfc2d7]'
+													}`
+												},
+												h(
+													'div',
+													{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-overflow-hidden sppcfw-pr-2' },
+													h('input', {
+														type: 'checkbox',
+														checked: isSelected,
+														onChange: () => toggleProduct(prod.id),
+														className: 'sppcfw-rounded sppcfw-text-[#9333ea] focus:sppcfw-ring-[#9333ea] sppcfw-cursor-pointer'
+													}),
+													prod.image_url
+														? h('img', { src: prod.image_url, alt: prod.title, className: 'sppcfw-w-6 sppcfw-h-6 sppcfw-object-cover sppcfw-rounded sppcfw-shrink-0' })
+														: h('span', { className: 'material-symbols-outlined sppcfw-text-base sppcfw-text-gray-400 sppcfw-shrink-0' }, 'shopping_bag'),
+													h('span', { className: 'sppcfw-font-medium sppcfw-truncate' }, prod.title)
+												),
+												h('span', { className: 'sppcfw-text-[10px] sppcfw-font-mono sppcfw-text-gray-400 sppcfw-shrink-0' }, `#${prod.id}`)
+											);
+									  })
+							)
+						)
 				),
 
+				// Footer Actions
 				h(
 					'div',
-					{ className: 'sppcfw-flex sppcfw-justify-end sppcfw-gap-3 sppcfw-pt-3 sppcfw-border-t sppcfw-border-[#374151]' },
-					h('button', { className: 'sppcfw-px-4 sppcfw-py-2 sppcfw-bg-[#121c2a] hover:sppcfw-bg-[#212b39] sppcfw-text-[#d9e3f6] sppcfw-rounded sppcfw-text-xs sppcfw-font-semibold', onClick: closeModal }, 'Cancel'),
+					{ className: 'sppcfw-flex sppcfw-justify-end sppcfw-gap-3 sppcfw-pt-3.5 sppcfw-border-t sppcfw-border-[#374151]' },
+					h('button', { className: 'sppcfw-px-4 sppcfw-py-2 sppcfw-bg-[#121c2a] hover:sppcfw-bg-[#212b39] sppcfw-text-[#d9e3f6] sppcfw-rounded sppcfw-text-xs sppcfw-font-semibold sppcfw-cursor-pointer', onClick: closeModal }, 'Cancel'),
 					h(
 						'button',
 						{
-							className: 'sppcfw-px-5 sppcfw-py-2 sppcfw-bg-[#9333ea] hover:sppcfw-bg-[#7e22ce] sppcfw-text-white sppcfw-rounded sppcfw-text-xs sppcfw-font-bold sppcfw-shadow',
+							className: 'sppcfw-px-5 sppcfw-py-2 sppcfw-bg-[#9333ea] hover:sppcfw-bg-[#7e22ce] sppcfw-text-white sppcfw-rounded sppcfw-text-xs sppcfw-font-bold sppcfw-shadow sppcfw-cursor-pointer',
 							onClick: () => {
 								closeModal();
 								saveTemplate();

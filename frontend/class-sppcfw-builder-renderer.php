@@ -197,14 +197,15 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				}
 
 				if ('product' === $scope) {
-					$selected_prods = isset($conditions['product_ids']) ? (array) $conditions['product_ids'] : array();
-					if (in_array($product_id, $selected_prods, true) || in_array((string) $product_id, $selected_prods, true)) {
+					$selected_prods = isset($conditions['product_ids']) ? array_map('intval', (array) $conditions['product_ids']) : array();
+					if (in_array((int) $product_id, $selected_prods, true)) {
 						$product_match = $tpl;
 						break;
 					}
 				} elseif ('category' === $scope) {
-					$selected_cats = isset($conditions['category_ids']) ? (array) $conditions['category_ids'] : array();
-					if (!empty(array_intersect($selected_cats, $product_cats))) {
+					$selected_cats = isset($conditions['category_ids']) ? array_map('intval', (array) $conditions['category_ids']) : array();
+					$int_product_cats = array_map('intval', (array) $product_cats);
+					if (!empty(array_intersect($selected_cats, $int_product_cats))) {
 						$category_match = $tpl;
 					}
 				} elseif ('entire' === $scope) {
