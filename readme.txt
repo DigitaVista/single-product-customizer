@@ -1,4 +1,4 @@
-== Product Page Customizer for WooCommerce ==
+=== Product Page Customizer for WooCommerce ===
 Contributors: wooxperto,hasan350,mahmudul47
 Tags: woocommerce, product customizer, variation swatches, quick checkout, customize woocommerce
 Requires at least: 6.5
