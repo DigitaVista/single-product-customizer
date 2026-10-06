@@ -227,6 +227,8 @@ if (!class_exists('SPPCFW_Builder')) {
 						'nonce' => wp_create_nonce('sppcfw_builder_nonce'),
 						'plugin_url' => SPPCFW_DIR_URL,
 						'template_id' => $template_id,
+						'is_pro' => function_exists('sppcfw_is_pro_active') && sppcfw_is_pro_active() ? true : false,
+						'pro_upgrade_url' => admin_url('admin.php?page=sppcfw-pro-license'),
 						'basic_settings' => array(
 							'enable_plus_minus_button' => $enable_pm,
 							'add_to_cart_button_text' => $btn_text,
@@ -712,6 +714,20 @@ if (!class_exists('SPPCFW_Builder')) {
 
 			$templates = get_option('sppcfw_builder_templates', array());
 
+			$decoded_conditions = json_decode($conditions, true);
+			if (!is_array($decoded_conditions)) {
+				$decoded_conditions = array('scope' => 'entire');
+			}
+
+			// Ensure Pro conditions cannot be set without active Pro license
+			if (!function_exists('sppcfw_is_pro_active') || !sppcfw_is_pro_active()) {
+				if (isset($decoded_conditions['scope']) && 'entire' !== $decoded_conditions['scope']) {
+					$decoded_conditions['scope'] = 'entire';
+					$decoded_conditions['category_ids'] = array();
+					$decoded_conditions['product_ids'] = array();
+				}
+			}
+
 			$templates[$template_id] = array(
 				'id' => $template_id,
 				'title' => $template_title,
@@ -719,7 +735,7 @@ if (!class_exists('SPPCFW_Builder')) {
 				'selected_product_id' => $selected_product_id,
 				'page_settings' => $page_settings,
 				'layout' => json_decode($layout, true),
-				'conditions' => json_decode($conditions, true),
+				'conditions' => $decoded_conditions,
 				'updated_at' => current_time('mysql'),
 			);
 

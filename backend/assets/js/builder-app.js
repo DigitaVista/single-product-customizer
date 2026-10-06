@@ -8889,11 +8889,17 @@
 		const [searchCat, setSearchCat] = useState('');
 		const [searchProd, setSearchProd] = useState('');
 
-		const currentScope = displayConditions.scope || 'entire';
+		const isProActive = Boolean(typeof SPPCFWBuilderConfig !== 'undefined' && SPPCFWBuilderConfig.is_pro);
+		const proUpgradeUrl = typeof SPPCFWBuilderConfig !== 'undefined' && SPPCFWBuilderConfig.pro_upgrade_url ? SPPCFWBuilderConfig.pro_upgrade_url : 'admin.php?page=sppcfw-pro-license';
+
+		const currentScope = !isProActive ? 'entire' : (displayConditions.scope || 'entire');
 		const selectedCategoryIds = Array.isArray(displayConditions.category_ids) ? displayConditions.category_ids.map(Number) : [];
 		const selectedProductIds = Array.isArray(displayConditions.product_ids) ? displayConditions.product_ids.map(Number) : [];
 
 		function handleScopeChange(scope) {
+			if (!isProActive && scope !== 'entire') {
+				return;
+			}
 			setDisplayConditions(prev => ({ ...prev, scope }));
 		}
 
@@ -8982,34 +8988,90 @@
 						// Option 2: Specific Category
 						h(
 							'label',
-							{ className: `sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-text-sm sppcfw-cursor-pointer sppcfw-p-2 sppcfw-rounded-md sppcfw-transition-colors ${currentScope === 'category' ? 'sppcfw-bg-[#9333ea]/15 sppcfw-border sppcfw-border-[#9333ea]/40' : 'hover:sppcfw-bg-[#1f2937]'}` },
+							{
+								className: `sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-text-sm sppcfw-p-2 sppcfw-rounded-md sppcfw-transition-colors ${
+									!isProActive
+										? 'sppcfw-opacity-50 sppcfw-cursor-not-allowed sppcfw-bg-[#1a2233]/40'
+										: currentScope === 'category'
+										? 'sppcfw-bg-[#9333ea]/15 sppcfw-border sppcfw-border-[#9333ea]/40 sppcfw-cursor-pointer'
+										: 'hover:sppcfw-bg-[#1f2937] sppcfw-cursor-pointer'
+								}`,
+								title: !isProActive ? 'Specific Category condition requires an active Pro license' : '',
+								onClick: e => {
+									if (!isProActive) {
+										e.preventDefault();
+									}
+								}
+							},
 							h('input', {
 								type: 'radio',
 								name: 'condition_scope',
 								value: 'category',
+								disabled: !isProActive,
 								className: 'sppcfw-text-[#9333ea] focus:sppcfw-ring-[#9333ea]',
-								checked: currentScope === 'category',
+								checked: isProActive && currentScope === 'category',
 								onChange: () => handleScopeChange('category'),
 							}),
-							h('span', { className: 'sppcfw-font-semibold sppcfw-text-white' }, 'Specific Category'),
-							h('span', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af]' }, '(Category-Based Scope)')
+							h('span', { className: `sppcfw-font-semibold ${!isProActive ? 'sppcfw-text-gray-400' : 'sppcfw-text-white'}` }, 'Specific Category'),
+							h('span', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af]' }, '(Category-Based Scope)'),
+							!isProActive && h(
+								'span',
+								{ className: 'sppcfw-ml-auto sppcfw-text-[10px] sppcfw-font-bold sppcfw-uppercase sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded sppcfw-bg-gradient-to-r sppcfw-from-amber-500 sppcfw-to-orange-600 sppcfw-text-white sppcfw-shadow-sm sppcfw-tracking-wide' },
+								'PRO'
+							)
 						),
 
 						// Option 3: Specific Product
 						h(
 							'label',
-							{ className: `sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-text-sm sppcfw-cursor-pointer sppcfw-p-2 sppcfw-rounded-md sppcfw-transition-colors ${currentScope === 'product' ? 'sppcfw-bg-[#9333ea]/15 sppcfw-border sppcfw-border-[#9333ea]/40' : 'hover:sppcfw-bg-[#1f2937]'}` },
+							{
+								className: `sppcfw-flex sppcfw-items-center sppcfw-gap-2.5 sppcfw-text-sm sppcfw-p-2 sppcfw-rounded-md sppcfw-transition-colors ${
+									!isProActive
+										? 'sppcfw-opacity-50 sppcfw-cursor-not-allowed sppcfw-bg-[#1a2233]/40'
+										: currentScope === 'product'
+										? 'sppcfw-bg-[#9333ea]/15 sppcfw-border sppcfw-border-[#9333ea]/40 sppcfw-cursor-pointer'
+										: 'hover:sppcfw-bg-[#1f2937] sppcfw-cursor-pointer'
+								}`,
+								title: !isProActive ? 'Specific Product condition requires an active Pro license' : '',
+								onClick: e => {
+									if (!isProActive) {
+										e.preventDefault();
+									}
+								}
+							},
 							h('input', {
 								type: 'radio',
 								name: 'condition_scope',
 								value: 'product',
+								disabled: !isProActive,
 								className: 'sppcfw-text-[#9333ea] focus:sppcfw-ring-[#9333ea]',
-								checked: currentScope === 'product',
+								checked: isProActive && currentScope === 'product',
 								onChange: () => handleScopeChange('product'),
 							}),
-							h('span', { className: 'sppcfw-font-semibold sppcfw-text-white' }, 'Specific Product / Separate Page'),
-							h('span', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af]' }, '(Product-Based Scope)')
+							h('span', { className: `sppcfw-font-semibold ${!isProActive ? 'sppcfw-text-gray-400' : 'sppcfw-text-white'}` }, 'Specific Product / Separate Page'),
+							h('span', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af]' }, '(Product-Based Scope)'),
+							!isProActive && h(
+								'span',
+								{ className: 'sppcfw-ml-auto sppcfw-text-[10px] sppcfw-font-bold sppcfw-uppercase sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded sppcfw-bg-gradient-to-r sppcfw-from-amber-500 sppcfw-to-orange-600 sppcfw-text-white sppcfw-shadow-sm sppcfw-tracking-wide' },
+								'PRO'
+							)
 						)
+					),
+
+					// Pro Upgrade Notice if not Pro
+					!isProActive && h(
+						'div',
+						{ className: 'sppcfw-p-3 sppcfw-rounded-lg sppcfw-bg-[#1e1b2e] sppcfw-border sppcfw-border-amber-500/30 sppcfw-flex sppcfw-items-center sppcfw-justify-between sppcfw-gap-3 sppcfw-text-xs sppcfw-text-amber-200' },
+						h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2 sppcfw-min-w-0' },
+							h('span', { className: 'material-symbols-outlined sppcfw-text-amber-400 sppcfw-text-base sppcfw-shrink-0' }, 'lock'),
+							h('span', { className: 'sppcfw-truncate' }, 'Specific Category & Product display rules require an active Pro license.')
+						),
+						h('a', {
+							href: proUpgradeUrl,
+							target: '_blank',
+							rel: 'noopener noreferrer',
+							className: 'sppcfw-font-bold sppcfw-text-white sppcfw-bg-gradient-to-r sppcfw-from-amber-500 sppcfw-to-orange-600 sppcfw-px-3 sppcfw-py-1.5 sppcfw-rounded sppcfw-shadow sppcfw-shrink-0 hover:sppcfw-opacity-95 sppcfw-text-[11px]'
+						}, 'Get Pro')
 					),
 
 					// Conditional Content: Categories Selector
