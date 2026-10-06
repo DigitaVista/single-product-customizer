@@ -32,7 +32,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 		public function sppcfw_disable_block_template_for_builder($has_template, $template_name)
 		{
 			if ('single-product' === $template_name) {
-				$is_preview = isset($_GET['sppcfw_preview']) && isset($_GET['template_id']) && current_user_can('manage_options');
+				$is_preview = isset($_GET['sppcfw_preview']) && isset($_GET['template_id']) && current_user_can('manage_options'); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$enable_builder = (int) get_option('sppcfw_enable_single_product_builder', 0);
 				$enable_quick_checkout = (int) get_option('sppcfw_enable_quick_checkout', 0);
 
@@ -61,7 +61,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				return;
 			}
 
-			$is_preview = isset($_GET['sppcfw_preview']) && isset($_GET['template_id']) && current_user_can('manage_options');
+			$is_preview = isset($_GET['sppcfw_preview']) && isset($_GET['template_id']) && current_user_can('manage_options'); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 			if (!$is_preview) {
 				// Suppress builder designs if Quick Checkout is enabled
@@ -201,8 +201,8 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 		{
 			$templates = get_option('sppcfw_builder_templates', array());
 
-			if (isset($_GET['sppcfw_preview']) && isset($_GET['template_id']) && current_user_can('manage_options')) {
-				$preview_id = sanitize_text_field($_GET['template_id']);
+			if (isset($_GET['sppcfw_preview']) && isset($_GET['template_id']) && current_user_can('manage_options')) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				$preview_id = sanitize_text_field(wp_unslash($_GET['template_id'])); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				if (isset($templates[$preview_id]) && !empty($templates[$preview_id]['layout'])) {
 					return $templates[$preview_id];
 				}
@@ -2004,8 +2004,8 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				$id = isset($el['id']) ? esc_attr($el['id']) : '';
 				$settings = isset($el['settings']) ? $el['settings'] : array();
 				$advanced = isset($el['advanced']) ? $el['advanced'] : array();
-				$custom_classes = !empty($advanced['custom_class']) ? esc_attr($advanced['custom_class']) : (!empty($advanced['css_classes']) ? esc_attr($advanced['css_classes']) : '');
-				$custom_id = !empty($advanced['css_id']) ? ' id="' . esc_attr($advanced['css_id']) . '"' : '';
+				$custom_classes = !empty($advanced['custom_class']) ? $advanced['custom_class'] : (!empty($advanced['css_classes']) ? $advanced['css_classes'] : '');
+				$custom_id = !empty($advanced['css_id']) ? sanitize_html_class($advanced['css_id']) : '';
 
 				$hide_classes = '';
 				if (!empty($advanced['hide_on_desktop'])) {
@@ -2018,13 +2018,13 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					$hide_classes .= ' sppcfw-hide-mobile';
 				}
 
-				$combined_class = ' sppcfw-el-' . $id . $hide_classes . (!empty($custom_classes) ? ' ' . $custom_classes : '');
+				$combined_class = 'sppcfw-el-' . $id . $hide_classes . (!empty($custom_classes) ? ' ' . $custom_classes : '');
 
 				if ('container' === $type) {
 					$is_full_width = (isset($settings['width_mode']) && 'full' === $settings['width_mode']) || (isset($settings['boxed_width']) && '100%' === $settings['boxed_width']) || (isset($advanced['width_mode']) && 'Full Width (100%)' === $advanced['width_mode']);
 					$width_mode = $is_full_width ? 'full' : 'boxed';
 
-					echo '<div' . $custom_id . ' class="sppcfw-builder-section sppcfw-container-' . esc_attr($width_mode) . $combined_class . '">';
+					echo '<div' . ($custom_id ? ' id="' . esc_attr($custom_id) . '"' : '') . ' class="sppcfw-builder-section sppcfw-container-' . esc_attr($width_mode) . ' ' . esc_attr($combined_class) . '">';
 					echo '<div class="sppcfw-flex-row">';
 					if (!empty($el['children'])) {
 						$this->sppcfw_render_elements_recursive($el['children']);
@@ -2032,14 +2032,14 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					echo '</div>';
 					echo '</div>';
 				} elseif ('column' === $type) {
-					echo '<div' . $custom_id . ' class="sppcfw-column' . $combined_class . '">';
+					echo '<div' . ($custom_id ? ' id="' . esc_attr($custom_id) . '"' : '') . ' class="sppcfw-column ' . esc_attr($combined_class) . '">';
 					if (!empty($el['children'])) {
 						$this->sppcfw_render_elements_recursive($el['children']);
 					}
 					echo '</div>';
 				} else {
 					// Render Widget
-					echo '<div' . $custom_id . ' class="sppcfw-widget-item' . $combined_class . '">';
+					echo '<div' . ($custom_id ? ' id="' . esc_attr($custom_id) . '"' : '') . ' class="sppcfw-widget-item ' . esc_attr($combined_class) . '">';
 					$this->sppcfw_render_single_widget($el);
 					echo '</div>';
 				}
@@ -2054,18 +2054,18 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 		 */
 		private function sppcfw_render_single_widget($el)
 		{
-			global $product;
+			global $product; // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 
 			if (!$product) {
-				$product = wc_get_product(get_the_ID());
+				$product = wc_get_product(get_the_ID()); // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedVariableFound
 			}
 
 			if (!$product) {
 				return;
 			}
 
-			$type = isset($el['type']) ? $el['type'] : '';
-			$id = isset($el['id']) ? esc_attr($el['id']) : '';
+			$type = isset($el['type']) ? sanitize_key($el['type']) : '';
+			$id = isset($el['id']) ? sanitize_html_class($el['id']) : '';
 			$el_class = !empty($id) ? ' sppcfw-el-' . $id : '';
 			$settings = isset($el['settings']) && is_array($el['settings']) ? $el['settings'] : array();
 			$styles = isset($el['styles']) && is_array($el['styles']) ? $el['styles'] : array();
@@ -2085,7 +2085,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					} else {
 						$title_html = esc_html($title_text);
 					}
-					echo '<' . $tag . ' class="product_title entry-title' . $el_class . '">' . $title_html . '</' . $tag . '>';
+					echo '<' . tag_escape($tag) . ' class="product_title entry-title' . esc_attr($el_class) . '">' . wp_kses_post($title_html) . '</' . tag_escape($tag) . '>';
 					break;
 				case 'heading':
 					$tag = !empty($settings['html_tag']) ? sanitize_key($settings['html_tag']) : 'h2';
@@ -2093,17 +2093,17 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					if (!in_array($tag, $valid_tags, true)) {
 						$tag = 'h2';
 					}
-					$text = isset($settings['text']) && '' !== $settings['text'] ? esc_html($settings['text']) : esc_html__('Add Your Heading Text Here', 'single-product-customizer');
+					$text = isset($settings['text']) && '' !== $settings['text'] ? $settings['text'] : __('Add Your Heading Text Here', 'single-product-customizer');
 					$link_url = !empty($settings['link_url']) ? esc_url($settings['link_url']) : '';
 					$target = !empty($settings['link_target_blank']) ? ' target="_blank" rel="noopener noreferrer"' : '';
 
-					echo '<' . $tag . ' class="sppcfw-custom-heading' . $el_class . '">';
+					echo '<' . tag_escape($tag) . ' class="sppcfw-custom-heading' . esc_attr($el_class) . '">';
 					if (!empty($link_url)) {
-						echo '<a href="' . $link_url . '"' . $target . '>' . $text . '</a>';
+						echo '<a href="' . esc_url($link_url) . '"' . ($target ? ' target="_blank" rel="noopener noreferrer"' : '') . '>' . esc_html($text) . '</a>';
 					} else {
-						echo $text;
+						echo esc_html($text);
 					}
-					echo '</' . $tag . '>';
+					echo '</' . tag_escape($tag) . '>';
 					break;
 				case 'text_editor':
 					$tag = !empty($settings['html_tag']) ? sanitize_key($settings['html_tag']) : 'div';
@@ -2111,8 +2111,8 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					if (!in_array($tag, $valid_tags, true)) {
 						$tag = 'div';
 					}
-					$content = isset($settings['text_content']) && '' !== $settings['text_content'] ? wp_kses_post($settings['text_content']) : esc_html__('Add your custom description or paragraph content here...', 'single-product-customizer');
-					echo '<' . $tag . ' class="sppcfw-custom-text-block' . $el_class . '">' . nl2br($content) . '</' . $tag . '>';
+					$content = isset($settings['text_content']) && '' !== $settings['text_content'] ? $settings['text_content'] : __('Add your custom description or paragraph content here...', 'single-product-customizer');
+					echo '<' . tag_escape($tag) . ' class="sppcfw-custom-text-block' . esc_attr($el_class) . '">' . wp_kses_post(nl2br($content)) . '</' . tag_escape($tag) . '>';
 					break;
 				case 'html_code':
 				case 'custom_html':
@@ -2121,15 +2121,15 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					$css = isset($settings['custom_css']) ? $settings['custom_css'] : '';
 					$js = isset($settings['custom_js']) ? $settings['custom_js'] : '';
 
-					echo '<div class="sppcfw-custom-html-wrapper' . $el_class . '">';
+					echo '<div class="sppcfw-custom-html-wrapper' . esc_attr($el_class) . '">';
 					if (!empty($css)) {
-						echo '<style type="text/css">' . $css . '</style>';
+						echo '<style type="text/css">' . wp_strip_all_tags($css) . '</style>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 					if (!empty($html)) {
-						echo do_shortcode($html);
+						echo do_shortcode(wp_kses_post($html)); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 					if (!empty($js)) {
-						echo '<script type="text/javascript">' . $js . '</script>';
+						echo '<script type="text/javascript">' . $js . '</script>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 					echo '</div>';
 					break;
@@ -2151,11 +2151,11 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						$show_badge = false;
 					}
 
-					echo '<div class="sppcfw-price-wrapper' . $el_class . '">';
+					echo '<div class="sppcfw-price-wrapper' . esc_attr($el_class) . '">';
 					if (!$show_reg && $product && $product->is_on_sale()) {
 						$sale_price = $product->get_sale_price();
 						if ($sale_price !== '' && false !== $sale_price) {
-							echo '<p class="price"><ins><span class="woocommerce-Price-amount amount">' . wc_price($sale_price) . '</span></ins></p>';
+							echo '<p class="price"><ins><span class="woocommerce-Price-amount amount">' . wp_kses_post(wc_price($sale_price)) . '</span></ins></p>';
 						} else {
 							woocommerce_template_single_price();
 						}
@@ -2280,16 +2280,16 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					$first_image = $all_images[0];
 					$is_on_sale = $product->is_on_sale();
 
-					echo '<div class="sppcfw-product-gallery-frontend-wrapper' . $el_class . ' sppcfw-gallery-container ' . esc_attr($align_class) . '" data-zoom="' . ($enable_zoom ? 'true' : 'false') . '" data-lightbox="' . ($enable_lightbox ? 'true' : 'false') . '">';
+					echo '<div class="sppcfw-product-gallery-frontend-wrapper' . esc_attr($el_class) . ' sppcfw-gallery-container ' . esc_attr($align_class) . '" data-zoom="' . esc_attr($enable_zoom ? 'true' : 'false') . '" data-lightbox="' . esc_attr($enable_lightbox ? 'true' : 'false') . '">';
 
 					// Main Featured Image Container
 					echo '<div class="sppcfw-gallery-main-container" style="position:relative; display:inline-block; max-width:100%;">';
 
 					if ($is_on_sale) {
-						echo '<span class="onsale sppcfw-gallery-sale-badge">' . esc_html__('Sale!', 'woocommerce') . '</span>';
+						echo '<span class="onsale sppcfw-gallery-sale-badge">' . esc_html__('Sale!', 'single-product-customizer') . '</span>';
 					}
 
-					echo '<div class="sppcfw-gallery-main-frame' . ($enable_zoom ? ' sppcfw-zoom-enabled' : '') . '">';
+					echo '<div class="sppcfw-gallery-main-frame' . esc_attr($enable_zoom ? ' sppcfw-zoom-enabled' : '') . '">';
 					echo '<img src="' . esc_url($first_image['main']) . '" data-zoom-src="' . esc_url($first_image['full']) . '" data-full-src="' . esc_url($first_image['full']) . '" alt="' . esc_attr($first_image['alt']) . '" class="sppcfw-gallery-main-img" style="max-width:100%;height:auto;display:block;" />';
 
 					if ($enable_zoom || $enable_lightbox) {
@@ -2311,18 +2311,18 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						if ('carousel' === $thumbs_layout) {
 							echo '<div class="sppcfw-gallery-carousel-wrapper" data-cols="' . esc_attr($cols) . '">';
 							if ($show_carousel_arrows) {
-								echo '<button type="button" class="sppcfw-carousel-nav sppcfw-carousel-prev" aria-label="Previous thumbnails">&#10094;</button>';
+								echo '<button type="button" class="sppcfw-carousel-nav sppcfw-carousel-prev" aria-label="' . esc_attr__('Previous thumbnails', 'single-product-customizer') . '">&#10094;</button>';
 							}
 							echo '<div class="sppcfw-gallery-carousel-track">';
 							foreach ($all_images as $idx => $img) {
 								$active_class = (0 === $idx) ? ' is-active' : '';
-								echo '<div class="sppcfw-gallery-carousel-slide' . $active_class . '" data-main-src="' . esc_url($img['main']) . '" data-full-src="' . esc_url($img['full']) . '" data-index="' . esc_attr($idx) . '" style="flex:0 0 calc((100% - (' . ($cols - 1) . ' * 8px)) / ' . $cols . '); min-width:40px; box-sizing:border-box;">';
+								echo '<div class="sppcfw-gallery-carousel-slide' . esc_attr($active_class) . '" data-main-src="' . esc_url($img['main']) . '" data-full-src="' . esc_url($img['full']) . '" data-index="' . esc_attr($idx) . '" style="flex:0 0 calc((100% - (' . intval($cols - 1) . ' * 8px)) / ' . intval($cols) . '); min-width:40px; box-sizing:border-box;">';
 								echo '<img src="' . esc_url($img['thumb']) . '" alt="' . esc_attr($img['alt']) . '" class="sppcfw-thumb-img" />';
 								echo '</div>';
 							}
 							echo '</div>';  // close sppcfw-gallery-carousel-track
 							if ($show_carousel_arrows) {
-								echo '<button type="button" class="sppcfw-carousel-nav sppcfw-carousel-next" aria-label="Next thumbnails">&#10095;</button>';
+								echo '<button type="button" class="sppcfw-carousel-nav sppcfw-carousel-next" aria-label="' . esc_attr__('Next thumbnails', 'single-product-customizer') . '">&#10095;</button>';
 							}
 							echo '</div>';  // close sppcfw-gallery-carousel-wrapper
 						} else {
@@ -2330,7 +2330,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 							echo '<div class="sppcfw-gallery-thumbs-grid" style="display:grid; grid-template-columns:repeat(' . esc_attr($cols) . ', minmax(0, 1fr)); gap:8px; margin-top:10px;">';
 							foreach ($all_images as $idx => $img) {
 								$active_class = (0 === $idx) ? ' is-active' : '';
-								echo '<div class="sppcfw-gallery-grid-thumb' . $active_class . '" data-main-src="' . esc_url($img['main']) . '" data-full-src="' . esc_url($img['full']) . '" data-index="' . esc_attr($idx) . '">';
+								echo '<div class="sppcfw-gallery-grid-thumb' . esc_attr($active_class) . '" data-main-src="' . esc_url($img['main']) . '" data-full-src="' . esc_url($img['full']) . '" data-index="' . esc_attr($idx) . '">';
 								echo '<img src="' . esc_url($img['thumb']) . '" alt="' . esc_attr($img['alt']) . '" class="sppcfw-thumb-img" />';
 								echo '</div>';
 							}
@@ -2346,15 +2346,15 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					$img_src = !empty($settings['custom_image_url']) ? $settings['custom_image_url'] : (!empty($settings['image_url']) ? $settings['image_url'] : '');
 
 					if (!empty($img_src)) {
-						$alt = !empty($settings['alt_text']) ? esc_attr($settings['alt_text']) : esc_attr($product->get_name());
+						$alt = !empty($settings['alt_text']) ? $settings['alt_text'] : $product->get_name();
 						$link_to = isset($settings['link_to']) ? $settings['link_to'] : 'none';
-						$custom_link = isset($settings['custom_link']) ? esc_url($settings['custom_link']) : '';
+						$custom_link = isset($settings['custom_link']) ? $settings['custom_link'] : '';
 						$target = !empty($settings['link_target_blank']) ? ' target="_blank" rel="noopener noreferrer"' : '';
 						if (!empty($settings['link_rel_nofollow'])) {
 							$target = !empty($target) ? ' target="_blank" rel="noopener noreferrer nofollow"' : ' rel="nofollow"';
 						}
 						$caption_type = isset($settings['caption_type']) ? $settings['caption_type'] : 'none';
-						$custom_caption = isset($settings['custom_caption']) ? esc_html($settings['custom_caption']) : '';
+						$custom_caption = isset($settings['custom_caption']) ? $settings['custom_caption'] : '';
 						$alignment = isset($styles['alignment']) ? $styles['alignment'] : (isset($settings['alignment']) ? $settings['alignment'] : 'center');
 						$align_class = 'text-center';
 						if ('left' === $alignment) {
@@ -2363,36 +2363,36 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 							$align_class = 'text-right';
 						}
 
-						echo '<div class="sppcfw-custom-image-wrapper' . $el_class . ' ' . esc_attr($align_class) . '">';
+						echo '<div class="sppcfw-custom-image-wrapper' . esc_attr($el_class) . ' ' . esc_attr($align_class) . '">';
 						if ('file' === $link_to) {
-							echo '<a href="' . esc_url($img_src) . '"' . $target . ' class="sppcfw-image-link inline-block">';
+							echo '<a href="' . esc_url($img_src) . '"' . $target . ' class="sppcfw-image-link inline-block">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						} elseif ('custom' === $link_to && !empty($custom_link)) {
-							echo '<a href="' . $custom_link . '"' . $target . ' class="sppcfw-image-link inline-block">';
+							echo '<a href="' . esc_url($custom_link) . '"' . $target . ' class="sppcfw-image-link inline-block">'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 						}
 
-						echo '<img src="' . esc_url($img_src) . '" alt="' . $alt . '" class="sppcfw-custom-image-el inline-block" style="max-width:100%;height:auto;" />';
+						echo '<img src="' . esc_url($img_src) . '" alt="' . esc_attr($alt) . '" class="sppcfw-custom-image-el inline-block" style="max-width:100%;height:auto;" />';
 
 						if ('file' === $link_to || ('custom' === $link_to && !empty($custom_link))) {
 							echo '</a>';
 						}
 
 						if ('custom' === $caption_type && !empty($custom_caption)) {
-							echo '<figcaption class="sppcfw-image-caption text-xs text-gray-500 mt-1.5">' . $custom_caption . '</figcaption>';
+							echo '<figcaption class="sppcfw-image-caption text-xs text-gray-500 mt-1.5">' . esc_html($custom_caption) . '</figcaption>';
 						}
 						echo '</div>';
 					}
 					break;
 				case 'variation_swatches':
 					if ($product->is_type('variable')) {
-						echo '<div class="sppcfw-swatches-wrapper' . $el_class . '">';
+						echo '<div class="sppcfw-swatches-wrapper' . esc_attr($el_class) . '">';
 						woocommerce_variable_add_to_cart();
 						echo '</div>';
 					}
 					break;
 				case 'product_add_to_cart':
-					$custom_class = !empty($advanced['custom_class']) ? ' ' . esc_attr($advanced['custom_class']) : '';
-					$var_display_type = !empty($settings['variation_display_type']) ? $settings['variation_display_type'] : 'swatches';
-					$swatch_shape = !empty($settings['swatch_shape']) ? $settings['swatch_shape'] : 'circle';
+					$custom_class = !empty($advanced['custom_class']) ? ' ' . sanitize_html_class($advanced['custom_class']) : '';
+					$var_display_type = !empty($settings['variation_display_type']) ? sanitize_key($settings['variation_display_type']) : 'swatches';
+					$swatch_shape = !empty($settings['swatch_shape']) ? sanitize_key($settings['swatch_shape']) : 'circle';
 					$show_labels = isset($settings['show_attribute_labels']) && false === $settings['show_attribute_labels'] ? ' sppcfw-hide-var-labels' : '';
 					$show_reset = empty($settings['show_variation_reset']) ? ' sppcfw-hide-var-reset' : '';
 					$cart_btn_text = '';
@@ -2403,9 +2403,9 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						$cart_btn_text = $settings['button_text'];
 					}
 
-					$var_classes = ' sppcfw-var-display-' . esc_attr($var_display_type) . ' sppcfw-swatch-shape-' . esc_attr($swatch_shape) . $show_labels . $show_reset;
+					$var_classes = ' sppcfw-var-display-' . sanitize_html_class($var_display_type) . ' sppcfw-swatch-shape-' . sanitize_html_class($swatch_shape) . $show_labels . $show_reset;
 
-					echo '<div class="sppcfw-add-to-cart-wrapper sppcfw-el-' . $id . $var_classes . $custom_class . '">';
+					echo '<div class="sppcfw-add-to-cart-wrapper sppcfw-el-' . esc_attr($id) . esc_attr($var_classes) . esc_attr($custom_class) . '">';
 
 					if ('table' === $var_display_type && $product && $product->is_type('variable')) {
 						$available_variations = $product->get_available_variations();
@@ -2445,7 +2445,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 								$row_bg = $is_first ? 'background:#faf5ff;' : '';
 								$attr_json = esc_attr(wp_json_encode($var['attributes']));
 
-								echo '<tr class="sppcfw-var-grid-row' . ($is_first ? ' is-selected' : '') . '" data-variation-id="' . esc_attr($var['variation_id']) . '" data-attributes="' . $attr_json . '" style="border-bottom:1px solid #f3f4f6;cursor:pointer;' . $row_bg . '">';
+								echo '<tr class="sppcfw-var-grid-row' . esc_attr($is_first ? ' is-selected' : '') . '" data-variation-id="' . esc_attr($var['variation_id']) . '" data-attributes="' . esc_attr($attr_json) . '" style="border-bottom:1px solid #f3f4f6;cursor:pointer;' . esc_attr($row_bg) . '">';
 								echo '<td style="padding:10px 12px;font-weight:500;color:#111827;">' . esc_html($var_name) . '</td>';
 								echo '<td style="padding:10px 12px;font-weight:bold;color:#9333ea;">' . wp_kses_post($price_html) . '</td>';
 								echo '<td style="padding:10px 12px;font-weight:500;color:' . esc_attr($stock_color) . ';">' . esc_html($stock_text) . '</td>';
@@ -2530,7 +2530,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						}, $cart_html);
 					}
 
-					echo $cart_html;
+					echo $cart_html; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					echo '</div>';
 					break;
 				case 'product_rating':
@@ -2556,35 +2556,35 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					$alignment = $this->sppcfw_get_device_prop($styles, 'alignment', 'desktop', 'left');
 					$justify_val = ('center' === $alignment) ? 'center' : (('right' === $alignment) ? 'flex-end' : 'flex-start');
 
-					echo '<div class="sppcfw-rating-wrapper' . $el_class . '">';
+					echo '<div class="sppcfw-rating-wrapper' . esc_attr($el_class) . '">';
 					echo '<div class="sppcfw-product-rating-container" style="display:flex; align-items:center; justify-content:' . esc_attr($justify_val) . '; gap:' . esc_attr($gap) . ';">';
 					echo '<div class="sppcfw-stars-box" style="position:relative; display:inline-flex; align-items:center; line-height:1; letter-spacing:2px; font-size:' . esc_attr($star_size) . '; user-select:none;">';
 					echo '<span class="sppcfw-stars-empty" style="color:' . esc_attr($empty_star_color) . ';">★★★★★</span>';
 					echo '<span class="sppcfw-stars-filled" style="position:absolute; top:0; left:0; overflow:hidden; white-space:nowrap; width:' . esc_attr($width_percent) . '%; color:' . esc_attr($star_color) . ';">★★★★★</span>';
 					echo '</div>';
 					echo '<a href="#reviews" class="sppcfw-review-link woocommerce-review-link" style="color:' . esc_attr($review_count_color) . '; font-size:' . esc_attr($review_font_size) . '; font-weight:' . esc_attr($review_font_weight) . '; text-decoration:none; line-height:1;">';
-					echo '(' . esc_html($rating_count) . ' ' . esc_html(_n('reviews', 'reviews', $rating_count, 'woocommerce')) . ')';
+					echo '(' . esc_html($rating_count) . ' ' . esc_html(_n('review', 'reviews', $rating_count, 'single-product-customizer')) . ')';
 					echo '</a>';
 					echo '</div>';
 					echo '</div>';
 					break;
 				case 'product_short_desc':
-					echo '<div class="sppcfw-short-desc-wrapper' . $el_class . '">';
+					echo '<div class="sppcfw-short-desc-wrapper' . esc_attr($el_class) . '">';
 					woocommerce_template_single_excerpt();
 					echo '</div>';
 					break;
 				case 'product_description':
-					echo '<div class="sppcfw-tabs-wrapper' . $el_class . '">';
+					echo '<div class="sppcfw-tabs-wrapper' . esc_attr($el_class) . '">';
 					woocommerce_output_product_data_tabs();
 					echo '</div>';
 					break;
 				case 'product_meta':
-					echo '<div class="sppcfw-meta-wrapper' . $el_class . '">';
+					echo '<div class="sppcfw-meta-wrapper' . esc_attr($el_class) . '">';
 					woocommerce_template_single_meta();
 					echo '</div>';
 					break;
 				case 'product_meta_item':
-					$meta_key = isset($el['metaKey']) ? $el['metaKey'] : '';
+					$meta_key = isset($el['metaKey']) ? sanitize_key($el['metaKey']) : '';
 					if ($meta_key) {
 						$label = isset($el['label']) ? esc_html($el['label']) : $meta_key;
 						$val = get_post_meta($product->get_id(), $meta_key, true);
@@ -2601,7 +2601,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 							}
 						}
 						if (!empty($val)) {
-							echo '<div class="sppcfw-custom-meta-field' . $el_class . ' p-2 bg-gray-50 border rounded my-2">';
+							echo '<div class="sppcfw-custom-meta-field' . esc_attr($el_class) . ' p-2 bg-gray-50 border rounded my-2">';
 							echo '<strong>' . esc_html($label) . ': </strong>';
 							echo '<span>' . esc_html(is_array($val) ? implode(', ', $val) : $val) . '</span>';
 							echo '</div>';
@@ -2609,12 +2609,12 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					}
 					break;
 				case 'custom_message':
-					echo '<div class="sppcfw-custom-message-banner' . $el_class . ' p-3 bg-indigo-100 text-indigo-800 rounded font-semibold my-2">';
+					echo '<div class="sppcfw-custom-message-banner' . esc_attr($el_class) . ' p-3 bg-indigo-100 text-indigo-800 rounded font-semibold my-2">';
 					echo esc_html__('Special Offer: Free Shipping on all orders!', 'single-product-customizer');
 					echo '</div>';
 					break;
 				case 'plus_minus_buttons':
-					echo '<div class="sppcfw-stepper-widget' . $el_class . ' my-2">';
+					echo '<div class="sppcfw-stepper-widget' . esc_attr($el_class) . ' my-2">';
 					woocommerce_quantity_input(array('input_value' => 1));
 					echo '</div>';
 					break;
@@ -2633,7 +2633,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					if (!empty($settings['posts_per_page_mobile'])) {
 						$posts_per_page = max($posts_per_page, intval($settings['posts_per_page_mobile']));
 					}
-					$default_title = $is_related ? __('Related products', 'woocommerce') : __('You may also like…', 'woocommerce');
+					$default_title = $is_related ? __('Related products', 'single-product-customizer') : __('You may also like…', 'single-product-customizer');
 					$title = isset($settings['title']) ? $settings['title'] : $default_title;
 
 					$product_id = $product->get_id();
@@ -2653,12 +2653,12 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 							'post_type'      => 'product',
 							'post_status'    => 'publish',
 							'posts_per_page' => $posts_per_page,
-							'post__not_in'   => array($product_id),
+							'post__not_in'   => array($product_id), // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_post__not_in
 							'fields'         => 'ids',
 							'orderby'        => !empty($settings['orderby']) ? sanitize_key($settings['orderby']) : 'rand',
 						);
 						if (!empty($cat_ids) && !is_wp_error($cat_ids)) {
-							$query_args['tax_query'] = array(
+							$query_args['tax_query'] = array( // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query
 								array(
 									'taxonomy' => 'product_cat',
 									'field'    => 'term_id',
@@ -2672,7 +2672,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 
 					$wrapper_class = $is_related ? 'sppcfw-related-wrapper' : 'sppcfw-upsell-wrapper';
 
-					echo '<div class="' . esc_attr($wrapper_class) . $el_class . ' sppcfw-products-block" data-cols="' . esc_attr($columns) . '">';
+					echo '<div class="' . esc_attr($wrapper_class . $el_class) . ' sppcfw-products-block" data-cols="' . esc_attr($columns) . '">';
 					if (!empty($title)) {
 						echo '<h2 class="sppcfw-related-heading">' . esc_html($title) . '</h2>';
 					}
@@ -2694,7 +2694,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 							echo '<div class="sppcfw-card-product">';
 							echo '<a href="' . esc_url($item_url) . '" class="sppcfw-card-thumb-link">';
 							if ($item_is_sale) {
-								echo '<span class="sppcfw-card-sale-badge">' . esc_html__('Sale!', 'woocommerce') . '</span>';
+								echo '<span class="sppcfw-card-sale-badge">' . esc_html__('Sale!', 'single-product-customizer') . '</span>';
 							}
 							echo '<img src="' . esc_url($item_img_url) . '" alt="' . esc_attr($item_name) . '" loading="lazy" />';
 							echo '</a>';

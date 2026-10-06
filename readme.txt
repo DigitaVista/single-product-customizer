@@ -1,4 +1,4 @@
-== Single Product Page Customizer with Variation Swatches for WooCommerce ==
+== Product Page Customizer for WooCommerce ==
 Contributors: wooxperto,hasan350,mahmudul47
 Tags: customize woocommerce, woocommerce, product tab, product customizer, variation swatches, quick checkout
 Requires at least: 6.5

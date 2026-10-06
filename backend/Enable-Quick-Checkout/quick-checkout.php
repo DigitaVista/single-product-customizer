@@ -19,9 +19,9 @@ $sppcfw_is_block_theme = $sppcfw_theme->exists() &&
 
 // Get current options (block themes force Quick Checkout off on init priority 11 before this admin view loads).
 $sppcfw_enable_quick_checkout = (int) get_option('sppcfw_enable_quick_checkout', 0);
-$sppcfw_enable_builder        = (int) get_option('sppcfw_enable_single_product_builder', 0);
-$is_builder_active            = !empty($sppcfw_enable_builder);
-$sppcfw_current_template      = get_option('sppcfw_enable_qc', 'template-1');
+$sppcfw_enable_builder = (int) get_option('sppcfw_enable_single_product_builder', 0);
+$is_builder_active = !empty($sppcfw_enable_builder);
+$sppcfw_current_template = get_option('sppcfw_enable_qc', 'template-1');
 
 if (!sppcfw_is_pro_active()) {
     // Force template-1 in admin when Pro is inactive
@@ -37,7 +37,7 @@ $sppcfw_qc_disabled_attr = '';
     <h1 class="sppcfw-heading-inline"><?php esc_html_e('Enable Quick Checkout', 'single-product-customizer'); ?></h1>
     <hr class="sppcfw-header-devider">
     <div class="sppcfw-quick-checkout-settings">
-        <?php if ($is_builder_active) : ?>
+        <?php if ($is_builder_active): ?>
             <div class="sppcfw_builder_notice_badge">
                 <span class="dashicons dashicons-info"></span>
                 <span>
@@ -123,16 +123,17 @@ $sppcfw_qc_disabled_attr = '';
                                     <input type="hidden" name="sppcfw_enable_qc" id="sppcfw_enable_qc" value="<?php echo esc_attr($sppcfw_current_template); ?>" />
 
                                     <div class="sppcfw-template-image-selector sppcfw-template-preview-picker">
-                                         <?php foreach ($sppcfw_template_files as $sppcfw_value => $sppcfw_label): 
-                                            $sppcfw_is_pro_active = sppcfw_is_pro_active();
-                                            $sppcfw_img_name = ($sppcfw_value === 'template-2') ? ($sppcfw_is_pro_active ? 'template-2-pro' : 'template-2-free') : $sppcfw_value;
-                                        ?>
+                                         <?php
+foreach ($sppcfw_template_files as $sppcfw_value => $sppcfw_label):
+    $sppcfw_is_pro_active = sppcfw_is_pro_active();
+    $sppcfw_img_name = ($sppcfw_value === 'template-2') ? ($sppcfw_is_pro_active ? 'template-2-pro' : 'template-2-free') : $sppcfw_value;
+    ?>
                                             <div class="sppcfw-template-item <?php echo $sppcfw_value === $sppcfw_current_template ? 'is-active' : ''; ?>"
                                                 role="button"
                                                 tabindex="0"
                                                 data-template="<?php echo esc_attr($sppcfw_value); ?>">
                                                 <div class="sppcfw-template-thumb">
-                                                    <img src="<?php echo esc_url( plugin_dir_url(__FILE__) . 'assets/img/' . $sppcfw_img_name . '.png' ); ?>" alt="<?php echo esc_attr($sppcfw_label); ?>">
+                                                    <img src="<?php echo esc_url(plugin_dir_url(__FILE__) . 'assets/img/' . $sppcfw_img_name . '.png'); ?>" alt="<?php echo esc_attr($sppcfw_label); ?>">
                                                 </div>
                                                 <span class="sppcfw-template-title"><?php echo esc_html($sppcfw_label); ?></span>
                                             </div>
@@ -142,11 +143,11 @@ $sppcfw_qc_disabled_attr = '';
 
                                 <div class="sppcfw-selected-template-preview">
                                     <div class="sppcfw-select-template-thumb">
-                                        <?php 
+                                        <?php
                                         $sppcfw_preview_img = ($sppcfw_current_template === 'template-2') ? (sppcfw_is_pro_active() ? 'template-2-pro' : 'template-2-free') : $sppcfw_current_template;
                                         ?>
                                         <img id="sppcfw-selected-template-preview-img"
-                                            src="<?php echo esc_url( plugin_dir_url(__FILE__) . 'assets/img/' . $sppcfw_preview_img . '.png' ); ?>"
+                                            src="<?php echo esc_url(plugin_dir_url(__FILE__) . 'assets/img/' . $sppcfw_preview_img . '.png'); ?>"
                                             alt="<?php echo esc_attr(isset($sppcfw_template_files[$sppcfw_current_template]) ? $sppcfw_template_files[$sppcfw_current_template] : $sppcfw_template_files['template-1']); ?>">
                                     </div>
                                 </div>

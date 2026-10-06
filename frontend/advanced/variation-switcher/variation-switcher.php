@@ -37,8 +37,8 @@ if( !class_exists("Sppcfw_Variation_Switcher")){
         public function is_enabled(){
             // 1. Check if Single Product Customizer builder template is active for this product or preview
             $product_id = get_the_ID();
-            if (!$product_id && isset($_GET['product_id'])) {
-                $product_id = absint($_GET['product_id']);
+            if (!$product_id && isset($_GET['product_id'])) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                $product_id = absint($_GET['product_id']); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
             }
             if (!$product_id && isset($GLOBALS['product']) && is_object($GLOBALS['product'])) {
                 $product_id = $GLOBALS['product']->get_id();
@@ -48,8 +48,8 @@ if( !class_exists("Sppcfw_Variation_Switcher")){
                 $matched = null;
                 $templates = get_option('sppcfw_builder_templates', array());
 
-                if (isset($_GET['sppcfw_preview']) && isset($_GET['template_id']) && current_user_can('manage_options')) {
-                    $preview_id = sanitize_text_field($_GET['template_id']);
+                if (isset($_GET['sppcfw_preview']) && isset($_GET['template_id']) && current_user_can('manage_options')) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+                    $preview_id = sanitize_text_field(wp_unslash($_GET['template_id'])); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                     if (isset($templates[$preview_id]) && !empty($templates[$preview_id]['layout'])) {
                         $matched = $templates[$preview_id];
                     }

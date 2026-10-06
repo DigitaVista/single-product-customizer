@@ -37,8 +37,8 @@ if (!class_exists('SPPCFW_Builder')) {
 		 */
 		public function sppcfw_suppress_builder_admin_notices()
 		{
-			$action = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : '';
-			if (isset($_GET['page']) && 'sppcfw-single-page-builder' === $_GET['page'] && isset($_GET['template_id']) && (empty($action) || 'edit' === $action)) {
+			$action = isset($_GET['action']) ? sanitize_text_field(wp_unslash($_GET['action'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if (isset($_GET['page']) && 'sppcfw-single-page-builder' === $_GET['page'] && isset($_GET['template_id']) && (empty($action) || 'edit' === $action)) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				remove_all_actions('admin_notices');
 				remove_all_actions('all_admin_notices');
 				remove_all_actions('user_admin_notices');
@@ -82,7 +82,7 @@ if (!class_exists('SPPCFW_Builder')) {
 		 */
 		public function sppcfw_enqueue_builder_assets($hook)
 		{
-			if (isset($_GET['page']) && ('sppcfw-single-page-builder' === $_GET['page'] || 'sppcfw-single-page-builder' === $_GET['page'])) {
+			if (isset($_GET['page']) && 'sppcfw-single-page-builder' === $_GET['page']) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				// Enqueue Builder Tailwind CSS
 				wp_enqueue_style(
 					'sppcfw-builder-tailwind',
@@ -92,8 +92,101 @@ if (!class_exists('SPPCFW_Builder')) {
 				);
 			}
 
-			$action = isset($_GET['action']) ? sanitize_text_field($_GET['action']) : '';
-			if (isset($_GET['page']) && 'sppcfw-single-page-builder' === $_GET['page'] && isset($_GET['template_id']) && (empty($action) || 'edit' === $action)) {
+			$action = isset($_GET['action']) ? sanitize_text_field(wp_unslash($_GET['action'])) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			if (isset($_GET['page']) && 'sppcfw-single-page-builder' === $_GET['page'] && isset($_GET['template_id']) && (empty($action) || 'edit' === $action)) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+				// Enqueue Tailwind JS for builder screen
+				wp_enqueue_script(
+					'sppcfw-builder-tailwindcss',
+					SPPCFW_DIR_URL . 'backend/assets/js/tailwindcss.js',
+					array(),
+					SPPCFW_VERSION,
+					false
+				);
+
+				$tailwind_config = 'tailwind.config = {
+					prefix: "sppcfw-",
+					darkMode: "class",
+					theme: {
+						extend: {
+							colors: {
+								"tertiary-container": "#9a5c00",
+								"inverse-surface": "#d9e3f6",
+								"on-secondary-fixed": "#001e31",
+								"surface-variant": "#2b3544",
+								"surface-dim": "#091421",
+								"on-error": "#690005",
+								"background": "#091421",
+								"surface-tint": "#ddb8ff",
+								"on-primary-container": "#f6e6ff",
+								"surface-container-highest": "#2b3544",
+								"on-primary": "#490080",
+								"tertiary-fixed-dim": "#ffb86b",
+								"tertiary": "#ffb86b",
+								"secondary": "#92ccff",
+								"primary-container": "#9333ea",
+								"on-background": "#d9e3f6",
+								"surface-container": "#16202e",
+								"on-tertiary-fixed-variant": "#683d00",
+								"primary-fixed-dim": "#ddb8ff",
+								"on-tertiary-container": "#ffe8d4",
+								"on-secondary": "#003351",
+								"on-tertiary-fixed": "#2c1700",
+								"secondary-fixed-dim": "#92ccff",
+								"on-secondary-fixed-variant": "#6800b4",
+								"surface-container-high": "#212b39",
+								"inverse-on-surface": "#27313f",
+								"primary-fixed": "#f0dbff",
+								"secondary-fixed": "#cce5ff",
+								"primary": "#ddb8ff",
+								"surface-bright": "#303a48",
+								"tertiary-fixed": "#ffdcbc",
+								"inverse-primary": "#861fdd",
+								"on-surface-variant": "#cfc2d7",
+								"surface-container-lowest": "#050f1c",
+								"outline": "#988ca0",
+								"secondary-container": "#3a98d7",
+								"surface-container-low": "#121c2a",
+								"on-secondary-container": "#002c46",
+								"on-primary-fixed": "#2c0051",
+								"outline-variant": "#4d4354",
+								"surface": "#091421",
+								"error": "#ffb4ab",
+								"on-tertiary": "#492900",
+								"error-container": "#93000a",
+								"on-secondary-fixed-variant": "#004b73",
+								"on-surface": "#d9e3f6",
+								"on-error-container": "#ffdad6"
+							},
+							borderRadius: {
+								DEFAULT: "0.125rem",
+								lg: "0.25rem",
+								xl: "0.5rem",
+								full: "0.75rem"
+							},
+							spacing: {
+								gutter: "12px",
+								"panel-width": "320px",
+								"touch-target": "32px",
+								"sidebar-width": "64px",
+								"control-gap": "8px"
+							},
+							fontFamily: {
+								"label-caps": ["Inter", "sans-serif"],
+								"data-mono": ["JetBrains Mono", "monospace"],
+								"headline-sm": ["Geist", "sans-serif"],
+								"body-md": ["Inter", "sans-serif"]
+							},
+							fontSize: {
+								"label-caps": ["11px", { lineHeight: "16px", letterSpacing: "0.05em", fontWeight: "700" }],
+								"data-mono": ["12px", { lineHeight: "16px", fontWeight: "400" }],
+								"headline-sm": ["18px", { lineHeight: "24px", fontWeight: "600" }],
+								"body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }]
+							}
+						}
+					}
+				};';
+				wp_add_inline_script('sppcfw-builder-tailwindcss', $tailwind_config, 'after');
+
 				// Enqueue React / WP Element
 				wp_enqueue_script('wp-element');
 
@@ -102,25 +195,25 @@ if (!class_exists('SPPCFW_Builder')) {
 					'sppcfw-builder-fonts',
 					'https://fonts.googleapis.com/css2?family=Geist:wght@400;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap',
 					array(),
-					null
+					SPPCFW_VERSION
 				);
 
 				wp_enqueue_style(
 					'sppcfw-builder-material-icons',
 					'https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap',
 					array(),
-					null
+					SPPCFW_VERSION
 				);
 
 				wp_enqueue_script(
 					'sppcfw-builder-app',
 					SPPCFW_DIR_URL . 'backend/assets/js/builder-app.js',
-					array('wp-element', 'jquery'),
+					array('wp-element', 'jquery', 'sppcfw-builder-tailwindcss'),
 					SPPCFW_VERSION,
 					true
 				);
 
-				$template_id = isset($_GET['template_id']) ? sanitize_text_field($_GET['template_id']) : 'template_default';
+				$template_id = isset($_GET['template_id']) ? sanitize_text_field(wp_unslash($_GET['template_id'])) : 'template_default'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$sppcfw_basic = get_option('sppcfw_basic', array());
 				$enable_pm = (is_array($sppcfw_basic) && isset($sppcfw_basic['enable_plus_minus_button']) && 'on' === $sppcfw_basic['enable_plus_minus_button']) ? 'on' : '';
 				$btn_text = (is_array($sppcfw_basic) && isset($sppcfw_basic['add_to_cart_button_text'])) ? $sppcfw_basic['add_to_cart_button_text'] : 'Add to cart';
@@ -573,19 +666,19 @@ if (!class_exists('SPPCFW_Builder')) {
 				wp_send_json_error(array('message' => __('Permission denied', 'single-product-customizer')));
 			}
 
-			$template_id = isset($_POST['template_id']) ? sanitize_text_field($_POST['template_id']) : '';
-			$template_title = isset($_POST['template_title']) ? sanitize_text_field($_POST['template_title']) : '';
-			$status = isset($_POST['status']) ? strtolower(sanitize_text_field($_POST['status'])) : 'published';
-			$page_settings = isset($_POST['page_settings']) ? json_decode(wp_unslash($_POST['page_settings']), true) : array();
-			$layout = isset($_POST['layout']) ? wp_unslash($_POST['layout']) : '';
-			$conditions = isset($_POST['conditions']) ? wp_unslash($_POST['conditions']) : '';
+			$template_id = isset($_POST['template_id']) ? sanitize_text_field(wp_unslash($_POST['template_id'])) : '';
+			$template_title = isset($_POST['template_title']) ? sanitize_text_field(wp_unslash($_POST['template_title'])) : '';
+			$status = isset($_POST['status']) ? strtolower(sanitize_text_field(wp_unslash($_POST['status']))) : 'published';
+			$page_settings = isset($_POST['page_settings']) ? json_decode(wp_unslash($_POST['page_settings']), true) : array(); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$layout = isset($_POST['layout']) ? wp_unslash($_POST['layout']) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+			$conditions = isset($_POST['conditions']) ? wp_unslash($_POST['conditions']) : ''; // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
 			if (isset($_POST['enable_plus_minus_button'])) {
 				$basic = get_option('sppcfw_basic', array());
 				if (!is_array($basic)) {
 					$basic = array();
 				}
-				$basic['enable_plus_minus_button'] = ('on' === sanitize_text_field($_POST['enable_plus_minus_button'])) ? 'on' : '';
+				$basic['enable_plus_minus_button'] = ('on' === sanitize_text_field(wp_unslash($_POST['enable_plus_minus_button']))) ? 'on' : '';
 				update_option('sppcfw_basic', $basic);
 			}
 
@@ -594,7 +687,7 @@ if (!class_exists('SPPCFW_Builder')) {
 				if (!is_array($basic)) {
 					$basic = array();
 				}
-				$basic['add_to_cart_button_text'] = sanitize_text_field($_POST['add_to_cart_button_text']);
+				$basic['add_to_cart_button_text'] = sanitize_text_field(wp_unslash($_POST['add_to_cart_button_text']));
 				update_option('sppcfw_basic', $basic);
 			}
 
@@ -603,11 +696,11 @@ if (!class_exists('SPPCFW_Builder')) {
 				if (!is_array($basic)) {
 					$basic = array();
 				}
-				$basic['hide_product_price'] = ('on' === sanitize_text_field($_POST['hide_product_price'])) ? 'on' : '';
+				$basic['hide_product_price'] = ('on' === sanitize_text_field(wp_unslash($_POST['hide_product_price']))) ? 'on' : '';
 				update_option('sppcfw_basic', $basic);
 			}
 
-			$selected_product_id = isset($_POST['selected_product_id']) ? sanitize_text_field($_POST['selected_product_id']) : (isset($page_settings['selected_product_id']) ? sanitize_text_field($page_settings['selected_product_id']) : '');
+			$selected_product_id = isset($_POST['selected_product_id']) ? sanitize_text_field(wp_unslash($_POST['selected_product_id'])) : (isset($page_settings['selected_product_id']) ? sanitize_text_field($page_settings['selected_product_id']) : '');
 
 			if (empty($template_id) || 'new' === $template_id) {
 				$template_id = 'template_' . time();
@@ -652,7 +745,7 @@ if (!class_exists('SPPCFW_Builder')) {
 		{
 			check_ajax_referer('sppcfw_builder_nonce', 'nonce');
 
-			$template_id = isset($_POST['template_id']) ? sanitize_text_field($_POST['template_id']) : 'template_default';
+			$template_id = isset($_POST['template_id']) ? sanitize_text_field(wp_unslash($_POST['template_id'])) : 'template_default';
 
 			if ('new' === $template_id) {
 				$blank_template = array(
@@ -768,7 +861,7 @@ if (!class_exists('SPPCFW_Builder')) {
 			}
 
 			$key = isset($_POST['key']) ? sanitize_key($_POST['key']) : '';
-			$value = isset($_POST['value']) ? sanitize_text_field($_POST['value']) : '';
+			$value = isset($_POST['value']) ? sanitize_text_field(wp_unslash($_POST['value'])) : '';
 
 			if ('enable_plus_minus_button' === $key) {
 				$basic = get_option('sppcfw_basic', array());

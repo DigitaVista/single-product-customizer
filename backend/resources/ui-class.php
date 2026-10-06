@@ -957,8 +957,8 @@ if (!class_exists('SPPCFW_backend_ui')):
         }
 
         public function builder_page() {
-            $action = isset( $_GET['action'] ) ? sanitize_text_field( $_GET['action'] ) : '';
-            if ( isset( $_GET['template_id'] ) && ( empty( $action ) || 'edit' === $action ) ) {
+            $action = isset( $_GET['action'] ) ? sanitize_text_field( wp_unslash( $_GET['action'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+            if ( isset( $_GET['template_id'] ) && ( empty( $action ) || 'edit' === $action ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
                 require_once SPPCFW_DIR_PATH . 'backend/builder/builder-view.php';
             } else {
                 require_once SPPCFW_DIR_PATH . 'backend/builder/templates-list-view.php';

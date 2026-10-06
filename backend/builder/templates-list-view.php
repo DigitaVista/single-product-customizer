@@ -9,7 +9,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$templates = get_option( 'sppcfw_builder_templates', array() );
+call_user_func(
+	function () {
+		$templates = get_option( 'sppcfw_builder_templates', array() );
 
 // Migrate legacy single template if present
 if ( empty( $templates ) ) {
@@ -88,9 +90,9 @@ if ( isset( $_GET['action'] ) && 'duplicate' === $_GET['action'] && isset( $_GET
 }
 
 // Handle Bulk Actions (Move to Trash, Scope updates)
-$bulk_option  = isset( $_REQUEST['sppcfw_bulk_action_option'] ) ? sanitize_text_field( $_REQUEST['sppcfw_bulk_action_option'] ) : '-1';
-$template_ids = isset( $_REQUEST['sppcfw_template_ids'] ) ? (array) $_REQUEST['sppcfw_template_ids'] : array();
-$bulk_nonce   = isset( $_REQUEST['sppcfw_bulk_delete_nonce'] ) ? sanitize_text_field( $_REQUEST['sppcfw_bulk_delete_nonce'] ) : '';
+$bulk_option  = isset( $_REQUEST['sppcfw_bulk_action_option'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['sppcfw_bulk_action_option'] ) ) : '-1'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$template_ids = isset( $_REQUEST['sppcfw_template_ids'] ) ? array_map( 'sanitize_text_field', wp_unslash( (array) $_REQUEST['sppcfw_template_ids'] ) ) : array(); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$bulk_nonce   = isset( $_REQUEST['sppcfw_bulk_delete_nonce'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['sppcfw_bulk_delete_nonce'] ) ) : '';
 
 if ( '-1' !== $bulk_option && ! empty( $template_ids ) ) {
 	if ( empty( $bulk_nonce ) || wp_verify_nonce( $bulk_nonce, 'sppcfw_bulk_delete_action' ) ) {
@@ -185,8 +187,8 @@ foreach ( $templates as $tpl ) {
 	if ( ! empty( $tpl['updated_at'] ) && 'N/A' !== $tpl['updated_at'] ) {
 		$time_stamp = strtotime( $tpl['updated_at'] );
 		if ( $time_stamp ) {
-			$ym_key                      = date( 'Ym', $time_stamp );
-			$ym_label                    = date( 'F Y', $time_stamp );
+			$ym_key                      = gmdate( 'Ym', $time_stamp );
+			$ym_label                    = gmdate( 'F Y', $time_stamp );
 			$available_months[ $ym_key ] = $ym_label;
 		}
 	}
@@ -194,10 +196,10 @@ foreach ( $templates as $tpl ) {
 krsort( $available_months );
 
 // Status, Scope, Date & Search Filter Selections
-$current_status      = isset( $_REQUEST['status'] ) ? strtolower( sanitize_text_field( $_REQUEST['status'] ) ) : 'all';
-$current_scope_filter = isset( $_REQUEST['sppcfw_filter_scope'] ) ? sanitize_text_field( $_REQUEST['sppcfw_filter_scope'] ) : 'all';
-$current_date_filter = isset( $_REQUEST['sppcfw_filter_date'] ) ? sanitize_text_field( $_REQUEST['sppcfw_filter_date'] ) : 'all';
-$search_query        = isset( $_REQUEST['search_query'] ) ? trim( sanitize_text_field( $_REQUEST['search_query'] ) ) : '';
+$current_status       = isset( $_REQUEST['status'] ) ? strtolower( sanitize_text_field( wp_unslash( $_REQUEST['status'] ) ) ) : 'all'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$current_scope_filter = isset( $_REQUEST['sppcfw_filter_scope'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['sppcfw_filter_scope'] ) ) : 'all'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$current_date_filter  = isset( $_REQUEST['sppcfw_filter_date'] ) ? sanitize_text_field( wp_unslash( $_REQUEST['sppcfw_filter_date'] ) ) : 'all'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+$search_query         = isset( $_REQUEST['search_query'] ) ? trim( sanitize_text_field( wp_unslash( $_REQUEST['search_query'] ) ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 
 // Filter $templates array based on status, scope, date, and search filters
 $filtered_templates = array();
@@ -241,7 +243,7 @@ foreach ( $templates as $id => $tpl ) {
 	// Date filter
 	if ( 'all' !== $current_date_filter && ! empty( $current_date_filter ) ) {
 		$time_stamp = ! empty( $tpl['updated_at'] ) ? strtotime( $tpl['updated_at'] ) : 0;
-		$ym_key     = $time_stamp ? date( 'Ym', $time_stamp ) : '';
+		$ym_key     = $time_stamp ? gmdate( 'Ym', $time_stamp ) : '';
 		if ( $ym_key !== $current_date_filter ) {
 			continue;
 		}
@@ -584,3 +586,6 @@ document.addEventListener('DOMContentLoaded', function() {
 	}
 });
 </script>
+<?php
+	}
+);
