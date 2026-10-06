@@ -90,7 +90,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 			// Hook into WooCommerce single product summary to render builder layout
 			add_action('woocommerce_before_single_product_summary', array($this, 'sppcfw_render_builder_template'), 5);
 
-			// 1. Core WooCommerce hooks
+			// 1. Core WooCommerce hooks & Summary cleanup
 			remove_action('woocommerce_before_main_content', 'woocommerce_breadcrumb', 20);
 			remove_action('woocommerce_sidebar', 'woocommerce_get_sidebar', 10);
 			remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10);
@@ -105,10 +105,15 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 			remove_action('woocommerce_after_single_product_summary', 'woocommerce_output_product_data_tabs', 10);
 			remove_action('woocommerce_after_single_product_summary', 'woocommerce_upsell_display', 15);
 			remove_action('woocommerce_after_single_product_summary', 'woocommerce_output_related_products', 20);
+			remove_all_actions('woocommerce_single_product_summary');
+			remove_all_actions('woocommerce_after_single_product_summary');
 
 			// 2. Astra Theme Compatibility
 			add_filter('astra_woo_single_product_structure', '__return_empty_array', 999);
 			add_filter('astra_woo_related_products', '__return_false', 999);
+			add_filter('astra_page_layout', function () {
+				return 'no-sidebar';
+			}, 999);
 			remove_action('woocommerce_single_product_summary', 'woocommerce_breadcrumb', 2);
 			remove_all_actions('astra_woo_single_title_before');
 			remove_all_actions('astra_woo_single_title_after');
@@ -124,31 +129,66 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 			remove_all_actions('astra_woo_single_category_after');
 
 			// 3. Kadence Theme Compatibility
+			add_filter('kadence_single_product_elements', '__return_empty_array', 999);
+			add_filter('kadence_sidebar', '__return_false', 999);
 			remove_all_actions('kadence_single_product_navigation');
 			remove_all_actions('kadence_single_product_before');
 			remove_all_actions('kadence_single_product_after');
 
 			// 4. OceanWP Theme Compatibility
+			add_filter('ocean_woo_summary_elements_positioning', '__return_empty_array', 999);
+			add_filter('ocean_display_upsells', '__return_false', 999);
+			add_filter('ocean_display_related_products', '__return_false', 999);
+			add_filter('ocean_post_layout_class', function () {
+				return 'full-width';
+			}, 999);
+			add_filter('ocean_post_layout_meta_value', function () {
+				return 'full-width';
+			}, 999);
+			remove_action('ocean_after_primary', 'oceanwp_display_sidebar');
+			remove_action('ocean_before_primary', 'oceanwp_display_sidebar');
 			remove_action('woocommerce_before_single_product_summary', 'oceanwp_product_next_prev_nav', 10);
 			remove_action('woocommerce_before_single_product_summary', 'oceanwp_woo_single_product_floating_bar', 10);
 			remove_all_actions('ocean_before_single_product');
 			remove_all_actions('ocean_after_single_product');
 			remove_all_actions('ocean_before_single_product_summary');
 			remove_all_actions('ocean_after_single_product_summary');
+			remove_all_actions('ocean_before_single_product_title');
+			remove_all_actions('ocean_after_single_product_title');
 
 			// 5. Storefront Theme Compatibility
+			add_filter('storefront_sidebar', '__return_false', 999);
 			remove_action('woocommerce_before_single_product_summary', 'storefront_single_product_pagination', 5);
 			remove_action('storefront_after_footer', 'storefront_sticky_single_add_to_cart', 999);
 			remove_action('woocommerce_after_single_product_summary', 'storefront_single_product_pagination', 30);
 
-			// 6. Flatsome Theme Compatibility
+			// 6. EnvoThemes Compatibility (envo-one, envo-storefront, envo-ecommerce)
+			remove_action('woocommerce_before_main_content', 'envo_one_wrapper_start', 10);
+			remove_action('woocommerce_after_main_content', 'envo_one_wrapper_end', 10);
+			remove_all_actions('envo_one_sidebar');
+			add_filter('get_post_metadata', function ($value, $object_id, $meta_key, $single) {
+				if ('envo_hide_sidebar' === $meta_key) {
+					return 'on';
+				}
+				return $value;
+			}, 10, 4);
+
+			// 7. Flatsome Theme Compatibility
 			remove_all_actions('flatsome_single_product_summary_top');
 			remove_all_actions('flatsome_single_product_summary_middle');
 			remove_all_actions('flatsome_single_product_summary_bottom');
 
-			// 7. Woodmart Theme Compatibility
+			// 8. Woodmart Theme Compatibility
 			remove_all_actions('woodmart_before_single_product_summary');
 			remove_all_actions('woodmart_after_single_product_summary');
+
+			// 9. Generic Sidebar Suppression on Single Product Builder
+			add_filter('is_active_sidebar', function ($is_active, $sidebar_id) {
+				if (is_singular('product') && in_array($sidebar_id, array('envo-one-right-sidebar', 'sidebar-1', 'sidebar-right', 'shop-sidebar', 'sidebar', 'primary-sidebar', 'secondary-sidebar'), true)) {
+					return false;
+				}
+				return $is_active;
+			}, 999, 2);
 		}
 
 		/**
@@ -262,6 +302,85 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 		{
 			$layout = isset($this->matched_template['layout']) ? $this->matched_template['layout'] : array();
 
+			// Ensure WooCommerce single product script and jQuery are enqueued
+			if (function_exists('is_singular') && is_singular('product')) {
+				wp_enqueue_script('wc-single-product');
+				wp_enqueue_script('jquery');
+
+				// Built-in Tab Switcher JS for Block Themes & Custom Themes
+				wp_add_inline_script('jquery', '
+					(function() {
+						function sppcfwInitTabs() {
+							var tabWrappers = document.querySelectorAll(".woocommerce-tabs, .wc-tabs-wrapper, .sppcfw-tabs-wrapper");
+							tabWrappers.forEach(function(wrapper) {
+								var tabLinks = wrapper.querySelectorAll("ul.tabs li a, ul.wc-tabs li a");
+								var panels = wrapper.querySelectorAll(".woocommerce-Tabs-panel, .panel.entry-content, .wc-tab");
+								
+								if (!tabLinks.length || !panels.length) return;
+
+								function activateTab(targetId) {
+									tabLinks.forEach(function(link) {
+										var href = link.getAttribute("href");
+										if (href === targetId || ("#" + href) === targetId) {
+											link.parentElement.classList.add("active");
+										} else {
+											link.parentElement.classList.remove("active");
+										}
+									});
+
+									panels.forEach(function(panel) {
+										var pId = "#" + panel.id;
+										if (pId === targetId || panel.id === targetId.replace("#", "")) {
+											panel.style.setProperty("display", "block", "important");
+											panel.classList.add("sppcfw-active-tab");
+										} else {
+											panel.style.setProperty("display", "none", "important");
+											panel.classList.remove("sppcfw-active-tab");
+										}
+									});
+								}
+
+								var activeLink = wrapper.querySelector("ul.tabs li.active a, ul.wc-tabs li.active a");
+								var initialTarget = activeLink ? activeLink.getAttribute("href") : null;
+								if (!initialTarget && tabLinks.length > 0) {
+									initialTarget = tabLinks[0].getAttribute("href");
+								}
+
+								if (initialTarget) {
+									activateTab(initialTarget);
+								}
+
+								tabLinks.forEach(function(link) {
+									link.addEventListener("click", function(e) {
+										e.preventDefault();
+										var targetSelector = this.getAttribute("href");
+										if (!targetSelector) return;
+										activateTab(targetSelector);
+									});
+								});
+							});
+
+							// Rating link -> Switch to Reviews tab
+							var reviewLinks = document.querySelectorAll(".woocommerce-review-link, .sppcfw-rating-link, a[href=\"#reviews\"], a[href=\"#tab-reviews\"]");
+							reviewLinks.forEach(function(rLink) {
+								rLink.addEventListener("click", function() {
+									var reviewTabLink = document.querySelector(".woocommerce-tabs ul.tabs li.reviews_tab a, .woocommerce-tabs a[href=\"#tab-reviews\"], .sppcfw-tabs-wrapper a[href=\"#tab-reviews\"]");
+									if (reviewTabLink) {
+										reviewTabLink.click();
+									}
+								});
+							});
+						}
+
+						if (document.readyState === "loading") {
+							document.addEventListener("DOMContentLoaded", sppcfwInitTabs);
+						} else {
+							sppcfwInitTabs();
+						}
+					})();
+				');
+			}
+
 			// Ensure variation switcher assets are enqueued if template uses swatches
 			$var_type = $this->sppcfw_find_var_display_type($layout);
 			if ('swatches' === $var_type || (null === $var_type && isset(SPPCFW_ADVANCED['enable_variation_switcher']) && 'on' === SPPCFW_ADVANCED['enable_variation_switcher'])) {
@@ -290,6 +409,144 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				.sppcfw-column { box-sizing: border-box; }
 				.sppcfw-widget-item { width: 100% !important; box-sizing: border-box !important; }
 
+				/* WooCommerce Tabs Base Styling for Block Themes & Custom Themes */
+				.woocommerce-tabs,
+				.sppcfw-tabs-wrapper {
+					width: 100% !important;
+					margin-top: 24px !important;
+					margin-bottom: 24px !important;
+					box-sizing: border-box !important;
+				}
+
+				.woocommerce-tabs ul.tabs,
+				.sppcfw-tabs-wrapper ul.tabs {
+					display: flex !important;
+					flex-wrap: wrap !important;
+					gap: 8px !important;
+					list-style: none !important;
+					padding: 0 !important;
+					margin: 0 0 20px 0 !important;
+					border-bottom: 1px solid #e5e7eb !important;
+				}
+
+				.woocommerce-tabs ul.tabs li,
+				.sppcfw-tabs-wrapper ul.tabs li {
+					display: inline-block !important;
+					margin: 0 !important;
+					padding: 0 !important;
+					background: transparent !important;
+					border: none !important;
+				}
+
+				.woocommerce-tabs ul.tabs li a,
+				.sppcfw-tabs-wrapper ul.tabs li a {
+					display: block !important;
+					padding: 10px 18px !important;
+					font-size: 15px !important;
+					font-weight: 600 !important;
+					color: #4b5563 !important;
+					text-decoration: none !important;
+					border-bottom: 2px solid transparent !important;
+					transition: all 0.2s ease-in-out !important;
+					border-radius: 4px 4px 0 0 !important;
+				}
+
+				.woocommerce-tabs ul.tabs li:hover a,
+				.sppcfw-tabs-wrapper ul.tabs li:hover a {
+					color: #111827 !important;
+				}
+
+				.woocommerce-tabs ul.tabs li.active a,
+				.sppcfw-tabs-wrapper ul.tabs li.active a {
+					color: #4f46e5 !important;
+					border-bottom: 2px solid #4f46e5 !important;
+				}
+
+				/* Hide inactive tab panels by default */
+				.woocommerce-tabs .woocommerce-Tabs-panel,
+				.woocommerce-tabs .panel.entry-content,
+				.woocommerce-tabs .wc-tab,
+				.sppcfw-tabs-wrapper .woocommerce-Tabs-panel,
+				.sppcfw-tabs-wrapper .panel.entry-content,
+				.sppcfw-tabs-wrapper .wc-tab {
+					display: none;
+					width: 100% !important;
+					box-sizing: border-box !important;
+					line-height: 1.7 !important;
+					color: #374151 !important;
+				}
+
+				.woocommerce-tabs .woocommerce-Tabs-panel.sppcfw-active-tab,
+				.sppcfw-tabs-wrapper .woocommerce-Tabs-panel.sppcfw-active-tab,
+				.woocommerce-tabs .panel.entry-content.sppcfw-active-tab,
+				.sppcfw-tabs-wrapper .panel.entry-content.sppcfw-active-tab,
+				.woocommerce-tabs .wc-tab.sppcfw-active-tab,
+				.sppcfw-tabs-wrapper .wc-tab.sppcfw-active-tab {
+					display: block !important;
+				}
+
+				/* Additional Information Table in Block Themes */
+				.woocommerce-tabs table.shop_attributes,
+				.sppcfw-tabs-wrapper table.shop_attributes {
+					width: 100% !important;
+					border-collapse: collapse !important;
+					margin: 16px 0 !important;
+					border: 1px solid #e5e7eb !important;
+					border-radius: 6px !important;
+					overflow: hidden !important;
+				}
+
+				.woocommerce-tabs table.shop_attributes th,
+				.sppcfw-tabs-wrapper table.shop_attributes th {
+					width: 30% !important;
+					padding: 10px 16px !important;
+					background: #f9fafb !important;
+					font-weight: 600 !important;
+					color: #111827 !important;
+					border-bottom: 1px solid #e5e7eb !important;
+					text-align: left !important;
+				}
+
+				.woocommerce-tabs table.shop_attributes td,
+				.sppcfw-tabs-wrapper table.shop_attributes td {
+					padding: 10px 16px !important;
+					color: #4b5563 !important;
+					border-bottom: 1px solid #e5e7eb !important;
+				}
+
+				/* Reviews in Block Themes */
+				.woocommerce-tabs #reviews,
+				.sppcfw-tabs-wrapper #reviews {
+					width: 100% !important;
+				}
+
+				.woocommerce-tabs #reviews ol.commentlist,
+				.sppcfw-tabs-wrapper #reviews ol.commentlist {
+					list-style: none !important;
+					padding: 0 !important;
+					margin: 0 0 24px 0 !important;
+				}
+
+				.woocommerce-tabs #reviews ol.commentlist li,
+				.sppcfw-tabs-wrapper #reviews ol.commentlist li {
+					border: 1px solid #e5e7eb !important;
+					border-radius: 8px !important;
+					padding: 16px !important;
+					margin-bottom: 16px !important;
+					background: #ffffff !important;
+				}
+
+				.woocommerce-tabs #reviews .comment-form textarea,
+				.sppcfw-tabs-wrapper #reviews .comment-form textarea {
+					width: 100% !important;
+					border: 1px solid #d1d5db !important;
+					border-radius: 6px !important;
+					padding: 8px 12px !important;
+					margin-top: 4px !important;
+					margin-bottom: 12px !important;
+					box-sizing: border-box !important;
+				}
+
 				/* Ensure outer theme containers do not cap max-width on custom single product layouts */
 				.woocommerce-page #primary,
 				.woocommerce #primary,
@@ -306,10 +563,24 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				.woocommerce-page .site-content,
 				.woocommerce .site-content,
 				.woocommerce div.product,
-				.woocommerce-page div.product {
+				.woocommerce-page div.product,
+				body.single-product .envo-content,
+				body.single-product article.woo-content {
 					width: 100% !important;
 					max-width: 100% !important;
+					flex: 0 0 100% !important;
 					box-sizing: border-box !important;
+				}
+
+				/* Suppress leftover theme sidebars on single product builder pages */
+				body.single-product #sidebar,
+				body.single-product aside#sidebar,
+				body.single-product .widget-area,
+				body.single-product #secondary,
+				body.single-product .sidebar-area,
+				body.single-product .col-md-3#sidebar,
+				body.single-product .col-sm-3#sidebar {
+					display: none !important;
 				}
 
 				/* Hide empty summary container from native WooCommerce template */
