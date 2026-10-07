@@ -53,10 +53,11 @@ Single Product Page Customizer with variation swatches provides a comprehensive 
 
 Design custom single product page layouts visually with zero coding required.
 
-* **Full-Featured Visual Canvas**: Intuitive React & Tailwind CSS drag-and-drop builder interface for crafting custom product layouts.
-* **Multi-Template Management**: Create, preview, edit, trash, and restore multiple custom single product templates with live status flags (Published/Draft/Trash).
-* **Dedicated Single Product Widgets (16+ Widgets)**:
-  - **Layout**: Flexbox Container (Row/Column directions, gap, background) and CSS Grid.
+**Visual Builder Core Features (Free)**:
+* **Full-Featured Visual Canvas**: Intuitive React (`wp.element`) & Tailwind CSS drag-and-drop builder interface for crafting custom product layouts.
+* **Multi-Template Management**: Create, preview, edit, trash, duplicate, and restore multiple custom single product templates with live status flags (Published/Draft/Trash).
+* **Dedicated Single Product Widgets (16+ Free Widgets)**:
+  - **Layout**: Flexbox Container (Row/Column directions, gap, padding, background) and CSS Grid.
   - **Product Gallery**: Thumbnail position controls, lightbox, zoom, and live variation image switching.
   - **Product Title & Heading**: Typography, HTML tags (H1-H6), colors, and margins.
   - **Product Price**: Strikethrough regular price formatting and discounted sale price highlighting.
@@ -66,11 +67,15 @@ Design custom single product page layouts visually with zero coding required.
   - **Full Description & Data Tabs**: Responsive tabs (Description, Additional Info, Reviews) with pure JavaScript tab switching.
   - **Product Meta**: Customizable SKU, Category, and Tag metadata displays.
   - **Custom Message**: Notice banners, urgency alerts, and shipping messages.
-  - **Plus/Minus Stopper**: Interactive quantity stepper controls.
+  - **Plus/Minus Stepper**: Interactive quantity stepper controls.
   - **Image & HTML / Shortcode Element**: Insert custom graphics, trust seals, shortcodes, and third-party widgets.
-* **Publish Display Conditions**: Assign templates globally to the **Entire Website** or unlock granular **Specific Category** and **Specific Product** rules with an active Pro license.
 * **Floating Structure Tree Panel**: Real-time layer hierarchy (Containers, Columns, Elements) for fast navigation.
 * **Live Responsive Viewports**: Real-time canvas previews across Desktop, Tablet, and Mobile devices.
+* **Global Template Assignment (Free)**: Set display conditions to the **Entire Website** to apply custom templates store-wide.
+
+**Visual Builder Pro Features**:
+* **Specific Category Display Rules**: Assign dedicated custom templates exclusively to chosen product categories with live category search and selection.
+* **Specific Product Display Rules**: Target and assign tailored custom templates to individual products.
 
 = Quick Checkout for WooCommerce =
 
@@ -229,10 +234,31 @@ Apply distinct customization rules per product category. Define category-wide de
 
 = Key Features Summary =
 
-= Basic Features (Free) =
+= 1. Visual Drag & Drop Single Product Builder =
+
+* **Free Capabilities**:
+  * React (`wp.element`) & Tailwind CSS drag-and-drop visual canvas editor
+  * Create, edit, duplicate, trash, and restore multiple custom single product templates
+  * 16+ Dedicated Product Widgets (Gallery, Add to Cart with Swatches/Table, Price, Title, Tabs, Meta, Custom Message, Steppers, etc.)
+  * Live responsive viewport preview (Desktop, Tablet, Mobile) and Structure Tree hierarchy panel
+  * Global store-wide template assignment (Entire Website)
+* **Pro Capabilities**:
+  * Category-Specific Template Assignment (Assign unique templates to selected product categories)
+  * Product-Specific Template Assignment (Assign tailored templates to individual products)
+
+= 2. Quick Checkout for WooCommerce =
+
+* **Free Capabilities**:
+  * Enable instant Quick Checkout directly on product detail pages
+  * Template 1 (Modern Horizontal Layout) for accelerated purchasing
+* **Pro Capabilities**:
+  * Additional Layout Templates (Classic Vertical & Split Layout)
+  * Element Display Controls (Toggle Title, Ratings/Reviews, and Short Description)
+  * Full Inline Billing & Shipping Checkout Form with direct AJAX order placement
+
+= 3. Core Store Settings (Free) =
 
 * **Enable Plus, Minus Quantity Buttons**
-* **Enable Quick Checkout (Modern Horizontal Template)**
 * **Enable Ajax Add to Cart Button**
 * **Change "Add to Cart" Button Text**
 * **Hide Add to Cart Button**
@@ -249,15 +275,11 @@ Apply distinct customization rules per product category. Define category-wide de
 * **Customize Related Product Title**
 * **Variation Reset Text Change**
 
-= Pro Features =
+= 4. Advanced Settings (Pro) =
 
 * **Individual Product & Category-Level Customization**:
   * Product-Specific Customization (Override global settings for individual products)
   * Category-Based Customization (Apply distinct customization rules per product category)
-* **Quick Checkout Pro Capabilities**:
-  * Selectable Layout Templates (Classic Vertical & Split Layout)
-  * Display Toggles for Product Title, Ratings/Reviews, and Short Description
-  * Full Inline Billing & Shipping Checkout Form with direct AJAX order placement
 * **Enable Min/Max Quantity Limits**
 * **Attach Custom Tabs (Position before or after standard tabs)**
 * **Attach Additional Custom Content via Display Hooks**
@@ -300,30 +322,17 @@ Yes, the Free version includes Quick Checkout with Template 1 (Modern Horizontal
 
 ### 1.1.0 (October 07, 2026)
 
-- **New:** **Visual Drag & Drop Single Product Page Builder** — modern visual canvas engine built with React (`wp.element`) and Tailwind CSS to design and customize single product pages visually.
-- **New:** **Multi-Template Management System** — create, manage, duplicate, preview, trash, and restore multiple custom single product templates with live status flags (Published / Draft / Trash).
-- **New:** **Dedicated Single Product Builder Widgets (16+ Widgets)**:
-  - *Layout Elements*: Flexbox Container (Rows, Columns, % widths, gap, padding, borders) and CSS Grid.
-  - *Product Gallery*: Featured image viewport, thumbnail carousel/list, zoom, lightbox, and live variation image auto-sync.
-  - *Product Title & Heading*: SEO-friendly H1-H6 HTML tags, typography, text transform, and colors.
-  - *Product Price*: Live sale price styling with regular price strikethrough formatting.
-  - *Add to Cart*: Core purchase widget with embedded Variation Display Modes (Swatches vs Variation Table vs Dropdowns) and custom button text ("Direct Order Now").
-  - *Rating Stars*: Average star rating and customer review count.
-  - *Short Description*: Product summary with customizable typography.
-  - *Full Description & Tabs*: Multi-tab container with pure vanilla JS switching (no jQuery conflict).
-  - *Product Meta*: SKU, Category links, and Tag links with inline/stacked layouts.
-  - *Custom Message*: Promotional alert boxes, delivery notices, and shipping banners.
-  - *Plus/Minus Stopper*: Interactive quantity stepper buttons.
-  - *Image & HTML Element*: Custom images, badges, third-party widgets, and shortcodes.
-- **New:** **Integrated Variation Display Modes inside Builder** — directly toggle between **Color & Label Swatches**, **Variation Table / Grid View**, or **WooCommerce Default Dropdowns** inside the Add to Cart widget.
-- **New:** **Publish Display Conditions & Scope Controls** — publish templates globally to the **Entire Website**, with **Specific Category** and **Specific Product** targeting protected by Pro license validation.
-- **New:** **Pro License Protection & UI Indicators** — Category & Product display conditions display disabled states, PRO badges, and direct license activation redirect links when Pro is inactive.
-- **New:** **Floating Structure Tree Panel** — real-time visual DOM tree showing nested containers, columns, and elements for fast layer selection.
-- **New:** **Live Responsive Device Switcher** — instant live canvas preview across Desktop, Tablet, and Mobile viewports.
-- **New:** **Frontend Isolated Builder Rendering Engine (`class-sppcfw-builder-renderer.php`)** — renders clean HTML5 markup with scoped responsive styles and zero theme template clashes.
-- **Update:** Restructured admin navigation and enhanced builder AJAX endpoints with nonce verification and capability checks.
-- **Fix:** Fixed variation image synchronization when switching colors or attribute terms.
-- **Improvement:** Optimized CSS & JS asset loading and improved performance for high-traffic WooCommerce stores.
+* **New:** Added a Visual Drag & Drop Single Product Page Builder powered by React (`wp.element`) and Tailwind CSS.
+* **New:** Added multi-template management with create, duplicate, preview, publish, draft, trash, and restore options.
+* **New:** Added 16+ product builder widgets, including Flexbox, CSS Grid, Product Gallery, Title, Price, Add to Cart, Rating, Description, Tabs, Product Meta, Custom Message, Image, and HTML elements.
+* **New:** Added integrated variation display modes: Swatches, Variation Table/Grid, and WooCommerce Default Dropdowns.
+* **New:** Added display conditions for the Entire Website, Specific Categories, and Specific Products.
+* **New:** Added Pro license protection and indicators for category and product-specific display conditions.
+* **New:** Added a Floating Structure Tree Panel and responsive Desktop, Tablet, and Mobile preview modes.
+* **New:** Added an isolated frontend rendering engine with scoped responsive styles to reduce theme conflicts.
+* **Update:** Improved admin navigation and secured builder AJAX requests with nonce and capability checks.
+* **Fix:** Fixed variation image synchronization when switching attribute terms.
+* **Improvement:** Optimized CSS and JavaScript asset loading for better builder performance.
 
 ### 1.0.9 (September 16, 2026)
 
