@@ -4,7 +4,7 @@ Tags: woocommerce, product customizer, variation swatches, quick checkout, custo
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.0.9
+Stable tag: 1.1.0
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
@@ -47,7 +47,30 @@ Our plugin is tested and fully compatible with these popular WordPress themes:
 
 Single Product Page Customizer with variation swatches provides a comprehensive suite of tools designed to enhance the functionality, responsiveness, aesthetics, and user experience of your WooCommerce product pages.
 
-**From advanced variation displays to streamlined quick checkout options, here's what this WooCommerce single product addon offers:**
+**From visual drag & drop single product building to streamlined quick checkout and variation swatches, here's what this WooCommerce single product addon offers:**
+
+= Visual Drag & Drop Single Product Page Builder (NEW) =
+
+Design custom single product page layouts visually with zero coding required.
+
+* **Full-Featured Visual Canvas**: Intuitive React & Tailwind CSS drag-and-drop builder interface for crafting custom product layouts.
+* **Multi-Template Management**: Create, preview, edit, trash, and restore multiple custom single product templates with live status flags (Published/Draft/Trash).
+* **Dedicated Single Product Widgets (16+ Widgets)**:
+  - **Layout**: Flexbox Container (Row/Column directions, gap, background) and CSS Grid.
+  - **Product Gallery**: Thumbnail position controls, lightbox, zoom, and live variation image switching.
+  - **Product Title & Heading**: Typography, HTML tags (H1-H6), colors, and margins.
+  - **Product Price**: Strikethrough regular price formatting and discounted sale price highlighting.
+  - **Add to Cart & Variation Options**: Integrated selection between **Interactive Color/Label Swatches**, **Bulk Variation Table / Grid**, and **Default Dropdowns** with custom button text (e.g. "Direct Order Now").
+  - **Rating Stars & Reviews**: Customer star rating display.
+  - **Short Description & Product Excerpt**: Clean excerpt display with typography controls.
+  - **Full Description & Data Tabs**: Responsive tabs (Description, Additional Info, Reviews) with pure JavaScript tab switching.
+  - **Product Meta**: Customizable SKU, Category, and Tag metadata displays.
+  - **Custom Message**: Notice banners, urgency alerts, and shipping messages.
+  - **Plus/Minus Stopper**: Interactive quantity stepper controls.
+  - **Image & HTML / Shortcode Element**: Insert custom graphics, trust seals, shortcodes, and third-party widgets.
+* **Publish Display Conditions**: Assign templates globally to the **Entire Website** or unlock granular **Specific Category** and **Specific Product** rules with an active Pro license.
+* **Floating Structure Tree Panel**: Real-time layer hierarchy (Containers, Columns, Elements) for fast navigation.
+* **Live Responsive Viewports**: Real-time canvas previews across Desktop, Tablet, and Mobile devices.
 
 = Quick Checkout for WooCommerce =
 
@@ -274,6 +297,33 @@ Yes! The plugin is designed to be compatible with standard WooCommerce themes as
 Yes, the Free version includes Quick Checkout with Template 1 (Modern Horizontal layout). Upgrading to Pro unlocks additional templates (Classic Vertical & Split Layout), component visibility controls, and inline billing/shipping checkout forms.
 
 == Changelog ==
+
+### 1.1.0 (October 07, 2026)
+
+- **New:** **Visual Drag & Drop Single Product Page Builder** — modern visual canvas engine built with React (`wp.element`) and Tailwind CSS to design and customize single product pages visually.
+- **New:** **Multi-Template Management System** — create, manage, duplicate, preview, trash, and restore multiple custom single product templates with live status flags (Published / Draft / Trash).
+- **New:** **Dedicated Single Product Builder Widgets (16+ Widgets)**:
+  - *Layout Elements*: Flexbox Container (Rows, Columns, % widths, gap, padding, borders) and CSS Grid.
+  - *Product Gallery*: Featured image viewport, thumbnail carousel/list, zoom, lightbox, and live variation image auto-sync.
+  - *Product Title & Heading*: SEO-friendly H1-H6 HTML tags, typography, text transform, and colors.
+  - *Product Price*: Live sale price styling with regular price strikethrough formatting.
+  - *Add to Cart*: Core purchase widget with embedded Variation Display Modes (Swatches vs Variation Table vs Dropdowns) and custom button text ("Direct Order Now").
+  - *Rating Stars*: Average star rating and customer review count.
+  - *Short Description*: Product summary with customizable typography.
+  - *Full Description & Tabs*: Multi-tab container with pure vanilla JS switching (no jQuery conflict).
+  - *Product Meta*: SKU, Category links, and Tag links with inline/stacked layouts.
+  - *Custom Message*: Promotional alert boxes, delivery notices, and shipping banners.
+  - *Plus/Minus Stopper*: Interactive quantity stepper buttons.
+  - *Image & HTML Element*: Custom images, badges, third-party widgets, and shortcodes.
+- **New:** **Integrated Variation Display Modes inside Builder** — directly toggle between **Color & Label Swatches**, **Variation Table / Grid View**, or **WooCommerce Default Dropdowns** inside the Add to Cart widget.
+- **New:** **Publish Display Conditions & Scope Controls** — publish templates globally to the **Entire Website**, with **Specific Category** and **Specific Product** targeting protected by Pro license validation.
+- **New:** **Pro License Protection & UI Indicators** — Category & Product display conditions display disabled states, PRO badges, and direct license activation redirect links when Pro is inactive.
+- **New:** **Floating Structure Tree Panel** — real-time visual DOM tree showing nested containers, columns, and elements for fast layer selection.
+- **New:** **Live Responsive Device Switcher** — instant live canvas preview across Desktop, Tablet, and Mobile viewports.
+- **New:** **Frontend Isolated Builder Rendering Engine (`class-sppcfw-builder-renderer.php`)** — renders clean HTML5 markup with scoped responsive styles and zero theme template clashes.
+- **Update:** Restructured admin navigation and enhanced builder AJAX endpoints with nonce verification and capability checks.
+- **Fix:** Fixed variation image synchronization when switching colors or attribute terms.
+- **Improvement:** Optimized CSS & JS asset loading and improved performance for high-traffic WooCommerce stores.
 
 ### 1.0.9 (September 16, 2026)
 
