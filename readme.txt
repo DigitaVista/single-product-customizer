@@ -239,7 +239,7 @@ For more information, see the [Appsero Privacy Policy](https://appsero.com/priva
 
 == Changelog ==
 
-= 1.1.0 - October 09, 2026 =
+= 1.1.0 - October 12, 2026 =
 
 * **New:** Added a Visual Drag & Drop Single Product Page Builder.
 * **New:** Added multi-template management with publish, draft, trash, restore, duplicate, and preview options.
