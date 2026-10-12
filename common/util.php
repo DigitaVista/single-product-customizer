@@ -339,7 +339,7 @@ if (!function_exists('sppcfw_is_valid_single_product_referer')) {
  * WordPress core intentionally silences this in production (@exif_read_data, see WP Trac #42480).
  */
 add_filter('wp_read_image_metadata_types', function($types) {
-    set_error_handler(function($errno, $errstr) {
+    set_error_handler(function($errno, $errstr) { // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_set_error_handler
         if (strpos($errstr, 'exif_read_data') !== false || strpos($errstr, 'Incorrect APP1') !== false) {
             return true;
         }

@@ -6,7 +6,7 @@
 * Requires at least:  6.5
 * Requires PHP:       8.1
 * Tested up to:       7.1
-* Version:           1.0.9
+* Version:           1.1.0
 * Author:            WebCartisan
 * Author URI:        http://webcartisan.com/
 * License:           GPL-2.0+
@@ -67,7 +67,7 @@ if ( ! defined( 'SPPCFW_DEV' ) ) {
 }
 
 if ( ! defined( 'SPPCFW_VERSION' ) ) {
-	define( 'SPPCFW_VERSION', '1.0.9' );
+	define( 'SPPCFW_VERSION', '1.1.0' );
 }
 
 if ( ! defined( 'SPPCFW_DIR_URL' ) ) {
@@ -119,7 +119,8 @@ add_action('wp',function(){
 require_once plugin_dir_path( __FILE__ ) . 'includes/sppcfw-admin-menu.php';
 require_once plugin_dir_path( __FILE__ ) . 'backend/sppcfw-welcome/sppcfw-welcome.php';
 require_once plugin_dir_path( __FILE__ ) . 'backend/sppcfw-welcome/sppcfw-discount-notice.php';
-require_once plugin_dir_path( __FILE__ ) . 'backend/sppcfw-welcome/sppcfw-setup-notice.php';
+require_once plugin_dir_path( __FILE__ ) . 'backend/builder/class-sppcfw-builder.php';
+require_once plugin_dir_path( __FILE__ ) . 'frontend/class-sppcfw-builder-renderer.php';
 
 /**
  * Check if WooCommerce is active (single-site + multisite).
@@ -174,6 +175,8 @@ if ( sppcfw_is_woocommerce_active() ) {
         include_once SPPCFW_DIR_PATH . 'common/util.php';
         include_once SPPCFW_DIR_PATH . 'backend/backend-master.php';
         include_once SPPCFW_DIR_PATH . 'frontend/frontend-master.php';
+        include_once SPPCFW_DIR_PATH . 'backend/builder/class-sppcfw-builder.php';
+        include_once SPPCFW_DIR_PATH . 'frontend/class-sppcfw-builder-renderer.php';
     }
 }
 

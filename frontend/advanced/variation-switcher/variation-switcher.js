@@ -4,11 +4,36 @@ jQuery(function ($) {
   setTimeout(setVariationsFromURL, 50);
 
   $(document)
-    .on("found_variation reset_data", "form.variations_form", function () {
-      setTimeout(initVariationSwitcher, 100);
+    .on("found_variation", "form.variations_form", function (event, variation) {
+      setTimeout(initVariationSwitcher, 50);
+      if (variation && variation.image && (variation.image.full_src || variation.image.src)) {
+        let imgUrl = variation.image.full_src || variation.image.src;
+        let $mainImgs = $(".sppcfw-gallery-main-img");
+        if ($mainImgs.length) {
+          $mainImgs.css("opacity", "0.3");
+          setTimeout(function() {
+            $mainImgs.attr("src", imgUrl).attr("data-zoom-src", imgUrl).attr("data-full-src", imgUrl).css("opacity", "1");
+          }, 60);
+        }
+        $(".sppcfw-gallery-carousel-slide, .sppcfw-gallery-grid-thumb").removeClass("is-active").filter(function () {
+          return $(this).attr("data-main-src") === imgUrl || $(this).attr("data-full-src") === imgUrl;
+        }).addClass("is-active");
+      }
+    })
+    .on("reset_data", "form.variations_form", function () {
+      setTimeout(initVariationSwitcher, 50);
+      let $firstThumb = $(".sppcfw-gallery-carousel-slide, .sppcfw-gallery-grid-thumb").first();
+      if ($firstThumb.length) {
+        $(".sppcfw-gallery-carousel-slide, .sppcfw-gallery-grid-thumb").removeClass("is-active");
+        $firstThumb.addClass("is-active");
+        let origSrc = $firstThumb.attr("data-main-src") || $firstThumb.attr("data-full-src");
+        if (origSrc) {
+          $(".sppcfw-gallery-main-img").attr("src", origSrc).attr("data-zoom-src", origSrc).attr("data-full-src", origSrc);
+        }
+      }
     })
     .on("change", ".vairation_select", function () {
-      setTimeout(initVariationSwitcher, 100);
+      setTimeout(initVariationSwitcher, 50);
     })
     .on("show_variation hide_variation", function () {
       setTimeout(updateVariationButtons, 50);
@@ -22,28 +47,73 @@ jQuery(function ($) {
 
     $("button.webfwc_variation_button")
       .off("click")
-      .on("click", function () {
+      .on("click", function (e) {
+        e.preventDefault();
         if ($(this).hasClass("webcfwc_btn_disable")) return false;
 
         let btnVal = $(this).data("val");
         let $parent = $(this).closest(".cu_button_el");
         let $select = $parent.find("select.vairation_select");
+        let $form = $(this).closest("form.variations_form");
 
-        $select.val(btnVal).trigger("change");
+        let isAlreadySelected = $(this).hasClass("selected");
+        if (isAlreadySelected) {
+          $select.val("").trigger("change");
+          $(this).removeClass("selected");
+        } else {
+          $select.val(btnVal).trigger("change");
+          $parent
+            .find("button.webfwc_variation_button.selected")
+            .removeClass("selected");
+          $(this).addClass("selected");
+        }
 
         let selectName = $select.attr("name");
         if (selectName) {
-          $parent
-            .closest("form.variations_form")
+          $form
             .find('input[name="' + selectName + '"]')
-            .val(btnVal)
+            .val(isAlreadySelected ? "" : btnVal)
             .trigger("change");
         }
 
-        $parent
-          .find("button.webfwc_variation_button.selected")
-          .removeClass("selected");
-        $(this).addClass("selected");
+        if ($form.length) {
+          $form.trigger("check_variations");
+          $form.trigger("woocommerce_variation_select_change");
+        }
+
+        // Fast instant image sync if variation match found
+        let variations = $form.data("product_variations") || $form.data("variations");
+        if (variations && Array.isArray(variations)) {
+          let selections = {};
+          $form.find("select.vairation_select, select[name^='attribute_']").each(function () {
+            let name = $(this).attr("name");
+            if (name && $(this).val()) selections[name] = $(this).val().toString();
+          });
+
+          let matched = variations.find(function (v) {
+            if (!v.attributes) return false;
+            return Object.keys(v.attributes).every(function (k) {
+              let chosen = selections[k] || selections[k.replace(/_/g, "-")] || selections[k.replace(/-/g, "_")];
+              if (!chosen || v.attributes[k] === "") return true;
+              return v.attributes[k].toString() === chosen.toString();
+            }) && Object.keys(selections).every(function (k) {
+              let vVal = v.attributes[k] || v.attributes[k.replace(/_/g, "-")] || v.attributes[k.replace(/-/g, "_")];
+              if (typeof vVal === "undefined" || vVal === "") return true;
+              return vVal.toString() === selections[k].toString();
+            });
+          });
+
+          if (matched && matched.image && (matched.image.full_src || matched.image.src)) {
+            let imgUrl = matched.image.full_src || matched.image.src;
+            let $mainImgs = $(".sppcfw-gallery-main-img");
+            if ($mainImgs.length) {
+              $mainImgs.attr("src", imgUrl).attr("data-zoom-src", imgUrl).attr("data-full-src", imgUrl);
+            }
+            $(".sppcfw-gallery-carousel-slide, .sppcfw-gallery-grid-thumb").removeClass("is-active").filter(function () {
+              return $(this).attr("data-main-src") === imgUrl || $(this).attr("data-full-src") === imgUrl;
+            }).addClass("is-active");
+          }
+        }
       });
 
     updateVariationButtons();
