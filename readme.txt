@@ -161,6 +161,8 @@ Create a unique product page experience for individual products, including custo
 
 Apply different product page layouts and customization rules to selected product categories. [Pro]
 
+Give your product pages a spooky-season refresh without the hassle. Customize WooCommerce product page layouts and highlight Halloween specials to make your seasonal products stand out.
+
 == Compatible Themes ==
 
 The plugin is tested with popular WooCommerce and WordPress themes, including:

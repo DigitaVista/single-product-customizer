@@ -32,11 +32,10 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 		public function sppcfw_disable_block_template_for_builder($has_template, $template_name)
 		{
 			if ('single-product' === $template_name) {
-				$is_preview = isset($_GET['sppcfw_preview']) && isset($_GET['template_id']) && current_user_can('manage_options'); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$enable_builder = (int) get_option('sppcfw_enable_single_product_builder', 0);
 				$enable_quick_checkout = (int) get_option('sppcfw_enable_quick_checkout', 0);
 
-				if ($is_preview || (!empty($enable_builder) && empty($enable_quick_checkout))) {
+				if (!empty($enable_builder) && empty($enable_quick_checkout)) {
 					return false;
 				}
 			}
@@ -61,20 +60,16 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				return;
 			}
 
-			$is_preview = isset($_GET['sppcfw_preview']) && isset($_GET['template_id']) && current_user_can('manage_options'); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			// Suppress builder designs if Quick Checkout is enabled
+			$sppcfw_enable_quick_checkout = (int) get_option('sppcfw_enable_quick_checkout', 0);
+			if (!empty($sppcfw_enable_quick_checkout)) {
+				return;
+			}
 
-			if (!$is_preview) {
-				// Suppress builder designs if Quick Checkout is enabled
-				$sppcfw_enable_quick_checkout = (int) get_option('sppcfw_enable_quick_checkout', 0);
-				if (!empty($sppcfw_enable_quick_checkout)) {
-					return;
-				}
-
-				// Suppress builder designs if Single Product Builder toggle is disabled
-				$sppcfw_enable_builder = (int) get_option('sppcfw_enable_single_product_builder', 0);
-				if (empty($sppcfw_enable_builder)) {
-					return;
-				}
+			// Suppress builder designs if Single Product Builder toggle is disabled
+			$sppcfw_enable_builder = (int) get_option('sppcfw_enable_single_product_builder', 0);
+			if (empty($sppcfw_enable_builder)) {
+				return;
 			}
 
 			$matched = $this->sppcfw_get_matching_template(get_the_ID());
