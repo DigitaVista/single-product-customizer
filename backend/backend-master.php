@@ -46,7 +46,8 @@ if( !class_exists( 'Sppcfw_backend_master' )){
 					'sppcfw_wc_action_hooks'=>$sppcfw_available_hooks,
                     'custom_message_display_hook_dashboard' => $sppcfw_custom_message_saved,
                     'variation_table_display_hook_dashboard' => $sppcfw_variation_table_saved,
-                    'logoUrl' => plugin_dir_url(__FILE__) . 'resources/images/logo.png'
+                    'logoUrl' => plugin_dir_url(__FILE__) . 'resources/images/logo.png',
+                    'is_pro_active' => sppcfw_is_pro_active()
 				)
 			);
 			// Media Uploader.
@@ -80,6 +81,6 @@ if( !class_exists( 'Sppcfw_backend_master' )){
 
 new Sppcfw_backend_master();
 
-include('backend-settings-page.php');
-include('backend-variable-switcher/backend-variable-switcher.php');
-include('ajax-handlers.php');
+include __DIR__ . '/backend-settings-page.php';
+include __DIR__ . '/backend-variable-switcher/backend-variable-switcher.php';
+include __DIR__ . '/ajax-handlers.php';

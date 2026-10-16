@@ -1,4 +1,7 @@
 <?php 
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 if( ! class_exists('Sppcfw_Frontend_Out_Of_Stock')){
     class Sppcfw_Frontend_Out_Of_Stock{
@@ -9,6 +12,9 @@ if( ! class_exists('Sppcfw_Frontend_Out_Of_Stock')){
     
     
         public function sppcfw_display_out_of_stock_text($sppcfw_stock_text, $product ){
+            if (!($product instanceof WC_Product)) {
+                return $sppcfw_stock_text;
+            }
                 
             if(  !$product->is_in_stock()  ){
 
@@ -18,7 +24,7 @@ if( ! class_exists('Sppcfw_Frontend_Out_Of_Stock')){
                     }
                 }
 
-                if(SPPCFW_PRO_ACTIVE){
+                if(sppcfw_is_pro_active()){
 
                     if(sppcfw_if_category_based_customization_enabled()===1){
                         $product_cat=sppcfw_get_product_category_id();    

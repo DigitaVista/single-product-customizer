@@ -5,8 +5,8 @@
 * Description:       An esential helper tool for woocommerce single product page. Borderless freedom to customize single product page. 
 * Requires at least:  6.5
 * Requires PHP:       8.1
-* Tested up to:       7.0
-* Version:           1.0.6
+* Tested up to:       7.1
+* Version:           1.1.0
 * Author:            WebCartisan
 * Author URI:        http://webcartisan.com/
 * License:           GPL-2.0+
@@ -25,7 +25,7 @@ if( ! defined( 'ABSPATH' ) ){
  */
 add_action( 'init', 'sppcfw_load_textdomain' );
 function sppcfw_load_textdomain() {
-    load_plugin_textdomain( 'single-product-customizer', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' );
+    load_plugin_textdomain( 'single-product-customizer', false, dirname( plugin_basename( __FILE__ ) ) . '/languages' ); // phpcs:ignore PluginCheck.CodeAnalysis.DiscouragedFunctions.load_plugin_textdomainFound, WordPress.WP.DeprecatedFunctions.load_plugin_textdomainFound
 }
 
 
@@ -67,7 +67,7 @@ if ( ! defined( 'SPPCFW_DEV' ) ) {
 }
 
 if ( ! defined( 'SPPCFW_VERSION' ) ) {
-	define( 'SPPCFW_VERSION', '1.0.6' );
+	define( 'SPPCFW_VERSION', '1.1.0' );
 }
 
 if ( ! defined( 'SPPCFW_DIR_URL' ) ) {
@@ -88,17 +88,16 @@ if ( ! defined( 'SPPCFW_ADVANCED' ) ) {
 	define( 'SPPCFW_ADVANCED', $sppcfw_advanced ); // advanced settings
 }
 
-if ( ! defined( 'SPPCFW_PRO_ACTIVE' ) ) {
-	define( 'SPPCFW_PRO_ACTIVE', false );
-}
-
 /**
  * Helper function to check if Pro version is active.
  *
  * @return bool
  */
 function sppcfw_is_pro_active() {
-	return ( defined( 'SPPCFW_PRO_ACTIVE' ) && SPPCFW_PRO_ACTIVE ) || ( function_exists( 'sppcfw_pro_license_is_active' ) && sppcfw_pro_license_is_active() );
+	if ( function_exists( 'sppcfw_pro_license_is_active' ) ) {
+		return sppcfw_pro_license_is_active();
+	}
+	return defined( 'SPPCFW_PRO_ACTIVE' ) && SPPCFW_PRO_ACTIVE;
 }
 
 $SPPCFW_INDIVIDUAL=array();// global var
@@ -106,10 +105,12 @@ add_action('wp',function(){
     if(!is_admin()){
         if(is_singular( 'product' )){
             global $post;
-            $product_id=$post->ID;
-            global $SPPCFW_INDIVIDUAL;
-            $sppcfw_individual_product_settings=get_post_meta($product_id,'sppcfw_product',true);
-            $SPPCFW_INDIVIDUAL=$sppcfw_individual_product_settings;
+            $product_id = (isset($post->ID) && !empty($post->ID)) ? $post->ID : get_the_ID();
+            if ($product_id) {
+                global $SPPCFW_INDIVIDUAL;
+                $sppcfw_individual_product_settings=get_post_meta($product_id,'sppcfw_product',true);
+                $SPPCFW_INDIVIDUAL=$sppcfw_individual_product_settings;
+            }
         }
     }
 });
@@ -117,8 +118,9 @@ add_action('wp',function(){
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/sppcfw-admin-menu.php';
 require_once plugin_dir_path( __FILE__ ) . 'backend/sppcfw-welcome/sppcfw-welcome.php';
-require_once plugin_dir_path( __FILE__ ) . 'backend/sppcfw-welcome/single-product-customizer-notice.php';
-require_once plugin_dir_path( __FILE__ ) . 'backend/sppcfw-welcome/sppcfw-setup-notice.php';
+require_once plugin_dir_path( __FILE__ ) . 'backend/sppcfw-welcome/sppcfw-discount-notice.php';
+require_once plugin_dir_path( __FILE__ ) . 'backend/builder/class-sppcfw-builder.php';
+require_once plugin_dir_path( __FILE__ ) . 'frontend/class-sppcfw-builder-renderer.php';
 
 /**
  * Check if WooCommerce is active (single-site + multisite).
@@ -158,63 +160,6 @@ function sppcfw_missing_woocommerce_notice() {
 }
 add_action( 'admin_notices', 'sppcfw_missing_woocommerce_notice' );
 
-/**
- * Register admin menu shell when WooCommerce is not active.
- */
-function sppcfw_register_admin_menu_without_woocommerce() {
-    if ( sppcfw_is_woocommerce_active() ) {
-        return;
-    }
-
-    $parent_slug = 'sppcfw-single-product-customizer';
-    $menu_title  = __( 'Single Product Customizer', 'single-product-customizer' );
-
-    add_menu_page(
-        $menu_title,
-        $menu_title,
-        'manage_options',
-        $parent_slug,
-        'sppcfw_render_woocommerce_required_admin_page',
-        'dashicons-admin-customizer',
-        56
-    );
-}
-add_action( 'admin_menu', 'sppcfw_register_admin_menu_without_woocommerce' );
-
-/**
- * Admin page shown when WooCommerce is missing.
- */
-function sppcfw_render_woocommerce_required_admin_page() {
-    if ( ! current_user_can( 'manage_options' ) ) {
-        wp_die( esc_html__( 'You do not have permission to access this page.', 'single-product-customizer' ) );
-    }
-
-    $install_url = admin_url( 'plugin-install.php?s=woocommerce&tab=search&type=term' );
-    ?>
-    <div class="wrap">
-        <h1><?php echo esc_html( __( 'Single Product Customizer', 'single-product-customizer' ) ); ?></h1>
-        <div class="notice notice-warning">
-            <p>
-                <strong>
-                    <?php
-                    esc_html_e(
-                        'Single Product Customizer requires WooCommerce for full functionality. Please install and activate WooCommerce to customize single product pages.',
-                        'single-product-customizer'
-                    );
-                    ?>
-                </strong>
-            </p>
-            <?php if ( current_user_can( 'install_plugins' ) ) : ?>
-                <p>
-                    <a class="button button-primary" href="<?php echo esc_url( $install_url ); ?>">
-                        <?php esc_html_e( 'Install WooCommerce', 'single-product-customizer' ); ?>
-                    </a>
-                </p>
-            <?php endif; ?>
-        </div>
-    </div>
-    <?php
-}
 
 require_once plugin_dir_path( __FILE__ ) . 'backend/classes/class-sppcfw-pro-admin-placeholders.php';
 SPPCFW_Pro_Admin_Placeholders::init();
@@ -225,10 +170,13 @@ if ( sppcfw_is_woocommerce_active() ) {
      */
     add_action( 'init', 'sppcfw_load_includes', 20 );
     function sppcfw_load_includes() {
+        global $sppcfw_available_hooks;
         include_once SPPCFW_DIR_PATH . 'backend/resources/hook-list.php';
         include_once SPPCFW_DIR_PATH . 'common/util.php';
         include_once SPPCFW_DIR_PATH . 'backend/backend-master.php';
         include_once SPPCFW_DIR_PATH . 'frontend/frontend-master.php';
+        include_once SPPCFW_DIR_PATH . 'backend/builder/class-sppcfw-builder.php';
+        include_once SPPCFW_DIR_PATH . 'frontend/class-sppcfw-builder-renderer.php';
     }
 }
 
@@ -425,7 +373,7 @@ function sppcfw_send_admin_notification_callback() {
  * Start Add YouTube help link Function
  *******************/
 
-function wodgc_help_youtube_link($link){
+function sppcfw_help_youtube_link( $link ) {
     ?>
     <span class="wwodgc_youtube-link">
         <a href="<?php echo esc_attr($link); ?>"
@@ -452,7 +400,7 @@ if ( ! class_exists( 'Appsero\Client' ) ) {
  *
  * @return void
  */
-function appsero_init_tracker_single_product_customizer() {
+function sppcfw_appsero_init_tracker_single_product_customizer() {
 
     if ( ! class_exists( 'Appsero\Client' ) ) {
       require_once __DIR__ . '/appsero/src/Client.php';
@@ -465,4 +413,4 @@ function appsero_init_tracker_single_product_customizer() {
 
 }
 
-appsero_init_tracker_single_product_customizer();
+sppcfw_appsero_init_tracker_single_product_customizer();

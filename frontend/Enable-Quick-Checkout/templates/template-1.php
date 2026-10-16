@@ -11,22 +11,22 @@ if (! defined('ABSPATH')) {
 
 ?>
 <?php if (class_exists('WC_Checkout')) :
-    $checkout = WC_Checkout::instance();
+    $sppcfw_checkout = WC_Checkout::instance();
 ?>
-    <?php if ($checkout->get_checkout_fields()) : ?>
+    <?php if ($sppcfw_checkout->get_checkout_fields()) : ?>
 
         <?php do_action('woocommerce_checkout_before_customer_details'); ?>
 
-        <div class="sppcfw-accordion" id="sppcfw-checkout-accordion">
-            <!-- Cart Section -->
-            <div name="checkout" method="post" class="sppcfw-checkout-wrapper">
+        <form name="checkout" method="post" class="checkout woocommerce-checkout sppcfw-checkout-form" action="<?php echo esc_url(wc_get_checkout_url()); ?>" enctype="multipart/form-data" aria-label="<?php echo esc_attr__('Checkout', 'single-product-customizer'); ?>">
+
+            <div class="sppcfw-accordion" id="sppcfw-checkout-accordion">
+                <!-- Cart Section -->
                 <div class="sppcfw-accordion-item sppcfw-accordion-item-active" id="sppcfw-cart-section">
-                    <!-- <div class="sppcfw-accordion-item" id="sppcfw-cart-section"> -->
                     <div class="sppcfw-accordion-header" data-section="sppcfw-cart-section">
                         <div class="sppcfw-accordion-header-left">
                             <span class="sppcfw-accordion-icon"><i class="fa-solid fa-cart-shopping"></i></span>
-                            <span><?php esc_html_e(
-                                        apply_filters('sppcfw_quick_checkout_cart_label', __('Cart', 'woocommerce'))
+                            <span><?php echo esc_html(
+                                        apply_filters('sppcfw_quick_checkout_cart_label', __('Cart', 'single-product-customizer'))
                                     );  ?>
                             </span>
                         </div>
@@ -41,16 +41,14 @@ if (! defined('ABSPATH')) {
 
                     </div>
                 </div>
-            </div>
-            <form name="checkout" method="post" class="checkout woocommerce-checkout sppcfw-checkout-form" action="<?php echo esc_url(wc_get_checkout_url()); ?>" enctype="multipart/form-data" aria-label="<?php echo esc_attr__('Checkout', 'woocommerce'); ?>">
 
                 <!-- Billing Section -->
                 <div class="sppcfw-accordion-item" id="sppcfw-billing-section">
                     <div class="sppcfw-accordion-header" data-section="sppcfw-billing-section">
                         <div class="sppcfw-accordion-header-left">
                             <span class="sppcfw-accordion-icon"><i class="fa-solid fa-file-invoice"></i></span>
-                            <span><?php esc_html_e(
-                                        apply_filters('sppcfw_quick_checkout_billing_details_label', __('Billing Details', 'woocommerce'))
+                            <span><?php echo esc_html(
+                                        apply_filters('sppcfw_quick_checkout_billing_details_label', __('Billing Details', 'single-product-customizer'))
                                     );  ?>
                             </span>
                         </div>
@@ -73,12 +71,12 @@ if (! defined('ABSPATH')) {
                                 <span class="sppcfw-accordion-icon"><i class="fa-solid fa-truck-fast"></i></span>
                                 <?php if (WC()->cart->needs_shipping()) : ?>
                                     <span><?php echo esc_html(
-                                                apply_filters('sppcfw_quick_checkout_shipping_details_label', __('Shipping Details', 'woocommerce'))
+                                                apply_filters('sppcfw_quick_checkout_shipping_details_label', __('Shipping Details', 'single-product-customizer'))
                                             );  ?>
                                     </span>
                                 <?php else : ?>
-                                    <span><?php esc_html_e(
-                                                apply_filters('sppcfw_quick_checkout_shipping_details_label', __('Shipping Details', 'woocommerce'))
+                                    <span><?php echo esc_html(
+                                                apply_filters('sppcfw_quick_checkout_shipping_details_label', __('Shipping Details', 'single-product-customizer'))
                                             );  ?>
                                     </span>
                                 <?php endif; ?>
@@ -100,8 +98,8 @@ if (! defined('ABSPATH')) {
                     <div class="sppcfw-accordion-header" data-section="sppcfw-order-section">
                         <div class="sppcfw-accordion-header-left">
                             <span class="sppcfw-accordion-icon"><i class="fa-solid fa-credit-card"></i></span>
-                            <span><?php esc_html_e(
-                                        apply_filters('sppcfw_quick_checkout_order_payment_label', __('Order & Payment', 'woocommerce'))
+                            <span><?php echo esc_html(
+                                        apply_filters('sppcfw_quick_checkout_order_payment_label', __('Order & Payment', 'single-product-customizer'))
                                     );  ?>
                             </span>
                         </div>
@@ -115,17 +113,16 @@ if (! defined('ABSPATH')) {
                         <?php do_action('sppcfw_after_quick_checkout_initial_payment'); ?>
                     </div>
                 </div>
-            </form>
-        </div>
+            </div><!-- .sppcfw-accordion -->
 
-        <?php wp_nonce_field('woocommerce-process_checkout', 'woocommerce-process-checkout-nonce'); ?>
+            <?php wp_nonce_field('woocommerce-process_checkout', 'woocommerce-process-checkout-nonce'); ?>
 
+            <?php do_action('woocommerce_after_checkout_form', $sppcfw_checkout); ?>
 
-        <?php do_action('woocommerce_after_checkout_form', $checkout); ?>
+        </form>
 
     <?php endif; ?>
 <?php endif; ?>
-</div>
 
 <script>
     // Accordion functionality

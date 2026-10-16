@@ -1,4 +1,7 @@
 <?php 
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 if(!class_exists("Sppcfw_Frontend_Variation_Reset_Text")){
     class Sppcfw_Frontend_Variation_Reset_Text{
@@ -19,15 +22,14 @@ if(!class_exists("Sppcfw_Frontend_Variation_Reset_Text")){
 
         public function sppcfw_variation_rest_text(){
             $change_clear_text='';
-            
 
-            if(SPPCFW_PRO_ACTIVE){
-                if(isset(SPPCFW_ADVANCED['change_clear_text'])){
-                    if(!empty(SPPCFW_ADVANCED['change_clear_text'])){
-                        $change_clear_text=SPPCFW_ADVANCED['change_clear_text'];
-                    }
+            if(isset(SPPCFW_ADVANCED['change_clear_text'])){
+                if(!empty(SPPCFW_ADVANCED['change_clear_text'])){
+                    $change_clear_text=SPPCFW_ADVANCED['change_clear_text'];
                 }
+            }
 
+            if(sppcfw_is_pro_active()){
                 if(sppcfw_if_category_based_customization_enabled()===1){
                     $product_cat=sppcfw_get_product_category_id();    
                     if($product_cat>0){
@@ -55,7 +57,7 @@ if(!class_exists("Sppcfw_Frontend_Variation_Reset_Text")){
         }
         public function is_enabled(){
             $enabled=0;
-            if(SPPCFW_PRO_ACTIVE){
+            if(!empty($this->sppcfw_variation_rest_text())){
                 $enabled=1;
             }
             return $enabled;

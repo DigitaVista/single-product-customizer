@@ -1,4 +1,7 @@
 <?php 
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 if( !class_exists("Sppcfw_Frontend_Backorder_Text")){
     class Sppcfw_Frontend_Backorder_Text{
@@ -7,6 +10,10 @@ if( !class_exists("Sppcfw_Frontend_Backorder_Text")){
         }
 
         public function sppcfw_change_backorder_text( $availability, $product ){
+            if (!($product instanceof WC_Product)) {
+                return $availability;
+            }
+
             if( $product->is_on_backorder() && $this->is_enabled()===1){
 
                 $sppcfw_backorder_text_val = $this->sppcfw_get_backorder_text();
@@ -22,15 +29,14 @@ if( !class_exists("Sppcfw_Frontend_Backorder_Text")){
         }
         public function sppcfw_get_backorder_text(){
             $change_backorder_text='';
-            
 
-            if(SPPCFW_PRO_ACTIVE){
-                if(isset(SPPCFW_ADVANCED['change_backorder_text'])){
-                    if(!empty(SPPCFW_ADVANCED['change_backorder_text'])){
-                        $change_backorder_text=SPPCFW_ADVANCED['change_backorder_text'];
-                    }
+            if(isset(SPPCFW_ADVANCED['change_backorder_text'])){
+                if(!empty(SPPCFW_ADVANCED['change_backorder_text'])){
+                    $change_backorder_text=SPPCFW_ADVANCED['change_backorder_text'];
                 }
+            }
 
+            if(sppcfw_is_pro_active()){
                 if(sppcfw_if_category_based_customization_enabled()===1){
                     $product_cat=sppcfw_get_product_category_id();    
                     if($product_cat>0){
@@ -58,7 +64,7 @@ if( !class_exists("Sppcfw_Frontend_Backorder_Text")){
         }
         public function is_enabled(){
             $enabled=0;
-            if(SPPCFW_PRO_ACTIVE){
+            if(!empty($this->sppcfw_get_backorder_text())){
                 $enabled=1;
             }
             return $enabled;

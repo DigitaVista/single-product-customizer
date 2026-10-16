@@ -19,7 +19,7 @@ add_action( 'admin_menu', 'sppcfw_register_welcome_page', 99 );
 add_action( 'current_screen', 'sppcfw_set_welcome_page_title' );
 add_action( 'admin_head', 'sppcfw_set_welcome_page_title', 1 );
 function sppcfw_set_welcome_page_title() {
-	if ( isset( $_GET['page'] ) && 'sppcfw-welcome' === $_GET['page'] ) {
+	if ( isset( $_GET['page'] ) && 'sppcfw-welcome' === sanitize_key( wp_unslash( $_GET['page'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		global $title;
 		if ( empty( $title ) ) {
 			$title = __( 'Single Product Customizer Welcome', 'single-product-customizer' );
@@ -32,7 +32,7 @@ function sppcfw_set_welcome_page_title() {
  */
 function sppcfw_disable_welcome_page_notices() {
 
-	if ( isset( $_GET['page'] ) && 'sppcfw-welcome' === sanitize_key( wp_unslash( $_GET['page'] ) ) ) {
+	if ( isset( $_GET['page'] ) && 'sppcfw-welcome' === sanitize_key( wp_unslash( $_GET['page'] ) ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		remove_all_actions( 'admin_notices' );
 		remove_all_actions( 'all_admin_notices' );
 	}
@@ -62,13 +62,7 @@ function sppcfw_enqueue_welcome_page_assets( $hook_suffix ) {
 		SPPCFW_VERSION,
 		'all'
 	);
-	wp_enqueue_style(
-		'sppcfw-setup-notice-style',
-		SPPCFW_DIR_URL . 'backend/assets/css/sppcfw-setup-notice.css',
-		array(),
-		SPPCFW_VERSION
-	);
-
+ 
 	wp_enqueue_script( 'jquery' );
 	wp_enqueue_script(
 		'sppcfw_welcome_page_script',
@@ -137,12 +131,7 @@ function sppcfw_welcome_content() {
 				</div>
 			</form>
 		</div>
-		<?php if ( class_exists( 'SPPCFW_Setup_Help_Notice' ) && ! SPPCFW_Setup_Help_Notice::is_dismissed() ) : ?>
-			<div class="sppcfw-content sppcfw-notice-warning" style="margin-top: 30px;">
-				<?php SPPCFW_Setup_Help_Notice::render_card( false ); ?>
-			</div>
-		<?php endif; ?>
-
+ 
 		<div class="sppcfw-content webcartisan-another-plugins">
 			<h2 class="sppcfw-section-title"><?php esc_html_e( 'Our Other Products', 'single-product-customizer' ); ?></h2>
 			<div class="sppcfw-features">

@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 }
 
 // Define products with their details (WordPress.org free plugins)
-$products = [
+$sppcfw_products = [
     [
         'id' => 'giveaway-lottery',
         'name' => __('Giveaway Lottery for WooCommerce', 'single-product-customizer'),
@@ -32,6 +32,30 @@ $products = [
         'rating' => 5,
         'installs' => '70+',
         'wporg_slug' => 'giveaway-lottery',
+        'is_woocommerce' => true
+    ],
+    [
+        'id' => 'GiftRocket-for-WooCommerce',
+        'name' => __('GiftRocket – Ultimate Gift Cards for WooCommerce', 'single-product-customizer'),
+        'description' => __('Easily create, manage, and deliver digital gift cards by email. Shoppers redeem them at cart and checkout. WooCommerce Blocks are supported.', 'single-product-customizer'),
+        'features' => [
+            __('Digital Gift Cards — Custom amounts & messages.', 'single-product-customizer'),
+            __('Email & Scheduled Delivery — Send instantly or later.', 'single-product-customizer'),
+            __('PDF Gift Cards — QR, barcode & PDF417 support.', 'single-product-customizer'),
+            __('Apple & Google Wallet — Mobile wallet support.', 'single-product-customizer'),
+            __('CSV Import — Bulk import codes & balances.', 'single-product-customizer'),
+            __('Easy Redemption — Redeem at cart & checkout.', 'single-product-customizer'),
+            __('Admin Dashboard — Manage cards, balances & transactions.', 'single-product-customizer'),
+        ],
+        'icon' => 'dashicons-admin-customizer',
+        'badge' => __('Popular', 'single-product-customizer'),
+        'color' => '#633bba',
+        'link' => 'https://wordpress.org/plugins/wallet-ready-gift-cards-for-woocommerce/',
+        'install_link' => admin_url('plugin-install.php?s=Wallet%2520Ready%2520Gift%2520Cards%2520for%2520WooCommerce%2520webcartisan&tab=search&type=term'),
+        'price' => __('Free', 'single-product-customizer'),
+        'rating' => 5,
+        'installs' => '70+',
+        'wporg_slug' => 'wallet-ready-gift-cards-for-woocommerce',
         'is_woocommerce' => true
     ],
     [
@@ -436,22 +460,22 @@ $products = [
     </div>
 
     <div class="wx-products-grid">
-        <?php foreach ($products as $product): ?>
-            <div class="wx-product-card" style="--product-color: <?php echo esc_attr($product['color']); ?>">
-                <?php if ($product['badge']): ?>
-                    <div class="wx-product-badge"><?php echo esc_html($product['badge']); ?></div>
+        <?php foreach ($sppcfw_products as $sppcfw_product): ?>
+            <div class="wx-product-card" style="--product-color: <?php echo esc_attr($sppcfw_product['color']); ?>">
+                <?php if ($sppcfw_product['badge']): ?>
+                    <div class="wx-product-badge"><?php echo esc_html($sppcfw_product['badge']); ?></div>
                 <?php endif; ?>
 
                 <div class="wx-product-header">
                     <div class="wx-product-icon">
-                        <span class="dashicons <?php echo esc_attr($product['icon']); ?>"></span>
+                        <span class="dashicons <?php echo esc_attr($sppcfw_product['icon']); ?>"></span>
                     </div>
-                    <h3 class="wx-product-title"><?php echo esc_html($product['name']); ?></h3>
-                    <div class="wx-product-price"><?php echo esc_html($product['price']); ?></div>
+                    <h3 class="wx-product-title"><?php echo esc_html($sppcfw_product['name']); ?></h3>
+                    <div class="wx-product-price"><?php echo esc_html($sppcfw_product['price']); ?></div>
 
                     <div class="wx-product-stats">
                         <div class="wx-product-tags">
-                            <?php if (isset($product['is_woocommerce']) && $product['is_woocommerce']): ?>
+                            <?php if (isset($sppcfw_product['is_woocommerce']) && $sppcfw_product['is_woocommerce']): ?>
                                 <span class="wx-plugin-tag wc">WooCommerce</span>
                             <?php endif; ?>
                         </div>
@@ -459,41 +483,41 @@ $products = [
                         <div class="wx-product-rating">
                         <span class="wx-product-stars">
                             <?php
-                            $rating = $product['rating'];
-                            $full_stars = floor($rating);
-                            $half_star = ($rating - $full_stars) >= 0.5;
+                            $sppcfw_rating = $sppcfw_product['rating'];
+                            $sppcfw_full_stars = floor($sppcfw_rating);
+                            $sppcfw_half_star = ($sppcfw_rating - $sppcfw_full_stars) >= 0.5;
 
-                            for ($i = 0; $i < $full_stars; $i++) {
+                            for ($sppcfw_i = 0; $sppcfw_i < $sppcfw_full_stars; $sppcfw_i++) {
                                 echo '★';
                             }
-                            if ($half_star) {
+                            if ($sppcfw_half_star) {
                                 echo '½';
                             }
-                            for ($i = $full_stars + ($half_star ? 1 : 0); $i < 5; $i++) {
+                            for ($sppcfw_i = $sppcfw_full_stars + ($sppcfw_half_star ? 1 : 0); $sppcfw_i < 5; $sppcfw_i++) {
                                 echo '☆';
                             }
                             ?>
                         </span>
-                            <span><?php echo number_format($product['rating'], 1); ?></span>
+                            <span><?php echo number_format($sppcfw_product['rating'], 1); ?></span>
                         </div>
                     </div>
                 </div>
 
                 <div class="wx-product-body">
-                    <p class="wx-product-description"><?php echo esc_html($product['description']); ?></p>
+                    <p class="wx-product-description"><?php echo esc_html($sppcfw_product['description']); ?></p>
 
                     <ul class="wx-product-features">
-                        <?php foreach (array_slice($product['features'], 0, 6) as $feature): ?>
-                            <li><?php echo esc_html($feature); ?></li>
+                        <?php foreach (array_slice($sppcfw_product['features'], 0, 6) as $sppcfw_feature): ?>
+                            <li><?php echo esc_html($sppcfw_feature); ?></li>
                         <?php endforeach; ?>
                     </ul>
 
                     <div class="wx-product-buttons">
-                        <a href="<?php echo esc_url(isset($product['install_link']) ? $product['install_link'] : $product['link']); ?>" class="wx-product-button">
+                        <a href="<?php echo esc_url(isset($sppcfw_product['install_link']) ? $sppcfw_product['install_link'] : $sppcfw_product['link']); ?>" class="wx-product-button">
                             <span class="dashicons dashicons-download"></span>
                             <?php esc_html_e('Install Now', 'single-product-customizer'); ?>
                         </a>
-                        <a href="<?php echo esc_url($product['link']); ?>" target="_blank" class="wx-product-button wx-product-button-secondary">
+                        <a href="<?php echo esc_url($sppcfw_product['link']); ?>" target="_blank" class="wx-product-button wx-product-button-secondary">
                             <span class="dashicons dashicons-external"></span>
                             <?php esc_html_e('View Details', 'single-product-customizer'); ?>
                         </a>
@@ -508,7 +532,7 @@ $products = [
         <p><?php esc_html_e('Visit our WordPress.org profile to see all our plugins, read reviews, and get support.', 'single-product-customizer'); ?></p>
 
         <div class="wx-button-group">
-            <a href="<?php echo admin_url('plugin-install.php?s=Webcartisan&tab=search&type=term'); ?>"  class="wx-org-button">
+            <a href="<?php echo esc_url( admin_url( 'plugin-install.php?s=Webcartisan&tab=search&type=term' ) ); ?>" class="wx-org-button">
                 <span class="dashicons dashicons-wordpress"></span>
                 <?php esc_html_e('View All Plugins', 'single-product-customizer'); ?>
             </a>

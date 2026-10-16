@@ -1,10 +1,13 @@
 <?php 
+if (!defined('ABSPATH')) {
+    exit;
+}
 
 if( !class_exists("Sppcfw_Frontend_Change_Add_To_Cart_Button_Text")){
 
     class Sppcfw_Frontend_Change_Add_To_Cart_Button_Text{
         public function __construct(){
-            add_action("woocommerce_product_single_add_to_cart_text",[$this,"sppcfw_change_add_to_cart_button_text"],10,1);
+            add_filter("woocommerce_product_single_add_to_cart_text",[$this,"sppcfw_change_add_to_cart_button_text"],999,1);
         }
     
     
@@ -19,13 +22,14 @@ if( !class_exists("Sppcfw_Frontend_Change_Add_To_Cart_Button_Text")){
 
         public function sppcfw_get_add_to_cart_button_text(){
             $add_to_cart_button_text='';
-            if(isset(SPPCFW_BASIC['add_to_cart_button_text'])){
-                if(!empty(SPPCFW_BASIC['add_to_cart_button_text'])){
-                    $add_to_cart_button_text=SPPCFW_BASIC['add_to_cart_button_text'];
+            $basic = defined('SPPCFW_BASIC') && is_array(SPPCFW_BASIC) ? SPPCFW_BASIC : get_option('sppcfw_basic', array());
+            if(isset($basic['add_to_cart_button_text'])){
+                if(!empty($basic['add_to_cart_button_text'])){
+                    $add_to_cart_button_text=$basic['add_to_cart_button_text'];
                 }
             }
 
-            if(SPPCFW_PRO_ACTIVE){
+            if(sppcfw_is_pro_active()){
 
                 if(sppcfw_if_category_based_customization_enabled()===1){
                     $product_cat=sppcfw_get_product_category_id();    
