@@ -249,7 +249,7 @@ function sppcfw_display_admin_notice() {
 
     // Review URL - Change to the URL of your plugin on WordPress.org
     $review_url = esc_url('https://wordpress.org/plugins/single-product-customizer/');
-    $dismiss_url = esc_url('https://www.webcartisan.com/single-product-page-customizer/');
+    $dismiss_url = esc_url('https://www.webcartisan.com/products/woocommerce-product-page-customizer/');
     // Plugin image URL
     $logo_url = esc_url(plugin_dir_url(__FILE__) . 'backend/resources/images/logo.png');
 
