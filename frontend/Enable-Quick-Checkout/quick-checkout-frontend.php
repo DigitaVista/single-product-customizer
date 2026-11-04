@@ -571,6 +571,12 @@ if (!class_exists('Sppcfw_Frontend_Quick_Checkout')) {
                 return;
             }
 
+            // Split Layout (template-3, Pro) renders its own gallery: hide the theme gallery and sale flash.
+            if (function_exists('sppcfw_is_pro_active') && sppcfw_is_pro_active() && get_option('sppcfw_enable_qc', 'default') === 'template-3') {
+                remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10);
+                remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20);
+            }
+
             // Remove single product summary hooks (category/meta, title, rating, short description)
             remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_title', 5);
             remove_action('woocommerce_single_product_summary', 'woocommerce_template_single_rating', 10);
