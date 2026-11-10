@@ -954,24 +954,6 @@ jQuery(document).ready(function () {
           jQuery("#sppcfw_product_change_backorder_text").val("");
         }
 
-        if (obj.hasOwnProperty("enable_quick_cart")) {
-          if (obj.enable_quick_cart === "on") {
-            jQuery("#sppcfw_product\\[enable_quick_cart\\]").prop(
-              "checked",
-              true
-            );
-          } else {
-            jQuery("#sppcfw_product\\[enable_quick_cart\\]").prop(
-              "checked",
-              false
-            );
-          }
-        } else {
-          jQuery("#sppcfw_product\\[enable_quick_cart\\]").prop(
-            "checked",
-            false
-          );
-        }
 
         element.unblock();
       });

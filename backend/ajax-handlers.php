@@ -16,9 +16,6 @@ class Sppcfw_Quick_Checkout
      */
     public function __construct()
     {
-        // After sppcfw_init (init priority 10) loads this file; must run later on the same init pass.
-        add_action('init', array(__CLASS__, 'maybe_disable_quick_checkout_for_block_theme'), 11);
-
         // Settings save handlers
         add_action('wp_ajax_sppcfw_save_settings', array($this, 'handle_save_settings'));
         add_action('wp_ajax_sppcfw_save_quick_checkout', array($this, 'handle_save_quick_checkout'));
@@ -58,7 +55,7 @@ class Sppcfw_Quick_Checkout
     }
 
     /**
-     * When a block theme is active, force Quick Checkout off in the database (same as unchecked).
+     * Legacy helper: forces Quick Checkout off in the database. No longer hooked, Quick Checkout supports block themes.
      */
     public static function maybe_disable_quick_checkout_for_block_theme()
     {

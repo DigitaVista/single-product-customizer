@@ -328,21 +328,15 @@
 		)
 	);
 
-    $sppcfw_is_block_theme = sppcfw_is_block_theme_active();
-    $sppcfw_related_products_disabled = $sppcfw_is_block_theme ? 'disabled' : '';
-    $sppcfw_related_products_desc = $sppcfw_is_block_theme ? '<span style="color: red; font-weight: bold;">' . __( 'This feature is not available in block theme', 'single-product-customizer' ) . '</span>' : '';
-    
     $sppcfw_back_ui_obj->add_field(
         'sppcfw_advanced',
         array(
             'id'                => 'related_products_title',
             'type'              => 'text',
             'name'              => __( 'Related products title', 'single-product-customizer' ),
-            'desc'              => $sppcfw_related_products_desc,
+            'desc'              => '',
             'default'           => __( 'Related products', 'single-product-customizer' ),
-			'help_link' 		=>'https://youtu.be/eOsk7buqgmI',
-            'disabled'          => $sppcfw_related_products_disabled,
-            'class'             => $sppcfw_related_products_disabled ? 'sppcfw_disabled_field' : ''
+			'help_link' 		=>'https://youtu.be/eOsk7buqgmI'
         )
     );
     
@@ -384,16 +378,6 @@
     );
 
 
-	$sppcfw_back_ui_obj->add_field(
-		'sppcfw_advanced',
-		array(
-			'id'   => 'enable_quick_cart',
-			'type' => 'checkbox',
-			'name' => __( 'Enable quick cart', 'single-product-customizer' ),
-			'desc' => '',
-            'class'=>'sppcfw_advanced_enable_quick_cart'
-		)
-	);
 
 	
 	$sppcfw_back_ui_obj->add_field(

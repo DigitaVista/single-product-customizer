@@ -123,6 +123,13 @@ if ( ! function_exists( 'sppcfw_ajax_add_to_cart' ) ) {
             wp_die();
         }
 
+        // WooCommerce's own form handler (wp_loaded) already adds the item when the
+        // "add-to-cart" field is posted. Adding it again here doubled the quantity.
+        if ( isset( $_POST['add-to-cart'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+            wc_print_notices();
+            wp_die();
+        }
+
         WC()->cart->add_to_cart( $product_id, $quantity, $variation_id );
 
         wc_print_notices();
