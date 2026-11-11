@@ -28,7 +28,7 @@ Create responsive product layouts with a drag-and-drop builder, customize produc
 * Apply a custom template across your entire store with the Free version.
 * Use product- and category-specific templates with Pro.
 
-[youtube https://youtu.be/FXdw43rSpwU]
+[youtube https://youtu.be/jNl1ah58KZE]
 
 == Visual Drag & Drop Page Builder for Single Product Pages ==
 
@@ -161,8 +161,6 @@ Create a unique product page experience for individual products, including custo
 ### Category-Based Customization
 
 Apply different product page layouts and customization rules to selected product categories. [Pro]
-
-Give your product pages a spooky-season refresh without the hassle. Customize WooCommerce product page layouts and highlight Halloween specials to make your seasonal products stand out.
 
 == Compatible Themes ==
 
