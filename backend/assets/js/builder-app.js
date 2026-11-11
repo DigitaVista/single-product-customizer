@@ -10,6 +10,7 @@
 	'use strict';
 
 	const { createElement: h, useState, useEffect, useRef, Component } = window.wp.element;
+	const { __ } = window.wp.i18n;
 
 	// Helper for AJAX post
 	function apiPost(action, data) {
@@ -30,7 +31,7 @@
 
 	// Static Visual Sample Data for Edit Canvas
 	const CANVAS_STATIC_DATA = {
-		title: 'Single Product Title',
+		title: __( 'Single Product Title', 'single-product-customizer' ),
 		price: '$49.99',
 		regular_price: '$59.99',
 		sale_price: '$49.99',
@@ -40,54 +41,54 @@
 		rating_count: 5,
 		image_url: window.SPPCFWBuilderConfig ? window.SPPCFWBuilderConfig.plugin_url + 'backend/resources/images/features-img.webp' : '',
 		short_description: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit.',
-		description: 'Full product description placeholder detailing extensive technical specifications and features.',
+		description: __( 'Full product description placeholder detailing extensive technical specifications and features.', 'single-product-customizer' ),
 		categories: 'Clothing, Featured',
 		tags: 'Customizer, Premium',
 		variations: [
-			{ name: 'pa_color', label: 'Color', options: ['Black', 'Purple', 'Blue'] },
-			{ name: 'pa_size', label: 'Size', options: ['S', 'M', 'L', 'XL'] }
+			{ name: 'pa_color', label: __( 'Color', 'single-product-customizer' ), options: ['Black', 'Purple', 'Blue'] },
+			{ name: 'pa_size', label: __( 'Size', 'single-product-customizer' ), options: ['S', 'M', 'L', 'XL'] }
 		],
 		related_products: [
-			{ id: 1, title: 'Demo Related Product 1', price: '$19.99', image_url: '' },
-			{ id: 2, title: 'Demo Related Product 2', price: '$29.99', image_url: '' },
-			{ id: 3, title: 'Demo Related Product 3', price: '$39.99', image_url: '' },
-			{ id: 4, title: 'Demo Related Product 4', price: '$49.99', image_url: '' }
+			{ id: 1, title: __( 'Demo Related Product 1', 'single-product-customizer' ), price: '$19.99', image_url: '' },
+			{ id: 2, title: __( 'Demo Related Product 2', 'single-product-customizer' ), price: '$29.99', image_url: '' },
+			{ id: 3, title: __( 'Demo Related Product 3', 'single-product-customizer' ), price: '$39.99', image_url: '' },
+			{ id: 4, title: __( 'Demo Related Product 4', 'single-product-customizer' ), price: '$49.99', image_url: '' }
 		],
 		upsell_products: [
-			{ id: 1, title: 'Demo Upsell Product 1', price: '$24.99', image_url: '' },
-			{ id: 2, title: 'Demo Upsell Product 2', price: '$34.99', image_url: '' },
-			{ id: 3, title: 'Demo Upsell Product 3', price: '$44.99', image_url: '' },
-			{ id: 4, title: 'Demo Upsell Product 4', price: '$54.99', image_url: '' }
+			{ id: 1, title: __( 'Demo Upsell Product 1', 'single-product-customizer' ), price: '$24.99', image_url: '' },
+			{ id: 2, title: __( 'Demo Upsell Product 2', 'single-product-customizer' ), price: '$34.99', image_url: '' },
+			{ id: 3, title: __( 'Demo Upsell Product 3', 'single-product-customizer' ), price: '$44.99', image_url: '' },
+			{ id: 4, title: __( 'Demo Upsell Product 4', 'single-product-customizer' ), price: '$54.99', image_url: '' }
 		]
 	};
 
 	// Atomic Elements Definitions (Image 1)
 	const ATOMIC_ELEMENTS = [
-		{ type: 'column', name: 'Column', preset: 'column', icon: 'view_column', desc: 'Add a new column into container' },
-		{ type: 'div_block', name: 'Div block', preset: 'div_block', icon: 'crop_square', desc: 'Simple full width div container' },
-		{ type: 'flexbox', name: 'Flexbox', preset: '1_container', icon: 'grid_view', desc: 'Flexbox layout container' },
+		{ type: 'column', name: __( 'Column', 'single-product-customizer' ), preset: 'column', icon: 'view_column', desc: __( 'Add a new column into container', 'single-product-customizer' ) },
+		{ type: 'div_block', name: __( 'Div block', 'single-product-customizer' ), preset: 'div_block', icon: 'crop_square', desc: __( 'Simple full width div container', 'single-product-customizer' ) },
+		{ type: 'flexbox', name: __( 'Flexbox', 'single-product-customizer' ), preset: '1_container', icon: 'grid_view', desc: __( 'Flexbox layout container', 'single-product-customizer' ) },
 		{ type: 'grid', name: 'Grid', preset: 'grid_2x2', icon: 'apps', desc: '2x2 grid container' },
-		{ type: 'tabs', name: 'Tabs', preset: 'product_description', icon: 'folder', desc: 'Tabs container widget' },
+		{ type: 'tabs', name: __( 'Tabs', 'single-product-customizer' ), preset: 'product_description', icon: 'folder', desc: __( 'Tabs container widget', 'single-product-customizer' ) },
 	];
 
 	// Core Single Product Widget Definitions
 	const CORE_WIDGETS = [
-		{ type: 'product_title', name: 'Product Title', icon: 'title' },
-		{ type: 'heading', name: 'Heading', icon: 'format_size' },
-		{ type: 'text_editor', name: 'Text Editor', icon: 'edit_note' },
-		{ type: 'product_price', name: 'Product Price', icon: 'payments' },
-		{ type: 'product_gallery', name: 'Product Gallery', icon: 'collections' },
-		{ type: 'image', name: 'Image', icon: 'image' },
+		{ type: 'product_title', name: __( 'Product Title', 'single-product-customizer' ), icon: 'title' },
+		{ type: 'heading', name: __( 'Heading', 'single-product-customizer' ), icon: 'format_size' },
+		{ type: 'text_editor', name: __( 'Text Editor', 'single-product-customizer' ), icon: 'edit_note' },
+		{ type: 'product_price', name: __( 'Product Price', 'single-product-customizer' ), icon: 'payments' },
+		{ type: 'product_gallery', name: __( 'Product Gallery', 'single-product-customizer' ), icon: 'collections' },
+		{ type: 'image', name: __( 'Image', 'single-product-customizer' ), icon: 'image' },
 		{ type: 'html_code', name: 'HTML Element', icon: 'code' },
-		{ type: 'product_add_to_cart', name: 'Add to Cart', icon: 'shopping_cart' },
-		{ type: 'product_rating', name: 'Rating Stars', icon: 'star' },
-		{ type: 'product_short_desc', name: 'Short Description', icon: 'description' },
-		{ type: 'product_description', name: 'Full Description & Tabs', icon: 'toc' },
-		{ type: 'product_meta', name: 'Product Meta', icon: 'inventory_2' },
-		{ type: 'custom_message', name: 'Custom Message', icon: 'campaign' },
+		{ type: 'product_add_to_cart', name: __( 'Add to Cart', 'single-product-customizer' ), icon: 'shopping_cart' },
+		{ type: 'product_rating', name: __( 'Rating Stars', 'single-product-customizer' ), icon: 'star' },
+		{ type: 'product_short_desc', name: __( 'Short Description', 'single-product-customizer' ), icon: 'description' },
+		{ type: 'product_description', name: __( 'Full Description & Tabs', 'single-product-customizer' ), icon: 'toc' },
+		{ type: 'product_meta', name: __( 'Product Meta', 'single-product-customizer' ), icon: 'inventory_2' },
+		{ type: 'custom_message', name: __( 'Custom Message', 'single-product-customizer' ), icon: 'campaign' },
 		{ type: 'plus_minus_buttons', name: 'Plus/Minus Stepper', icon: 'exposure' },
-		{ type: 'related_products', name: 'Related Products', icon: 'grid_on' },
-		{ type: 'upsell_products', name: 'Upsell Products', icon: 'auto_awesome' },
+		{ type: 'related_products', name: __( 'Related Products', 'single-product-customizer' ), icon: 'grid_on' },
+		{ type: 'upsell_products', name: __( 'Upsell Products', 'single-product-customizer' ), icon: 'auto_awesome' },
 	];
 
 	// Preset Layout Generator
@@ -118,7 +119,7 @@
 					{
 						id: 'col-' + timestamp + '-1',
 						type: 'column',
-						label: 'Column 1 (100%)',
+						label: __( 'Column 1 (100%)', 'single-product-customizer' ),
 						settings: { flex_width: '100%' },
 						children: [],
 						styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' },
@@ -133,7 +134,7 @@
 					{
 						id: 'col-' + timestamp + '-1',
 						type: 'column',
-						label: 'Column 1 (100%)',
+						label: __( 'Column 1 (100%)', 'single-product-customizer' ),
 						settings: { flex_width: '100%' },
 						children: [],
 						styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' },
@@ -142,42 +143,42 @@
 				break;
 			case '2_col_50_50':
 				children = [
-					{ id: 'col-' + timestamp + '-1', type: 'column', label: 'Column 1 (50%)', settings: { flex_width: '50%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-2', type: 'column', label: 'Column 2 (50%)', settings: { flex_width: '50%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-1', type: 'column', label: __( 'Column 1 (50%)', 'single-product-customizer' ), settings: { flex_width: '50%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-2', type: 'column', label: __( 'Column 2 (50%)', 'single-product-customizer' ), settings: { flex_width: '50%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
 				];
 				break;
 			case '2_col_33_66':
 				children = [
-					{ id: 'col-' + timestamp + '-1', type: 'column', label: 'Column 1 (33%)', settings: { flex_width: '33.33%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-2', type: 'column', label: 'Column 2 (67%)', settings: { flex_width: '66.66%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-1', type: 'column', label: __( 'Column 1 (33%)', 'single-product-customizer' ), settings: { flex_width: '33.33%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-2', type: 'column', label: __( 'Column 2 (67%)', 'single-product-customizer' ), settings: { flex_width: '66.66%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
 				];
 				break;
 			case '2_col_66_33':
 				children = [
-					{ id: 'col-' + timestamp + '-1', type: 'column', label: 'Column 1 (67%)', settings: { flex_width: '66.66%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-2', type: 'column', label: 'Column 2 (33%)', settings: { flex_width: '33.33%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-1', type: 'column', label: __( 'Column 1 (67%)', 'single-product-customizer' ), settings: { flex_width: '66.66%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-2', type: 'column', label: __( 'Column 2 (33%)', 'single-product-customizer' ), settings: { flex_width: '33.33%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
 				];
 				break;
 			case '3_col_33_33_33':
 				children = [
-					{ id: 'col-' + timestamp + '-1', type: 'column', label: 'Column 1 (33%)', settings: { flex_width: '33.33%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-2', type: 'column', label: 'Column 2 (33%)', settings: { flex_width: '33.33%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-3', type: 'column', label: 'Column 3 (33%)', settings: { flex_width: '33.33%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-1', type: 'column', label: __( 'Column 1 (33%)', 'single-product-customizer' ), settings: { flex_width: '33.33%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-2', type: 'column', label: __( 'Column 2 (33%)', 'single-product-customizer' ), settings: { flex_width: '33.33%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-3', type: 'column', label: __( 'Column 3 (33%)', 'single-product-customizer' ), settings: { flex_width: '33.33%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
 				];
 				break;
 			case '3_col_25_50_25':
 				children = [
-					{ id: 'col-' + timestamp + '-1', type: 'column', label: 'Column 1 (25%)', settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-2', type: 'column', label: 'Column 2 (50%)', settings: { flex_width: '50%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-3', type: 'column', label: 'Column 3 (25%)', settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-1', type: 'column', label: __( 'Column 1 (25%)', 'single-product-customizer' ), settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-2', type: 'column', label: __( 'Column 2 (50%)', 'single-product-customizer' ), settings: { flex_width: '50%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-3', type: 'column', label: __( 'Column 3 (25%)', 'single-product-customizer' ), settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
 				];
 				break;
 			case '4_col_25_25_25_25':
 				children = [
-					{ id: 'col-' + timestamp + '-1', type: 'column', label: 'Column 1 (25%)', settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-2', type: 'column', label: 'Column 2 (25%)', settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-3', type: 'column', label: 'Column 3 (25%)', settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-4', type: 'column', label: 'Column 4 (25%)', settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-1', type: 'column', label: __( 'Column 1 (25%)', 'single-product-customizer' ), settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-2', type: 'column', label: __( 'Column 2 (25%)', 'single-product-customizer' ), settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-3', type: 'column', label: __( 'Column 3 (25%)', 'single-product-customizer' ), settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-4', type: 'column', label: __( 'Column 4 (25%)', 'single-product-customizer' ), settings: { flex_width: '25%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
 				];
 				break;
 			case 'grid_2x2':
@@ -185,61 +186,61 @@
 				settings.flex_direction = 'grid';
 				settings.grid_columns = '2';
 				children = [
-					{ id: 'col-' + timestamp + '-1', type: 'column', label: 'Grid Box 1', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-2', type: 'column', label: 'Grid Box 2', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-3', type: 'column', label: 'Grid Box 3', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-4', type: 'column', label: 'Grid Box 4', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-1', type: 'column', label: __( 'Grid Box 1', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-2', type: 'column', label: __( 'Grid Box 2', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-3', type: 'column', label: __( 'Grid Box 3', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-4', type: 'column', label: __( 'Grid Box 4', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
 				];
 				break;
 			case 'grid_3x3':
 				settings.flex_direction = 'grid';
 				settings.grid_columns = '3';
 				children = [
-					{ id: 'col-' + timestamp + '-1', type: 'column', label: 'Grid Box 1', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-2', type: 'column', label: 'Grid Box 2', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-3', type: 'column', label: 'Grid Box 3', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-4', type: 'column', label: 'Grid Box 4', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-5', type: 'column', label: 'Grid Box 5', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-6', type: 'column', label: 'Grid Box 6', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-7', type: 'column', label: 'Grid Box 7', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-8', type: 'column', label: 'Grid Box 8', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-9', type: 'column', label: 'Grid Box 9', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-1', type: 'column', label: __( 'Grid Box 1', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-2', type: 'column', label: __( 'Grid Box 2', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-3', type: 'column', label: __( 'Grid Box 3', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-4', type: 'column', label: __( 'Grid Box 4', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-5', type: 'column', label: __( 'Grid Box 5', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-6', type: 'column', label: __( 'Grid Box 6', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-7', type: 'column', label: __( 'Grid Box 7', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-8', type: 'column', label: __( 'Grid Box 8', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-9', type: 'column', label: __( 'Grid Box 9', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
 				];
 				break;
 			case 'grid_1_2':
 				settings.flex_direction = 'grid';
 				settings.grid_columns = '2';
 				children = [
-					{ id: 'col-' + timestamp + '-1', type: 'column', label: 'Grid Box 1', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-2', type: 'column', label: 'Grid Box 2', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-3', type: 'column', label: 'Grid Box 3', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-1', type: 'column', label: __( 'Grid Box 1', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-2', type: 'column', label: __( 'Grid Box 2', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-3', type: 'column', label: __( 'Grid Box 3', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
 				];
 				break;
 			case 'grid_2_1':
 				settings.flex_direction = 'grid';
 				settings.grid_columns = '2';
 				children = [
-					{ id: 'col-' + timestamp + '-1', type: 'column', label: 'Grid Box 1', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-2', type: 'column', label: 'Grid Box 2', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
-					{ id: 'col-' + timestamp + '-3', type: 'column', label: 'Grid Box 3', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-1', type: 'column', label: __( 'Grid Box 1', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-2', type: 'column', label: __( 'Grid Box 2', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-3', type: 'column', label: __( 'Grid Box 3', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
 				];
 				break;
 			case 'div_block':
 				settings.width_mode = 'full';
 				children = [
-					{ id: 'col-' + timestamp + '-1', type: 'column', label: 'Div Content', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-1', type: 'column', label: __( 'Div Content', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
 				];
 				break;
 			default:
 				children = [
-					{ id: 'col-' + timestamp + '-1', type: 'column', label: 'Column 1', settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
+					{ id: 'col-' + timestamp + '-1', type: 'column', label: __( 'Column 1', 'single-product-customizer' ), settings: { flex_width: '100%' }, children: [], styles: { padding_top: '12px', padding_right: '12px', padding_bottom: '12px', padding_left: '12px' } },
 				];
 		}
 
 		return {
 			id: containerId,
 			type: 'container',
-			label: presetType === 'div_block' ? 'Div Container' : presetType.indexOf('grid') === 0 ? 'Grid Container' : 'Flexbox Container',
+			label: presetType === 'div_block' ? __( 'Div Container', 'single-product-customizer' ) : presetType.indexOf('grid') === 0 ? __( 'Grid Container', 'single-product-customizer' ) : __( 'Flexbox Container', 'single-product-customizer' ),
 			settings: settings,
 			children: children,
 			styles: {
@@ -378,8 +379,8 @@
 			}
 		}
 
-		if (inComment) return 'Unclosed comment block "/*" (missing "*/")';
-		if (inSingleQuote || inDoubleQuote) return 'Unclosed quote string in CSS rules';
+		if (inComment) return __( 'Unclosed comment block "/*" (missing "*/")', 'single-product-customizer' );
+		if (inSingleQuote || inDoubleQuote) return __( 'Unclosed quote string in CSS rules', 'single-product-customizer' );
 		if (braceCount > 0) return `Missing ${braceCount} closing brace(s) "}" in CSS`;
 
 		return null;
@@ -453,7 +454,7 @@
 							{
 								className: 'sppcfw-text-gray-400 hover:sppcfw-text-gray-700 sppcfw-transition-colors sppcfw-cursor-pointer sppcfw-text-xl sppcfw-p-1 sppcfw-font-bold',
 								onClick: () => setStep('type_selection'),
-								title: 'Back to layout type',
+								title: __( 'Back to layout type', 'single-product-customizer' ),
 							},
 							'‹'
 					  )
@@ -461,7 +462,7 @@
 				h(
 					'h3',
 					{ className: 'sppcfw-text-base sppcfw-font-semibold sppcfw-text-gray-700 sppcfw-text-center' },
-					step === 'type_selection' ? 'Which layout would you like to use?' : 'Select your structure'
+					step === 'type_selection' ? __( 'Which layout would you like to use?', 'single-product-customizer' ) : __( 'Select your structure', 'single-product-customizer' )
 				),
 				onClose
 					? h(
@@ -469,7 +470,7 @@
 							{
 								className: 'sppcfw-text-gray-400 hover:sppcfw-text-gray-700 sppcfw-transition-colors sppcfw-cursor-pointer sppcfw-text-base sppcfw-p-1 sppcfw-font-bold',
 								onClick: onClose,
-								title: 'Close',
+								title: __( 'Close', 'single-product-customizer' ),
 							},
 							'✕'
 					  )
@@ -500,7 +501,7 @@
 								h('div', { className: 'sppcfw-w-full sppcfw-h-1/2 sppcfw-bg-[#cbd5e1] group-hover:sppcfw-bg-[#a855f7] sppcfw-rounded-sm' })
 							)
 						),
-						h('span', { className: 'sppcfw-text-sm sppcfw-font-medium sppcfw-text-gray-600 group-hover:sppcfw-text-[#9333ea]' }, 'Flexbox')
+						h('span', { className: 'sppcfw-text-sm sppcfw-font-medium sppcfw-text-gray-600 group-hover:sppcfw-text-[#9333ea]' }, __( 'Flexbox', 'single-product-customizer' ))
 					),
 
 					// Grid Card
@@ -518,7 +519,7 @@
 							h('div', { className: 'sppcfw-border sppcfw-border-dashed sppcfw-border-[#94a3b8] group-hover:sppcfw-border-[#a855f7] sppcfw-rounded-sm' }),
 							h('div', { className: 'sppcfw-border sppcfw-border-dashed sppcfw-border-[#94a3b8] group-hover:sppcfw-border-[#a855f7] sppcfw-rounded-sm' })
 						),
-						h('span', { className: 'sppcfw-text-sm sppcfw-font-medium sppcfw-text-gray-600 group-hover:sppcfw-text-[#9333ea]' }, 'Grid')
+						h('span', { className: 'sppcfw-text-sm sppcfw-font-medium sppcfw-text-gray-600 group-hover:sppcfw-text-[#9333ea]' }, __( 'Grid', 'single-product-customizer' ))
 					)
 				),
 
@@ -535,7 +536,7 @@
 								{
 									className: 'sppcfw-w-full sppcfw-h-16 sppcfw-bg-[#cbd5e1]/60 hover:sppcfw-bg-[#9333ea] hover:sppcfw-text-white sppcfw-text-gray-600 sppcfw-rounded-md sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-cursor-pointer sppcfw-transition-all sppcfw-shadow-sm sppcfw-font-bold sppcfw-text-lg',
 									onClick: () => handlePresetSelect('flex_col'),
-									title: 'Single Column (Vertical)',
+									title: __( 'Single Column (Vertical)', 'single-product-customizer' ),
 								},
 								'↓'
 							),
@@ -546,7 +547,7 @@
 								{
 									className: 'sppcfw-w-full sppcfw-h-16 sppcfw-bg-[#cbd5e1]/60 hover:sppcfw-bg-[#9333ea] hover:sppcfw-text-white sppcfw-text-gray-600 sppcfw-rounded-md sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-cursor-pointer sppcfw-transition-all sppcfw-shadow-sm sppcfw-font-bold sppcfw-text-lg',
 									onClick: () => handlePresetSelect('flex_row'),
-									title: 'Single Row (Horizontal)',
+									title: __( 'Single Row (Horizontal)', 'single-product-customizer' ),
 								},
 								'→'
 							),
@@ -637,7 +638,7 @@
 								{
 									className: 'sppcfw-w-full sppcfw-h-16 sppcfw-bg-[#cbd5e1]/60 hover:sppcfw-bg-[#9333ea] sppcfw-rounded-md sppcfw-p-1.5 sppcfw-grid sppcfw-grid-cols-2 sppcfw-gap-1 sppcfw-cursor-pointer sppcfw-transition-all sppcfw-shadow-sm sppcfw-tab-group',
 									onClick: () => handlePresetSelect('grid_2x2'),
-									title: 'Grid 2x2',
+									title: __( 'Grid 2x2', 'single-product-customizer' ),
 								},
 								h('div', { className: 'sppcfw-bg-[#94a3b8] group-hover:sppcfw-bg-white/80 sppcfw-rounded-sm' }),
 								h('div', { className: 'sppcfw-bg-[#94a3b8] group-hover:sppcfw-bg-white/80 sppcfw-rounded-sm' }),
@@ -651,7 +652,7 @@
 								{
 									className: 'sppcfw-w-full sppcfw-h-16 sppcfw-bg-[#cbd5e1]/60 hover:sppcfw-bg-[#9333ea] sppcfw-rounded-md sppcfw-p-1 sppcfw-grid sppcfw-grid-cols-3 sppcfw-gap-0.5 sppcfw-cursor-pointer sppcfw-transition-all sppcfw-shadow-sm sppcfw-tab-group',
 									onClick: () => handlePresetSelect('grid_3x3'),
-									title: 'Grid 3x3',
+									title: __( 'Grid 3x3', 'single-product-customizer' ),
 								},
 								h('div', { className: 'sppcfw-bg-[#94a3b8] group-hover:sppcfw-bg-white/80 sppcfw-rounded-sm' }),
 								h('div', { className: 'sppcfw-bg-[#94a3b8] group-hover:sppcfw-bg-white/80 sppcfw-rounded-sm' }),
@@ -670,7 +671,7 @@
 								{
 									className: 'sppcfw-w-full sppcfw-h-16 sppcfw-bg-[#cbd5e1]/60 hover:sppcfw-bg-[#9333ea] sppcfw-rounded-md sppcfw-p-1.5 sppcfw-flex sppcfw-flex-col sppcfw-gap-1 sppcfw-cursor-pointer sppcfw-transition-all sppcfw-shadow-sm sppcfw-tab-group',
 									onClick: () => handlePresetSelect('grid_1_2'),
-									title: 'Grid 1 Top, 2 Bottom',
+									title: __( 'Grid 1 Top, 2 Bottom', 'single-product-customizer' ),
 								},
 								h('div', { className: 'sppcfw-w-full sppcfw-h-1/2 sppcfw-bg-[#94a3b8] group-hover:sppcfw-bg-white/80 sppcfw-rounded-sm' }),
 								h(
@@ -687,7 +688,7 @@
 								{
 									className: 'sppcfw-w-full sppcfw-h-16 sppcfw-bg-[#cbd5e1]/60 hover:sppcfw-bg-[#9333ea] sppcfw-rounded-md sppcfw-p-1.5 sppcfw-flex sppcfw-flex-col sppcfw-gap-1 sppcfw-cursor-pointer sppcfw-transition-all sppcfw-shadow-sm sppcfw-tab-group',
 									onClick: () => handlePresetSelect('grid_2_1'),
-									title: 'Grid 2 Top, 1 Bottom',
+									title: __( 'Grid 2 Top, 1 Bottom', 'single-product-customizer' ),
 								},
 								h(
 									'div',
@@ -881,7 +882,7 @@
 	}
 
 	// Searchable Product Select Dropdown Component
-	function SearchableProductSelect({ products = [], selectedProductId, onChange, placeholder = 'Search products...' }) {
+	function SearchableProductSelect({ products = [], selectedProductId, onChange, placeholder = __( 'Search products...', 'single-product-customizer' ) }) {
 		const [isOpen, setIsOpen] = useState(false);
 		const [searchTerm, setSearchTerm] = useState('');
 		const containerRef = useRef(null);
@@ -902,7 +903,7 @@
 		}, [isOpen]);
 
 		const selectedProduct = products.find(p => String(p.id) === String(selectedProductId));
-		const displayLabel = selectedProduct ? selectedProduct.title : 'Default (All Products)';
+		const displayLabel = selectedProduct ? selectedProduct.title : __( 'Default (All Products)', 'single-product-customizer' );
 
 		const filteredProducts = products.filter(p => {
 			if (!searchTerm.trim()) return true;
@@ -1000,8 +1001,8 @@
 								h(
 									'div',
 									null,
-									h('div', { className: 'sppcfw-text-xs sppcfw-font-semibold' }, 'Default (All Products)'),
-									h('div', { className: 'sppcfw-text-[10px] sppcfw-opacity-70' }, 'Demo sample preview')
+									h('div', { className: 'sppcfw-text-xs sppcfw-font-semibold' }, __( 'Default (All Products)', 'single-product-customizer' )),
+									h('div', { className: 'sppcfw-text-[10px] sppcfw-opacity-70' }, __( 'Demo sample preview', 'single-product-customizer' ))
 								)
 							),
 							!selectedProductId && h('span', { className: 'material-symbols-outlined sppcfw-text-xs sppcfw-font-bold' }, 'check')
@@ -1040,7 +1041,7 @@
 							: h(
 									'div',
 									{ className: 'sppcfw-py-4 sppcfw-text-center sppcfw-text-gray-400 sppcfw-text-xs' },
-									'No products found matching "',
+									__( 'No products found matching "', 'single-product-customizer' ),
 									searchTerm,
 									'"'
 							  )
@@ -1053,12 +1054,12 @@
 	function BuilderApp() {
 		const initialTplId = window.SPPCFWBuilderConfig ? window.SPPCFWBuilderConfig.template_id || 'template_default' : 'template_default';
 		const [templateId, setTemplateId] = useState(initialTplId);
-		const [templateTitle, setTemplateTitle] = useState('Single Product Template');
+		const [templateTitle, setTemplateTitle] = useState(__( 'Single Product Template', 'single-product-customizer' ));
 		const [enablePlusMinus, setEnablePlusMinus] = useState(() => {
 			return !!(window.SPPCFWBuilderConfig && window.SPPCFWBuilderConfig.basic_settings && window.SPPCFWBuilderConfig.basic_settings.enable_plus_minus_button === 'on');
 		});
 		const [addToCartBtnText, setAddToCartBtnText] = useState(() => {
-			return (window.SPPCFWBuilderConfig && window.SPPCFWBuilderConfig.basic_settings && window.SPPCFWBuilderConfig.basic_settings.add_to_cart_button_text) || 'Add to cart';
+			return (window.SPPCFWBuilderConfig && window.SPPCFWBuilderConfig.basic_settings && window.SPPCFWBuilderConfig.basic_settings.add_to_cart_button_text) || __( 'Add to cart', 'single-product-customizer' );
 		});
 		const [hidePrice, setHidePrice] = useState(() => {
 			return !!(window.SPPCFWBuilderConfig && window.SPPCFWBuilderConfig.basic_settings && window.SPPCFWBuilderConfig.basic_settings.hide_product_price === 'on');
@@ -1154,7 +1155,7 @@
 							setEnablePlusMinus(res.data.basic_settings.enable_plus_minus_button === 'on');
 						}
 						if (res.data.basic_settings.add_to_cart_button_text !== undefined) {
-							setAddToCartBtnText(res.data.basic_settings.add_to_cart_button_text || 'Add to cart');
+							setAddToCartBtnText(res.data.basic_settings.add_to_cart_button_text || __( 'Add to cart', 'single-product-customizer' ));
 						}
 						if (res.data.basic_settings.hide_product_price !== undefined) {
 							setHidePrice(res.data.basic_settings.hide_product_price === 'on');
@@ -1189,7 +1190,7 @@
 							setEnablePlusMinus(res.data.basic_settings.enable_plus_minus_button === 'on');
 						}
 						if (res.data.basic_settings.add_to_cart_button_text !== undefined) {
-							setAddToCartBtnText(res.data.basic_settings.add_to_cart_button_text || 'Add to cart');
+							setAddToCartBtnText(res.data.basic_settings.add_to_cart_button_text || __( 'Add to cart', 'single-product-customizer' ));
 						}
 						if (res.data.basic_settings.hide_product_price !== undefined) {
 							setHidePrice(res.data.basic_settings.hide_product_price === 'on');
@@ -1305,7 +1306,7 @@
 
 			const duplicatedCol = JSON.parse(JSON.stringify(colToDuplicate));
 			duplicatedCol.id = newColId;
-			duplicatedCol.label = (colToDuplicate.label || 'Column') + ' (Copy)';
+			duplicatedCol.label = (colToDuplicate.label || __( 'Column', 'single-product-customizer' )) + ' (Copy)';
 
 			function reassignIds(item) {
 				item.id = 'el-' + item.type + '-' + Date.now() + '-' + Math.floor(Math.random() * 1000);
@@ -1431,14 +1432,14 @@
 				setIsSaving(false);
 				const firstErr = validationErrors[0];
 				setStatusMessage('⚠️ ' + firstErr);
-				alert('Cannot save or publish template due to syntax errors:\n\n' + validationErrors.join('\n\n') + '\n\nPlease fix the errors in your HTML / CSS / JS code before saving.');
+				alert(__( 'Cannot save or publish template due to syntax errors:\n\n', 'single-product-customizer' ) + validationErrors.join('\n\n') + '\n\nPlease fix the errors in your HTML / CSS / JS code before saving.');
 				return;
 			}
 
 			setIsSaving(true);
 			const currentStatus = (pageSettings && pageSettings.status) ? pageSettings.status.toLowerCase() : 'published';
 			const isDraft = currentStatus === 'draft';
-			setStatusMessage(isDraft ? 'Saving draft...' : 'Publishing template...');
+			setStatusMessage(isDraft ? __( 'Saving draft...', 'single-product-customizer' ) : __( 'Publishing template...', 'single-product-customizer' ));
 
 			const updatedPageSettings = {
 				...pageSettings,
@@ -1462,11 +1463,11 @@
 					if (res.data && res.data.template_id) {
 						setTemplateId(res.data.template_id);
 					}
-					setStatusMessage(res.data.message || (isDraft ? 'Draft saved successfully!' : 'Published successfully!'));
+					setStatusMessage(res.data.message || (isDraft ? __( 'Draft saved successfully!', 'single-product-customizer' ) : __( 'Published successfully!', 'single-product-customizer' )));
 					fetchTemplatesList();
 					setTimeout(() => setStatusMessage(''), 4000);
 				} else {
-					setStatusMessage('Failed to save template.');
+					setStatusMessage('⚠️ ' + __( 'Failed to save template.', 'single-product-customizer' ));
 				}
 			});
 		}
@@ -1496,7 +1497,7 @@
 			if (validationErrors.length > 0) {
 				const firstErr = validationErrors[0];
 				setStatusMessage('⚠️ ' + firstErr);
-				alert('Cannot preview template due to syntax errors:\n\n' + validationErrors.join('\n\n') + '\n\nPlease fix the errors before previewing.');
+				alert(__( 'Cannot preview template due to syntax errors:\n\n', 'single-product-customizer' ) + validationErrors.join('\n\n') + '\n\nPlease fix the errors before previewing.');
 				return;
 			}
 
@@ -1752,15 +1753,15 @@
 		}, []);
 
 		const currentStatus = (pageSettings && pageSettings.status) ? pageSettings.status.toLowerCase() : 'published';
-		let publishLabel = 'Publish';
+		let publishLabel = __( 'Publish', 'single-product-customizer' );
 		if (isSaving) {
-			publishLabel = currentStatus === 'draft' ? 'Saving...' : 'Publishing...';
+			publishLabel = currentStatus === 'draft' ? __( 'Saving...', 'single-product-customizer' ) : __( 'Publishing...', 'single-product-customizer' );
 		} else if (currentStatus === 'draft') {
-			publishLabel = 'Save Draft';
+			publishLabel = __( 'Save Draft', 'single-product-customizer' );
 		} else if (currentStatus === 'pending' || currentStatus === 'pending review' || currentStatus === 'private') {
-			publishLabel = 'Save (' + currentStatus + ')';
+			publishLabel = __( 'Save (', 'single-product-customizer' ) + currentStatus + ')';
 		} else {
-			publishLabel = 'Publish';
+			publishLabel = __( 'Publish', 'single-product-customizer' );
 		}
 
 		return h(
@@ -1778,7 +1779,7 @@
 					{
 						className: 'sppcfw-w-7 sppcfw-h-7 sppcfw-rounded-full sppcfw-bg-white sppcfw-text-black sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-shadow hover:sppcfw-bg-gray-100 sppcfw-transition-all sppcfw-font-bold focus:sppcfw-outline-none sppcfw-cursor-pointer',
 						onClick: () => setIsMenuOpen(!isMenuOpen),
-						title: 'Menu',
+						title: __( 'Menu', 'single-product-customizer' ),
 					},
 					h('span', { className: 'material-symbols-outlined sppcfw-text-lg sppcfw-leading-none sppcfw-font-bold' }, 'menu')
 				),
@@ -1798,7 +1799,7 @@
 								},
 							},
 							h('span', { className: 'material-symbols-outlined sppcfw-text-base sppcfw-text-gray-300' }, 'logout'),
-							'Exit to Builder'
+							__( 'Exit to Builder', 'single-product-customizer' )
 						)
 					),
 
@@ -1808,7 +1809,7 @@
 					{
 						className: 'sppcfw-w-7 sppcfw-h-7 sppcfw-bg-[#262626] hover:sppcfw-bg-[#333333] sppcfw-border sppcfw-border-[#3a3a3a] sppcfw-text-white sppcfw-rounded sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-transition-colors sppcfw-cursor-pointer',
 						onClick: openElementsTab,
-						title: 'Add Elements',
+						title: __( 'Add Elements', 'single-product-customizer' ),
 					},
 					h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'add')
 				),
@@ -1821,7 +1822,7 @@
 							activeLeftTab === 'settings' ? 'sppcfw-border-[#9333ea] sppcfw-text-white sppcfw-bg-[#333333]' : 'sppcfw-border-[#3a3a3a] sppcfw-text-white'
 						}`,
 						onClick: openPageSettings,
-						title: 'Page Settings',
+						title: __( 'Page Settings', 'single-product-customizer' ),
 					},
 					h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'article')
 				),
@@ -1831,7 +1832,7 @@
 					'button',
 					{
 						className: 'sppcfw-w-7 sppcfw-h-7 sppcfw-text-gray-300 hover:sppcfw-text-white sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-transition-colors sppcfw-cursor-pointer',
-						title: 'Revision History',
+						title: __( 'Revision History', 'single-product-customizer' ),
 					},
 					h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'history')
 				),
@@ -1853,7 +1854,7 @@
 							type: 'button',
 							className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1 sppcfw-cursor-pointer sppcfw-text-gray-300 hover:sppcfw-text-white sppcfw-font-medium sppcfw-text-xs sppcfw-bg-transparent sppcfw-border-none focus:sppcfw-outline-none sppcfw-py-1 sppcfw-px-2 sppcfw-rounded hover:sppcfw-bg-[#262626] sppcfw-transition-colors',
 							onClick: () => setIsTemplateMenuOpen(!isTemplateMenuOpen),
-							title: 'Switch Template',
+							title: __( 'Switch Template', 'single-product-customizer' ),
 						},
 						h('span', { className: 'sppcfw-font-semibold sppcfw-max-w-[140px] sppcfw-truncate' }, templateTitle || 'home'),
 						h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'expand_more')
@@ -1865,7 +1866,7 @@
 							'div',
 							{ className: 'sppcfw-absolute sppcfw-top-9 sppcfw-left-1/2 sppcfw--translate-x-1/2 sppcfw-w-64 sppcfw-bg-[#1e1e1e] sppcfw-border sppcfw-border-[#333333] sppcfw-rounded-lg sppcfw-shadow-2xl sppcfw-z-50 sppcfw-py-2 sppcfw-text-white sppcfw-animate-in sppcfw-fade-in sppcfw-slide-in-from-top-1 sppcfw-duration-150' },
 							h('div', { className: 'sppcfw-px-3 sppcfw-py-1 sppcfw-text-[10px] sppcfw-uppercase sppcfw-font-bold sppcfw-text-gray-400 sppcfw-border-b sppcfw-border-[#2d2d2d] sppcfw-mb-1 sppcfw-flex sppcfw-justify-between sppcfw-items-center' },
-								h('span', null, 'Page Templates'),
+								h('span', null, __( 'Page Templates', 'single-product-customizer' )),
 								h('span', { className: 'sppcfw-text-[9px] sppcfw-bg-[#2d2d2d] sppcfw-text-gray-300 sppcfw-px-1.5 sppcfw-py-0.5 sppcfw-rounded' }, (allTemplates ? allTemplates.length : 0) + ' Total')
 							),
 							h(
@@ -1892,7 +1893,7 @@
 													'div',
 													{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2 sppcfw-overflow-hidden' },
 													isActive && h('span', { className: 'sppcfw-text-purple-400 sppcfw-text-xs sppcfw-font-bold' }, '✓'),
-													h('span', { className: 'sppcfw-truncate sppcfw-max-w-[140px]' }, tpl.title || 'Untitled Template')
+													h('span', { className: 'sppcfw-truncate sppcfw-max-w-[140px]' }, tpl.title || __( 'Untitled Template', 'single-product-customizer' ))
 												),
 												h(
 													'span',
@@ -1901,11 +1902,11 @@
 															(tpl.status || '').toLowerCase() === 'draft' ? 'sppcfw-bg-amber-900/60 sppcfw-text-amber-300 sppcfw-border sppcfw-border-amber-500/30' : 'sppcfw-bg-emerald-900/60 sppcfw-text-emerald-300 sppcfw-border sppcfw-border-emerald-500/30'
 														}`,
 													},
-													tpl.status || 'Published'
+													tpl.status || __( 'Published', 'single-product-customizer' )
 												)
 											);
 									  })
-									: h('div', { className: 'sppcfw-px-3 sppcfw-py-2 sppcfw-text-xs sppcfw-text-gray-400 sppcfw-italic sppcfw-text-center' }, 'No saved templates found')
+									: h('div', { className: 'sppcfw-px-3 sppcfw-py-2 sppcfw-text-xs sppcfw-text-gray-400 sppcfw-italic sppcfw-text-center' }, __( 'No saved templates found', 'single-product-customizer' ))
 							),
 							h('div', { className: 'sppcfw-border-t sppcfw-border-[#2d2d2d] sppcfw-mt-1 sppcfw-pt-1 sppcfw-px-1' },
 								h(
@@ -1918,7 +1919,7 @@
 										},
 									},
 									h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'add'),
-									'Create New Template'
+									__( 'Create New Template', 'single-product-customizer' )
 								)
 							)
 						)
@@ -1935,7 +1936,7 @@
 								deviceView === 'desktop' ? 'sppcfw-text-white sppcfw-border-b-2 sppcfw-border-white' : ''
 							}`,
 							onClick: () => setDeviceView('desktop'),
-							title: 'Desktop View',
+							title: __( 'Desktop View', 'single-product-customizer' ),
 						},
 						h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'desktop_windows')
 					),
@@ -1946,7 +1947,7 @@
 								deviceView === 'tablet' ? 'sppcfw-text-white sppcfw-border-b-2 sppcfw-border-white' : ''
 							}`,
 							onClick: () => setDeviceView('tablet'),
-							title: 'Tablet View',
+							title: __( 'Tablet View', 'single-product-customizer' ),
 						},
 						h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'tablet_mac')
 					),
@@ -1957,7 +1958,7 @@
 								deviceView === 'mobile' ? 'sppcfw-text-white sppcfw-border-b-2 sppcfw-border-white' : ''
 							}`,
 							onClick: () => setDeviceView('mobile'),
-							title: 'Mobile View',
+							title: __( 'Mobile View', 'single-product-customizer' ),
 						},
 						h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'smartphone')
 					)
@@ -1994,7 +1995,7 @@
 								isStructureOpen ? 'sppcfw-bg-[#262626] sppcfw-text-white sppcfw-border sppcfw-border-[#3a3a3a]' : 'sppcfw-text-gray-400 hover:sppcfw-text-white'
 							}`,
 							onClick: () => setIsStructureOpen(!isStructureOpen),
-							title: 'Structure Panel',
+							title: __( 'Structure Panel', 'single-product-customizer' ),
 						},
 						h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'layers')
 					),
@@ -2005,7 +2006,7 @@
 						{
 							className: 'sppcfw-w-7 sppcfw-h-7 sppcfw-text-gray-400 hover:sppcfw-text-white sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-transition-colors sppcfw-cursor-pointer',
 							onClick: handlePreview,
-							title: 'Preview designed page in new tab',
+							title: __( 'Preview designed page in new tab', 'single-product-customizer' ),
 						},
 						h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'visibility')
 					),
@@ -2042,10 +2043,10 @@
 						activeLeftTab === 'widgets' ? 'sppcfw-text-[#ddb8ff] sppcfw-border-l-2 sppcfw-border-[#9333ea] sppcfw-bg-[#2b3544]' : 'sppcfw-text-[#cfc2d7] hover:sppcfw-bg-[#212b39]'
 					}`,
 					onClick: openElementsTab,
-					title: 'Elements Drawer',
+					title: __( 'Elements Drawer', 'single-product-customizer' ),
 				},
 				h('span', { className: 'material-symbols-outlined sppcfw-text-xl' }, 'add_box'),
-				h('span', { className: 'sppcfw-text-[9px] sppcfw-uppercase sppcfw-font-bold sppcfw-tracking-wider' }, 'Elements')
+				h('span', { className: 'sppcfw-text-[9px] sppcfw-uppercase sppcfw-font-bold sppcfw-tracking-wider' }, __( 'Elements', 'single-product-customizer' ))
 			)
 		);
 	}
@@ -2158,13 +2159,13 @@
 			h(
 				'div',
 				{ className: 'sppcfw-p-3 sppcfw-border-b sppcfw-border-[#374151] sppcfw-bg-[#121c2a] sppcfw-flex sppcfw-justify-between sppcfw-items-center' },
-				h('h2', { className: 'sppcfw-text-sm sppcfw-font-extrabold sppcfw-text-white sppcfw-text-center sppcfw-flex-1' }, 'Post Settings'),
+				h('h2', { className: 'sppcfw-text-sm sppcfw-font-extrabold sppcfw-text-white sppcfw-text-center sppcfw-flex-1' }, __( 'Post Settings', 'single-product-customizer' )),
 				h(
 					'button',
 					{
 						className: 'sppcfw-text-gray-400 hover:sppcfw-text-white sppcfw-text-xs sppcfw-font-bold sppcfw-px-1.5 sppcfw-py-0.5 sppcfw-rounded hover:sppcfw-bg-[#212b39]',
 						onClick: closePanel,
-						title: 'Close',
+						title: __( 'Close', 'single-product-customizer' ),
 					},
 					'✕'
 				)
@@ -2183,7 +2184,7 @@
 						onClick: () => setActiveTab('settings'),
 					},
 					h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'build'),
-					'Settings'
+					__( 'Settings', 'single-product-customizer' )
 				),
 				h(
 					'button',
@@ -2194,7 +2195,7 @@
 						onClick: () => setActiveTab('style'),
 					},
 					h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'contrast'),
-					'Style'
+					__( 'Style', 'single-product-customizer' )
 				),
 				h(
 					'button',
@@ -2205,7 +2206,7 @@
 						onClick: () => setActiveTab('advanced'),
 					},
 					h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'settings'),
-					'Advanced'
+					__( 'Advanced', 'single-product-customizer' )
 				)
 			),
 
@@ -2230,7 +2231,7 @@
 									className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between sppcfw-cursor-pointer sppcfw-mb-3 sppcfw-select-none',
 									onClick: () => setIsGeneralOpen(!isGeneralOpen),
 								},
-								h('h3', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-white sppcfw-flex sppcfw-items-center sppcfw-gap-2' }, h('span', { className: 'sppcfw-text-[10px]' }, isGeneralOpen ? '▼' : '▶'), 'General Settings')
+								h('h3', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-white sppcfw-flex sppcfw-items-center sppcfw-gap-2' }, h('span', { className: 'sppcfw-text-[10px]' }, isGeneralOpen ? '▼' : '▶'), __( 'General Settings', 'single-product-customizer' ))
 							),
 
 							isGeneralOpen &&
@@ -2242,13 +2243,13 @@
 									h(
 										'div',
 										{ className: 'sppcfw-space-y-1.5' },
-										h('label', { className: 'sppcfw-font-semibold sppcfw-text-gray-200 sppcfw-block' }, 'Title'),
+										h('label', { className: 'sppcfw-font-semibold sppcfw-text-gray-200 sppcfw-block' }, __( 'Title', 'single-product-customizer' )),
 										h('input', {
 											type: 'text',
 											className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] focus:sppcfw-border-[#9333ea] sppcfw-rounded sppcfw-px-3 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white sppcfw-placeholder-gray-500 focus:sppcfw-outline-none',
 											value: templateTitle,
 											onChange: e => setTemplateTitle(e.target.value),
-											placeholder: 'Page title...',
+											placeholder: __( 'Page title...', 'single-product-customizer' ),
 										})
 									),
 
@@ -2256,7 +2257,7 @@
 									h(
 										'div',
 										{ className: 'sppcfw-space-y-1.5' },
-										h('label', { className: 'sppcfw-font-semibold sppcfw-text-gray-200 sppcfw-block' }, 'Status'),
+										h('label', { className: 'sppcfw-font-semibold sppcfw-text-gray-200 sppcfw-block' }, __( 'Status', 'single-product-customizer' )),
 										h(
 											'select',
 											{
@@ -2264,10 +2265,10 @@
 												value: (pageSettings.status || 'published').toLowerCase(),
 												onChange: e => handlePageSettingChange('status', e.target.value.toLowerCase()),
 											},
-											h('option', { value: 'published' }, 'Published'),
-											h('option', { value: 'draft' }, 'Draft'),
-											h('option', { value: 'private' }, 'Private'),
-											h('option', { value: 'pending review' }, 'Pending Review')
+											h('option', { value: 'published' }, __( 'Published', 'single-product-customizer' )),
+											h('option', { value: 'draft' }, __( 'Draft', 'single-product-customizer' )),
+											h('option', { value: 'private' }, __( 'Private', 'single-product-customizer' )),
+											h('option', { value: 'pending review' }, __( 'Pending Review', 'single-product-customizer' ))
 										)
 									),
 
@@ -2275,7 +2276,7 @@
 									h(
 										'div',
 										{ className: 'sppcfw-space-y-1.5' },
-										h('label', { className: 'sppcfw-font-semibold sppcfw-text-gray-200 sppcfw-block' }, 'Preview Product Data'),
+										h('label', { className: 'sppcfw-font-semibold sppcfw-text-gray-200 sppcfw-block' }, __( 'Preview Product Data', 'single-product-customizer' )),
 										h(SearchableProductSelect, {
 											products,
 											selectedProductId,
@@ -2287,7 +2288,7 @@
 									h(
 										'div',
 										{ className: 'sppcfw-space-y-1.5 sppcfw-pt-1' },
-										h('label', { className: 'sppcfw-font-semibold sppcfw-text-gray-200 sppcfw-block' }, 'Page Layout'),
+										h('label', { className: 'sppcfw-font-semibold sppcfw-text-gray-200 sppcfw-block' }, __( 'Page Layout', 'single-product-customizer' )),
 										h(
 											'select',
 											{
@@ -2295,11 +2296,11 @@
 												value: pageSettings.pageLayout || 'Default',
 												onChange: e => handlePageSettingChange('pageLayout', e.target.value),
 											},
-											h('option', { value: 'Default' }, 'Default'),
-											h('option', { value: 'Canvas' }, 'Canvas'),
-											h('option', { value: 'Full Width' }, 'Full Width')
+											h('option', { value: 'Default' }, __( 'Default', 'single-product-customizer' )),
+											h('option', { value: 'Canvas' }, __( 'Canvas', 'single-product-customizer' )),
+											h('option', { value: 'Full Width' }, __( 'Full Width', 'single-product-customizer' ))
 										),
-										h('p', { className: 'sppcfw-text-[11px] sppcfw-text-gray-400 sppcfw-italic font-sans' }, 'The default page template as defined in Panel → Hamburger Menu → Site Settings.')
+										h('p', { className: 'sppcfw-text-[11px] sppcfw-text-gray-400 sppcfw-italic font-sans' }, __( 'The default page template as defined in Panel → Hamburger Menu → Site Settings.', 'single-product-customizer' ))
 									)
 								)
 						)
@@ -2310,11 +2311,11 @@
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-4' },
-						h('h3', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-white sppcfw-uppercase sppcfw-tracking-wider sppcfw-mb-2' }, 'Page Background & Style'),
+						h('h3', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-white sppcfw-uppercase sppcfw-tracking-wider sppcfw-mb-2' }, __( 'Page Background & Style', 'single-product-customizer' )),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							h('label', { className: 'sppcfw-font-semibold sppcfw-text-gray-200 sppcfw-block' }, 'Background Color'),
+							h('label', { className: 'sppcfw-font-semibold sppcfw-text-gray-200 sppcfw-block' }, __( 'Background Color', 'single-product-customizer' )),
 							h('input', {
 								type: 'color',
 								className: 'sppcfw-w-full sppcfw-h-8 sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-cursor-pointer',
@@ -2329,11 +2330,11 @@
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-4' },
-						h('h3', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-white sppcfw-uppercase sppcfw-tracking-wider sppcfw-mb-2' }, 'Custom CSS & Scripts'),
+						h('h3', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-white sppcfw-uppercase sppcfw-tracking-wider sppcfw-mb-2' }, __( 'Custom CSS & Scripts', 'single-product-customizer' )),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							h('label', { className: 'sppcfw-font-semibold sppcfw-text-gray-200 sppcfw-block' }, 'Custom CSS'),
+							h('label', { className: 'sppcfw-font-semibold sppcfw-text-gray-200 sppcfw-block' }, __( 'Custom CSS', 'single-product-customizer' )),
 							h('textarea', {
 								className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-p-2 sppcfw-text-xs font-mono sppcfw-text-white sppcfw-h-32 focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
 								placeholder: '/* Add custom CSS for this page template */',
@@ -2386,9 +2387,9 @@
 			h(
 				'div',
 				{ className: 'sppcfw-p-3 sppcfw-border-b sppcfw-border-[#374151] sppcfw-bg-[#121c2a] sppcfw-space-y-2' },
-				h('div', { className: 'sppcfw-flex sppcfw-justify-between sppcfw-items-center' }, h('h2', { className: 'sppcfw-text-sm sppcfw-font-extrabold sppcfw-text-[#d9e3f6] sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' }, h('span', { className: 'material-symbols-outlined sppcfw-text-base sppcfw-text-[#9333ea]' }, 'widgets'), 'Elements'), h('span', { className: 'sppcfw-text-[10px] sppcfw-text-[#9ca3af] font-mono' }, `${elements.length} items on canvas`)),
+				h('div', { className: 'sppcfw-flex sppcfw-justify-between sppcfw-items-center' }, h('h2', { className: 'sppcfw-text-sm sppcfw-font-extrabold sppcfw-text-[#d9e3f6] sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' }, h('span', { className: 'material-symbols-outlined sppcfw-text-base sppcfw-text-[#9333ea]' }, 'widgets'), __( 'Elements', 'single-product-customizer' )), h('span', { className: 'sppcfw-text-[10px] sppcfw-text-[#9ca3af] font-mono' }, `${elements.length} items on canvas`)),
 
-				h('label', { className: 'inspector-label sppcfw-text-[10px]' }, 'Preview Product Data'),
+				h('label', { className: 'inspector-label sppcfw-text-[10px]' }, __( 'Preview Product Data', 'single-product-customizer' )),
 				h(SearchableProductSelect, {
 					products,
 					selectedProductId,
@@ -2408,7 +2409,7 @@
 						}`,
 						onClick: () => setActiveSubTab('widgets'),
 					},
-					'Widgets'
+					__( 'Widgets', 'single-product-customizer' )
 				),
 				h(
 					'button',
@@ -2418,7 +2419,7 @@
 						}`,
 						onClick: () => setActiveSubTab('components'),
 					},
-					'Components'
+					__( 'Components', 'single-product-customizer' )
 				),
 				h(
 					'button',
@@ -2428,7 +2429,7 @@
 						}`,
 						onClick: () => setActiveSubTab('globals'),
 					},
-					'Globals'
+					__( 'Globals', 'single-product-customizer' )
 				)
 			),
 
@@ -2443,7 +2444,7 @@
 					h('input', {
 						type: 'text',
 						className: 'sppcfw-w-full sppcfw-bg-[#091421] sppcfw-border sppcfw-border-[#374151] focus:sppcfw-border-[#9333ea] sppcfw-rounded sppcfw-pl-8 sppcfw-pr-7 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-[#d9e3f6] sppcfw-placeholder-[#6b7280] focus:sppcfw-outline-none',
-						placeholder: 'Search Widget...',
+						placeholder: __( 'Search Widget...', 'single-product-customizer' ),
 						value: searchQuery,
 						onChange: e => setSearchQuery(e.target.value),
 					}),
@@ -2474,7 +2475,7 @@
 							className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between sppcfw-cursor-pointer sppcfw-mb-2 sppcfw-select-none',
 							onClick: () => setIsLayoutOpen(!isLayoutOpen),
 						},
-						h('h3', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#d9e3f6] sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' }, h('span', { className: 'sppcfw-text-[10px]' }, isLayoutOpen ? '▼' : '▶'), 'Layout')
+						h('h3', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#d9e3f6] sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' }, h('span', { className: 'sppcfw-text-[10px]' }, isLayoutOpen ? '▼' : '▶'), __( 'Layout', 'single-product-customizer' ))
 					),
 
 					isLayoutOpen &&
@@ -2496,7 +2497,7 @@
 									{ className: 'sppcfw-w-10 sppcfw-h-7 sppcfw-border-2 sppcfw-border-dashed sppcfw-border-[#9ca3af] group-hover:sppcfw-border-[#ddb8ff] sppcfw-rounded-sm sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-transition-colors' },
 									h('div', { className: 'sppcfw-w-5 sppcfw-h-3 sppcfw-border sppcfw-border-dashed sppcfw-border-[#6b7280] group-hover:sppcfw-border-[#c084fc] sppcfw-rounded-[1px]' })
 								),
-								h('span', { className: 'sppcfw-text-xs sppcfw-font-medium sppcfw-text-center sppcfw-text-[#d9e3f6] group-hover:sppcfw-text-white' }, 'Container')
+								h('span', { className: 'sppcfw-text-xs sppcfw-font-medium sppcfw-text-center sppcfw-text-[#d9e3f6] group-hover:sppcfw-text-white' }, __( 'Container', 'single-product-customizer' ))
 							),
 
 							// 2. Grid Card
@@ -2516,7 +2517,7 @@
 									h('div', { className: 'sppcfw-bg-[#6b7280] group-hover:sppcfw-bg-[#c084fc] sppcfw-rounded-[1px]' }),
 									h('div', { className: 'sppcfw-bg-[#6b7280] group-hover:sppcfw-bg-[#c084fc] sppcfw-rounded-[1px]' })
 								),
-								h('span', { className: 'sppcfw-text-xs sppcfw-font-medium sppcfw-text-center sppcfw-text-[#d9e3f6] group-hover:sppcfw-text-white' }, 'Grid')
+								h('span', { className: 'sppcfw-text-xs sppcfw-font-medium sppcfw-text-center sppcfw-text-[#d9e3f6] group-hover:sppcfw-text-white' }, __( 'Grid', 'single-product-customizer' ))
 							)
 						)
 				),
@@ -2526,7 +2527,7 @@
 					h(
 						'div',
 						null,
-						h('h3', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#cfc2d7] sppcfw-uppercase sppcfw-tracking-wider sppcfw-mb-2' }, 'Single Product Widgets'),
+						h('h3', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#cfc2d7] sppcfw-uppercase sppcfw-tracking-wider sppcfw-mb-2' }, __( 'Single Product Widgets', 'single-product-customizer' )),
 						h(
 							'div',
 							{ className: 'sppcfw-grid sppcfw-grid-cols-2 sppcfw-gap-2 sppcfw-mb-4' },
@@ -2573,7 +2574,7 @@
 											h('span', { className: 'material-symbols-outlined sppcfw-text-xs sppcfw-text-[#92ccff]' }, 'data_object'),
 											h('div', { className: 'sppcfw-overflow-hidden' }, h('div', { className: 'sppcfw-text-xs sppcfw-font-medium sppcfw-truncate' }, m.label), h('div', { className: 'sppcfw-text-[10px] sppcfw-text-[#9ca3af] sppcfw-truncate font-mono' }, typeof m.value === 'object' ? JSON.stringify(m.value) : String(m.value || '')))
 										),
-										h('span', { className: 'sppcfw-text-[9px] sppcfw-bg-[#212b39] sppcfw-text-[#cfc2d7] sppcfw-px-1.5 sppcfw-py-0.5 sppcfw-rounded font-mono' }, 'Meta')
+										h('span', { className: 'sppcfw-text-[9px] sppcfw-bg-[#212b39] sppcfw-text-[#cfc2d7] sppcfw-px-1.5 sppcfw-py-0.5 sppcfw-rounded font-mono' }, __( 'Meta', 'single-product-customizer' ))
 									)
 								)
 							)
@@ -2812,7 +2813,7 @@
 					{
 						type: 'button',
 						className: 'sppcfw-w-7 sppcfw-h-7 sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-bg-[#111827] sppcfw-text-gray-400 hover:sppcfw-text-white hover:sppcfw-border-[#9333ea] sppcfw-transition-colors sppcfw-cursor-pointer',
-						title: 'Global Colors',
+						title: __( 'Global Colors', 'single-product-customizer' ),
 						onClick: () => {
 							setShowPalette(!showPalette);
 							setIsOpen(true);
@@ -2848,7 +2849,7 @@
 					h(
 						'div',
 						{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between sppcfw-mb-2.5 sppcfw-pb-1.5 sppcfw-border-b sppcfw-border-gray-200' },
-						h('span', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-gray-800' }, 'Color Picker'),
+						h('span', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-gray-800' }, __( 'Color Picker', 'single-product-customizer' )),
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-gray-500' },
@@ -2857,7 +2858,7 @@
 								{
 									type: 'button',
 									className: 'hover:sppcfw-text-gray-900 sppcfw-cursor-pointer sppcfw-p-0.5',
-									title: 'Reset color',
+									title: __( 'Reset color', 'single-product-customizer' ),
 									onClick: () => {
 										if (typeof onChange === 'function') {
 											onChange(defaultVal === 'transparent' ? '' : defaultVal);
@@ -2871,7 +2872,7 @@
 								{
 									type: 'button',
 									className: 'hover:sppcfw-text-gray-900 sppcfw-cursor-pointer sppcfw-p-0.5',
-									title: 'Add to custom presets',
+									title: __( 'Add to custom presets', 'single-product-customizer' ),
 									onClick: () => {
 										if (!customPresets.includes(currentColorText)) {
 											setCustomPresets([...customPresets, currentColorText]);
@@ -2885,7 +2886,7 @@
 								{
 									type: 'button',
 									className: `hover:sppcfw-text-gray-900 sppcfw-cursor-pointer sppcfw-p-0.5 ${showPalette ? 'sppcfw-text-[#9333ea]' : ''}`,
-									title: 'Saved colors',
+									title: __( 'Saved colors', 'single-product-customizer' ),
 									onClick: () => setShowPalette(!showPalette)
 								},
 								h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'palette')
@@ -2896,7 +2897,7 @@
 									{
 										type: 'button',
 										className: 'hover:sppcfw-text-gray-900 sppcfw-cursor-pointer sppcfw-p-0.5',
-										title: 'Eyedropper tool',
+										title: __( 'Eyedropper tool', 'single-product-customizer' ),
 										onClick: handleEyeDropper
 									},
 									h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'colorize')
@@ -2984,7 +2985,7 @@
 								type: 'button',
 								className: 'sppcfw-px-1.5 sppcfw-py-1 sppcfw-bg-gray-100 hover:sppcfw-bg-gray-200 sppcfw-border sppcfw-border-gray-300 sppcfw-rounded sppcfw-text-[10px] sppcfw-font-bold sppcfw-text-gray-700 sppcfw-cursor-pointer sppcfw-transition-colors',
 								onClick: cycleFormat,
-								title: 'Toggle Format (HEXA / RGBA / HSLA)'
+								title: __( 'Toggle Format (HEXA / RGBA / HSLA)', 'single-product-customizer' )
 							},
 							format
 						)
@@ -2995,7 +2996,7 @@
 						h(
 							'div',
 							{ className: 'sppcfw-mt-2.5 sppcfw-pt-2.5 sppcfw-border-t sppcfw-border-gray-200' },
-							h('span', { className: 'sppcfw-text-[10px] sppcfw-font-bold sppcfw-text-gray-600 sppcfw-block sppcfw-mb-1.5' }, 'Palette Presets'),
+							h('span', { className: 'sppcfw-text-[10px] sppcfw-font-bold sppcfw-text-gray-600 sppcfw-block sppcfw-mb-1.5' }, __( 'Palette Presets', 'single-product-customizer' )),
 							h(
 								'div',
 								{ className: 'sppcfw-flex sppcfw-flex-wrap sppcfw-gap-1.5' },
@@ -3166,30 +3167,30 @@
 		const isImage = isProductGallery || isCustomImage;
 
 		const typeLabels = {
-			container: 'Edit Container',
-			column: 'Edit Column',
-			image: 'Edit Image',
-			product_gallery: 'Edit Product Gallery',
-			html_code: 'Edit HTML Element',
-			custom_html: 'Edit HTML Element',
-			heading: 'Edit Heading',
-			text_editor: 'Edit Text Editor',
-			product_title: 'Edit Product Title',
-			product_price: 'Edit Product Price',
-			product_add_to_cart: 'Edit Add to Cart',
-			product_rating: 'Edit Rating Stars',
-			product_short_desc: 'Edit Short Description',
-			product_description: 'Edit Product Description',
-			product_meta: 'Edit Product Meta',
-			product_meta_item: 'Edit Meta Field',
-			variation_swatches: 'Edit Variation Swatches',
-			custom_message: 'Edit Custom Message',
-			plus_minus_buttons: 'Edit Stepper Buttons',
-			related_products: 'Edit Related Products',
-			upsell_products: 'Edit Upsell Products',
+			container: __( 'Edit Container', 'single-product-customizer' ),
+			column: __( 'Edit Column', 'single-product-customizer' ),
+			image: __( 'Edit Image', 'single-product-customizer' ),
+			product_gallery: __( 'Edit Product Gallery', 'single-product-customizer' ),
+			html_code: __( 'Edit HTML Element', 'single-product-customizer' ),
+			custom_html: __( 'Edit HTML Element', 'single-product-customizer' ),
+			heading: __( 'Edit Heading', 'single-product-customizer' ),
+			text_editor: __( 'Edit Text Editor', 'single-product-customizer' ),
+			product_title: __( 'Edit Product Title', 'single-product-customizer' ),
+			product_price: __( 'Edit Product Price', 'single-product-customizer' ),
+			product_add_to_cart: __( 'Edit Add to Cart', 'single-product-customizer' ),
+			product_rating: __( 'Edit Rating Stars', 'single-product-customizer' ),
+			product_short_desc: __( 'Edit Short Description', 'single-product-customizer' ),
+			product_description: __( 'Edit Product Description', 'single-product-customizer' ),
+			product_meta: __( 'Edit Product Meta', 'single-product-customizer' ),
+			product_meta_item: __( 'Edit Meta Field', 'single-product-customizer' ),
+			variation_swatches: __( 'Edit Variation Swatches', 'single-product-customizer' ),
+			custom_message: __( 'Edit Custom Message', 'single-product-customizer' ),
+			plus_minus_buttons: __( 'Edit Stepper Buttons', 'single-product-customizer' ),
+			related_products: __( 'Edit Related Products', 'single-product-customizer' ),
+			upsell_products: __( 'Edit Upsell Products', 'single-product-customizer' ),
 		};
-		const panelTitle = typeLabels[selectedElement.type] || (selectedElement.label ? 'Edit ' + selectedElement.label : 'Edit Element');
-		const firstTabLabel = (isContainer || isColumn) ? 'Layout' : 'Content';
+		const panelTitle = typeLabels[selectedElement.type] || (selectedElement.label ? 'Edit ' + selectedElement.label : __( 'Edit Element', 'single-product-customizer' ));
+		const firstTabLabel = (isContainer || isColumn) ? __( 'Layout', 'single-product-customizer' ) : __( 'Content', 'single-product-customizer' );
 		const firstTabIcon = (isContainer || isColumn)
 			? 'view_column'
 			: isProductGallery
@@ -3311,7 +3312,7 @@
 								isLinked ? 'sppcfw-bg-[#9333ea]/30 sppcfw-border-[#9333ea] sppcfw-text-purple-200' : 'sppcfw-bg-[#111827] sppcfw-border-[#374151] sppcfw-text-gray-400 hover:sppcfw-text-white'
 							}`,
 							onClick: () => setIsLinked(!isLinked),
-							title: isLinked ? 'Unlink values' : 'Link values',
+							title: isLinked ? __( 'Unlink values', 'single-product-customizer' ) : __( 'Link values', 'single-product-customizer' ),
 						},
 						h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, isLinked ? 'link' : 'link_off')
 					)
@@ -3381,14 +3382,14 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'general',
-					'Container Layout',
+					__( 'Container Layout', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-4' },
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Container Layout'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Container Layout', 'single-product-customizer' )),
 							h(
 								'div',
 								{ className: 'sppcfw-relative sppcfw-w-44' },
@@ -3399,8 +3400,8 @@
 										value: getSetting('flex_direction') === 'grid' ? 'Grid' : 'Flexbox',
 										onChange: e => handleSettingChange('flex_direction', e.target.value === 'Grid' ? 'grid' : 'row'),
 									},
-									h('option', { value: 'Flexbox' }, 'Flexbox'),
-									h('option', { value: 'Grid' }, 'Grid')
+									h('option', { value: 'Flexbox' }, __( 'Flexbox', 'single-product-customizer' )),
+									h('option', { value: 'Grid' }, __( 'Grid', 'single-product-customizer' ))
 								)
 							)
 						),
@@ -3408,7 +3409,7 @@
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Content Width'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Content Width', 'single-product-customizer' )),
 							h(
 								'div',
 								{ className: 'sppcfw-relative sppcfw-w-44' },
@@ -3419,44 +3420,44 @@
 										value: getSetting('width_mode') === 'full' ? 'Full Width' : 'Boxed',
 										onChange: e => handleSettingChange('width_mode', e.target.value === 'Full Width' ? 'full' : 'boxed'),
 									},
-									h('option', { value: 'Boxed' }, 'Boxed'),
-									h('option', { value: 'Full Width' }, 'Full Width')
+									h('option', { value: 'Boxed' }, __( 'Boxed', 'single-product-customizer' )),
+									h('option', { value: 'Full Width' }, __( 'Full Width', 'single-product-customizer' ))
 								)
 							)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Width', true, widthUnit, setWidthUnit, ['px', '%', 'vw']),
+							renderControlHeader(__( 'Width', 'single-product-customizer' ), true, widthUnit, setWidthUnit, ['px', '%', 'vw']),
 							renderSliderInput(getSetting('boxed_width') || '1140px', v => handleSettingChange('boxed_width', v), 100, 2000, 1, widthUnit, '1140')
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Min Height', true, heightUnit, setHeightUnit, ['px', 'vh', 'em']),
+						renderControlHeader(__( 'Min Height', 'single-product-customizer' ), true, heightUnit, setHeightUnit, ['px', 'vh', 'em']),
 						renderSliderInput(getSetting('min_height') || '', v => handleSettingChange('min_height', v), 0, 1000, 1, heightUnit, ''),
-						h('p', { className: 'sppcfw-text-[11px] sppcfw-text-gray-400 sppcfw-italic sppcfw-pt-0.5' }, 'To achieve full height Container use 100vh.')
+						h('p', { className: 'sppcfw-text-[11px] sppcfw-text-gray-400 sppcfw-italic sppcfw-pt-0.5' }, __( 'To achieve full height Container use 100vh.', 'single-product-customizer' ))
 						)
 					)
 				),
 				renderAccordion(
 					'items',
-					'Container Items',
+					__( 'Container Items', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-4' },
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-text-[#e5e7eb] sppcfw-font-medium' }, 'Direction', h('span', { className: 'material-symbols-outlined sppcfw-text-[13px] sppcfw-text-gray-400', title: deviceView }, 'desktop_windows')),
+							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-text-[#e5e7eb] sppcfw-font-medium' }, __( 'Direction', 'single-product-customizer' ), h('span', { className: 'material-symbols-outlined sppcfw-text-[13px] sppcfw-text-gray-400', title: deviceView }, 'desktop_windows')),
 							h(
 								'div',
 								{ className: 'sppcfw-flex sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-bg-[#111827] sppcfw-overflow-hidden' },
 								[
-									{ val: 'row', title: 'Row - Horizontal', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M3 8h10M9 4l4 4-4 4' })) },
-									{ val: 'column', title: 'Column - Vertical', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M8 3v10M4 9l4 4 4-4' })) },
-									{ val: 'row-reverse', title: 'Row Reverse', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M13 8H3M7 4L3 8l4 4' })) },
-									{ val: 'column-reverse', title: 'Column Reverse', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M8 13V3M4 7l4-4 4 4' })) },
+									{ val: 'row', title: __( 'Row - Horizontal', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M3 8h10M9 4l4 4-4 4' })) },
+									{ val: 'column', title: __( 'Column - Vertical', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M8 3v10M4 9l4 4 4-4' })) },
+									{ val: 'row-reverse', title: __( 'Row Reverse', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M13 8H3M7 4L3 8l4 4' })) },
+									{ val: 'column-reverse', title: __( 'Column Reverse', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 2, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M8 13V3M4 7l4-4 4 4' })) },
 								].map(dirOpt => {
 									const isAct = (getSetting('flex_direction') || 'row') === dirOpt.val;
 									return h('button', { key: dirOpt.val, type: 'button', className: `sppcfw-p-2 sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-transition-colors sppcfw-cursor-pointer ${isAct ? 'sppcfw-bg-[#374151] sppcfw-text-white' : 'sppcfw-text-gray-400 hover:sppcfw-text-white hover:sppcfw-bg-[#1f2937]'}`, onClick: () => handleSettingChange('flex_direction', dirOpt.val), title: dirOpt.title }, dirOpt.icon);
@@ -3466,17 +3467,17 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-text-[#e5e7eb] sppcfw-font-medium' }, 'Justify Content', h('span', { className: 'material-symbols-outlined sppcfw-text-[13px] sppcfw-text-gray-400', title: deviceView }, 'desktop_windows')),
+							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-text-[#e5e7eb] sppcfw-font-medium' }, __( 'Justify Content', 'single-product-customizer' ), h('span', { className: 'material-symbols-outlined sppcfw-text-[13px] sppcfw-text-gray-400', title: deviceView }, 'desktop_windows')),
 							h(
 								'div',
 								{ className: 'sppcfw-flex sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-bg-[#111827] sppcfw-overflow-hidden' },
 								[
-									{ val: 'flex-start', title: 'Start', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 1.5, y: 1.5, width: 1.5, height: 13, rx: 0.5 }), h('rect', { x: 4.5, y: 4, width: 3, height: 8, rx: 0.5 }), h('rect', { x: 9, y: 4, width: 3, height: 8, rx: 0.5 })) },
-									{ val: 'center', title: 'Center', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 4, y: 4, width: 3.5, height: 8, rx: 0.5 }), h('rect', { x: 8.5, y: 4, width: 3.5, height: 8, rx: 0.5 })) },
-									{ val: 'flex-end', title: 'End', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 13, y: 1.5, width: 1.5, height: 13, rx: 0.5 }), h('rect', { x: 4, y: 4, width: 3, height: 8, rx: 0.5 }), h('rect', { x: 8.5, y: 4, width: 3, height: 8, rx: 0.5 })) },
-									{ val: 'space-between', title: 'Space Between', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 1.5, y: 1.5, width: 1.5, height: 13, rx: 0.5 }), h('rect', { x: 13, y: 1.5, width: 1.5, height: 13, rx: 0.5 }), h('rect', { x: 4.5, y: 4, width: 2.5, height: 8, rx: 0.5 }), h('rect', { x: 9, y: 4, width: 2.5, height: 8, rx: 0.5 })) },
-									{ val: 'space-around', title: 'Space Around', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 2.5, y: 4, width: 3, height: 8, rx: 0.5 }), h('rect', { x: 7, y: 2, width: 1.5, height: 12, rx: 0.5, opacity: 0.35 }), h('rect', { x: 10.5, y: 4, width: 3, height: 8, rx: 0.5 })) },
-									{ val: 'space-evenly', title: 'Space Evenly', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 2, y: 4, width: 2.5, height: 8, rx: 0.5 }), h('rect', { x: 6.75, y: 4, width: 2.5, height: 8, rx: 0.5 }), h('rect', { x: 11.5, y: 4, width: 2.5, height: 8, rx: 0.5 })) },
+									{ val: 'flex-start', title: __( 'Start', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 1.5, y: 1.5, width: 1.5, height: 13, rx: 0.5 }), h('rect', { x: 4.5, y: 4, width: 3, height: 8, rx: 0.5 }), h('rect', { x: 9, y: 4, width: 3, height: 8, rx: 0.5 })) },
+									{ val: 'center', title: __( 'Center', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 4, y: 4, width: 3.5, height: 8, rx: 0.5 }), h('rect', { x: 8.5, y: 4, width: 3.5, height: 8, rx: 0.5 })) },
+									{ val: 'flex-end', title: __( 'End', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 13, y: 1.5, width: 1.5, height: 13, rx: 0.5 }), h('rect', { x: 4, y: 4, width: 3, height: 8, rx: 0.5 }), h('rect', { x: 8.5, y: 4, width: 3, height: 8, rx: 0.5 })) },
+									{ val: 'space-between', title: __( 'Space Between', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 1.5, y: 1.5, width: 1.5, height: 13, rx: 0.5 }), h('rect', { x: 13, y: 1.5, width: 1.5, height: 13, rx: 0.5 }), h('rect', { x: 4.5, y: 4, width: 2.5, height: 8, rx: 0.5 }), h('rect', { x: 9, y: 4, width: 2.5, height: 8, rx: 0.5 })) },
+									{ val: 'space-around', title: __( 'Space Around', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 2.5, y: 4, width: 3, height: 8, rx: 0.5 }), h('rect', { x: 7, y: 2, width: 1.5, height: 12, rx: 0.5, opacity: 0.35 }), h('rect', { x: 10.5, y: 4, width: 3, height: 8, rx: 0.5 })) },
+									{ val: 'space-evenly', title: __( 'Space Evenly', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 2, y: 4, width: 2.5, height: 8, rx: 0.5 }), h('rect', { x: 6.75, y: 4, width: 2.5, height: 8, rx: 0.5 }), h('rect', { x: 11.5, y: 4, width: 2.5, height: 8, rx: 0.5 })) },
 								].map(jcOpt => {
 									const isAct = (getSetting('justify_content') || 'flex-start') === jcOpt.val;
 									return h('button', { key: jcOpt.val, type: 'button', className: `sppcfw-flex-1 sppcfw-py-2 sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-transition-colors sppcfw-cursor-pointer ${isAct ? 'sppcfw-bg-[#374151] sppcfw-text-white' : 'sppcfw-text-gray-400 hover:sppcfw-text-white hover:sppcfw-bg-[#1f2937]'}`, onClick: () => handleSettingChange('justify_content', jcOpt.val), title: jcOpt.title }, jcOpt.icon);
@@ -3486,15 +3487,15 @@
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-text-[#e5e7eb] sppcfw-font-medium' }, 'Align Items', h('span', { className: 'material-symbols-outlined sppcfw-text-[13px] sppcfw-text-gray-400', title: deviceView }, 'desktop_windows')),
+							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-text-[#e5e7eb] sppcfw-font-medium' }, __( 'Align Items', 'single-product-customizer' ), h('span', { className: 'material-symbols-outlined sppcfw-text-[13px] sppcfw-text-gray-400', title: deviceView }, 'desktop_windows')),
 							h(
 								'div',
 								{ className: 'sppcfw-flex sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-bg-[#111827] sppcfw-overflow-hidden' },
 								[
-									{ val: 'flex-start', title: 'Start', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 1.5, y: 1.5, width: 13, height: 1.5, rx: 0.5 }), h('rect', { x: 6, y: 4.5, width: 4, height: 9, rx: 0.5 })) },
-									{ val: 'center', title: 'Center', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 1.5, y: 7.25, width: 13, height: 1.5, rx: 0.5 }), h('rect', { x: 6, y: 2.5, width: 4, height: 11, rx: 0.5 })) },
-									{ val: 'flex-end', title: 'End', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 1.5, y: 13, width: 13, height: 1.5, rx: 0.5 }), h('rect', { x: 6, y: 2.5, width: 4, height: 9, rx: 0.5 })) },
-									{ val: 'stretch', title: 'Stretch', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 1.5, y: 1.5, width: 13, height: 1.5, rx: 0.5 }), h('rect', { x: 1.5, y: 13, width: 13, height: 1.5, rx: 0.5 }), h('rect', { x: 6, y: 4, width: 4, height: 8, rx: 0.5 })) },
+									{ val: 'flex-start', title: __( 'Start', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 1.5, y: 1.5, width: 13, height: 1.5, rx: 0.5 }), h('rect', { x: 6, y: 4.5, width: 4, height: 9, rx: 0.5 })) },
+									{ val: 'center', title: __( 'Center', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 1.5, y: 7.25, width: 13, height: 1.5, rx: 0.5 }), h('rect', { x: 6, y: 2.5, width: 4, height: 11, rx: 0.5 })) },
+									{ val: 'flex-end', title: __( 'End', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 1.5, y: 13, width: 13, height: 1.5, rx: 0.5 }), h('rect', { x: 6, y: 2.5, width: 4, height: 9, rx: 0.5 })) },
+									{ val: 'stretch', title: __( 'Stretch', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'currentColor' }, h('rect', { x: 1.5, y: 1.5, width: 13, height: 1.5, rx: 0.5 }), h('rect', { x: 1.5, y: 13, width: 13, height: 1.5, rx: 0.5 }), h('rect', { x: 6, y: 4, width: 4, height: 8, rx: 0.5 })) },
 								].map(aiOpt => {
 									const isAct = (getSetting('align_items') || 'stretch') === aiOpt.val;
 									return h('button', { key: aiOpt.val, type: 'button', className: `sppcfw-p-2 sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-transition-colors sppcfw-cursor-pointer ${isAct ? 'sppcfw-bg-[#374151] sppcfw-text-white' : 'sppcfw-text-gray-400 hover:sppcfw-text-white hover:sppcfw-bg-[#1f2937]'}`, onClick: () => handleSettingChange('align_items', aiOpt.val), title: aiOpt.title }, aiOpt.icon);
@@ -3504,7 +3505,7 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Gaps', true, gapsUnit, setGapsUnit, ['px', 'em', '%']),
+							renderControlHeader(__( 'Gaps', 'single-product-customizer' ), true, gapsUnit, setGapsUnit, ['px', 'em', '%']),
 							h(
 								'div',
 								{ className: 'sppcfw-flex sppcfw-items-start sppcfw-gap-1.5' },
@@ -3558,7 +3559,7 @@
 											isGapsLinked ? 'sppcfw-bg-[#374151] sppcfw-border-[#4b5563] sppcfw-text-white' : 'sppcfw-bg-[#111827] sppcfw-border-[#374151] sppcfw-text-gray-400 hover:sppcfw-text-white'
 										}`,
 										onClick: () => setIsGapsLinked(!isGapsLinked),
-										title: isGapsLinked ? 'Unlink values' : 'Link values',
+										title: isGapsLinked ? __( 'Unlink values', 'single-product-customizer' ) : __( 'Link values', 'single-product-customizer' ),
 									},
 									h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, isGapsLinked ? 'link' : 'link_off')
 								)
@@ -3566,20 +3567,20 @@
 							h(
 								'div',
 								{ className: 'sppcfw-flex sppcfw-text-[10px] sppcfw-text-gray-400 sppcfw-pr-9' },
-								h('span', { className: 'sppcfw-flex-1 sppcfw-text-center' }, 'Column'),
-								h('span', { className: 'sppcfw-flex-1 sppcfw-text-center' }, 'Row')
+								h('span', { className: 'sppcfw-flex-1 sppcfw-text-center' }, __( 'Column', 'single-product-customizer' )),
+								h('span', { className: 'sppcfw-flex-1 sppcfw-text-center' }, __( 'Row', 'single-product-customizer' ))
 							)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-text-[#e5e7eb] sppcfw-font-medium' }, 'Wrap', h('span', { className: 'material-symbols-outlined sppcfw-text-[13px] sppcfw-text-gray-400', title: deviceView }, 'desktop_windows')),
+							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-text-[#e5e7eb] sppcfw-font-medium' }, __( 'Wrap', 'single-product-customizer' ), h('span', { className: 'material-symbols-outlined sppcfw-text-[13px] sppcfw-text-gray-400', title: deviceView }, 'desktop_windows')),
 							h(
 								'div',
 								{ className: 'sppcfw-flex sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-bg-[#111827] sppcfw-overflow-hidden' },
 								[
-									{ val: 'nowrap', title: 'No Wrap', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 1.75, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M2 3v10M5 8h8M9.5 4.5L13 8l-3.5 3.5' })) },
-									{ val: 'wrap', title: 'Wrap', icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 1.75, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M3 5.5h7a3 3 0 0 1 3 3v0a3 3 0 0 1-3 3H4M7 8.5L4 11.5l3 3' })) },
+									{ val: 'nowrap', title: __( 'No Wrap', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 1.75, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M2 3v10M5 8h8M9.5 4.5L13 8l-3.5 3.5' })) },
+									{ val: 'wrap', title: __( 'Wrap', 'single-product-customizer' ), icon: h('svg', { width: 14, height: 14, viewBox: '0 0 16 16', fill: 'none', stroke: 'currentColor', strokeWidth: 1.75, strokeLinecap: 'round', strokeLinejoin: 'round' }, h('path', { d: 'M3 5.5h7a3 3 0 0 1 3 3v0a3 3 0 0 1-3 3H4M7 8.5L4 11.5l3 3' })) },
 								].map(wrapOpt => {
 									const isAct = (getSetting('flex_wrap') || 'nowrap') === wrapOpt.val;
 									return h('button', { key: wrapOpt.val, type: 'button', className: `sppcfw-p-2 sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-transition-colors sppcfw-cursor-pointer ${isAct ? 'sppcfw-bg-[#374151] sppcfw-text-white' : 'sppcfw-text-gray-400 hover:sppcfw-text-white hover:sppcfw-bg-[#1f2937]'}`, onClick: () => handleSettingChange('flex_wrap', wrapOpt.val), title: wrapOpt.title }, wrapOpt.icon);
@@ -3598,14 +3599,14 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'general',
-					'Column Width & Size',
+					__( 'Column Width & Size', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, 'Quick Width Presets'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, __( 'Quick Width Presets', 'single-product-customizer' )),
 							h(
 								'div',
 								{ className: 'sppcfw-grid sppcfw-grid-cols-4 sppcfw-gap-1.5' },
@@ -3622,7 +3623,7 @@
 											onClick: () => {
 												handleSettingChange('flex_width', w);
 												const targetKey = getDeviceKey('flex_width', deviceView);
-												updateElementProperties({ ...selectedElement, label: 'Column (' + w + ')', settings: { ...selectedElement.settings, [targetKey]: w } });
+												updateElementProperties({ ...selectedElement, label: __( 'Column (', 'single-product-customizer' ) + w + ')', settings: { ...selectedElement.settings, [targetKey]: w } });
 											},
 										},
 										w
@@ -3636,37 +3637,37 @@
 							h(
 								'div',
 								{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-gray-200 sppcfw-font-medium' }, 'Flex Width'),
+							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Flex Width', 'single-product-customizer' )),
 								h('span', { className: 'sppcfw-text-[10px] sppcfw-text-gray-300 font-mono' }, getSetting('flex_width') || '100%')
 							),
 							renderSliderInput(getSetting('flex_width') || '100%', v => {
 								handleSettingChange('flex_width', v);
 								const targetKey = getDeviceKey('flex_width', deviceView);
-								updateElementProperties({ ...selectedElement, label: 'Column (' + v + ')', settings: { ...selectedElement.settings, [targetKey]: v } });
+								updateElementProperties({ ...selectedElement, label: __( 'Column (', 'single-product-customizer' ) + v + ')', settings: { ...selectedElement.settings, [targetKey]: v } });
 							}, 5, 100, 1, '%')
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Min Height', true, heightUnit, setHeightUnit, ['px', 'vh']),
+						renderControlHeader(__( 'Min Height', 'single-product-customizer' ), true, heightUnit, setHeightUnit, ['px', 'vh']),
 						renderSliderInput(getSetting('min_height') || '', v => handleSettingChange('min_height', v), 0, 800, 1, heightUnit, '')
 						)
 					)
 				),
 				renderAccordion(
 					'items',
-					'Column Items Layout',
+					__( 'Column Items Layout', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-gray-200 sppcfw-font-medium' }, 'Direction'),
+							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Direction', 'single-product-customizer' )),
 							renderButtonGroup(
 								[
-									{ value: 'column', label: '↓ Column' },
-									{ value: 'row', label: '→ Row' },
+									{ value: 'column', label: __( '↓ Column', 'single-product-customizer' ) },
+									{ value: 'row', label: __( '→ Row', 'single-product-customizer' ) },
 								],
 								getSetting('flex_direction') || 'column',
 								v => handleSettingChange('flex_direction', v)
@@ -3675,12 +3676,12 @@
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-gray-200 sppcfw-font-medium' }, 'Justify Content'),
+							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Justify Content', 'single-product-customizer' )),
 							renderButtonGroup(
 								[
-									{ value: 'flex-start', title: 'Start', label: 'Top' },
-									{ value: 'center', title: 'Center', label: 'Mid' },
-									{ value: 'flex-end', title: 'End', label: 'Btm' },
+									{ value: 'flex-start', title: __( 'Start', 'single-product-customizer' ), label: __( 'Top', 'single-product-customizer' ) },
+									{ value: 'center', title: __( 'Center', 'single-product-customizer' ), label: __( 'Mid', 'single-product-customizer' ) },
+									{ value: 'flex-end', title: __( 'End', 'single-product-customizer' ), label: __( 'Btm', 'single-product-customizer' ) },
 								],
 								getSetting('justify_content') || 'flex-start',
 								v => handleSettingChange('justify_content', v)
@@ -3689,13 +3690,13 @@
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-gray-200 sppcfw-font-medium' }, 'Align Items'),
+							h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Align Items', 'single-product-customizer' )),
 							renderButtonGroup(
 								[
-									{ value: 'flex-start', title: 'Start', label: 'Left' },
-									{ value: 'center', title: 'Center', label: 'Mid' },
-									{ value: 'flex-end', title: 'End', label: 'Right' },
-									{ value: 'stretch', title: 'Stretch', label: 'Full' },
+									{ value: 'flex-start', title: __( 'Start', 'single-product-customizer' ), label: __( 'Left', 'single-product-customizer' ) },
+									{ value: 'center', title: __( 'Center', 'single-product-customizer' ), label: __( 'Mid', 'single-product-customizer' ) },
+									{ value: 'flex-end', title: __( 'End', 'single-product-customizer' ), label: __( 'Right', 'single-product-customizer' ) },
+									{ value: 'stretch', title: __( 'Stretch', 'single-product-customizer' ), label: __( 'Full', 'single-product-customizer' ) },
 								],
 								getSetting('align_items') || 'stretch',
 								v => handleSettingChange('align_items', v)
@@ -3704,14 +3705,14 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Widget Gap', true, gapsUnit, setGapsUnit, ['px', 'em']),
+							renderControlHeader(__( 'Widget Gap', 'single-product-customizer' ), true, gapsUnit, setGapsUnit, ['px', 'em']),
 							renderSliderInput(getSetting('gap') || '12px', v => handleSettingChange('gap', v), 0, 80, 1, gapsUnit, '12')
 						)
 					)
 				),
 				renderAccordion(
 					'button',
-					'Column Actions',
+					__( 'Column Actions', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-2.5' },
@@ -3723,7 +3724,7 @@
 								onClick: () => addColumnToContainer && addColumnToContainer(selectedElement.id),
 							},
 							h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'add'),
-							'Add New Column To Container'
+							__( 'Add New Column To Container', 'single-product-customizer' )
 						),
 						h(
 							'div',
@@ -3736,7 +3737,7 @@
 									onClick: () => duplicateColumn && duplicateColumn(selectedElement.id),
 								},
 								h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, 'content_copy'),
-								'Duplicate'
+								__( 'Duplicate', 'single-product-customizer' )
 							),
 							h(
 								'button',
@@ -3746,7 +3747,7 @@
 								onClick: () => removeElement && removeElement(selectedElement.id),
 								},
 								h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, 'delete'),
-								'Delete'
+								__( 'Delete', 'single-product-customizer' )
 							)
 						)
 					)
@@ -3761,14 +3762,14 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'general',
-					'Choose Image',
+					__( 'Choose Image', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-4' },
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-2' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium sppcfw-block' }, 'Image Asset'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium sppcfw-block' }, __( 'Image Asset', 'single-product-customizer' )),
 							h(
 								'div',
 								{
@@ -3776,8 +3777,8 @@
 									onClick: () => {
 										if (typeof wp !== 'undefined' && wp.media) {
 											const frame = wp.media({
-												title: 'Select Image',
-												button: { text: 'Insert Image' },
+												title: __( 'Select Image', 'single-product-customizer' ),
+												button: { text: __( 'Insert Image', 'single-product-customizer' ) },
 												multiple: false,
 											});
 											frame.on('select', () => {
@@ -3791,7 +3792,7 @@
 											});
 											frame.open();
 										} else {
-											const url = prompt('Enter Image URL:', getSetting('custom_image_url') || '');
+											const url = prompt(__( 'Enter Image URL:', 'single-product-customizer' ), getSetting('custom_image_url') || '');
 											if (url !== null && url.trim() !== '') {
 												handleSettingChange('custom_image_url', url.trim());
 											}
@@ -3804,31 +3805,31 @@
 											{ className: 'sppcfw-space-y-2' },
 											h('img', {
 												src: getSetting('custom_image_url'),
-												alt: getSetting('alt_text') || 'Selected Custom Preview',
+												alt: getSetting('alt_text') || __( 'Selected Custom Preview', 'single-product-customizer' ),
 												className: 'sppcfw-h-32 sppcfw-w-full sppcfw-object-contain sppcfw-rounded sppcfw-bg-[#091421]/60 sppcfw-p-1',
 											}),
-											h('div', { className: 'sppcfw-text-[11px] sppcfw-text-[#ddb8ff] sppcfw-font-semibold' }, 'Click to Change Image')
+											h('div', { className: 'sppcfw-text-[11px] sppcfw-text-[#ddb8ff] sppcfw-font-semibold' }, __( 'Click to Change Image', 'single-product-customizer' ))
 									  )
 									: h(
 											'div',
 											{ className: 'sppcfw-py-6 sppcfw-space-y-2' },
 											h('span', { className: 'material-symbols-outlined sppcfw-text-3xl sppcfw-text-gray-400 group-hover:sppcfw-text-[#ddb8ff] sppcfw-transition-colors' }, 'add_photo_alternate'),
-											h('div', { className: 'sppcfw-text-xs sppcfw-font-semibold sppcfw-text-gray-200' }, 'Choose Image from Media Library'),
-											h('div', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400' }, 'Insert any custom image into your layout')
+											h('div', { className: 'sppcfw-text-xs sppcfw-font-semibold sppcfw-text-gray-200' }, __( 'Choose Image from Media Library', 'single-product-customizer' )),
+											h('div', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400' }, __( 'Insert any custom image into your layout', 'single-product-customizer' ))
 									  )
 							),
 							getSetting('custom_image_url') &&
 								h(
 									'div',
 									{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between sppcfw-pt-1' },
-									h('button', { type: 'button', className: 'sppcfw-text-[11px] sppcfw-text-red-400 hover:sppcfw-text-red-300 sppcfw-underline sppcfw-cursor-pointer', onClick: () => handleSettingChange('custom_image_url', '') }, 'Remove Image'),
-									h('span', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400' }, 'Custom Image Set')
+									h('button', { type: 'button', className: 'sppcfw-text-[11px] sppcfw-text-red-400 hover:sppcfw-text-red-300 sppcfw-underline sppcfw-cursor-pointer', onClick: () => handleSettingChange('custom_image_url', '') }, __( 'Remove Image', 'single-product-customizer' )),
+									h('span', { className: 'sppcfw-text-[10px] sppcfw-text-gray-400' }, __( 'Custom Image Set', 'single-product-customizer' ))
 								)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Image URL (Direct)'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Image URL (Direct)', 'single-product-customizer' )),
 						h('input', {
 							type: 'text',
 							className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
@@ -3840,19 +3841,19 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Alt Text'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Alt Text', 'single-product-customizer' )),
 						h('input', {
 							type: 'text',
 							className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
 							value: getSetting('alt_text') || '',
-							placeholder: 'Descriptive alt text for image',
+							placeholder: __( 'Descriptive alt text for image', 'single-product-customizer' ),
 							onChange: e => handleSettingChange('alt_text', e.target.value),
 						})
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Image Resolution'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Image Resolution', 'single-product-customizer' )),
 							h(
 								'select',
 								{
@@ -3860,21 +3861,21 @@
 									value: getSetting('image_size') || 'large',
 									onChange: e => handleSettingChange('image_size', e.target.value),
 								},
-								h('option', { value: 'thumbnail' }, 'Thumbnail (150x150)'),
-								h('option', { value: 'medium' }, 'Medium (300x300)'),
-								h('option', { value: 'large' }, 'Large (1024x1024)'),
-								h('option', { value: 'full' }, 'Full Size')
+								h('option', { value: 'thumbnail' }, __( 'Thumbnail (150x150)', 'single-product-customizer' )),
+								h('option', { value: 'medium' }, __( 'Medium (300x300)', 'single-product-customizer' )),
+								h('option', { value: 'large' }, __( 'Large (1024x1024)', 'single-product-customizer' )),
+								h('option', { value: 'full' }, __( 'Full Size', 'single-product-customizer' ))
 							)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Alignment', true),
+						renderControlHeader(__( 'Alignment', 'single-product-customizer' ), true),
 						renderButtonGroup(
 							[
-								{ value: 'left', icon: 'format_align_left', title: 'Left' },
-								{ value: 'center', icon: 'format_align_center', title: 'Center' },
-								{ value: 'right', icon: 'format_align_right', title: 'Right' },
+								{ value: 'left', icon: 'format_align_left', title: __( 'Left', 'single-product-customizer' ) },
+								{ value: 'center', icon: 'format_align_center', title: __( 'Center', 'single-product-customizer' ) },
+								{ value: 'right', icon: 'format_align_right', title: __( 'Right', 'single-product-customizer' ) },
 							],
 							getStyle('alignment') || 'center',
 							v => handleStyleChange('alignment', v)
@@ -3884,14 +3885,14 @@
 				),
 				renderAccordion(
 					'items',
-					'Caption & Link Options',
+					__( 'Caption & Link Options', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Caption'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Caption', 'single-product-customizer' )),
 						h(
 							'select',
 							{
@@ -3899,8 +3900,8 @@
 								value: getSetting('caption_type') || 'none',
 								onChange: e => handleSettingChange('caption_type', e.target.value),
 							},
-							h('option', { value: 'none' }, 'None'),
-							h('option', { value: 'custom' }, 'Custom Caption')
+							h('option', { value: 'none' }, __( 'None', 'single-product-customizer' )),
+							h('option', { value: 'custom' }, __( 'Custom Caption', 'single-product-customizer' ))
 						)
 						),
 						getSetting('caption_type') === 'custom' &&
@@ -3908,13 +3909,13 @@
 								type: 'text',
 								className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none',
 								value: getSetting('custom_caption') || '',
-								placeholder: 'Enter custom caption text...',
+								placeholder: __( 'Enter custom caption text...', 'single-product-customizer' ),
 								onChange: e => handleSettingChange('custom_caption', e.target.value),
 							}),
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Link'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Link', 'single-product-customizer' )),
 						h(
 							'select',
 							{
@@ -3922,9 +3923,9 @@
 								value: getSetting('link_to') || 'none',
 								onChange: e => handleSettingChange('link_to', e.target.value),
 							},
-							h('option', { value: 'none' }, 'None'),
-							h('option', { value: 'file' }, 'Media File'),
-							h('option', { value: 'custom' }, 'Custom URL')
+							h('option', { value: 'none' }, __( 'None', 'single-product-customizer' )),
+							h('option', { value: 'file' }, __( 'Media File', 'single-product-customizer' )),
+							h('option', { value: 'custom' }, __( 'Custom URL', 'single-product-customizer' ))
 						)
 						),
 						getSetting('link_to') === 'custom' &&
@@ -3942,7 +3943,7 @@
 									'div',
 									{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2' },
 									h('input', { type: 'checkbox', id: 'chk-blank', className: 'sppcfw-accent-[#9333ea]', checked: !!getSetting('link_target_blank'), onChange: e => handleSettingChange('link_target_blank', e.target.checked) }),
-									h('label', { htmlFor: 'chk-blank', className: 'sppcfw-text-xs sppcfw-text-gray-300' }, 'Open in new window')
+									h('label', { htmlFor: 'chk-blank', className: 'sppcfw-text-xs sppcfw-text-gray-300' }, __( 'Open in new window', 'single-product-customizer' ))
 								)
 							)
 					)
@@ -3961,30 +3962,30 @@
 				h(
 					'div',
 					{ className: 'sppcfw-bg-[#16202e] sppcfw-border sppcfw-border-[#3b4b62] sppcfw-rounded-lg sppcfw-p-3.5 sppcfw-space-y-1.5' },
-					h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#92ccff]' }, h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'collections'), 'WooCommerce Product Gallery'),
-					h('p', { className: 'sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-leading-relaxed' }, 'This widget automatically displays the featured image and gallery thumbnails of the active product from WooCommerce.')
+					h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#92ccff]' }, h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'collections'), __( 'WooCommerce Product Gallery', 'single-product-customizer' )),
+					h('p', { className: 'sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-leading-relaxed' }, __( 'This widget automatically displays the featured image and gallery thumbnails of the active product from WooCommerce.', 'single-product-customizer' ))
 				),
 				renderAccordion(
 					'general',
-					'Gallery Options',
+					__( 'Gallery Options', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Show Gallery Thumbnails'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Show Gallery Thumbnails', 'single-product-customizer' )),
 							h('input', { type: 'checkbox', className: 'sppcfw-accent-[#9333ea] sppcfw-w-4 sppcfw-h-4 sppcfw-cursor-pointer', checked: showThumbs, onChange: e => handleSettingChange('show_thumbnails', e.target.checked) })
 						),
 						showThumbs &&
 							h(
 								'div',
 								{ className: 'sppcfw-space-y-1.5' },
-								h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium sppcfw-block' }, 'Thumbnail Display Format'),
+								h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium sppcfw-block' }, __( 'Thumbnail Display Format', 'single-product-customizer' )),
 								renderButtonGroup(
 									[
-										{ value: 'grid', label: 'Grid', icon: 'grid_view', title: 'Static Thumbnail Grid' },
-										{ value: 'carousel', label: 'Carousel', icon: 'view_carousel', title: 'Interactive Thumbnail Carousel' },
+										{ value: 'grid', label: __( 'Grid', 'single-product-customizer' ), icon: 'grid_view', title: __( 'Static Thumbnail Grid', 'single-product-customizer' ) },
+										{ value: 'carousel', label: __( 'Carousel', 'single-product-customizer' ), icon: 'view_carousel', title: __( 'Interactive Thumbnail Carousel', 'single-product-customizer' ) },
 									],
 									thumbsLayout,
 									v => handleSettingChange('thumbs_layout', v)
@@ -3994,7 +3995,7 @@
 							h(
 								'div',
 								{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-								h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, thumbsLayout === 'carousel' ? 'Visible Carousel Items' : 'Thumbnail Columns'),
+								h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, thumbsLayout === 'carousel' ? __( 'Visible Carousel Items', 'single-product-customizer' ) : __( 'Thumbnail Columns', 'single-product-customizer' )),
 								h(
 									'select',
 									{
@@ -4002,40 +4003,40 @@
 										value: getSetting('gallery_columns') || '4',
 										onChange: e => handleSettingChange('gallery_columns', e.target.value),
 									},
-									h('option', { value: '3' }, '3 Items'),
-									h('option', { value: '4' }, '4 Items'),
-									h('option', { value: '5' }, '5 Items'),
-									h('option', { value: '6' }, '6 Items')
+									h('option', { value: '3' }, __( '3 Items', 'single-product-customizer' )),
+									h('option', { value: '4' }, __( '4 Items', 'single-product-customizer' )),
+									h('option', { value: '5' }, __( '5 Items', 'single-product-customizer' )),
+									h('option', { value: '6' }, __( '6 Items', 'single-product-customizer' ))
 								)
 							),
 						showThumbs && thumbsLayout === 'carousel' &&
 							h(
 								'div',
 								{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-								h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Show Carousel Navigation Arrows'),
+								h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Show Carousel Navigation Arrows', 'single-product-customizer' )),
 								h('input', { type: 'checkbox', className: 'sppcfw-accent-[#9333ea] sppcfw-w-4 sppcfw-h-4 sppcfw-cursor-pointer', checked: getSetting('show_carousel_arrows') !== false, onChange: e => handleSettingChange('show_carousel_arrows', e.target.checked) })
 							),
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Lightbox Popup'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Lightbox Popup', 'single-product-customizer' )),
 							h('input', { type: 'checkbox', className: 'sppcfw-accent-[#9333ea] sppcfw-w-4 sppcfw-h-4 sppcfw-cursor-pointer', checked: getSetting('enable_lightbox') !== false, onChange: e => handleSettingChange('enable_lightbox', e.target.checked) })
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Image Zoom On Hover'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Image Zoom On Hover', 'single-product-customizer' )),
 							h('input', { type: 'checkbox', className: 'sppcfw-accent-[#9333ea] sppcfw-w-4 sppcfw-h-4 sppcfw-cursor-pointer', checked: getSetting('enable_zoom') !== false, onChange: e => handleSettingChange('enable_zoom', e.target.checked) })
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5 sppcfw-pt-1' },
-							renderControlHeader('Gallery Alignment', true),
+							renderControlHeader(__( 'Gallery Alignment', 'single-product-customizer' ), true),
 							renderButtonGroup(
 								[
-									{ value: 'left', icon: 'format_align_left', title: 'Left' },
-									{ value: 'center', icon: 'format_align_center', title: 'Center' },
-									{ value: 'right', icon: 'format_align_right', title: 'Right' },
+									{ value: 'left', icon: 'format_align_left', title: __( 'Left', 'single-product-customizer' ) },
+									{ value: 'center', icon: 'format_align_center', title: __( 'Center', 'single-product-customizer' ) },
+									{ value: 'right', icon: 'format_align_right', title: __( 'Right', 'single-product-customizer' ) },
 								],
 								getStyle('alignment') || 'center',
 								v => handleStyleChange('alignment', v)
@@ -4054,19 +4055,19 @@
 				h(
 					'div',
 					{ className: 'sppcfw-bg-[#16202e] sppcfw-border sppcfw-border-[#3b4b62] sppcfw-rounded-lg sppcfw-p-3.5 sppcfw-space-y-1.5' },
-					h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#92ccff]' }, h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'title'), 'WooCommerce Product Title'),
-					h('p', { className: 'sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-leading-relaxed' }, 'This widget automatically renders the title of the active product from WooCommerce.')
+					h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#92ccff]' }, h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'title'), __( 'WooCommerce Product Title', 'single-product-customizer' )),
+					h('p', { className: 'sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-leading-relaxed' }, __( 'This widget automatically renders the title of the active product from WooCommerce.', 'single-product-customizer' ))
 				),
 				renderAccordion(
 					'general',
-					'Title Settings',
+					__( 'Title Settings', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'HTML Tag'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'HTML Tag', 'single-product-customizer' )),
 							h(
 								'select',
 								{
@@ -4080,19 +4081,19 @@
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Link to Product Page'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Link to Product Page', 'single-product-customizer' )),
 							h('input', { type: 'checkbox', className: 'sppcfw-accent-[#9333ea] sppcfw-w-4 sppcfw-h-4 sppcfw-cursor-pointer', checked: !!getSetting('link_to_product'), onChange: e => handleSettingChange('link_to_product', e.target.checked) })
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Alignment', true),
+							renderControlHeader(__( 'Alignment', 'single-product-customizer' ), true),
 							renderButtonGroup(
 								[
-									{ value: 'left', icon: 'format_align_left', title: 'Left' },
-									{ value: 'center', icon: 'format_align_center', title: 'Center' },
-									{ value: 'right', icon: 'format_align_right', title: 'Right' },
-									{ value: 'justify', icon: 'format_align_justify', title: 'Justify' },
+									{ value: 'left', icon: 'format_align_left', title: __( 'Left', 'single-product-customizer' ) },
+									{ value: 'center', icon: 'format_align_center', title: __( 'Center', 'single-product-customizer' ) },
+									{ value: 'right', icon: 'format_align_right', title: __( 'Right', 'single-product-customizer' ) },
+									{ value: 'justify', icon: 'format_align_justify', title: __( 'Justify', 'single-product-customizer' ) },
 								],
 								getStyle('alignment') || 'left',
 								v => handleStyleChange('alignment', v)
@@ -4113,7 +4114,7 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'price_display',
-					'Price Display Settings',
+					__( 'Price Display Settings', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
@@ -4147,8 +4148,8 @@
 							h(
 								'label',
 								{ htmlFor: 'sppcfw_basic_hide_price', className: 'sppcfw-flex sppcfw-flex-col sppcfw-cursor-pointer' },
-								h('span', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#d9e3f6]' }, 'Hide price'),
-								h('span', { className: 'sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-mt-0.5' }, 'Hides the price on single product pages. Automatically syncs with Basic Settings.')
+								h('span', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#d9e3f6]' }, __( 'Hide price', 'single-product-customizer' )),
+								h('span', { className: 'sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-mt-0.5' }, __( 'Hides the price on single product pages. Automatically syncs with Basic Settings.', 'single-product-customizer' ))
 							)
 						),
 
@@ -4166,8 +4167,8 @@
 							h(
 								'label',
 								{ htmlFor: 'sppcfw_show_regular_price', className: 'sppcfw-flex sppcfw-flex-col sppcfw-cursor-pointer' },
-								h('span', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#d9e3f6]' }, 'Show regular price if on sale'),
-								h('span', { className: 'sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-mt-0.5' }, 'When both regular and sale price exist, display the crossed-out regular price. If the product only has one price, that single price is always shown.')
+								h('span', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#d9e3f6]' }, __( 'Show regular price if on sale', 'single-product-customizer' )),
+								h('span', { className: 'sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-mt-0.5' }, __( 'When both regular and sale price exist, display the crossed-out regular price. If the product only has one price, that single price is always shown.', 'single-product-customizer' ))
 							)
 						),
 
@@ -4185,8 +4186,8 @@
 							h(
 								'label',
 								{ htmlFor: 'sppcfw_show_sale_badge', className: 'sppcfw-flex sppcfw-flex-col sppcfw-cursor-pointer' },
-								h('span', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#d9e3f6]' }, 'Show sale badge'),
-								h('span', { className: 'sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-mt-0.5' }, 'Displays a "Sale" badge when the product is discounted.')
+								h('span', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#d9e3f6]' }, __( 'Show sale badge', 'single-product-customizer' )),
+								h('span', { className: 'sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-mt-0.5' }, __( 'Displays a "Sale" badge when the product is discounted.', 'single-product-customizer' ))
 							)
 						),
 
@@ -4194,12 +4195,12 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Alignment', true),
+							renderControlHeader(__( 'Alignment', 'single-product-customizer' ), true),
 							renderButtonGroup(
 								[
-									{ value: 'left', icon: 'format_align_left', title: 'Left' },
-									{ value: 'center', icon: 'format_align_center', title: 'Center' },
-									{ value: 'right', icon: 'format_align_right', title: 'Right' },
+									{ value: 'left', icon: 'format_align_left', title: __( 'Left', 'single-product-customizer' ) },
+									{ value: 'center', icon: 'format_align_center', title: __( 'Center', 'single-product-customizer' ) },
+									{ value: 'right', icon: 'format_align_right', title: __( 'Right', 'single-product-customizer' ) },
 								],
 								getStyle('alignment') || 'left',
 								v => handleStyleChange('alignment', v)
@@ -4217,26 +4218,26 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'general',
-					'Heading Content',
+					__( 'Heading Content', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Heading Text'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Heading Text', 'single-product-customizer' )),
 						h('input', {
 							type: 'text',
 							className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
-							value: getSetting('text') !== undefined ? getSetting('text') : 'Add Your Heading Text Here',
-							placeholder: 'Enter heading text...',
+							value: getSetting('text') !== undefined ? getSetting('text') : __( 'Add Your Heading Text Here', 'single-product-customizer' ),
+							placeholder: __( 'Enter heading text...', 'single-product-customizer' ),
 							onChange: e => handleSettingChange('text', e.target.value),
 						})
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'HTML Tag'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'HTML Tag', 'single-product-customizer' )),
 							h(
 								'select',
 								{
@@ -4250,7 +4251,7 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Link URL (optional)'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Link URL (optional)', 'single-product-customizer' )),
 						h('input', {
 							type: 'text',
 							className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
@@ -4262,12 +4263,12 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Alignment', true),
+						renderControlHeader(__( 'Alignment', 'single-product-customizer' ), true),
 						renderButtonGroup(
 							[
-								{ value: 'left', icon: 'format_align_left', title: 'Left' },
-								{ value: 'center', icon: 'format_align_center', title: 'Center' },
-								{ value: 'right', icon: 'format_align_right', title: 'Right' },
+								{ value: 'left', icon: 'format_align_left', title: __( 'Left', 'single-product-customizer' ) },
+								{ value: 'center', icon: 'format_align_center', title: __( 'Center', 'single-product-customizer' ) },
+								{ value: 'right', icon: 'format_align_right', title: __( 'Right', 'single-product-customizer' ) },
 							],
 							getStyle('alignment') || 'left',
 							v => handleStyleChange('alignment', v)
@@ -4285,26 +4286,26 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'general',
-					'Text Content',
+					__( 'Text Content', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Text Content'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Text Content', 'single-product-customizer' )),
 						h('textarea', {
 							rows: 6,
 							className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-p-2.5 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
-							value: getSetting('text_content') !== undefined ? getSetting('text_content') : 'Add your custom description or paragraph content here...',
-							placeholder: 'Enter custom text or description...',
+							value: getSetting('text_content') !== undefined ? getSetting('text_content') : __( 'Add your custom description or paragraph content here...', 'single-product-customizer' ),
+							placeholder: __( 'Enter custom text or description...', 'single-product-customizer' ),
 							onChange: e => handleSettingChange('text_content', e.target.value),
 						})
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'HTML Tag'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'HTML Tag', 'single-product-customizer' )),
 							h(
 								'select',
 								{
@@ -4318,12 +4319,12 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Alignment', true),
+						renderControlHeader(__( 'Alignment', 'single-product-customizer' ), true),
 						renderButtonGroup(
 							[
-								{ value: 'left', icon: 'format_align_left', title: 'Left' },
-								{ value: 'center', icon: 'format_align_center', title: 'Center' },
-								{ value: 'right', icon: 'format_align_right', title: 'Right' },
+								{ value: 'left', icon: 'format_align_left', title: __( 'Left', 'single-product-customizer' ) },
+								{ value: 'center', icon: 'format_align_center', title: __( 'Center', 'single-product-customizer' ) },
+								{ value: 'right', icon: 'format_align_right', title: __( 'Right', 'single-product-customizer' ) },
 							],
 							getStyle('alignment') || 'left',
 							v => handleStyleChange('alignment', v)
@@ -4337,22 +4338,22 @@
 		// 1g. Dynamic Product Elements Information Panel (Used for all other Product Elements)
 		function renderProductElementDynamicCard() {
 			const typeDescriptions = {
-				product_title: 'Displays the active product title dynamically from WooCommerce catalog.',
-				product_price: 'Displays the dynamic price, sale price, and discount badge automatically.',
-				product_add_to_cart: 'Displays the dynamic Add to Cart button and quantity selector.',
-				product_rating: 'Displays the average star rating and review count from WooCommerce.',
-				product_short_desc: 'Displays the product excerpt or short description from WooCommerce.',
-				product_description: 'Displays the full product description, reviews, and data tabs.',
-				product_meta: 'Displays SKU, product categories, and tags dynamically.',
-				product_meta_item: 'Displays custom WooCommerce product meta field values.',
-				variation_swatches: 'Displays variable product options, attributes, and variation table.',
-				custom_message: 'Displays customizable notification banner on the product page.',
-				plus_minus_buttons: 'Displays plus/minus quantity stepper buttons.',
-				related_products: 'Displays related products grid generated by WooCommerce.',
-				upsell_products: 'Displays upsell recommendations from WooCommerce.',
+				product_title: __( 'Displays the active product title dynamically from WooCommerce catalog.', 'single-product-customizer' ),
+				product_price: __( 'Displays the dynamic price, sale price, and discount badge automatically.', 'single-product-customizer' ),
+				product_add_to_cart: __( 'Displays the dynamic Add to Cart button and quantity selector.', 'single-product-customizer' ),
+				product_rating: __( 'Displays the average star rating and review count from WooCommerce.', 'single-product-customizer' ),
+				product_short_desc: __( 'Displays the product excerpt or short description from WooCommerce.', 'single-product-customizer' ),
+				product_description: __( 'Displays the full product description, reviews, and data tabs.', 'single-product-customizer' ),
+				product_meta: __( 'Displays SKU, product categories, and tags dynamically.', 'single-product-customizer' ),
+				product_meta_item: __( 'Displays custom WooCommerce product meta field values.', 'single-product-customizer' ),
+				variation_swatches: __( 'Displays variable product options, attributes, and variation table.', 'single-product-customizer' ),
+				custom_message: __( 'Displays customizable notification banner on the product page.', 'single-product-customizer' ),
+				plus_minus_buttons: __( 'Displays plus/minus quantity stepper buttons.', 'single-product-customizer' ),
+				related_products: __( 'Displays related products grid generated by WooCommerce.', 'single-product-customizer' ),
+				upsell_products: __( 'Displays upsell recommendations from WooCommerce.', 'single-product-customizer' ),
 			};
 
-			const desc = typeDescriptions[selectedElement.type] || 'This element renders dynamic WooCommerce single product content.';
+			const desc = typeDescriptions[selectedElement.type] || __( 'This element renders dynamic WooCommerce single product content.', 'single-product-customizer' );
 
 			return h(
 				'div',
@@ -4370,8 +4371,8 @@
 					h(
 						'div',
 						{ className: 'sppcfw-bg-[#111827] sppcfw-p-3 sppcfw-rounded sppcfw-border sppcfw-border-[#374151] sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-space-y-1' },
-						h('div', { className: 'sppcfw-font-bold sppcfw-text-[#ddb8ff] sppcfw-flex sppcfw-items-center sppcfw-gap-1' }, h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, 'info'), 'Dynamic WooCommerce Element'),
-						h('p', null, 'Content for this element is automatically managed by WooCommerce. To customize colors, typography, spacing, or borders, switch to the Style and Advanced tabs.')
+						h('div', { className: 'sppcfw-font-bold sppcfw-text-[#ddb8ff] sppcfw-flex sppcfw-items-center sppcfw-gap-1' }, h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, 'info'), __( 'Dynamic WooCommerce Element', 'single-product-customizer' )),
+						h('p', null, __( 'Content for this element is automatically managed by WooCommerce. To customize colors, typography, spacing, or borders, switch to the Style and Advanced tabs.', 'single-product-customizer' ))
 					),
 					h(
 						'button',
@@ -4381,7 +4382,7 @@
 							onClick: () => setActiveTab('style'),
 						},
 						h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'contrast'),
-						'Customize in Style Panel →'
+						__( 'Customize in Style Panel →', 'single-product-customizer' )
 					)
 				)
 			);
@@ -4400,7 +4401,7 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'background',
-					'Background',
+					__( 'Background', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
@@ -4419,7 +4420,7 @@
 									}`,
 									onClick: () => setBgTab('normal')
 								},
-								'Normal'
+								__( 'Normal', 'single-product-customizer' )
 							),
 							h(
 								'button',
@@ -4432,7 +4433,7 @@
 									}`,
 									onClick: () => setBgTab('hover')
 								},
-								'Hover'
+								__( 'Hover', 'single-product-customizer' )
 							)
 						),
 
@@ -4440,7 +4441,7 @@
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Background Type'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Background Type', 'single-product-customizer' )),
 							h(
 								'div',
 								{ className: 'sppcfw-flex sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-bg-[#111827] sppcfw-overflow-hidden' },
@@ -4452,7 +4453,7 @@
 										className: `sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-transition-colors sppcfw-cursor-pointer ${
 											currentBgType === 'classic' ? 'sppcfw-bg-[#374151] sppcfw-text-white' : 'sppcfw-text-gray-400 hover:sppcfw-text-white'
 										}`,
-										title: 'Classic',
+										title: __( 'Classic', 'single-product-customizer' ),
 										onClick: () => handleStyleChange(bgTab === 'normal' ? 'bg_type' : 'bg_hover_type', 'classic')
 									},
 									h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'brush')
@@ -4465,7 +4466,7 @@
 										className: `sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-border-l sppcfw-border-[#374151] sppcfw-transition-colors sppcfw-cursor-pointer ${
 											currentBgType === 'gradient' ? 'sppcfw-bg-[#374151] sppcfw-text-white' : 'sppcfw-text-gray-400 hover:sppcfw-text-white'
 										}`,
-										title: 'Gradient',
+										title: __( 'Gradient', 'single-product-customizer' ),
 										onClick: () => handleStyleChange(bgTab === 'normal' ? 'bg_type' : 'bg_hover_type', 'gradient')
 									},
 									h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'gradient')
@@ -4480,7 +4481,7 @@
 								{ className: 'sppcfw-space-y-3.5' },
 								// Color
 								renderColorPicker(
-									'Color',
+									__( 'Color', 'single-product-customizer' ),
 									getStyle(bgTab === 'normal' ? 'bg_color' : 'bg_hover_color'),
 									v => handleStyleChange(bgTab === 'normal' ? 'bg_color' : 'bg_hover_color', v),
 									'transparent'
@@ -4499,8 +4500,8 @@
 									function openMediaPicker() {
 										if (typeof wp !== 'undefined' && wp.media) {
 											const frame = wp.media({
-												title: 'Select Background Image',
-												button: { text: 'Insert Background Image' },
+												title: __( 'Select Background Image', 'single-product-customizer' ),
+												button: { text: __( 'Insert Background Image', 'single-product-customizer' ) },
 												multiple: false
 											});
 											frame.on('select', () => {
@@ -4521,7 +4522,7 @@
 											});
 											frame.open();
 										} else {
-											const url = prompt('Enter Background Image URL:', currentImgUrl || '');
+											const url = prompt(__( 'Enter Background Image URL:', 'single-product-customizer' ), currentImgUrl || '');
 											if (url !== null && url.trim()) {
 												handleMultiStyleChange({
 													[imgKey]: url.trim(),
@@ -4561,7 +4562,7 @@
 											h(
 												'div',
 												{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
-												h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Image'),
+												h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Image', 'single-product-customizer' )),
 												h('span', { className: 'material-symbols-outlined sppcfw-text-xs sppcfw-text-gray-400' }, 'desktop_windows')
 											),
 											h(
@@ -4573,7 +4574,7 @@
 														{
 															type: 'button',
 															className: 'sppcfw-text-gray-400 hover:sppcfw-text-red-400 sppcfw-p-1 sppcfw-rounded hover:sppcfw-bg-red-950/40 sppcfw-transition-colors sppcfw-cursor-pointer sppcfw-flex sppcfw-items-center sppcfw-justify-center',
-															title: 'Remove Image',
+															title: __( 'Remove Image', 'single-product-customizer' ),
 															onClick: e => {
 																e.stopPropagation();
 																removeImage();
@@ -4598,7 +4599,7 @@
 														{ className: 'sppcfw-w-full sppcfw-h-full sppcfw-relative' },
 														h('img', {
 															src: currentImgUrl,
-															alt: 'Background Preview',
+															alt: __( 'Background Preview', 'single-product-customizer' ),
 															className: 'sppcfw-w-full sppcfw-h-full sppcfw-object-cover'
 														}),
 														h(
@@ -4614,20 +4615,20 @@
 																		openMediaPicker();
 																	}
 																},
-																'Change'
+																__( 'Change', 'single-product-customizer' )
 															),
 															h(
 																'button',
 																{
 																	type: 'button',
 																	className: 'sppcfw-px-2.5 sppcfw-py-1 sppcfw-bg-red-600 hover:sppcfw-bg-red-700 sppcfw-text-white sppcfw-rounded sppcfw-text-xs sppcfw-font-semibold sppcfw-shadow sppcfw-cursor-pointer',
-																	title: 'Delete Image',
+																	title: __( 'Delete Image', 'single-product-customizer' ),
 																	onClick: e => {
 																		e.stopPropagation();
 																		removeImage();
 																	}
 																},
-																'Remove'
+																__( 'Remove', 'single-product-customizer' )
 															)
 														)
 												  )
@@ -4635,7 +4636,7 @@
 														'div',
 														{ className: 'sppcfw-w-full sppcfw-h-full sppcfw-flex sppcfw-flex-col sppcfw-items-center sppcfw-justify-center sppcfw-gap-1 sppcfw-text-gray-400 group-hover:sppcfw-text-white' },
 														h('span', { className: 'material-symbols-outlined sppcfw-text-xl' }, 'add_photo_alternate'),
-														h('span', { className: 'sppcfw-text-[11px] sppcfw-font-medium' }, 'Choose Image')
+														h('span', { className: 'sppcfw-text-[11px] sppcfw-font-medium' }, __( 'Choose Image', 'single-product-customizer' ))
 												  )
 										),
 
@@ -4648,7 +4649,7 @@
 												h(
 													'div',
 													{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-													h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Image Resolution'),
+													h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Image Resolution', 'single-product-customizer' )),
 													h(
 														'select',
 														{
@@ -4659,7 +4660,7 @@
 														['Full', 'Large', 'Medium', 'Thumbnail'].map(r => h('option', { key: r, value: r }, r))
 													)
 												),
-												h('p', { className: 'sppcfw-text-[10px] sppcfw-italic sppcfw-text-gray-400 sppcfw-leading-tight' }, 'Image size settings don\'t apply to Dynamic Images.'),
+												h('p', { className: 'sppcfw-text-[10px] sppcfw-italic sppcfw-text-gray-400 sppcfw-leading-tight' }, __( 'Image size settings don\'t apply to Dynamic Images.', 'single-product-customizer' )),
 
 												h('hr', { className: 'sppcfw-border-[#374151] sppcfw-my-2' }),
 
@@ -4670,7 +4671,7 @@
 													h(
 														'div',
 														{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
-														h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Position'),
+														h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Position', 'single-product-customizer' )),
 														h('span', { className: 'material-symbols-outlined sppcfw-text-xs sppcfw-text-gray-400' }, 'desktop_windows')
 													),
 													h(
@@ -4687,9 +4688,9 @@
 													h(
 														'div',
 														{ className: 'sppcfw-space-y-2 sppcfw-pl-2 sppcfw-border-l sppcfw-border-[#374151]' },
-														renderControlHeader('X Position', true, '%', () => {}, ['%']),
+														renderControlHeader(__( 'X Position', 'single-product-customizer' ), true, '%', () => {}, ['%']),
 														renderSliderInput(getStyle('bg_pos_x') || '50%', v => handleStyleChange('bg_pos_x', v), 0, 100, 1, '%', '50'),
-														renderControlHeader('Y Position', true, '%', () => {}, ['%']),
+														renderControlHeader(__( 'Y Position', 'single-product-customizer' ), true, '%', () => {}, ['%']),
 														renderSliderInput(getStyle('bg_pos_y') || '50%', v => handleStyleChange('bg_pos_y', v), 0, 100, 1, '%', '50')
 													),
 
@@ -4697,7 +4698,7 @@
 												h(
 													'div',
 													{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-													h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Attachment'),
+													h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Attachment', 'single-product-customizer' )),
 													h(
 														'select',
 														{
@@ -4716,7 +4717,7 @@
 													h(
 														'div',
 														{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
-														h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Repeat'),
+														h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Repeat', 'single-product-customizer' )),
 														h('span', { className: 'material-symbols-outlined sppcfw-text-xs sppcfw-text-gray-400' }, 'desktop_windows')
 													),
 													h(
@@ -4737,7 +4738,7 @@
 													h(
 														'div',
 														{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
-														h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Display Size'),
+														h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Display Size', 'single-product-customizer' )),
 														h('span', { className: 'material-symbols-outlined sppcfw-text-xs sppcfw-text-gray-400' }, 'desktop_windows')
 													),
 													h(
@@ -4754,7 +4755,7 @@
 													h(
 														'div',
 														{ className: 'sppcfw-space-y-1.5 sppcfw-pl-2 sppcfw-border-l sppcfw-border-[#374151]' },
-														renderControlHeader('Custom Scale Width', true, widthUnit, setWidthUnit, ['%', 'px', 'vw']),
+														renderControlHeader(__( 'Custom Scale Width', 'single-product-customizer' ), true, widthUnit, setWidthUnit, ['%', 'px', 'vw']),
 														renderSliderInput(getStyle('bg_custom_size') || '100%', v => handleStyleChange('bg_custom_size', v), 1, 200, 1, widthUnit, '100')
 													)
 											),
@@ -4764,7 +4765,7 @@
 											h(
 												'div',
 												{ className: 'sppcfw-space-y-1.5' },
-												renderControlHeader('Transition Duration', true, 's', () => {}, ['s']),
+												renderControlHeader(__( 'Transition Duration', 'single-product-customizer' ), true, 's', () => {}, ['s']),
 												renderSliderInput(getStyle('bg_hover_transition') || '0.3s', v => handleStyleChange('bg_hover_transition', v), 0.1, 3, 0.1, 's', '0.3')
 											)
 									);
@@ -4776,12 +4777,12 @@
 							h(
 								'div',
 								{ className: 'sppcfw-space-y-3.5' },
-								renderColorPicker('Color 1', getStyle('bg_gradient_color1') || '#9333ea', v => handleStyleChange('bg_gradient_color1', v), '#9333ea'),
-								renderColorPicker('Color 2', getStyle('bg_gradient_color2') || '#3b82f6', v => handleStyleChange('bg_gradient_color2', v), '#3b82f6'),
+								renderColorPicker(__( 'Color 1', 'single-product-customizer' ), getStyle('bg_gradient_color1') || '#9333ea', v => handleStyleChange('bg_gradient_color1', v), '#9333ea'),
+								renderColorPicker(__( 'Color 2', 'single-product-customizer' ), getStyle('bg_gradient_color2') || '#3b82f6', v => handleStyleChange('bg_gradient_color2', v), '#3b82f6'),
 								h(
 									'div',
 									{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-									h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Gradient Type'),
+									h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Gradient Type', 'single-product-customizer' )),
 									h(
 										'select',
 										{
@@ -4796,7 +4797,7 @@
 									h(
 										'div',
 										{ className: 'sppcfw-space-y-1.5' },
-										renderControlHeader('Angle', true, 'deg', () => {}, ['deg']),
+										renderControlHeader(__( 'Angle', 'single-product-customizer' ), true, 'deg', () => {}, ['deg']),
 										renderSliderInput(getStyle('bg_gradient_angle') || '180deg', v => handleStyleChange('bg_gradient_angle', v), 0, 360, 1, 'deg', '180')
 									)
 							)
@@ -4804,14 +4805,14 @@
 				),
 				renderAccordion(
 					'border',
-					'Border & Radius',
+					__( 'Border & Radius', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Border Type'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Border Type', 'single-product-customizer' )),
 							h(
 								'select',
 								{
@@ -4841,14 +4842,14 @@
 							h(
 								'div',
 								{ className: 'sppcfw-space-y-3' },
-								renderControlHeader('Border Width', true, widthUnit, setWidthUnit, ['px']),
+								renderControlHeader(__( 'Border Width', 'single-product-customizer' ), true, widthUnit, setWidthUnit, ['px']),
 								renderSliderInput(getStyle('border_width') || (getStyle('border_type') === 'Double' ? '3px' : '1px'), v => handleStyleChange('border_width', v), 1, 20, 1, 'px'),
-								renderColorPicker('Border Color', getStyle('border_color') || '#374151', v => handleStyleChange('border_color', v), '#374151')
+								renderColorPicker(__( 'Border Color', 'single-product-customizer' ), getStyle('border_color') || '#374151', v => handleStyleChange('border_color', v), '#374151')
 							),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Border Radius', true, radiusUnit, setRadiusUnit, ['px', '%']),
+						renderControlHeader(__( 'Border Radius', 'single-product-customizer' ), true, radiusUnit, setRadiusUnit, ['px', '%']),
 						renderFourBoxInput(getStyle, 'border_radius', handleMultiStyleChange, radiusUnit, isRadiusLinked, setIsRadiusLinked)
 						)
 					)
@@ -4863,21 +4864,21 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'typography',
-					'Typography',
+					__( 'Typography', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Text Color', getStyle('text_color'), v => handleStyleChange('text_color', v), '#111827'),
+						renderColorPicker(__( 'Text Color', 'single-product-customizer' ), getStyle('text_color'), v => handleStyleChange('text_color', v), '#111827'),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Font Size', true, widthUnit, setWidthUnit, ['px', 'rem', 'em']),
+						renderControlHeader(__( 'Font Size', 'single-product-customizer' ), true, widthUnit, setWidthUnit, ['px', 'rem', 'em']),
 						renderSliderInput(getStyle('font_size') || '16px', v => handleStyleChange('font_size', v), 10, 80, 1, widthUnit, '16')
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-						h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Font Family'),
+						h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Font Family', 'single-product-customizer' )),
 							h(
 								'select',
 								{
@@ -4891,7 +4892,7 @@
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-						h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Font Weight'),
+						h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Font Weight', 'single-product-customizer' )),
 							h(
 								'select',
 								{
@@ -4900,31 +4901,31 @@
 									onChange: e => handleStyleChange('font_weight', e.target.value),
 								},
 								[
-									{ val: 'Default', label: 'Default' },
-									{ val: '400', label: 'Normal (400)' },
-									{ val: '500', label: 'Medium (500)' },
-									{ val: '600', label: 'Semi-Bold (600)' },
-									{ val: '700', label: 'Bold (700)' },
-									{ val: '800', label: 'Extra-Bold (800)' },
+									{ val: 'Default', label: __( 'Default', 'single-product-customizer' ) },
+									{ val: '400', label: __( 'Normal (400)', 'single-product-customizer' ) },
+									{ val: '500', label: __( 'Medium (500)', 'single-product-customizer' ) },
+									{ val: '600', label: __( 'Semi-Bold (600)', 'single-product-customizer' ) },
+									{ val: '700', label: __( 'Bold (700)', 'single-product-customizer' ) },
+									{ val: '800', label: __( 'Extra-Bold (800)', 'single-product-customizer' ) },
 								].map(fw => h('option', { key: fw.val, value: fw.val }, fw.label))
 							)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Line Height', true, heightUnit, setHeightUnit, ['px', 'em']),
-						renderSliderInput(getStyle('line_height') || '', v => handleStyleChange('line_height', v), 12, 100, 1, heightUnit, 'Normal')
+						renderControlHeader(__( 'Line Height', 'single-product-customizer' ), true, heightUnit, setHeightUnit, ['px', 'em']),
+						renderSliderInput(getStyle('line_height') || '', v => handleStyleChange('line_height', v), 12, 100, 1, heightUnit, __( 'Normal', 'single-product-customizer' ))
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Alignment', true),
+						renderControlHeader(__( 'Alignment', 'single-product-customizer' ), true),
 						renderButtonGroup(
 							[
-								{ value: 'left', icon: 'format_align_left', title: 'Left' },
-								{ value: 'center', icon: 'format_align_center', title: 'Center' },
-								{ value: 'right', icon: 'format_align_right', title: 'Right' },
-								{ value: 'justify', icon: 'format_align_justify', title: 'Justify' },
+								{ value: 'left', icon: 'format_align_left', title: __( 'Left', 'single-product-customizer' ) },
+								{ value: 'center', icon: 'format_align_center', title: __( 'Center', 'single-product-customizer' ) },
+								{ value: 'right', icon: 'format_align_right', title: __( 'Right', 'single-product-customizer' ) },
+								{ value: 'justify', icon: 'format_align_justify', title: __( 'Justify', 'single-product-customizer' ) },
 							],
 							getStyle('alignment') || 'left',
 							v => handleStyleChange('alignment', v)
@@ -4934,21 +4935,21 @@
 				),
 				renderAccordion(
 					'background',
-					'Background & Spacing',
+					__( 'Background & Spacing', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Background Color', getStyle('bg_color'), v => handleStyleChange('bg_color', v), 'transparent'),
+						renderColorPicker(__( 'Background Color', 'single-product-customizer' ), getStyle('bg_color'), v => handleStyleChange('bg_color', v), 'transparent'),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Padding', true, paddingUnit, setPaddingUnit, ['px', '%']),
+						renderControlHeader(__( 'Padding', 'single-product-customizer' ), true, paddingUnit, setPaddingUnit, ['px', '%']),
 						renderFourBoxInput(getStyle, 'padding', handleMultiStyleChange, paddingUnit, isPaddingLinked, setIsPaddingLinked)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Border Radius', true, radiusUnit, setRadiusUnit, ['px', '%']),
+						renderControlHeader(__( 'Border Radius', 'single-product-customizer' ), true, radiusUnit, setRadiusUnit, ['px', '%']),
 						renderFourBoxInput(getStyle, 'border_radius', handleMultiStyleChange, radiusUnit, isRadiusLinked, setIsRadiusLinked)
 						)
 					)
@@ -4963,25 +4964,25 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'colors',
-					'Price Colors & Sizing',
+					__( 'Price Colors & Sizing', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Price Color', getStyle('price_color') || getStyle('text_color'), v => {
+						renderColorPicker(__( 'Price Color', 'single-product-customizer' ), getStyle('price_color') || getStyle('text_color'), v => {
 							handleMultiStyleChange({ price_color: v, text_color: v });
 						}, '#9333ea'),
-						renderColorPicker('Regular Price Color', getStyle('regular_price_color'), v => handleStyleChange('regular_price_color', v), '#9ca3af'),
-						renderColorPicker('Sale Price Color', getStyle('sale_price_color'), v => handleStyleChange('sale_price_color', v), '#ef4444'),
+						renderColorPicker(__( 'Regular Price Color', 'single-product-customizer' ), getStyle('regular_price_color'), v => handleStyleChange('regular_price_color', v), '#9ca3af'),
+						renderColorPicker(__( 'Sale Price Color', 'single-product-customizer' ), getStyle('sale_price_color'), v => handleStyleChange('sale_price_color', v), '#ef4444'),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Price Font Size', true, widthUnit, setWidthUnit, ['px', 'rem', 'em']),
+						renderControlHeader(__( 'Price Font Size', 'single-product-customizer' ), true, widthUnit, setWidthUnit, ['px', 'rem', 'em']),
 						renderSliderInput(getStyle('font_size') || '24px', v => handleStyleChange('font_size', v), 12, 60, 1, widthUnit, '24')
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-						h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Font Weight'),
+						h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Font Weight', 'single-product-customizer' )),
 							h(
 								'select',
 								{
@@ -4995,12 +4996,12 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Alignment', true),
+						renderControlHeader(__( 'Alignment', 'single-product-customizer' ), true),
 						renderButtonGroup(
 							[
-								{ value: 'left', icon: 'format_align_left', title: 'Left' },
-								{ value: 'center', icon: 'format_align_center', title: 'Center' },
-								{ value: 'right', icon: 'format_align_right', title: 'Right' },
+								{ value: 'left', icon: 'format_align_left', title: __( 'Left', 'single-product-customizer' ) },
+								{ value: 'center', icon: 'format_align_center', title: __( 'Center', 'single-product-customizer' ) },
+								{ value: 'right', icon: 'format_align_right', title: __( 'Right', 'single-product-customizer' ) },
 							],
 							getStyle('alignment') || 'left',
 							v => handleStyleChange('alignment', v)
@@ -5018,30 +5019,30 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'button_colors',
-					'Button Colors',
+					__( 'Button Colors', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Button Background', getStyle('btn_bg_color') || getStyle('bg_color'), v => {
+						renderColorPicker(__( 'Button Background', 'single-product-customizer' ), getStyle('btn_bg_color') || getStyle('bg_color'), v => {
 							handleStyleChange('btn_bg_color', v);
 						}, '#9333ea'),
-						renderColorPicker('Button Text Color', getStyle('btn_text_color') || getStyle('text_color'), v => {
+						renderColorPicker(__( 'Button Text Color', 'single-product-customizer' ), getStyle('btn_text_color') || getStyle('text_color'), v => {
 							handleStyleChange('btn_text_color', v);
 						}, '#ffffff'),
-						renderColorPicker('Hover Background', getStyle('btn_hover_bg_color'), v => handleStyleChange('btn_hover_bg_color', v), '#7e22ce'),
-						renderColorPicker('Hover Text Color', getStyle('btn_hover_text_color'), v => handleStyleChange('btn_hover_text_color', v), '#ffffff')
+						renderColorPicker(__( 'Hover Background', 'single-product-customizer' ), getStyle('btn_hover_bg_color'), v => handleStyleChange('btn_hover_bg_color', v), '#7e22ce'),
+						renderColorPicker(__( 'Hover Text Color', 'single-product-customizer' ), getStyle('btn_hover_text_color'), v => handleStyleChange('btn_hover_text_color', v), '#ffffff')
 					)
 				),
 				renderAccordion(
 					'button_typography',
-					'Typography',
+					__( 'Typography', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Font Size', true, fontSizeUnit, setFontSizeUnit, ['px', 'rem', 'em']),
+							renderControlHeader(__( 'Font Size', 'single-product-customizer' ), true, fontSizeUnit, setFontSizeUnit, ['px', 'rem', 'em']),
 							renderSliderInput(getStyle('btn_font_size') || getStyle('font_size') || '14px', v => {
 								handleMultiStyleChange({ btn_font_size: v, font_size: v });
 							}, 10, 60, 1, fontSizeUnit, '14')
@@ -5049,7 +5050,7 @@
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Font Weight'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Font Weight', 'single-product-customizer' )),
 							h(
 								'select',
 								{
@@ -5057,18 +5058,18 @@
 									value: getStyle('font_weight') || 'Default',
 									onChange: e => handleStyleChange('font_weight', e.target.value),
 								},
-								h('option', { value: 'Default' }, 'Default'),
-								h('option', { value: '400' }, '400 (Normal)'),
-								h('option', { value: '500' }, '500 (Medium)'),
-								h('option', { value: '600' }, '600 (Semi-Bold)'),
-								h('option', { value: '700' }, '700 (Bold)'),
-								h('option', { value: '800' }, '800 (Extra-Bold)')
+								h('option', { value: 'Default' }, __( 'Default', 'single-product-customizer' )),
+								h('option', { value: '400' }, __( '400 (Normal)', 'single-product-customizer' )),
+								h('option', { value: '500' }, __( '500 (Medium)', 'single-product-customizer' )),
+								h('option', { value: '600' }, __( '600 (Semi-Bold)', 'single-product-customizer' )),
+								h('option', { value: '700' }, __( '700 (Bold)', 'single-product-customizer' )),
+								h('option', { value: '800' }, __( '800 (Extra-Bold)', 'single-product-customizer' ))
 							)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Font Family'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Font Family', 'single-product-customizer' )),
 							h(
 								'select',
 								{
@@ -5076,64 +5077,64 @@
 									value: getStyle('font_family') || 'Inherit',
 									onChange: e => handleStyleChange('font_family', e.target.value),
 								},
-								h('option', { value: 'Inherit' }, 'Inherit'),
-								h('option', { value: 'Inter' }, 'Inter'),
-								h('option', { value: 'Roboto' }, 'Roboto'),
-								h('option', { value: 'Open Sans' }, 'Open Sans'),
-								h('option', { value: 'Lato' }, 'Lato'),
-								h('option', { value: 'Poppins' }, 'Poppins'),
-								h('option', { value: 'Montserrat' }, 'Montserrat')
+								h('option', { value: 'Inherit' }, __( 'Inherit', 'single-product-customizer' )),
+								h('option', { value: 'Inter' }, __( 'Inter', 'single-product-customizer' )),
+								h('option', { value: 'Roboto' }, __( 'Roboto', 'single-product-customizer' )),
+								h('option', { value: 'Open Sans' }, __( 'Open Sans', 'single-product-customizer' )),
+								h('option', { value: 'Lato' }, __( 'Lato', 'single-product-customizer' )),
+								h('option', { value: 'Poppins' }, __( 'Poppins', 'single-product-customizer' )),
+								h('option', { value: 'Montserrat' }, __( 'Montserrat', 'single-product-customizer' ))
 							)
 						)
 					)
 				),
 				renderAccordion(
 					'button_quantity',
-					'Quantity Field',
+					__( 'Quantity Field', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Input Background', getStyle('qty_bg_color'), v => handleStyleChange('qty_bg_color', v), '#ffffff'),
-						renderColorPicker('Input Text Color', getStyle('qty_text_color'), v => handleStyleChange('qty_text_color', v), '#111827'),
-						renderColorPicker('Border Color', getStyle('qty_border_color'), v => handleStyleChange('qty_border_color', v), '#d1d5db'),
-						renderColorPicker('+/- Buttons Background', getStyle('qty_btn_bg'), v => handleStyleChange('qty_btn_bg', v), '#f3f4f6'),
-						renderColorPicker('+/- Buttons Color', getStyle('qty_btn_color'), v => handleStyleChange('qty_btn_color', v), '#374151'),
-						renderColorPicker('+/- Buttons Hover BG', getStyle('qty_btn_hover_bg'), v => handleStyleChange('qty_btn_hover_bg', v), '#e5e7eb')
+						renderColorPicker(__( 'Input Background', 'single-product-customizer' ), getStyle('qty_bg_color'), v => handleStyleChange('qty_bg_color', v), '#ffffff'),
+						renderColorPicker(__( 'Input Text Color', 'single-product-customizer' ), getStyle('qty_text_color'), v => handleStyleChange('qty_text_color', v), '#111827'),
+						renderColorPicker(__( 'Border Color', 'single-product-customizer' ), getStyle('qty_border_color'), v => handleStyleChange('qty_border_color', v), '#d1d5db'),
+						renderColorPicker(__( '+/- Buttons Background', 'single-product-customizer' ), getStyle('qty_btn_bg'), v => handleStyleChange('qty_btn_bg', v), '#f3f4f6'),
+						renderColorPicker(__( '+/- Buttons Color', 'single-product-customizer' ), getStyle('qty_btn_color'), v => handleStyleChange('qty_btn_color', v), '#374151'),
+						renderColorPicker(__( '+/- Buttons Hover BG', 'single-product-customizer' ), getStyle('qty_btn_hover_bg'), v => handleStyleChange('qty_btn_hover_bg', v), '#e5e7eb')
 					)
 				),
 				renderAccordion(
 					'button_spacing',
-					'Dimensions & Spacing',
+					__( 'Dimensions & Spacing', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Button Padding', true, paddingUnit, setPaddingUnit, ['px']),
+							renderControlHeader(__( 'Button Padding', 'single-product-customizer' ), true, paddingUnit, setPaddingUnit, ['px']),
 							renderFourBoxInput(getStyle, 'btn_padding', handleMultiStyleChange, paddingUnit, isPaddingLinked, setIsPaddingLinked)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Border Radius', true, radiusUnit, setRadiusUnit, ['px', '%']),
+							renderControlHeader(__( 'Border Radius', 'single-product-customizer' ), true, radiusUnit, setRadiusUnit, ['px', '%']),
 							renderFourBoxInput(getStyle, 'btn_border_radius', handleMultiStyleChange, radiusUnit, isRadiusLinked, setIsRadiusLinked)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Items Gap', true, widthUnit, setWidthUnit, ['px']),
+							renderControlHeader(__( 'Items Gap', 'single-product-customizer' ), true, widthUnit, setWidthUnit, ['px']),
 							renderSliderInput(getStyle('gap') || '12px', v => handleStyleChange('gap', v), 0, 40, 1, 'px', '12')
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Alignment', true),
+							renderControlHeader(__( 'Alignment', 'single-product-customizer' ), true),
 							renderButtonGroup(
 								[
-									{ value: 'left', icon: 'format_align_left', title: 'Left' },
-									{ value: 'center', icon: 'format_align_center', title: 'Center' },
-									{ value: 'right', icon: 'format_align_right', title: 'Right' },
+									{ value: 'left', icon: 'format_align_left', title: __( 'Left', 'single-product-customizer' ) },
+									{ value: 'center', icon: 'format_align_center', title: __( 'Center', 'single-product-customizer' ) },
+									{ value: 'right', icon: 'format_align_right', title: __( 'Right', 'single-product-customizer' ) },
 								],
 								getStyle('alignment') || 'left',
 								v => handleStyleChange('alignment', v)
@@ -5143,34 +5144,34 @@
 				),
 				renderAccordion(
 					'variation_style',
-					'Variation & Swatches Style',
+					__( 'Variation & Swatches Style', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Attribute Label Color', getStyle('var_label_color'), v => handleStyleChange('var_label_color', v), '#374151'),
+						renderColorPicker(__( 'Attribute Label Color', 'single-product-customizer' ), getStyle('var_label_color'), v => handleStyleChange('var_label_color', v), '#374151'),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Attribute Label Size', true, fontSizeUnit, setFontSizeUnit, ['px']),
+							renderControlHeader(__( 'Attribute Label Size', 'single-product-customizer' ), true, fontSizeUnit, setFontSizeUnit, ['px']),
 							renderSliderInput(getStyle('var_label_size') || '12px', v => handleStyleChange('var_label_size', v), 10, 24, 1, 'px', '12')
 						),
-						renderColorPicker('Active Swatch Accent Color', getStyle('active_swatch_color'), v => handleStyleChange('active_swatch_color', v), '#9333ea'),
+						renderColorPicker(__( 'Active Swatch Accent Color', 'single-product-customizer' ), getStyle('active_swatch_color'), v => handleStyleChange('active_swatch_color', v), '#9333ea'),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Swatch Size', true, widthUnit, setWidthUnit, ['px']),
+							renderControlHeader(__( 'Swatch Size', 'single-product-customizer' ), true, widthUnit, setWidthUnit, ['px']),
 							renderSliderInput(getStyle('swatch_size') || '36px', v => handleStyleChange('swatch_size', v), 18, 80, 1, widthUnit, '36')
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Swatch Border Radius', true, radiusUnit, setRadiusUnit, ['px', '%']),
+							renderControlHeader(__( 'Swatch Border Radius', 'single-product-customizer' ), true, radiusUnit, setRadiusUnit, ['px', '%']),
 							renderSliderInput(getStyle('swatch_border_radius') || '4px', v => handleStyleChange('swatch_border_radius', v), 0, 50, 1, radiusUnit, '4')
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Swatch Items Gap', true, widthUnit, setWidthUnit, ['px']),
+							renderControlHeader(__( 'Swatch Items Gap', 'single-product-customizer' ), true, widthUnit, setWidthUnit, ['px']),
 							renderSliderInput(getStyle('swatch_gap') || '8px', v => handleStyleChange('swatch_gap', v), 0, 30, 1, 'px', '8')
 						)
 					)
@@ -5185,39 +5186,39 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'rating_stars',
-					'Stars Appearance',
+					__( 'Stars Appearance', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Star Color (Filled)', getStyle('star_color') || getStyle('text_color'), v => {
+						renderColorPicker(__( 'Star Color (Filled)', 'single-product-customizer' ), getStyle('star_color') || getStyle('text_color'), v => {
 							handleMultiStyleChange({ star_color: v, text_color: v });
 						}, '#f59e0b'),
-						renderColorPicker('Empty Star Color', getStyle('empty_star_color'), v => handleStyleChange('empty_star_color', v), '#d1d5db'),
+						renderColorPicker(__( 'Empty Star Color', 'single-product-customizer' ), getStyle('empty_star_color'), v => handleStyleChange('empty_star_color', v), '#d1d5db'),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Star Size', true, widthUnit, setWidthUnit, ['px']),
+							renderControlHeader(__( 'Star Size', 'single-product-customizer' ), true, widthUnit, setWidthUnit, ['px']),
 							renderSliderInput(getStyle('star_size') || '18px', v => handleStyleChange('star_size', v), 10, 60, 1, widthUnit, '18')
 						)
 					)
 				),
 				renderAccordion(
 					'rating_text',
-					'Review Count & Typography',
+					__( 'Review Count & Typography', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Text Color', getStyle('review_count_color'), v => handleStyleChange('review_count_color', v), '#6b7280'),
+						renderColorPicker(__( 'Text Color', 'single-product-customizer' ), getStyle('review_count_color'), v => handleStyleChange('review_count_color', v), '#6b7280'),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Font Size', true, widthUnit, setWidthUnit, ['px']),
+							renderControlHeader(__( 'Font Size', 'single-product-customizer' ), true, widthUnit, setWidthUnit, ['px']),
 							renderSliderInput(getStyle('review_font_size') || '14px', v => handleStyleChange('review_font_size', v), 10, 32, 1, widthUnit, '14')
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Font Weight'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Font Weight', 'single-product-customizer' )),
 							h(
 								'select',
 								{
@@ -5225,38 +5226,38 @@
 									value: getStyle('review_font_weight') || 'Default',
 									onChange: e => handleStyleChange('review_font_weight', e.target.value),
 								},
-								h('option', { value: 'Default' }, 'Default'),
-								h('option', { value: '300' }, '300 (Light)'),
-								h('option', { value: '400' }, '400 (Normal)'),
-								h('option', { value: '500' }, '500 (Medium)'),
-								h('option', { value: '600' }, '600 (Semi-Bold)'),
-								h('option', { value: '700' }, '700 (Bold)'),
-								h('option', { value: '800' }, '800 (Extra-Bold)')
+								h('option', { value: 'Default' }, __( 'Default', 'single-product-customizer' )),
+								h('option', { value: '300' }, __( '300 (Light)', 'single-product-customizer' )),
+								h('option', { value: '400' }, __( '400 (Normal)', 'single-product-customizer' )),
+								h('option', { value: '500' }, __( '500 (Medium)', 'single-product-customizer' )),
+								h('option', { value: '600' }, __( '600 (Semi-Bold)', 'single-product-customizer' )),
+								h('option', { value: '700' }, __( '700 (Bold)', 'single-product-customizer' )),
+								h('option', { value: '800' }, __( '800 (Extra-Bold)', 'single-product-customizer' ))
 							)
 						)
 					)
 				),
 				renderAccordion(
 					'rating_layout',
-					'Layout & Alignment',
+					__( 'Layout & Alignment', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Space Between (Gap)', true, widthUnit, setWidthUnit, ['px']),
+							renderControlHeader(__( 'Space Between (Gap)', 'single-product-customizer' ), true, widthUnit, setWidthUnit, ['px']),
 							renderSliderInput(getStyle('gap') || '8px', v => handleStyleChange('gap', v), 0, 40, 1, widthUnit, '8')
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Alignment', true),
+							renderControlHeader(__( 'Alignment', 'single-product-customizer' ), true),
 							renderButtonGroup(
 								[
-									{ value: 'left', icon: 'format_align_left', title: 'Left' },
-									{ value: 'center', icon: 'format_align_center', title: 'Center' },
-									{ value: 'right', icon: 'format_align_right', title: 'Right' },
+									{ value: 'left', icon: 'format_align_left', title: __( 'Left', 'single-product-customizer' ) },
+									{ value: 'center', icon: 'format_align_center', title: __( 'Center', 'single-product-customizer' ) },
+									{ value: 'right', icon: 'format_align_right', title: __( 'Right', 'single-product-customizer' ) },
 								],
 								getStyle('alignment') || 'left',
 								v => handleStyleChange('alignment', v)
@@ -5274,19 +5275,19 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'image',
-					'Image Sizing & Alignment',
+					__( 'Image Sizing & Alignment', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Alignment', true),
+						renderControlHeader(__( 'Alignment', 'single-product-customizer' ), true),
 						renderButtonGroup(
 							[
-								{ value: 'left', icon: 'format_align_left', title: 'Left' },
-								{ value: 'center', icon: 'format_align_center', title: 'Center' },
-								{ value: 'right', icon: 'format_align_right', title: 'Right' },
+								{ value: 'left', icon: 'format_align_left', title: __( 'Left', 'single-product-customizer' ) },
+								{ value: 'center', icon: 'format_align_center', title: __( 'Center', 'single-product-customizer' ) },
+								{ value: 'right', icon: 'format_align_right', title: __( 'Right', 'single-product-customizer' ) },
 							],
 							getStyle('alignment') || 'center',
 							v => handleStyleChange('alignment', v)
@@ -5295,39 +5296,39 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Width', true, imgWidthUnit, setImgWidthUnit, ['%', 'px', 'vw']),
+						renderControlHeader(__( 'Width', 'single-product-customizer' ), true, imgWidthUnit, setImgWidthUnit, ['%', 'px', 'vw']),
 						renderSliderInput(getStyle('width') || '100%', v => handleStyleChange('width', v), 0, 100, 1, imgWidthUnit)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Max Width', true, maxImgWidthUnit, setMaxImgWidthUnit, ['%', 'px', 'vw']),
+						renderControlHeader(__( 'Max Width', 'single-product-customizer' ), true, maxImgWidthUnit, setMaxImgWidthUnit, ['%', 'px', 'vw']),
 						renderSliderInput(getStyle('max_width') || '100%', v => handleStyleChange('max_width', v), 0, 100, 1, maxImgWidthUnit)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Height', true, imgHeightUnit, setImgHeightUnit, ['px', 'vh', '%']),
-						renderSliderInput(getStyle('height') || '', v => handleStyleChange('height', v), 0, 800, 1, imgHeightUnit, 'Auto')
+						renderControlHeader(__( 'Height', 'single-product-customizer' ), true, imgHeightUnit, setImgHeightUnit, ['px', 'vh', '%']),
+						renderSliderInput(getStyle('height') || '', v => handleStyleChange('height', v), 0, 800, 1, imgHeightUnit, __( 'Auto', 'single-product-customizer' ))
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Opacity', false),
+						renderControlHeader(__( 'Opacity', 'single-product-customizer' ), false),
 						renderSliderInput(getStyle('opacity') || '1', v => handleStyleChange('opacity', v), 0, 1, 0.05, '')
 						)
 					)
 				),
 				renderAccordion(
 					'border',
-					'Border & Box Shadow',
+					__( 'Border & Box Shadow', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-						h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Border Type'),
+						h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Border Type', 'single-product-customizer' )),
 							h(
 								'select',
 								{
@@ -5341,7 +5342,7 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Border Radius', true, radiusUnit, setRadiusUnit, ['px', '%']),
+						renderControlHeader(__( 'Border Radius', 'single-product-customizer' ), true, radiusUnit, setRadiusUnit, ['px', '%']),
 						renderFourBoxInput(getStyle, 'border_radius', handleMultiStyleChange, radiusUnit, isRadiusLinked, setIsRadiusLinked)
 						)
 					)
@@ -5356,23 +5357,23 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'typography',
-					'Tabs Appearance',
+					__( 'Tabs Appearance', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Tab Heading Color', getStyle('text_color'), v => handleStyleChange('text_color', v), '#111827'),
-						renderColorPicker('Active Tab Highlight', getStyle('active_tab_color'), v => handleStyleChange('active_tab_color', v), '#9333ea'),
-						renderColorPicker('Panel Background', getStyle('bg_color'), v => handleStyleChange('bg_color', v), '#f9fafb'),
+						renderColorPicker(__( 'Tab Heading Color', 'single-product-customizer' ), getStyle('text_color'), v => handleStyleChange('text_color', v), '#111827'),
+						renderColorPicker(__( 'Active Tab Highlight', 'single-product-customizer' ), getStyle('active_tab_color'), v => handleStyleChange('active_tab_color', v), '#9333ea'),
+						renderColorPicker(__( 'Panel Background', 'single-product-customizer' ), getStyle('bg_color'), v => handleStyleChange('bg_color', v), '#f9fafb'),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Content Padding', true, paddingUnit, setPaddingUnit, ['px']),
+						renderControlHeader(__( 'Content Padding', 'single-product-customizer' ), true, paddingUnit, setPaddingUnit, ['px']),
 						renderFourBoxInput(getStyle, 'padding', handleMultiStyleChange, paddingUnit, isPaddingLinked, setIsPaddingLinked)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Border Radius', true, radiusUnit, setRadiusUnit, ['px']),
+						renderControlHeader(__( 'Border Radius', 'single-product-customizer' ), true, radiusUnit, setRadiusUnit, ['px']),
 						renderFourBoxInput(getStyle, 'border_radius', handleMultiStyleChange, radiusUnit, isRadiusLinked, setIsRadiusLinked)
 						)
 					)
@@ -5387,22 +5388,22 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'typography',
-					'Meta Text Styles',
+					__( 'Meta Text Styles', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Label Color', getStyle('label_color'), v => handleStyleChange('label_color', v), '#111827'),
-						renderColorPicker('Value / Link Color', getStyle('text_color'), v => handleStyleChange('text_color', v), '#6b7280'),
+						renderColorPicker(__( 'Label Color', 'single-product-customizer' ), getStyle('label_color'), v => handleStyleChange('label_color', v), '#111827'),
+						renderColorPicker(__( 'Value / Link Color', 'single-product-customizer' ), getStyle('text_color'), v => handleStyleChange('text_color', v), '#6b7280'),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Font Size', true, widthUnit, setWidthUnit, ['px']),
+						renderControlHeader(__( 'Font Size', 'single-product-customizer' ), true, widthUnit, setWidthUnit, ['px']),
 						renderSliderInput(getStyle('font_size') || '13px', v => handleStyleChange('font_size', v), 10, 24, 1, widthUnit, '13')
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Item Gap', true, gapsUnit, setGapsUnit, ['px']),
+						renderControlHeader(__( 'Item Gap', 'single-product-customizer' ), true, gapsUnit, setGapsUnit, ['px']),
 						renderSliderInput(getStyle('gap') || '6px', v => handleStyleChange('gap', v), 0, 30, 1, gapsUnit, '6')
 						)
 					)
@@ -5417,23 +5418,23 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'colors',
-					'Banner Colors & Border',
+					__( 'Banner Colors & Border', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Background Color', getStyle('bg_color'), v => handleStyleChange('bg_color', v), '#faf5ff'),
-						renderColorPicker('Text Color', getStyle('text_color'), v => handleStyleChange('text_color', v), '#7e22ce'),
-						renderColorPicker('Accent Border Color', getStyle('border_color'), v => handleStyleChange('border_color', v), '#9333ea'),
+						renderColorPicker(__( 'Background Color', 'single-product-customizer' ), getStyle('bg_color'), v => handleStyleChange('bg_color', v), '#faf5ff'),
+						renderColorPicker(__( 'Text Color', 'single-product-customizer' ), getStyle('text_color'), v => handleStyleChange('text_color', v), '#7e22ce'),
+						renderColorPicker(__( 'Accent Border Color', 'single-product-customizer' ), getStyle('border_color'), v => handleStyleChange('border_color', v), '#9333ea'),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Padding', true, paddingUnit, setPaddingUnit, ['px']),
+						renderControlHeader(__( 'Padding', 'single-product-customizer' ), true, paddingUnit, setPaddingUnit, ['px']),
 						renderFourBoxInput(getStyle, 'padding', handleMultiStyleChange, paddingUnit, isPaddingLinked, setIsPaddingLinked)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Border Radius', true, radiusUnit, setRadiusUnit, ['px']),
+						renderControlHeader(__( 'Border Radius', 'single-product-customizer' ), true, radiusUnit, setRadiusUnit, ['px']),
 						renderFourBoxInput(getStyle, 'border_radius', handleMultiStyleChange, radiusUnit, isRadiusLinked, setIsRadiusLinked)
 						)
 					)
@@ -5448,23 +5449,23 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'button',
-					'Stepper Buttons & Input',
+					__( 'Stepper Buttons & Input', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Button Background', getStyle('btn_bg_color') || getStyle('bg_color'), v => {
+						renderColorPicker(__( 'Button Background', 'single-product-customizer' ), getStyle('btn_bg_color') || getStyle('bg_color'), v => {
 							handleStyleChange('btn_bg_color', v);
 							handleStyleChange('bg_color', v);
 						}, '#f3f4f6'),
-						renderColorPicker('Button Text Color', getStyle('btn_text_color') || getStyle('text_color'), v => {
+						renderColorPicker(__( 'Button Text Color', 'single-product-customizer' ), getStyle('btn_text_color') || getStyle('text_color'), v => {
 							handleStyleChange('btn_text_color', v);
 							handleStyleChange('text_color', v);
 						}, '#111827'),
-						renderColorPicker('Border Color', getStyle('border_color'), v => handleStyleChange('border_color', v), '#d1d5db'),
+						renderColorPicker(__( 'Border Color', 'single-product-customizer' ), getStyle('border_color'), v => handleStyleChange('border_color', v), '#d1d5db'),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Border Radius', true, radiusUnit, setRadiusUnit, ['px']),
+						renderControlHeader(__( 'Border Radius', 'single-product-customizer' ), true, radiusUnit, setRadiusUnit, ['px']),
 						renderFourBoxInput(getStyle, 'border_radius', handleMultiStyleChange, radiusUnit, isRadiusLinked, setIsRadiusLinked)
 						)
 					)
@@ -5479,34 +5480,34 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'typography',
-					'Style & Colors',
+					__( 'Style & Colors', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
-						renderColorPicker('Primary Color', getStyle('text_color'), v => handleStyleChange('text_color', v), '#111827'),
-						renderColorPicker('Background Color', getStyle('bg_color'), v => handleStyleChange('bg_color', v), 'transparent'),
-						renderColorPicker('Border Color', getStyle('border_color'), v => handleStyleChange('border_color', v), '#e5e7eb'),
+						renderColorPicker(__( 'Primary Color', 'single-product-customizer' ), getStyle('text_color'), v => handleStyleChange('text_color', v), '#111827'),
+						renderColorPicker(__( 'Background Color', 'single-product-customizer' ), getStyle('bg_color'), v => handleStyleChange('bg_color', v), 'transparent'),
+						renderColorPicker(__( 'Border Color', 'single-product-customizer' ), getStyle('border_color'), v => handleStyleChange('border_color', v), '#e5e7eb'),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Padding', true, paddingUnit, setPaddingUnit, ['px']),
+						renderControlHeader(__( 'Padding', 'single-product-customizer' ), true, paddingUnit, setPaddingUnit, ['px']),
 						renderFourBoxInput(getStyle, 'padding', handleMultiStyleChange, paddingUnit, isPaddingLinked, setIsPaddingLinked)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Border Radius', true, radiusUnit, setRadiusUnit, ['px']),
+						renderControlHeader(__( 'Border Radius', 'single-product-customizer' ), true, radiusUnit, setRadiusUnit, ['px']),
 						renderFourBoxInput(getStyle, 'border_radius', handleMultiStyleChange, radiusUnit, isRadiusLinked, setIsRadiusLinked)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Alignment', true),
+						renderControlHeader(__( 'Alignment', 'single-product-customizer' ), true),
 						renderButtonGroup(
 							[
-								{ value: 'left', icon: 'format_align_left', title: 'Left' },
-								{ value: 'center', icon: 'format_align_center', title: 'Center' },
-								{ value: 'right', icon: 'format_align_right', title: 'Right' },
+								{ value: 'left', icon: 'format_align_left', title: __( 'Left', 'single-product-customizer' ) },
+								{ value: 'center', icon: 'format_align_center', title: __( 'Center', 'single-product-customizer' ) },
+								{ value: 'right', icon: 'format_align_right', title: __( 'Right', 'single-product-customizer' ) },
 							],
 							getStyle('alignment') || 'left',
 							v => handleStyleChange('alignment', v)
@@ -5596,7 +5597,7 @@
 		// 1i. Related & Upsell Products Content Panel
 		function renderRelatedProductsContent() {
 			const isRelated = selectedElement.type === 'related_products';
-			const defaultTitle = isRelated ? 'Related products' : 'You may also like…';
+			const defaultTitle = isRelated ? __( 'Related products', 'single-product-customizer' ) : __( 'You may also like…', 'single-product-customizer' );
 			const titleVal = getSetting('title', true) !== undefined ? getSetting('title', true) : defaultTitle;
 			const defaultCols = deviceView === 'mobile' ? 2 : (deviceView === 'tablet' ? 3 : 4);
 			const columnsVal = parseInt(getSetting('columns'), 10) || defaultCols;
@@ -5609,7 +5610,7 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'related_content_general',
-					isRelated ? 'Related Products Settings' : 'Upsell Products Settings',
+					isRelated ? __( 'Related Products Settings', 'single-product-customizer' ) : __( 'Upsell Products Settings', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-4' },
@@ -5617,7 +5618,7 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, 'Section Heading Title'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, __( 'Section Heading Title', 'single-product-customizer' )),
 							h('input', {
 								type: 'text',
 								className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
@@ -5631,7 +5632,7 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Columns', true),
+							renderControlHeader(__( 'Columns', 'single-product-customizer' ), true),
 							renderButtonGroup(
 								[
 									{ value: 1, label: '1' },
@@ -5650,7 +5651,7 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Products Count (Limit)', true),
+							renderControlHeader(__( 'Products Count (Limit)', 'single-product-customizer' ), true),
 							h('input', {
 								type: 'number',
 								min: 1,
@@ -5665,7 +5666,7 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, 'Order By'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, __( 'Order By', 'single-product-customizer' )),
 							h(
 								'select',
 								{
@@ -5673,12 +5674,12 @@
 									value: orderbyVal,
 									onChange: e => handleSettingChange('orderby', e.target.value, true),
 								},
-								h('option', { value: 'rand' }, 'Random (Default)'),
-								h('option', { value: 'date' }, 'Date / Latest'),
-								h('option', { value: 'title' }, 'Title / Alphabetical'),
-								h('option', { value: 'price' }, 'Price'),
-								h('option', { value: 'popularity' }, 'Popularity / Sales'),
-								h('option', { value: 'rating' }, 'Top Rated')
+								h('option', { value: 'rand' }, __( 'Random (Default)', 'single-product-customizer' )),
+								h('option', { value: 'date' }, __( 'Date / Latest', 'single-product-customizer' )),
+								h('option', { value: 'title' }, __( 'Title / Alphabetical', 'single-product-customizer' )),
+								h('option', { value: 'price' }, __( 'Price', 'single-product-customizer' )),
+								h('option', { value: 'popularity' }, __( 'Popularity / Sales', 'single-product-customizer' )),
+								h('option', { value: 'rating' }, __( 'Top Rated', 'single-product-customizer' ))
 							)
 						),
 
@@ -5686,7 +5687,7 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, 'Order Direction'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, __( 'Order Direction', 'single-product-customizer' )),
 							renderButtonGroup(
 								[
 									{ value: 'desc', label: 'DESC' },
@@ -5752,12 +5753,12 @@
 							h('div', { className: 'sppcfw-w-6 sppcfw-h-6 sppcfw-rounded-md sppcfw-bg-purple-500/20 sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-text-purple-300' },
 								h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'code')
 							),
-							'Custom Code Studio'
+							__( 'Custom Code Studio', 'single-product-customizer' )
 						),
-						h('span', { className: 'sppcfw-px-2 sppcfw-py-0.5 sppcfw-text-[10px] sppcfw-font-bold sppcfw-rounded-full sppcfw-bg-emerald-500/15 sppcfw-text-emerald-400 sppcfw-border sppcfw-border-emerald-500/30' }, '● Live Preview')
+						h('span', { className: 'sppcfw-px-2 sppcfw-py-0.5 sppcfw-text-[10px] sppcfw-font-bold sppcfw-rounded-full sppcfw-bg-emerald-500/15 sppcfw-text-emerald-400 sppcfw-border sppcfw-border-emerald-500/30' }, __( '● Live Preview', 'single-product-customizer' ))
 					),
 					h('p', { className: 'sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-leading-relaxed' },
-						'Write custom HTML markup, scoped CSS rules, and JavaScript logic. Code is rendered and executed in real-time in the canvas preview.'
+						__( 'Write custom HTML markup, scoped CSS rules, and JavaScript logic. Code is rendered and executed in real-time in the canvas preview.', 'single-product-customizer' )
 					)
 				),
 
@@ -5766,9 +5767,9 @@
 					'div',
 					{ className: 'sppcfw-flex sppcfw-bg-[#111827] sppcfw-p-1 sppcfw-rounded-lg sppcfw-border sppcfw-border-[#374151] sppcfw-gap-1' },
 					[
-						{ id: 'html', label: 'HTML Markup', icon: 'html', color: 'sppcfw-text-cyan-400', activeClass: 'sppcfw-bg-cyan-500/20 sppcfw-text-cyan-300 sppcfw-border-cyan-500/40', hasError: !!htmlError },
-						{ id: 'css', label: 'CSS Styles', icon: 'css', color: 'sppcfw-text-pink-400', activeClass: 'sppcfw-bg-pink-500/20 sppcfw-text-pink-300 sppcfw-border-pink-500/40', hasError: !!cssError },
-						{ id: 'js', label: 'JavaScript', icon: 'javascript', color: 'sppcfw-text-amber-400', activeClass: 'sppcfw-bg-amber-500/20 sppcfw-text-amber-300 sppcfw-border-amber-500/40', hasError: !!jsError },
+						{ id: 'html', label: __( 'HTML Markup', 'single-product-customizer' ), icon: 'html', color: 'sppcfw-text-cyan-400', activeClass: 'sppcfw-bg-cyan-500/20 sppcfw-text-cyan-300 sppcfw-border-cyan-500/40', hasError: !!htmlError },
+						{ id: 'css', label: __( 'CSS Styles', 'single-product-customizer' ), icon: 'css', color: 'sppcfw-text-pink-400', activeClass: 'sppcfw-bg-pink-500/20 sppcfw-text-pink-300 sppcfw-border-pink-500/40', hasError: !!cssError },
+						{ id: 'js', label: __( 'JavaScript', 'single-product-customizer' ), icon: 'javascript', color: 'sppcfw-text-amber-400', activeClass: 'sppcfw-bg-amber-500/20 sppcfw-text-amber-300 sppcfw-border-amber-500/40', hasError: !!jsError },
 					].map(tab =>
 						h(
 							'button',
@@ -5784,7 +5785,7 @@
 							},
 							h('span', { className: `material-symbols-outlined sppcfw-text-sm ${tab.color}` }, tab.icon),
 							tab.label,
-							tab.hasError && h('span', { className: 'sppcfw-text-[10px] sppcfw-leading-none sppcfw-text-red-400 font-bold sppcfw-animate-pulse', title: 'Syntax Error in this tab' }, '⚠️')
+							tab.hasError && h('span', { className: 'sppcfw-text-[10px] sppcfw-leading-none sppcfw-text-red-400 font-bold sppcfw-animate-pulse', title: __( 'Syntax Error in this tab', 'single-product-customizer' ) }, '⚠️')
 						)
 					)
 				),
@@ -5806,10 +5807,10 @@
 								type: 'button',
 								className: 'sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded sppcfw-bg-[#16202e] sppcfw-border sppcfw-border-[#374151] hover:sppcfw-border-purple-400 sppcfw-text-[10px] sppcfw-font-bold sppcfw-text-gray-300 hover:sppcfw-text-white sppcfw-transition-all sppcfw-flex sppcfw-items-center sppcfw-gap-1 sppcfw-cursor-pointer',
 								onClick: () => handleCopy(activeVal, codeTab),
-								title: 'Copy Code',
+								title: __( 'Copy Code', 'single-product-customizer' ),
 							},
 							h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, copiedTab === codeTab ? 'check' : 'content_copy'),
-							copiedTab === codeTab ? 'Copied!' : 'Copy'
+							copiedTab === codeTab ? __( 'Copied!', 'single-product-customizer' ) : __( 'Copy', 'single-product-customizer' )
 						),
 						h(
 							'button',
@@ -5821,9 +5822,9 @@
 									else if (codeTab === 'css') handleSettingChange('custom_css', '');
 									else if (codeTab === 'js') handleSettingChange('custom_js', '');
 								},
-								title: 'Clear code',
+								title: __( 'Clear code', 'single-product-customizer' ),
 							},
-							'Clear'
+							__( 'Clear', 'single-product-customizer' )
 						)
 					)
 				),
@@ -5832,7 +5833,7 @@
 				codeTab === 'html' &&
 					renderAccordion(
 						'html_editor',
-						'HTML Code / Markup',
+						__( 'HTML Code / Markup', 'single-product-customizer' ),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-2' },
@@ -5859,16 +5860,16 @@
 									h(
 										'div',
 										{ className: 'sppcfw-space-y-0.5 sppcfw-flex-1' },
-										h('div', { className: 'sppcfw-font-bold sppcfw-text-red-300' }, 'HTML Code Error (Fix to allow Save/Publish)'),
+										h('div', { className: 'sppcfw-font-bold sppcfw-text-red-300' }, __( 'HTML Code Error (Fix to allow Save/Publish)', 'single-product-customizer' )),
 										h('div', { className: 'sppcfw-text-[10px] sppcfw-text-red-200/90 font-mono' }, htmlError)
 									)
 								),
 							h('div', { className: 'sppcfw-p-2.5 sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded-md sppcfw-text-[11px] sppcfw-text-gray-400 sppcfw-space-y-1' },
 								h('div', { className: 'sppcfw-font-bold sppcfw-text-cyan-300 sppcfw-flex sppcfw-items-center sppcfw-gap-1' },
 									h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, 'info'),
-									'HTML & Shortcode Tips'
+									__( 'HTML & Shortcode Tips', 'single-product-customizer' )
 								),
-								h('p', { className: 'sppcfw-text-[10px] sppcfw-leading-relaxed' }, 'You can include standard HTML tags, svg icons, inline tags, or WordPress / WooCommerce shortcodes (e.g. [add_to_cart id="..."], [product_categories]).')
+								h('p', { className: 'sppcfw-text-[10px] sppcfw-leading-relaxed' }, __( 'You can include standard HTML tags, svg icons, inline tags, or WordPress / WooCommerce shortcodes (e.g. [add_to_cart id="..."], [product_categories]).', 'single-product-customizer' ))
 							)
 						)
 					),
@@ -5877,7 +5878,7 @@
 				codeTab === 'css' &&
 					renderAccordion(
 						'css_editor',
-						'Custom CSS Styles',
+						__( 'Custom CSS Styles', 'single-product-customizer' ),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-2' },
@@ -5904,14 +5905,14 @@
 									h(
 										'div',
 										{ className: 'sppcfw-space-y-0.5 sppcfw-flex-1' },
-										h('div', { className: 'sppcfw-font-bold sppcfw-text-red-300' }, 'CSS Syntax Error (Fix to allow Save/Publish)'),
+										h('div', { className: 'sppcfw-font-bold sppcfw-text-red-300' }, __( 'CSS Syntax Error (Fix to allow Save/Publish)', 'single-product-customizer' )),
 										h('div', { className: 'sppcfw-text-[10px] sppcfw-text-red-200/90 font-mono' }, cssError)
 									)
 								),
 							h('div', { className: 'sppcfw-p-2.5 sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded-md sppcfw-text-[11px] sppcfw-text-gray-400 sppcfw-space-y-1' },
 								h('div', { className: 'sppcfw-font-bold sppcfw-text-pink-300 sppcfw-flex sppcfw-items-center sppcfw-gap-1' },
 									h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, 'brush'),
-									'CSS Rules Tips'
+									__( 'CSS Rules Tips', 'single-product-customizer' )
 								),
 								h('p', { className: 'sppcfw-text-[10px] sppcfw-leading-relaxed' }, 'Enter pure CSS without <style> tags. Styles apply instantly to the canvas preview and the frontend.')
 							)
@@ -5922,7 +5923,7 @@
 				codeTab === 'js' &&
 					renderAccordion(
 						'js_editor',
-						'Custom JavaScript',
+						__( 'Custom JavaScript', 'single-product-customizer' ),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-2' },
@@ -5949,14 +5950,14 @@
 									h(
 										'div',
 										{ className: 'sppcfw-space-y-0.5 sppcfw-flex-1' },
-										h('div', { className: 'sppcfw-font-bold sppcfw-text-red-300' }, 'JavaScript Syntax Error (Fix to allow Save/Publish)'),
+										h('div', { className: 'sppcfw-font-bold sppcfw-text-red-300' }, __( 'JavaScript Syntax Error (Fix to allow Save/Publish)', 'single-product-customizer' )),
 										h('div', { className: 'sppcfw-text-[10px] sppcfw-text-red-200/90 font-mono' }, jsError)
 									)
 								),
 							h('div', { className: 'sppcfw-p-2.5 sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded-md sppcfw-text-[11px] sppcfw-text-gray-400 sppcfw-space-y-1' },
 								h('div', { className: 'sppcfw-font-bold sppcfw-text-amber-300 sppcfw-flex sppcfw-items-center sppcfw-gap-1' },
 									h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, 'terminal'),
-									'JavaScript Execution Tips'
+									__( 'JavaScript Execution Tips', 'single-product-customizer' )
 								),
 								h('p', { className: 'sppcfw-text-[10px] sppcfw-leading-relaxed' }, 'Enter pure JavaScript without <script> tags. The "container" argument is available to scope queries to this element.')
 							)
@@ -5977,7 +5978,7 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'cart_general',
-					'Quantity & Button Settings',
+					__( 'Quantity & Button Settings', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
@@ -6004,20 +6005,20 @@
 							h(
 								'label',
 								{ htmlFor: 'sppcfw_basic_enable_plus_minus_button', className: 'sppcfw-flex sppcfw-flex-col sppcfw-cursor-pointer' },
-								h('span', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#d9e3f6]' }, 'Enable plus/minus button for quantity change'),
-								h('span', { className: 'sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-mt-0.5' }, 'Displays interactive + and - stepper buttons next to the quantity input on the product page.')
+								h('span', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#d9e3f6]' }, __( 'Enable plus/minus button for quantity change', 'single-product-customizer' )),
+								h('span', { className: 'sppcfw-text-[11px] sppcfw-text-[#9ca3af] sppcfw-mt-0.5' }, __( 'Displays interactive + and - stepper buttons next to the quantity input on the product page.', 'single-product-customizer' ))
 							)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, 'Change add to cart button text'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, __( 'Change add to cart button text', 'single-product-customizer' )),
 							h('input', {
 								type: 'text',
 								id: 'sppcfw_basic_add_to_cart_button_text',
 								className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]',
-								value: (addToCartBtnText !== undefined && addToCartBtnText !== null && addToCartBtnText !== '') ? addToCartBtnText : (getSetting('button_text') || 'Add to cart'),
-								placeholder: 'Add to cart',
+								value: (addToCartBtnText !== undefined && addToCartBtnText !== null && addToCartBtnText !== '') ? addToCartBtnText : (getSetting('button_text') || __( 'Add to cart', 'single-product-customizer' )),
+								placeholder: __( 'Add to cart', 'single-product-customizer' ),
 								onChange: e => {
 									const val = e.target.value;
 									if (typeof setAddToCartBtnText === 'function') {
@@ -6035,14 +6036,14 @@
 				),
 				renderAccordion(
 					'variation_settings',
-					'Variation Display Settings',
+					__( 'Variation Display Settings', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, 'Variation Display Mode'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, __( 'Variation Display Mode', 'single-product-customizer' )),
 							h(
 								'select',
 								{
@@ -6050,21 +6051,21 @@
 									value: varDisplayType,
 									onChange: e => handleSettingChange('variation_display_type', e.target.value),
 								},
-								h('option', { value: 'swatches' }, '🎨 Color & Label Swatches'),
-								h('option', { value: 'dropdown' }, '📋 WooCommerce Default Dropdowns'),
-								h('option', { value: 'table' }, '📊 Variation Table / Grid')
+								h('option', { value: 'swatches' }, __( '🎨 Color & Label Swatches', 'single-product-customizer' )),
+								h('option', { value: 'dropdown' }, __( '📋 WooCommerce Default Dropdowns', 'single-product-customizer' )),
+								h('option', { value: 'table' }, __( '📊 Variation Table / Grid', 'single-product-customizer' ))
 							)
 						),
 						varDisplayType === 'swatches' &&
 							h(
 								'div',
 								{ className: 'sppcfw-space-y-1.5' },
-								h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, 'Swatch Shape'),
+								h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, __( 'Swatch Shape', 'single-product-customizer' )),
 								renderButtonGroup(
 									[
-										{ value: 'circle', label: 'Circle' },
-										{ value: 'rounded', label: 'Rounded' },
-										{ value: 'square', label: 'Square' },
+										{ value: 'circle', label: __( 'Circle', 'single-product-customizer' ) },
+										{ value: 'rounded', label: __( 'Rounded', 'single-product-customizer' ) },
+										{ value: 'square', label: __( 'Square', 'single-product-customizer' ) },
 									],
 									swatchShape,
 									v => handleSettingChange('swatch_shape', v)
@@ -6073,7 +6074,7 @@
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Show Attribute Labels (Color, Size)'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Show Attribute Labels (Color, Size)', 'single-product-customizer' )),
 							h('input', {
 								type: 'checkbox',
 								className: 'sppcfw-accent-[#9333ea] sppcfw-w-4 sppcfw-h-4 sppcfw-cursor-pointer',
@@ -6084,7 +6085,7 @@
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, 'Show Variation Clear / Reset Link'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-[#d1d5db] sppcfw-font-medium' }, __( 'Show Variation Clear / Reset Link', 'single-product-customizer' )),
 							h('input', {
 								type: 'checkbox',
 								className: 'sppcfw-accent-[#9333ea] sppcfw-w-4 sppcfw-h-4 sppcfw-cursor-pointer',
@@ -6106,26 +6107,26 @@
 				{ className: 'sppcfw-space-y-4' },
 				renderAccordion(
 					'spacing',
-					'Layout & Spacing',
+					__( 'Layout & Spacing', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-4' },
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							renderControlHeader('Margin', true, marginUnit, setMarginUnit, ['px', '%', 'em']),
+							renderControlHeader(__( 'Margin', 'single-product-customizer' ), true, marginUnit, setMarginUnit, ['px', '%', 'em']),
 							renderFourBoxInput(getAdvanced, 'margin', handleMultiAdvancedChange, marginUnit, isMarginLinked, setIsMarginLinked)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-						renderControlHeader('Padding', true, paddingUnit, setPaddingUnit, ['px', '%', 'em']),
+						renderControlHeader(__( 'Padding', 'single-product-customizer' ), true, paddingUnit, setPaddingUnit, ['px', '%', 'em']),
 						renderFourBoxInput(getAdvanced, 'padding', handleMultiAdvancedChange, paddingUnit, isPaddingLinked, setIsPaddingLinked)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							renderControlHeader('Width Mode', true),
+							renderControlHeader(__( 'Width Mode', 'single-product-customizer' ), true),
 							h(
 								'select',
 								{
@@ -6133,23 +6134,23 @@
 									value: getAdvanced('width_mode') || 'Default',
 									onChange: e => handleAdvancedChange('width_mode', e.target.value),
 								},
-								h('option', { value: 'Default' }, 'Default'),
-								h('option', { value: 'Full Width (100%)' }, 'Full Width (100%)'),
-								h('option', { value: 'Inline (auto)' }, 'Inline (auto)'),
-								h('option', { value: 'Custom' }, 'Custom')
+								h('option', { value: 'Default' }, __( 'Default', 'single-product-customizer' )),
+								h('option', { value: 'Full Width (100%)' }, __( 'Full Width (100%)', 'single-product-customizer' )),
+								h('option', { value: 'Inline (auto)' }, __( 'Inline (auto)', 'single-product-customizer' )),
+								h('option', { value: 'Custom' }, __( 'Custom', 'single-product-customizer' ))
 							)
 						),
 						h('hr', { className: 'sppcfw-border-[#374151] sppcfw-my-2' }),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1' },
-							renderControlHeader('Align Self', true),
+							renderControlHeader(__( 'Align Self', 'single-product-customizer' ), true),
 						renderButtonGroup(
 							[
-								{ value: 'flex-start', title: 'Start', label: 'Start' },
-								{ value: 'center', title: 'Center', label: 'Center' },
-								{ value: 'flex-end', title: 'End', label: 'End' },
-								{ value: 'stretch', title: 'Stretch', label: 'Stretch' },
+								{ value: 'flex-start', title: __( 'Start', 'single-product-customizer' ), label: __( 'Start', 'single-product-customizer' ) },
+								{ value: 'center', title: __( 'Center', 'single-product-customizer' ), label: __( 'Center', 'single-product-customizer' ) },
+								{ value: 'flex-end', title: __( 'End', 'single-product-customizer' ), label: __( 'End', 'single-product-customizer' ) },
+								{ value: 'stretch', title: __( 'Stretch', 'single-product-customizer' ), label: __( 'Stretch', 'single-product-customizer' ) },
 							],
 							getAdvanced('align_self') || '',
 							v => handleAdvancedChange('align_self', v)
@@ -6158,12 +6159,12 @@
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1' },
-							renderControlHeader('Order', true),
+							renderControlHeader(__( 'Order', 'single-product-customizer' ), true),
 						renderButtonGroup(
 							[
-								{ value: 'start', title: 'Start', label: 'First' },
-								{ value: 'end', title: 'End', label: 'Last' },
-								{ value: 'custom', title: 'Custom', label: 'Custom' },
+								{ value: 'start', title: __( 'Start', 'single-product-customizer' ), label: __( 'First', 'single-product-customizer' ) },
+								{ value: 'end', title: __( 'End', 'single-product-customizer' ), label: __( 'Last', 'single-product-customizer' ) },
+								{ value: 'custom', title: __( 'Custom', 'single-product-customizer' ), label: __( 'Custom', 'single-product-customizer' ) },
 							],
 							getAdvanced('order') || '',
 							v => handleAdvancedChange('order', v)
@@ -6173,14 +6174,14 @@
 				),
 				renderAccordion(
 					'position',
-					'Position & Attributes',
+					__( 'Position & Attributes', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3.5' },
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-						h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, 'Position'),
+						h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium' }, __( 'Position', 'single-product-customizer' )),
 							h(
 								'select',
 								{
@@ -6188,15 +6189,15 @@
 									value: getAdvanced('position') || 'Default',
 									onChange: e => handleAdvancedChange('position', e.target.value),
 								},
-								h('option', { value: 'Default' }, 'Default'),
-								h('option', { value: 'Absolute' }, 'Absolute'),
-								h('option', { value: 'Fixed' }, 'Fixed')
+								h('option', { value: 'Default' }, __( 'Default', 'single-product-customizer' )),
+								h('option', { value: 'Absolute' }, __( 'Absolute', 'single-product-customizer' )),
+								h('option', { value: 'Fixed' }, __( 'Fixed', 'single-product-customizer' ))
 							)
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
-							renderControlHeader('Z-Index', true),
+							renderControlHeader(__( 'Z-Index', 'single-product-customizer' ), true),
 							h('input', {
 								type: 'number',
 								className: 'sppcfw-w-24 sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1 sppcfw-text-xs sppcfw-text-center sppcfw-text-white focus:sppcfw-outline-none',
@@ -6212,19 +6213,19 @@
 								type: 'text',
 								className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none',
 								value: getAdvanced('css_id', true) || '',
-								placeholder: 'e.g. my-custom-id',
+								placeholder: __( 'e.g. my-custom-id', 'single-product-customizer' ),
 								onChange: e => handleAdvancedChange('css_id', e.target.value, true),
 							})
 						),
 						h(
 							'div',
 							{ className: 'sppcfw-space-y-1.5' },
-							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, 'CSS Classes'),
+							h('label', { className: 'sppcfw-text-xs sppcfw-text-gray-200 sppcfw-font-medium sppcfw-block' }, __( 'CSS Classes', 'single-product-customizer' )),
 							h('input', {
 								type: 'text',
 								className: 'sppcfw-w-full sppcfw-bg-[#111827] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded sppcfw-px-2.5 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white focus:sppcfw-outline-none',
 								value: getAdvanced('css_classes', true) || (getAdvanced('custom_class', true) || ''),
-								placeholder: 'e.g. custom-class-1 custom-class-2',
+								placeholder: __( 'e.g. custom-class-1 custom-class-2', 'single-product-customizer' ),
 								onChange: e => {
 									handleAdvancedChange('css_classes', e.target.value, true);
 									handleAdvancedChange('custom_class', e.target.value, true);
@@ -6235,14 +6236,14 @@
 				),
 				renderAccordion(
 					'responsive',
-					'Responsive Visibility',
+					__( 'Responsive Visibility', 'single-product-customizer' ),
 					h(
 						'div',
 						{ className: 'sppcfw-space-y-3' },
 						[
-							{ key: 'hide_on_desktop', label: 'Hide On Desktop' },
-							{ key: 'hide_on_tablet', label: 'Hide On Tablet' },
-							{ key: 'hide_on_mobile', label: 'Hide On Mobile' },
+							{ key: 'hide_on_desktop', label: __( 'Hide On Desktop', 'single-product-customizer' ) },
+							{ key: 'hide_on_tablet', label: __( 'Hide On Tablet', 'single-product-customizer' ) },
+							{ key: 'hide_on_mobile', label: __( 'Hide On Mobile', 'single-product-customizer' ) },
 						].map(res =>
 							h(
 								'div',
@@ -6281,7 +6282,7 @@
 							{
 								className: 'sppcfw-text-[#9ca3af] hover:sppcfw-text-white sppcfw-p-1 sppcfw-rounded hover:sppcfw-bg-[#212b39] sppcfw-transition-colors',
 								onClick: closeInspector,
-								title: 'Back to Elements',
+								title: __( 'Back to Elements', 'single-product-customizer' ),
 							},
 							'←'
 						),
@@ -6297,7 +6298,7 @@
 										: 'sppcfw-bg-purple-500/20 sppcfw-text-purple-300 sppcfw-border-purple-500/40'
 								}`,
 							},
-							deviceView === 'mobile' ? '📱 Mobile' : deviceView === 'tablet' ? '📱 Tablet' : '🖥 Desktop'
+							deviceView === 'mobile' ? __( '📱 Mobile', 'single-product-customizer' ) : deviceView === 'tablet' ? __( '📱 Tablet', 'single-product-customizer' ) : __( '🖥 Desktop', 'single-product-customizer' )
 						)
 					),
 					h(
@@ -6305,7 +6306,7 @@
 						{
 							className: 'sppcfw-text-[#9ca3af] hover:sppcfw-text-white sppcfw-font-bold sppcfw-text-sm sppcfw-px-2',
 							onClick: closeInspector,
-							title: 'Close Inspector',
+							title: __( 'Close Inspector', 'single-product-customizer' ),
 						},
 						'✕'
 					)
@@ -6335,7 +6336,7 @@
 							onClick: () => setActiveTab('style'),
 						},
 						h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'contrast'),
-						'Style'
+						__( 'Style', 'single-product-customizer' )
 					),
 					h(
 						'button',
@@ -6346,7 +6347,7 @@
 							onClick: () => setActiveTab('advanced'),
 						},
 						h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'settings'),
-						'Advanced'
+						__( 'Advanced', 'single-product-customizer' )
 					)
 				)
 			),
@@ -6401,8 +6402,8 @@
 									onClick: () => setIsAddingContainer(true),
 								},
 								h('div', { className: 'sppcfw-w-16 sppcfw-h-16 sppcfw-rounded-full sppcfw-bg-[#9333ea]/10 sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-mb-4 group-hover:sppcfw-scale-110 sppcfw-transition-transform' }, h('span', { className: 'material-symbols-outlined sppcfw-text-4xl sppcfw-text-[#9333ea]' }, 'add_circle')),
-								h('h2', { className: 'sppcfw-text-2xl sppcfw-font-extrabold sppcfw-text-[#111827] sppcfw-mb-2' }, 'Select Layout Structure'),
-								h('p', { className: 'sppcfw-text-sm sppcfw-text-[#6b7280] sppcfw-max-w-md sppcfw-mb-6' }, 'Choose a Layout Structure (Flexbox or Grid) to start building your single product page layout.'),
+								h('h2', { className: 'sppcfw-text-2xl sppcfw-font-extrabold sppcfw-text-[#111827] sppcfw-mb-2' }, __( 'Select Layout Structure', 'single-product-customizer' )),
+								h('p', { className: 'sppcfw-text-sm sppcfw-text-[#6b7280] sppcfw-max-w-md sppcfw-mb-6' }, __( 'Choose a Layout Structure (Flexbox or Grid) to start building your single product page layout.', 'single-product-customizer' )),
 								h(
 									'button',
 									{
@@ -6413,7 +6414,7 @@
 										},
 									},
 									h('span', { className: 'material-symbols-outlined sppcfw-text-lg' }, 'add'),
-									'Add Layout / Container'
+									__( 'Add Layout / Container', 'single-product-customizer' )
 								)
 						  )
 					: h(
@@ -6453,7 +6454,7 @@
 											onClick: () => setIsAddingContainer(true),
 										},
 										h('span', { className: 'material-symbols-outlined sppcfw-text-xl sppcfw-text-[#9333ea] group-hover:sppcfw-scale-125 sppcfw-transition-transform' }, 'add_circle'),
-										h('span', { className: 'sppcfw-text-sm sppcfw-font-bold sppcfw-text-[#4b5563] group-hover:sppcfw-text-[#9333ea]' }, 'Add Container Section')
+										h('span', { className: 'sppcfw-text-sm sppcfw-font-bold sppcfw-text-[#4b5563] group-hover:sppcfw-text-[#9333ea]' }, __( 'Add Container Section', 'single-product-customizer' ))
 								  )
 					  )
 			),
@@ -6462,7 +6463,7 @@
 			h(
 				'div',
 				{ className: 'sppcfw-fixed sppcfw-bottom-4 sppcfw-left-[420px] sppcfw-bg-[#16202e] sppcfw-border sppcfw-border-[#4d4354] sppcfw-rounded sppcfw-px-3 sppcfw-py-1 sppcfw-text-xs font-mono sppcfw-text-[#cfc2d7] sppcfw-z-20 sppcfw-shadow-md' },
-				'Layout > ' + (findElementInTree(elements, selectedElementId)?.label || 'Empty Selection')
+				'Layout > ' + (findElementInTree(elements, selectedElementId)?.label || __( 'Empty Selection', 'single-product-customizer' ))
 			)
 		);
 	}
@@ -6599,13 +6600,13 @@
 				{
 					className: 'sppcfw-p-3 sppcfw-bg-[#121c2a] sppcfw-border-b sppcfw-border-[#374151] sppcfw-flex sppcfw-justify-between sppcfw-items-center sppcfw-cursor-move sppcfw-select-none',
 					onMouseDown: handleMouseDown,
-					title: 'Drag to move panel',
+					title: __( 'Drag to move panel', 'single-product-customizer' ),
 				},
 				h(
 					'h3',
 					{ className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-pointer-events-none' },
 					h('span', { className: 'material-symbols-outlined sppcfw-text-sm sppcfw-text-[#9333ea]' }, 'account_tree'),
-					'Structure'
+					__( 'Structure', 'single-product-customizer' )
 				),
 				h(
 					'div',
@@ -6616,7 +6617,7 @@
 							type: 'button',
 							className: 'sppcfw-text-xs sppcfw-text-[#cfc2d7] hover:sppcfw-text-white sppcfw-font-bold sppcfw-p-1 sppcfw-rounded hover:sppcfw-bg-[#212b39]',
 							onClick: () => setIsCollapsed(!isCollapsed),
-							title: isCollapsed ? 'Expand' : 'Collapse',
+							title: isCollapsed ? __( 'Expand', 'single-product-customizer' ) : __( 'Collapse', 'single-product-customizer' ),
 						},
 						isCollapsed ? '□' : '–'
 					),
@@ -6626,7 +6627,7 @@
 							type: 'button',
 							className: 'sppcfw-text-xs sppcfw-text-[#cfc2d7] hover:sppcfw-text-white sppcfw-font-bold sppcfw-p-1 sppcfw-rounded hover:sppcfw-bg-[#212b39]',
 							onClick: closeStructure,
-							title: 'Close',
+							title: __( 'Close', 'single-product-customizer' ),
 						},
 						'✕'
 					)
@@ -6657,7 +6658,7 @@
 						},
 					},
 					elements.length === 0
-						? h('div', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af] sppcfw-text-center sppcfw-py-4' }, 'No elements on canvas')
+						? h('div', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af] sppcfw-text-center sppcfw-py-4' }, __( 'No elements on canvas', 'single-product-customizer' ))
 						: elements.map((item, idx) =>
 								h(StructureTreeNode, {
 									key: item.id,
@@ -6680,7 +6681,7 @@
 					{
 						className: 'sppcfw-h-2 sppcfw-w-full sppcfw-cursor-ns-resize sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-bg-[#121c2a] hover:sppcfw-bg-[#9333ea]/30 sppcfw-border-t sppcfw-border-[#374151]/50 sppcfw-transition-colors group',
 						onMouseDown: handleResizeMouseDown,
-						title: 'Drag to resize vertically (max 400px)',
+						title: __( 'Drag to resize vertically (max 400px)', 'single-product-customizer' ),
 					},
 					h('div', { className: 'sppcfw-w-8 sppcfw-h-0.5 sppcfw-bg-gray-500/60 group-hover:sppcfw-bg-[#9333ea] sppcfw-rounded-full sppcfw-pointer-events-none' })
 				)
@@ -6883,7 +6884,7 @@
 				h(
 					'span',
 					{ className: 'sppcfw-text-[9px] font-mono sppcfw-opacity-80 sppcfw-uppercase sppcfw-px-1.5 sppcfw-py-0.5 sppcfw-rounded sppcfw-bg-[#091421] sppcfw-flex-shrink-0' },
-					item.type === 'container' ? (item.settings && item.settings.width_mode === 'boxed' ? 'Boxed' : 'Full') : item.type === 'column' ? (item.settings && item.settings.flex_width ? item.settings.flex_width : 'Col') : item.type
+					item.type === 'container' ? (item.settings && item.settings.width_mode === 'boxed' ? __( 'Boxed', 'single-product-customizer' ) : __( 'Full', 'single-product-customizer' )) : item.type === 'column' ? (item.settings && item.settings.flex_width ? item.settings.flex_width : __( 'Col', 'single-product-customizer' )) : item.type
 				)
 			),
 
@@ -7144,7 +7145,7 @@
 								e.stopPropagation();
 								if (typeof openStructureChooser === 'function') openStructureChooser();
 							},
-							title: 'Add Container',
+							title: __( 'Add Container', 'single-product-customizer' ),
 						},
 						'+'
 					),
@@ -7154,7 +7155,7 @@
 							className: 'sppcfw-cursor-grab active:sppcfw-cursor-grabbing sppcfw-font-extrabold sppcfw-text-[10px] sppcfw-tracking-wider hover:sppcfw-text-black sppcfw-transition-colors sppcfw-px-1 sppcfw-py-0.5 sppcfw-rounded hover:sppcfw-bg-white/20',
 							draggable: true,
 							onDragStart: handleContainerDragStart,
-							title: 'Drag to reorder container up or down',
+							title: __( 'Drag to reorder container up or down', 'single-product-customizer' ),
 						},
 						':::'
 					),
@@ -7166,7 +7167,7 @@
 								e.stopPropagation();
 								removeElement(container.id);
 							},
-							title: 'Delete Container',
+							title: __( 'Delete Container', 'single-product-customizer' ),
 						},
 						'✕'
 					)
@@ -7332,7 +7333,7 @@
 						className: 'sppcfw-selection-badge sppcfw-absolute sppcfw--top-3 sppcfw-right-2 sppcfw-bg-[#9333ea] sppcfw-text-white sppcfw-px-2 sppcfw-h-5 sppcfw-leading-none sppcfw-rounded sppcfw-text-[10px] font-mono sppcfw-z-20 sppcfw-shadow-md sppcfw-flex sppcfw-items-center sppcfw-gap-2 sppcfw-select-none',
 						style: { height: '20px', lineHeight: '1', fontSize: '10px', boxSizing: 'border-box' }
 					},
-					h('span', { className: 'sppcfw-font-bold sppcfw-leading-none', style: { lineHeight: '1', fontSize: '10px' } }, column.label || 'Column'),
+					h('span', { className: 'sppcfw-font-bold sppcfw-leading-none', style: { lineHeight: '1', fontSize: '10px' } }, column.label || __( 'Column', 'single-product-customizer' )),
 					h(
 						'button',
 						{
@@ -7343,7 +7344,7 @@
 								e.stopPropagation();
 								if (typeof addColumnToContainer === 'function') addColumnToContainer(containerId);
 							},
-							title: 'Add New Column to Container',
+							title: __( 'Add New Column to Container', 'single-product-customizer' ),
 						},
 						'+'
 					),
@@ -7357,7 +7358,7 @@
 								e.stopPropagation();
 								if (typeof duplicateColumn === 'function') duplicateColumn(column.id);
 							},
-							title: 'Duplicate Column',
+							title: __( 'Duplicate Column', 'single-product-customizer' ),
 						},
 						'📋'
 					),
@@ -7371,7 +7372,7 @@
 								e.stopPropagation();
 								if (typeof removeElement === 'function') removeElement(column.id);
 							},
-							title: 'Delete Column',
+							title: __( 'Delete Column', 'single-product-customizer' ),
 						},
 						'✕'
 					)
@@ -7419,7 +7420,7 @@
 							{
 								type: 'button',
 								className: 'sppcfw-w-10 sppcfw-h-10 sppcfw-border sppcfw-border-[#cbd5e1] group-hover:sppcfw-border-[#9333ea] sppcfw-bg-white sppcfw-text-[#94a3b8] group-hover:sppcfw-text-[#9333ea] sppcfw-rounded-md sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-cursor-pointer sppcfw-shadow-sm group-hover:sppcfw-shadow sppcfw-transition-all',
-								title: 'Add Element',
+								title: __( 'Add Element', 'single-product-customizer' ),
 								onClick: e => {
 									e.stopPropagation();
 									if (typeof openElementsTab === 'function') openElementsTab();
@@ -7427,7 +7428,7 @@
 							},
 							h('span', { className: 'material-symbols-outlined sppcfw-text-lg' }, 'add')
 						),
-						h('span', { className: 'sppcfw-text-xs sppcfw-font-semibold sppcfw-text-[#64748b] group-hover:sppcfw-text-[#9333ea] sppcfw-mt-2' }, 'Add Element')
+						h('span', { className: 'sppcfw-text-xs sppcfw-font-semibold sppcfw-text-[#64748b] group-hover:sppcfw-text-[#9333ea] sppcfw-mt-2' }, __( 'Add Element', 'single-product-customizer' ))
 				  )
 		);
 	}
@@ -7613,18 +7614,18 @@
 						'div',
 						{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2 sppcfw-font-bold sppcfw-text-xs sppcfw-text-red-400' },
 						h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'error'),
-						'HTML Element Broken (Isolated)'
+						__( 'HTML Element Broken (Isolated)', 'single-product-customizer' )
 					),
 					h(
 						'p',
 						{ className: 'sppcfw-text-[11px] sppcfw-text-red-200/90 font-mono sppcfw-bg-black/50 sppcfw-p-2 sppcfw-rounded sppcfw-break-words' },
-						this.state.error ? (this.state.error.message || String(this.state.error)) : 'Render Error in this HTML Element'
+						this.state.error ? (this.state.error.message || String(this.state.error)) : __( 'Render Error in this HTML Element', 'single-product-customizer' )
 					),
 					h(
 						'div',
 						{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-[10px] sppcfw-text-gray-400 sppcfw-pt-0.5' },
 						h('span', { className: 'material-symbols-outlined sppcfw-text-xs sppcfw-text-emerald-400' }, 'verified_user'),
-						'Error isolated to this section. All other widgets and layout continue to render normally.'
+						__( 'Error isolated to this section. All other widgets and layout continue to render normally.', 'single-product-customizer' )
 					)
 				);
 			}
@@ -7703,8 +7704,8 @@
 				h('div', { className: 'sppcfw-w-9 sppcfw-h-9 sppcfw-rounded-lg sppcfw-bg-purple-500/20 sppcfw-text-purple-300 sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-mx-auto' },
 					h('span', { className: 'material-symbols-outlined sppcfw-text-lg' }, 'code')
 				),
-				h('div', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-purple-200' }, 'Custom HTML Element'),
-				h('div', { className: 'sppcfw-text-[11px] sppcfw-text-gray-400 sppcfw-max-w-xs sppcfw-mx-auto' }, 'Click to write custom HTML markup, CSS styling, and JavaScript logic.')
+				h('div', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-purple-200' }, __( 'Custom HTML Element', 'single-product-customizer' )),
+				h('div', { className: 'sppcfw-text-[11px] sppcfw-text-gray-400 sppcfw-max-w-xs sppcfw-mx-auto' }, __( 'Click to write custom HTML markup, CSS styling, and JavaScript logic.', 'single-product-customizer' ))
 			);
 		}
 
@@ -7732,7 +7733,7 @@
 					'div',
 					{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-1.5 sppcfw-text-[10px] sppcfw-text-gray-400 sppcfw-pt-0.5' },
 					h('span', { className: 'material-symbols-outlined sppcfw-text-xs sppcfw-text-emerald-400' }, 'verified_user'),
-					'Error isolated to this section. All other sections and page layout remain intact.'
+					__( 'Error isolated to this section. All other sections and page layout remain intact.', 'single-product-customizer' )
 				)
 			);
 		}
@@ -7769,7 +7770,7 @@
 		switch (el.type) {
 			case 'product_title': {
 				const titleTag = (settings && settings.html_tag) || 'h1';
-				const titleText = safeSample.title || staticFallback.title || 'Product Title';
+				const titleText = safeSample.title || staticFallback.title || __( 'Product Title', 'single-product-customizer' );
 				const fwVal = getResponsiveProp(styles, 'font_weight', deviceView);
 				const resolvedFontWeight = (fwVal && fwVal !== 'Default') ? fwVal : undefined;
 				const linkToProduct = !!settings.link_to_product;
@@ -7795,7 +7796,7 @@
 			}
 			case 'heading': {
 				const headingTag = (settings && settings.html_tag) || 'h2';
-				const headingText = (settings && settings.text !== undefined && settings.text !== '') ? settings.text : 'Add Your Heading Text Here';
+				const headingText = (settings && settings.text !== undefined && settings.text !== '') ? settings.text : __( 'Add Your Heading Text Here', 'single-product-customizer' );
 				const linkUrl = settings && settings.link_url;
 				const fwVal = getResponsiveProp(styles, 'font_weight', deviceView);
 				const resolvedFontWeight = (fwVal && fwVal !== 'Default') ? fwVal : undefined;
@@ -7819,7 +7820,7 @@
 			}
 			case 'text_editor': {
 				const textTag = (settings && settings.html_tag) || 'div';
-				const textContent = (settings && settings.text_content !== undefined && settings.text_content !== '') ? settings.text_content : 'Add your custom description or paragraph content here...';
+				const textContent = (settings && settings.text_content !== undefined && settings.text_content !== '') ? settings.text_content : __( 'Add your custom description or paragraph content here...', 'single-product-customizer' );
 				return h(
 					textTag,
 					{
@@ -7853,7 +7854,7 @@
 						'div',
 						{ className: `sppcfw-flex sppcfw-items-center sppcfw-gap-2 sppcfw-py-2 sppcfw-px-3 sppcfw-rounded-lg sppcfw-bg-amber-500/10 sppcfw-border sppcfw-border-amber-500/30 sppcfw-text-amber-400 sppcfw-text-xs ${alignClass}` },
 						h('span', { className: 'material-symbols-outlined sppcfw-text-base' }, 'visibility_off'),
-						h('span', { className: 'sppcfw-font-medium' }, 'Price is hidden by Basic Settings (Hide Price is enabled)')
+						h('span', { className: 'sppcfw-font-medium' }, __( 'Price is hidden by Basic Settings (Hide Price is enabled)', 'single-product-customizer' ))
 					);
 				}
 
@@ -7894,7 +7895,7 @@
 								className: 'sppcfw-text-white sppcfw-text-xs sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded sppcfw-font-bold sppcfw-uppercase sppcfw-shadow-sm sppcfw-tracking-wide',
 								style: { backgroundColor: salePriceColor || '#ef4444' }
 							},
-							settings.sale_badge_text || 'Sale'
+							settings.sale_badge_text || __( 'Sale', 'single-product-customizer' )
 						)
 				);
 			}
@@ -7950,12 +7951,12 @@
 							h(
 								'span',
 								{ className: 'sppcfw-absolute sppcfw-top-3 sppcfw-left-3 sppcfw-bg-[#ef4444] sppcfw-text-white sppcfw-text-xs sppcfw-px-2.5 sppcfw-py-1 sppcfw-rounded-full sppcfw-font-bold sppcfw-uppercase sppcfw-z-10 sppcfw-shadow-sm' },
-								'Sale!'
+								__( 'Sale!', 'single-product-customizer' )
 							),
 						mainImgSrc
 							? h('img', {
 									src: mainImgSrc,
-									alt: safeSample.title || 'Product Featured Image',
+									alt: safeSample.title || __( 'Product Featured Image', 'single-product-customizer' ),
 									style: customImgStyle,
 									className: 'sppcfw-w-full sppcfw-h-auto sppcfw-object-contain sppcfw-transition-all'
 							  })
@@ -7963,7 +7964,7 @@
 									'div',
 									{ className: 'sppcfw-py-12 sppcfw-text-center sppcfw-text-gray-400 sppcfw-space-y-1 sppcfw-border sppcfw-border-dashed sppcfw-rounded-lg sppcfw-w-full' },
 									h('span', { className: 'material-symbols-outlined sppcfw-text-4xl' }, 'collections'),
-									h('div', { className: 'sppcfw-text-xs' }, 'No Product Image Available')
+									h('div', { className: 'sppcfw-text-xs' }, __( 'No Product Image Available', 'single-product-customizer' ))
 							  ),
 						// Badges / Action Icons (Zoom & Lightbox)
 						(showZoom || showLightbox) &&
@@ -7973,13 +7974,13 @@
 								showZoom &&
 									h(
 										'span',
-										{ className: 'sppcfw-bg-white/90 sppcfw-backdrop-blur sppcfw-p-1.5 sppcfw-rounded-full sppcfw-shadow-sm sppcfw-text-gray-700 sppcfw-flex sppcfw-items-center sppcfw-justify-center', title: 'Zoom Enabled' },
+										{ className: 'sppcfw-bg-white/90 sppcfw-backdrop-blur sppcfw-p-1.5 sppcfw-rounded-full sppcfw-shadow-sm sppcfw-text-gray-700 sppcfw-flex sppcfw-items-center sppcfw-justify-center', title: __( 'Zoom Enabled', 'single-product-customizer' ) },
 										h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, 'zoom_in')
 									),
 								showLightbox &&
 									h(
 										'span',
-										{ className: 'sppcfw-bg-white/90 sppcfw-backdrop-blur sppcfw-p-1.5 sppcfw-rounded-full sppcfw-shadow-sm sppcfw-text-gray-700 sppcfw-flex sppcfw-items-center sppcfw-justify-center', title: 'Lightbox Enabled' },
+										{ className: 'sppcfw-bg-white/90 sppcfw-backdrop-blur sppcfw-p-1.5 sppcfw-rounded-full sppcfw-shadow-sm sppcfw-text-gray-700 sppcfw-flex sppcfw-items-center sppcfw-justify-center', title: __( 'Lightbox Enabled', 'single-product-customizer' ) },
 										h('span', { className: 'material-symbols-outlined sppcfw-text-xs' }, 'fullscreen')
 									)
 							)
@@ -7999,7 +8000,7 @@
 											{
 												type: 'button',
 												className: 'sppcfw-w-7 sppcfw-h-7 sppcfw-rounded-full sppcfw-bg-white sppcfw-border sppcfw-border-gray-200 sppcfw-shadow-sm sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-text-gray-700 hover:sppcfw-bg-gray-100 sppcfw-shrink-0 sppcfw-transition-all',
-												title: 'Previous Thumbnails'
+												title: __( 'Previous Thumbnails', 'single-product-customizer' )
 											},
 											h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'chevron_left')
 										),
@@ -8042,7 +8043,7 @@
 											{
 												type: 'button',
 												className: 'sppcfw-w-7 sppcfw-h-7 sppcfw-rounded-full sppcfw-bg-white sppcfw-border sppcfw-border-gray-200 sppcfw-shadow-sm sppcfw-flex sppcfw-items-center sppcfw-justify-center sppcfw-text-gray-700 hover:sppcfw-bg-gray-100 sppcfw-shrink-0 sppcfw-transition-all',
-												title: 'Next Thumbnails'
+												title: __( 'Next Thumbnails', 'single-product-customizer' )
 											},
 											h('span', { className: 'material-symbols-outlined sppcfw-text-sm' }, 'chevron_right')
 										)
@@ -8123,8 +8124,8 @@
 								style: { minHeight: '140px', maxWidth: imgMaxWidth }
 							},
 							h('span', { className: 'material-symbols-outlined sppcfw-text-4xl sppcfw-text-[#9333ea] group-hover:sppcfw-scale-110 sppcfw-transition-transform' }, 'add_photo_alternate'),
-							h('div', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#6b21a8]' }, 'Image Widget - Choose Image'),
-							h('div', { className: 'sppcfw-text-[11px] sppcfw-text-[#7e22ce]' }, 'Click here or select this element to choose or upload an image')
+							h('div', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#6b21a8]' }, __( 'Image Widget - Choose Image', 'single-product-customizer' )),
+							h('div', { className: 'sppcfw-text-[11px] sppcfw-text-[#7e22ce]' }, __( 'Click here or select this element to choose or upload an image', 'single-product-customizer' ))
 						)
 					);
 				}
@@ -8137,7 +8138,7 @@
 						{ className: `sppcfw-inline-flex ${flexAlign} sppcfw-w-full` },
 						h('img', {
 							src: customImgSrc,
-							alt: imgSettings.alt_text || 'Custom Image',
+							alt: imgSettings.alt_text || __( 'Custom Image', 'single-product-customizer' ),
 							style: customImgStyle,
 							className: 'sppcfw-w-full sppcfw-h-auto sppcfw-object-contain sppcfw-transition-all inline-block'
 						})
@@ -8150,7 +8151,7 @@
 				const btnLabel = (settings && settings.button_text) ||
 					(typeof addToCartBtnText !== 'undefined' && addToCartBtnText) ||
 					(typeof window !== 'undefined' && window.SPPCFWBuilderConfig && window.SPPCFWBuilderConfig.basic_settings && window.SPPCFWBuilderConfig.basic_settings.add_to_cart_button_text) ||
-					'Add to cart';
+					__( 'Add to cart', 'single-product-customizer' );
 
 				const customBtnBg = getResponsiveProp(styles, 'btn_bg_color', deviceView) || getResponsiveProp(styles, 'bg_color', deviceView);
 				const customBtnColor = getResponsiveProp(styles, 'btn_text_color', deviceView) || getResponsiveProp(styles, 'text_color', deviceView);
@@ -8414,7 +8415,7 @@
 											}
 										},
 										className: 'sppcfw-text-[12px] sppcfw-text-[#4b5563] hover:sppcfw-text-[#9333ea] sppcfw-font-medium sppcfw-cursor-pointer sppcfw-inline-block hover:sppcfw-underline'
-									}, 'Clear')
+									}, __( 'Clear', 'single-product-customizer' ))
 								)
 						),
 
@@ -8480,7 +8481,7 @@
 											}
 										},
 										className: 'sppcfw-text-[12px] sppcfw-text-[#4b5563] hover:sppcfw-text-[#9333ea] sppcfw-font-medium sppcfw-cursor-pointer sppcfw-inline-block hover:sppcfw-underline'
-									}, 'Clear')
+									}, __( 'Clear', 'single-product-customizer' ))
 								)
 						),
 
@@ -8498,10 +8499,10 @@
 									h(
 										'tr',
 										null,
-										h('th', { className: 'sppcfw-p-2.5' }, 'Variation'),
-										h('th', { className: 'sppcfw-p-2.5' }, 'Price'),
-										h('th', { className: 'sppcfw-p-2.5' }, 'Stock'),
-										h('th', { className: 'sppcfw-p-2.5 sppcfw-text-center' }, 'Select')
+										h('th', { className: 'sppcfw-p-2.5' }, __( 'Variation', 'single-product-customizer' )),
+										h('th', { className: 'sppcfw-p-2.5' }, __( 'Price', 'single-product-customizer' )),
+										h('th', { className: 'sppcfw-p-2.5' }, __( 'Stock', 'single-product-customizer' )),
+										h('th', { className: 'sppcfw-p-2.5 sppcfw-text-center' }, __( 'Select', 'single-product-customizer' ))
 									)
 								),
 								h(
@@ -8533,7 +8534,7 @@
 														className: 'sppcfw-p-2.5 sppcfw-font-bold sppcfw-text-[#9333ea] sppcfw-var-price-cell',
 														dangerouslySetInnerHTML: { __html: vRow.price || safeSample.price || '$49.99' }
 													}),
-													h('td', { className: `sppcfw-p-2.5 sppcfw-font-medium ${vRow.is_in_stock === false ? 'sppcfw-text-red-500' : 'sppcfw-text-green-600'}` }, vRow.stock || 'In Stock'),
+													h('td', { className: `sppcfw-p-2.5 sppcfw-font-medium ${vRow.is_in_stock === false ? 'sppcfw-text-red-500' : 'sppcfw-text-green-600'}` }, vRow.stock || __( 'In Stock', 'single-product-customizer' )),
 													h(
 														'td',
 														{ className: 'sppcfw-p-2.5 sppcfw-text-center' },
@@ -8555,19 +8556,19 @@
 											if (attr1 && attr2) {
 												(attr1.options || []).forEach(o1 => {
 													(attr2.options || []).slice(0, 2).forEach(o2 => {
-														combinations.push({ name: `${o1} / ${o2}`, price: safeSample.price || '$49.99', stock: 'In Stock' });
+														combinations.push({ name: `${o1} / ${o2}`, price: safeSample.price || '$49.99', stock: __( 'In Stock', 'single-product-customizer' ) });
 													});
 												});
 											} else if (attr1) {
 												(attr1.options || []).forEach(o1 => {
-													combinations.push({ name: String(o1), price: safeSample.price || '$49.99', stock: 'In Stock' });
+													combinations.push({ name: String(o1), price: safeSample.price || '$49.99', stock: __( 'In Stock', 'single-product-customizer' ) });
 												});
 											}
 										}
 										if (combinations.length === 0) {
 											combinations = [
-												{ name: 'Black / M', price: safeSample.price || '$49.99', stock: 'In Stock' },
-												{ name: 'Purple / L', price: safeSample.price || '$54.99', stock: 'In Stock' },
+												{ name: 'Black / M', price: safeSample.price || '$49.99', stock: __( 'In Stock', 'single-product-customizer' ) },
+												{ name: 'Purple / L', price: safeSample.price || '$54.99', stock: __( 'In Stock', 'single-product-customizer' ) },
 												{ name: 'Blue / XL', price: safeSample.price || '$59.99', stock: '2 Left' }
 											];
 										}
@@ -8688,7 +8689,7 @@
 						fontSize: getResponsiveProp(styles, 'font_size', deviceView) || undefined,
 						lineHeight: getResponsiveProp(styles, 'line_height', deviceView) || undefined,
 					}
-				}, safeSample.short_description || staticFallback.short_description || 'Product short description placeholder.');
+				}, safeSample.short_description || staticFallback.short_description || __( 'Product short description placeholder.', 'single-product-customizer' ));
 			case 'product_description':
 				const activeTabCol = getResponsiveProp(styles, 'active_tab_color', deviceView) || '#9333ea';
 				const descBg = getResponsiveProp(styles, 'bg_color', deviceView) || '#f9fafb';
@@ -8704,8 +8705,8 @@
 							color: getResponsiveProp(styles, 'text_color', deviceView) || '#111827',
 							borderBottomColor: activeTabCol,
 						}
-					}, 'Description'),
-					h('p', { className: 'sppcfw-text-sm sppcfw-text-[#4b5563]' }, safeSample.description || staticFallback.description || 'Full product description placeholder.')
+					}, __( 'Description', 'single-product-customizer' )),
+					h('p', { className: 'sppcfw-text-sm sppcfw-text-[#4b5563]' }, safeSample.description || staticFallback.description || __( 'Full product description placeholder.', 'single-product-customizer' ))
 				);
 			case 'product_meta':
 				const labelColor = getResponsiveProp(styles, 'label_color', deviceView) || '#111827';
@@ -8719,15 +8720,15 @@
 						style: { color: metaValColor, fontSize: metaFontSize, gap: metaGap }
 					},
 					h('div', null, h('strong', { style: { color: labelColor } }, 'SKU: '), safeSample.sku || staticFallback.sku || 'SAMPLE-SKU-123'),
-					h('div', null, h('strong', { style: { color: labelColor } }, 'Category: '), safeSample.categories || staticFallback.categories || 'Clothing'),
-					safeSample.tags && h('div', null, h('strong', { style: { color: labelColor } }, 'Tags: '), safeSample.tags || staticFallback.tags)
+					h('div', null, h('strong', { style: { color: labelColor } }, __( 'Category: ', 'single-product-customizer' )), safeSample.categories || staticFallback.categories || __( 'Clothing', 'single-product-customizer' )),
+					safeSample.tags && h('div', null, h('strong', { style: { color: labelColor } }, __( 'Tags: ', 'single-product-customizer' )), safeSample.tags || staticFallback.tags)
 				);
 			case 'product_meta_item':
 				return h(
 					'div',
 					{ className: 'sppcfw-p-2.5 sppcfw-bg-[#f3f4f6] sppcfw-rounded sppcfw-border sppcfw-border-[#e5e7eb] sppcfw-text-sm sppcfw-flex sppcfw-items-center sppcfw-justify-between' },
 					h('span', { className: 'sppcfw-font-semibold sppcfw-text-[#111827]' }, el.label),
-					h('span', { className: 'sppcfw-text-[#4b5563] font-mono sppcfw-text-xs' }, el.metaKey || 'Meta Field')
+					h('span', { className: 'sppcfw-text-[#4b5563] font-mono sppcfw-text-xs' }, el.metaKey || __( 'Meta Field', 'single-product-customizer' ))
 				);
 			case 'custom_message':
 				const cmBg = getResponsiveProp(styles, 'bg_color', deviceView) || '#faf5ff';
@@ -8739,7 +8740,7 @@
 						className: 'sppcfw-p-3 sppcfw-border-l-4 sppcfw-rounded-r sppcfw-text-xs sppcfw-font-medium',
 						style: { backgroundColor: cmBg, color: cmText, borderLeftColor: cmBorder }
 					},
-					settings && settings.custom_message ? settings.custom_message : '✨ Limited Offer: Free Shipping on orders over $50!'
+					settings && settings.custom_message ? settings.custom_message : __( '✨ Limited Offer: Free Shipping on orders over $50!', 'single-product-customizer' )
 				);
 			case 'plus_minus_buttons':
 				const pmbBg = getResponsiveProp(styles, 'btn_bg_color', deviceView) || getResponsiveProp(styles, 'bg_color', deviceView) || '#f3f4f6';
@@ -8759,8 +8760,8 @@
 				const variationsList = (safeSample && safeSample.variations && safeSample.variations.length > 0)
 					? safeSample.variations
 					: [
-							{ name: 'pa_color', label: 'Color', options: ['Black', 'Purple', 'Blue'] },
-							{ name: 'pa_size', label: 'Size', options: ['S', 'M', 'L', 'XL'] }
+							{ name: 'pa_color', label: __( 'Color', 'single-product-customizer' ), options: ['Black', 'Purple', 'Blue'] },
+							{ name: 'pa_size', label: __( 'Size', 'single-product-customizer' ), options: ['S', 'M', 'L', 'XL'] }
 					  ];
 
 				const colorHexMap = {
@@ -8782,7 +8783,7 @@
 					{ className: 'sppcfw-border sppcfw-border-[#e5e7eb] sppcfw-rounded-lg sppcfw-p-3.5 sppcfw-bg-[#f9fafb] sppcfw-space-y-3 sppcfw-my-1' },
 					h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2 sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#111827]' },
 						h('span', { className: 'material-symbols-outlined sppcfw-text-sm sppcfw-text-[#9333ea]' }, 'grid_view'),
-						'Product Variations & Swatches'
+						__( 'Product Variations & Swatches', 'single-product-customizer' )
 					),
 					h(
 						'div',
@@ -8825,7 +8826,7 @@
 			case 'related_products':
 			case 'upsell_products': {
 				const isRelated = el.type === 'related_products';
-				const defaultTitle = isRelated ? 'Related products' : 'You may also like…';
+				const defaultTitle = isRelated ? __( 'Related products', 'single-product-customizer' ) : __( 'You may also like…', 'single-product-customizer' );
 				const titleText = (el.settings && el.settings.title !== undefined) ? el.settings.title : defaultTitle;
 				const defaultCols = deviceView === 'mobile' ? 2 : (deviceView === 'tablet' ? 3 : 4);
 				const columns = parseInt(getResponsiveProp(el.settings, 'columns', deviceView), 10) || defaultCols;
@@ -8836,7 +8837,7 @@
 					? rawList
 					: [1, 2, 3, 4, 5, 6, 7, 8].map(idx => ({
 							id: idx,
-							title: `${isRelated ? 'Related' : 'Upsell'} Product ${idx}`,
+							title: `${isRelated ? __( 'Related', 'single-product-customizer' ) : __( 'Upsell', 'single-product-customizer' )} Product ${idx}`,
 							price: `$${(19.99 * idx).toFixed(2)}`,
 							image_url: ''
 					  }));
@@ -8873,7 +8874,7 @@
 									h('div', { className: 'sppcfw-text-[11px] sppcfw-font-semibold sppcfw-text-[#111827] sppcfw-truncate', title: prodItem.title }, prodItem.title),
 									h('div', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-[#9333ea]', dangerouslySetInnerHTML: typeof prodItem.price === 'string' && prodItem.price.includes('<') ? { __html: prodItem.price } : undefined }, typeof prodItem.price === 'string' && prodItem.price.includes('<') ? undefined : prodItem.price)
 								),
-								h('div', { className: 'sppcfw-w-full sppcfw-py-1 sppcfw-bg-[#f3f4f6] sppcfw-text-center sppcfw-rounded sppcfw-text-[10px] sppcfw-font-bold sppcfw-text-gray-700 sppcfw-mt-2' }, 'Add to cart')
+								h('div', { className: 'sppcfw-w-full sppcfw-py-1 sppcfw-bg-[#f3f4f6] sppcfw-text-center sppcfw-rounded sppcfw-text-[10px] sppcfw-font-bold sppcfw-text-gray-700 sppcfw-mt-2' }, __( 'Add to cart', 'single-product-customizer' ))
 							)
 						)
 					)
@@ -8955,7 +8956,7 @@
 				h(
 					'div',
 					{ className: 'sppcfw-flex sppcfw-justify-between sppcfw-items-center sppcfw-border-b sppcfw-border-[#374151] sppcfw-pb-3.5 sppcfw-mb-4' },
-					h('h3', { className: 'sppcfw-text-lg sppcfw-font-bold sppcfw-text-white sppcfw-flex sppcfw-items-center sppcfw-gap-2' }, h('span', { className: 'material-symbols-outlined sppcfw-text-[#9333ea]' }, 'tune'), 'Publish Display Conditions'),
+					h('h3', { className: 'sppcfw-text-lg sppcfw-font-bold sppcfw-text-white sppcfw-flex sppcfw-items-center sppcfw-gap-2' }, h('span', { className: 'material-symbols-outlined sppcfw-text-[#9333ea]' }, 'tune'), __( 'Publish Display Conditions', 'single-product-customizer' )),
 					h('button', { className: 'sppcfw-text-[#cfc2d7] hover:sppcfw-text-white sppcfw-font-bold sppcfw-cursor-pointer sppcfw-text-base', onClick: closeModal }, '✕')
 				),
 
@@ -8963,7 +8964,7 @@
 				h(
 					'div',
 					{ className: 'sppcfw-space-y-4 sppcfw-overflow-y-auto sppcfw-pr-1 sppcfw-flex-1 sppcfw-mb-4' },
-					h('p', { className: 'sppcfw-text-xs sppcfw-text-[#cfc2d7]' }, 'Choose where your single product page builder template will be applied:'),
+					h('p', { className: 'sppcfw-text-xs sppcfw-text-[#cfc2d7]' }, __( 'Choose where your single product page builder template will be applied:', 'single-product-customizer' )),
 
 					// Radio Scopes
 					h(
@@ -8981,8 +8982,8 @@
 								checked: currentScope === 'entire',
 								onChange: () => handleScopeChange('entire'),
 							}),
-							h('span', { className: 'sppcfw-font-semibold sppcfw-text-white' }, 'Entire Website'),
-							h('span', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af]' }, '(All Single Product Pages)')
+							h('span', { className: 'sppcfw-font-semibold sppcfw-text-white' }, __( 'Entire Website', 'single-product-customizer' )),
+							h('span', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af]' }, __( '(All Single Product Pages)', 'single-product-customizer' ))
 						),
 
 						// Option 2: Specific Category
@@ -8996,7 +8997,7 @@
 										? 'sppcfw-bg-[#9333ea]/15 sppcfw-border sppcfw-border-[#9333ea]/40 sppcfw-cursor-pointer'
 										: 'hover:sppcfw-bg-[#1f2937] sppcfw-cursor-pointer'
 								}`,
-								title: !isProActive ? 'Specific Category condition requires an active Pro license' : '',
+								title: !isProActive ? __( 'Specific Category condition requires an active Pro license', 'single-product-customizer' ) : '',
 								onClick: e => {
 									if (!isProActive) {
 										e.preventDefault();
@@ -9012,8 +9013,8 @@
 								checked: isProActive && currentScope === 'category',
 								onChange: () => handleScopeChange('category'),
 							}),
-							h('span', { className: `sppcfw-font-semibold ${!isProActive ? 'sppcfw-text-gray-400' : 'sppcfw-text-white'}` }, 'Specific Category'),
-							h('span', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af]' }, '(Category-Based Scope)'),
+							h('span', { className: `sppcfw-font-semibold ${!isProActive ? 'sppcfw-text-gray-400' : 'sppcfw-text-white'}` }, __( 'Specific Category', 'single-product-customizer' )),
+							h('span', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af]' }, __( '(Category-Based Scope)', 'single-product-customizer' )),
 							!isProActive && h(
 								'span',
 								{ className: 'sppcfw-ml-auto sppcfw-text-[10px] sppcfw-font-bold sppcfw-uppercase sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded sppcfw-bg-gradient-to-r sppcfw-from-amber-500 sppcfw-to-orange-600 sppcfw-text-white sppcfw-shadow-sm sppcfw-tracking-wide' },
@@ -9032,7 +9033,7 @@
 										? 'sppcfw-bg-[#9333ea]/15 sppcfw-border sppcfw-border-[#9333ea]/40 sppcfw-cursor-pointer'
 										: 'hover:sppcfw-bg-[#1f2937] sppcfw-cursor-pointer'
 								}`,
-								title: !isProActive ? 'Specific Product condition requires an active Pro license' : '',
+								title: !isProActive ? __( 'Specific Product condition requires an active Pro license', 'single-product-customizer' ) : '',
 								onClick: e => {
 									if (!isProActive) {
 										e.preventDefault();
@@ -9048,8 +9049,8 @@
 								checked: isProActive && currentScope === 'product',
 								onChange: () => handleScopeChange('product'),
 							}),
-							h('span', { className: `sppcfw-font-semibold ${!isProActive ? 'sppcfw-text-gray-400' : 'sppcfw-text-white'}` }, 'Specific Product / Separate Page'),
-							h('span', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af]' }, '(Product-Based Scope)'),
+							h('span', { className: `sppcfw-font-semibold ${!isProActive ? 'sppcfw-text-gray-400' : 'sppcfw-text-white'}` }, __( 'Specific Product / Separate Page', 'single-product-customizer' )),
+							h('span', { className: 'sppcfw-text-xs sppcfw-text-[#9ca3af]' }, __( '(Product-Based Scope)', 'single-product-customizer' )),
 							!isProActive && h(
 								'span',
 								{ className: 'sppcfw-ml-auto sppcfw-text-[10px] sppcfw-font-bold sppcfw-uppercase sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded sppcfw-bg-gradient-to-r sppcfw-from-amber-500 sppcfw-to-orange-600 sppcfw-text-white sppcfw-shadow-sm sppcfw-tracking-wide' },
@@ -9064,14 +9065,14 @@
 						{ className: 'sppcfw-p-3 sppcfw-rounded-lg sppcfw-bg-[#1e1b2e] sppcfw-border sppcfw-border-amber-500/30 sppcfw-flex sppcfw-items-center sppcfw-justify-between sppcfw-gap-3 sppcfw-text-xs sppcfw-text-amber-200' },
 						h('div', { className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2 sppcfw-min-w-0' },
 							h('span', { className: 'material-symbols-outlined sppcfw-text-amber-400 sppcfw-text-base sppcfw-shrink-0' }, 'lock'),
-							h('span', { className: 'sppcfw-truncate' }, 'Specific Category & Product display rules require an active Pro license.')
+							h('span', { className: 'sppcfw-truncate' }, __( 'Specific Category & Product display rules require an active Pro license.', 'single-product-customizer' ))
 						),
 						h('a', {
 							href: proUpgradeUrl,
 							target: '_blank',
 							rel: 'noopener noreferrer',
 							className: 'sppcfw-font-bold sppcfw-text-white sppcfw-bg-gradient-to-r sppcfw-from-amber-500 sppcfw-to-orange-600 sppcfw-px-3 sppcfw-py-1.5 sppcfw-rounded sppcfw-shadow sppcfw-shrink-0 hover:sppcfw-opacity-95 sppcfw-text-[11px]'
-						}, 'Get Pro')
+						}, __( 'Get Pro', 'single-product-customizer' ))
 					),
 
 					// Conditional Content: Categories Selector
@@ -9084,15 +9085,15 @@
 								{ className: 'sppcfw-flex sppcfw-justify-between sppcfw-items-center' },
 								h('label', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-white sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
 									h('span', { className: 'material-symbols-outlined sppcfw-text-sm sppcfw-text-[#9333ea]' }, 'category'),
-									'Select Categories to apply:',
+									__( 'Select Categories to apply:', 'single-product-customizer' ),
 									h('span', { className: 'sppcfw-text-[11px] sppcfw-font-semibold sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded-full sppcfw-bg-[#9333ea]/20 sppcfw-text-[#ddb8ff]' }, `${selectedCategoryIds.length} selected`)
 								),
 								h(
 									'div',
 									{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2' },
-									h('button', { type: 'button', onClick: selectAllCategories, className: 'sppcfw-text-[11px] sppcfw-text-[#9333ea] hover:sppcfw-underline sppcfw-cursor-pointer' }, 'Select All'),
+									h('button', { type: 'button', onClick: selectAllCategories, className: 'sppcfw-text-[11px] sppcfw-text-[#9333ea] hover:sppcfw-underline sppcfw-cursor-pointer' }, __( 'Select All', 'single-product-customizer' )),
 									h('span', { className: 'sppcfw-text-gray-500 sppcfw-text-xs' }, '|'),
-									h('button', { type: 'button', onClick: clearCategories, className: 'sppcfw-text-[11px] sppcfw-text-gray-400 hover:sppcfw-underline sppcfw-cursor-pointer' }, 'Clear')
+									h('button', { type: 'button', onClick: clearCategories, className: 'sppcfw-text-[11px] sppcfw-text-gray-400 hover:sppcfw-underline sppcfw-cursor-pointer' }, __( 'Clear', 'single-product-customizer' ))
 								)
 							),
 
@@ -9105,7 +9106,7 @@
 									type: 'text',
 									value: searchCat,
 									onChange: e => setSearchCat(e.target.value),
-									placeholder: 'Filter categories by name...',
+									placeholder: __( 'Filter categories by name...', 'single-product-customizer' ),
 									className: 'sppcfw-w-full sppcfw-bg-[#1f2937] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded-md sppcfw-pl-8 sppcfw-pr-3 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white sppcfw-placeholder-gray-400 focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]'
 								})
 							),
@@ -9115,7 +9116,7 @@
 								'div',
 								{ className: 'sppcfw-max-h-48 sppcfw-overflow-y-auto sppcfw-space-y-1 sppcfw-pr-1 sppcfw-rounded-md sppcfw-border sppcfw-border-[#1f2937] sppcfw-p-1' },
 								filteredCategories.length === 0
-									? h('div', { className: 'sppcfw-py-4 sppcfw-text-center sppcfw-text-xs sppcfw-text-gray-400' }, 'No categories found.')
+									? h('div', { className: 'sppcfw-py-4 sppcfw-text-center sppcfw-text-xs sppcfw-text-gray-400' }, __( 'No categories found.', 'single-product-customizer' ))
 									: filteredCategories.map(cat => {
 											const isSelected = selectedCategoryIds.includes(Number(cat.id));
 											return h(
@@ -9153,15 +9154,15 @@
 								{ className: 'sppcfw-flex sppcfw-justify-between sppcfw-items-center' },
 								h('label', { className: 'sppcfw-text-xs sppcfw-font-bold sppcfw-text-white sppcfw-flex sppcfw-items-center sppcfw-gap-1.5' },
 									h('span', { className: 'material-symbols-outlined sppcfw-text-sm sppcfw-text-[#9333ea]' }, 'shopping_bag'),
-									'Select Products to apply:',
+									__( 'Select Products to apply:', 'single-product-customizer' ),
 									h('span', { className: 'sppcfw-text-[11px] sppcfw-font-semibold sppcfw-px-2 sppcfw-py-0.5 sppcfw-rounded-full sppcfw-bg-[#9333ea]/20 sppcfw-text-[#ddb8ff]' }, `${selectedProductIds.length} selected`)
 								),
 								h(
 									'div',
 									{ className: 'sppcfw-flex sppcfw-items-center sppcfw-gap-2' },
-									h('button', { type: 'button', onClick: selectAllProducts, className: 'sppcfw-text-[11px] sppcfw-text-[#9333ea] hover:sppcfw-underline sppcfw-cursor-pointer' }, 'Select All'),
+									h('button', { type: 'button', onClick: selectAllProducts, className: 'sppcfw-text-[11px] sppcfw-text-[#9333ea] hover:sppcfw-underline sppcfw-cursor-pointer' }, __( 'Select All', 'single-product-customizer' )),
 									h('span', { className: 'sppcfw-text-gray-500 sppcfw-text-xs' }, '|'),
-									h('button', { type: 'button', onClick: clearProducts, className: 'sppcfw-text-[11px] sppcfw-text-gray-400 hover:sppcfw-underline sppcfw-cursor-pointer' }, 'Clear')
+									h('button', { type: 'button', onClick: clearProducts, className: 'sppcfw-text-[11px] sppcfw-text-gray-400 hover:sppcfw-underline sppcfw-cursor-pointer' }, __( 'Clear', 'single-product-customizer' ))
 								)
 							),
 
@@ -9174,7 +9175,7 @@
 									type: 'text',
 									value: searchProd,
 									onChange: e => setSearchProd(e.target.value),
-									placeholder: 'Search products by title or ID...',
+									placeholder: __( 'Search products by title or ID...', 'single-product-customizer' ),
 									className: 'sppcfw-w-full sppcfw-bg-[#1f2937] sppcfw-border sppcfw-border-[#374151] sppcfw-rounded-md sppcfw-pl-8 sppcfw-pr-3 sppcfw-py-1.5 sppcfw-text-xs sppcfw-text-white sppcfw-placeholder-gray-400 focus:sppcfw-outline-none focus:sppcfw-border-[#9333ea]'
 								})
 							),
@@ -9184,7 +9185,7 @@
 								'div',
 								{ className: 'sppcfw-max-h-52 sppcfw-overflow-y-auto sppcfw-space-y-1 sppcfw-pr-1 sppcfw-rounded-md sppcfw-border sppcfw-border-[#1f2937] sppcfw-p-1' },
 								filteredProducts.length === 0
-									? h('div', { className: 'sppcfw-py-4 sppcfw-text-center sppcfw-text-xs sppcfw-text-gray-400' }, 'No products found.')
+									? h('div', { className: 'sppcfw-py-4 sppcfw-text-center sppcfw-text-xs sppcfw-text-gray-400' }, __( 'No products found.', 'single-product-customizer' ))
 									: filteredProducts.map(prod => {
 											const isSelected = selectedProductIds.includes(Number(prod.id));
 											return h(
@@ -9220,7 +9221,7 @@
 				h(
 					'div',
 					{ className: 'sppcfw-flex sppcfw-justify-end sppcfw-gap-3 sppcfw-pt-3.5 sppcfw-border-t sppcfw-border-[#374151]' },
-					h('button', { className: 'sppcfw-px-4 sppcfw-py-2 sppcfw-bg-[#121c2a] hover:sppcfw-bg-[#212b39] sppcfw-text-[#d9e3f6] sppcfw-rounded sppcfw-text-xs sppcfw-font-semibold sppcfw-cursor-pointer', onClick: closeModal }, 'Cancel'),
+					h('button', { className: 'sppcfw-px-4 sppcfw-py-2 sppcfw-bg-[#121c2a] hover:sppcfw-bg-[#212b39] sppcfw-text-[#d9e3f6] sppcfw-rounded sppcfw-text-xs sppcfw-font-semibold sppcfw-cursor-pointer', onClick: closeModal }, __( 'Cancel', 'single-product-customizer' )),
 					h(
 						'button',
 						{
@@ -9230,7 +9231,7 @@
 								saveTemplate();
 							},
 						},
-						'Save & Publish'
+						__( 'Save & Publish', 'single-product-customizer' )
 					)
 				)
 			)

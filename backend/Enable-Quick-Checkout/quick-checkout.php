@@ -10,6 +10,7 @@ if (!defined('ABSPATH')) {
 $sppcfw_template_files = array(
     'template-1' => __('Template 1 - Modern Horizontal', 'single-product-customizer'),
     'template-2' => __('Template 2 - Classic Vertical', 'single-product-customizer'),
+    'template-3' => __('Template 3 - Split Layout', 'single-product-customizer'),
 );
 
 $sppcfw_theme = wp_get_theme();
@@ -126,7 +127,7 @@ $sppcfw_qc_disabled_attr = '';
                                          <?php
 foreach ($sppcfw_template_files as $sppcfw_value => $sppcfw_label):
     $sppcfw_is_pro_active = sppcfw_is_pro_active();
-    $sppcfw_img_name = ($sppcfw_value === 'template-2') ? ($sppcfw_is_pro_active ? 'template-2-pro' : 'template-2-free') : $sppcfw_value;
+    $sppcfw_img_name = ($sppcfw_value === 'template-2') ? ($sppcfw_is_pro_active ? 'template-2-pro' : 'template-2-free') : (($sppcfw_value === 'template-3') ? ($sppcfw_is_pro_active ? 'template-3' : 'template-3-pro') : $sppcfw_value);
     ?>
                                             <div class="sppcfw-template-item <?php echo $sppcfw_value === $sppcfw_current_template ? 'is-active' : ''; ?>"
                                                 role="button"
@@ -144,7 +145,7 @@ foreach ($sppcfw_template_files as $sppcfw_value => $sppcfw_label):
                                 <div class="sppcfw-selected-template-preview">
                                     <div class="sppcfw-select-template-thumb">
                                         <?php
-                                        $sppcfw_preview_img = ($sppcfw_current_template === 'template-2') ? (sppcfw_is_pro_active() ? 'template-2-pro' : 'template-2-free') : $sppcfw_current_template;
+                                        $sppcfw_preview_img = ($sppcfw_current_template === 'template-2') ? (sppcfw_is_pro_active() ? 'template-2-pro' : 'template-2-free') : (($sppcfw_current_template === 'template-3') ? (sppcfw_is_pro_active() ? 'template-3' : 'template-3-pro') : $sppcfw_current_template);
                                         ?>
                                         <img id="sppcfw-selected-template-preview-img"
                                             src="<?php echo esc_url(plugin_dir_url(__FILE__) . 'assets/img/' . $sppcfw_preview_img . '.png'); ?>"

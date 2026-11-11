@@ -17,8 +17,6 @@ if (! defined('ABSPATH')) {
 
         <?php do_action('woocommerce_checkout_before_customer_details'); ?>
 
-        <form name="checkout" method="post" class="checkout woocommerce-checkout sppcfw-checkout-form" action="<?php echo esc_url(wc_get_checkout_url()); ?>" enctype="multipart/form-data" aria-label="<?php echo esc_attr__('Checkout', 'single-product-customizer'); ?>">
-
             <div class="sppcfw-accordion" id="sppcfw-checkout-accordion">
                 <!-- Cart Section -->
                 <div class="sppcfw-accordion-item sppcfw-accordion-item-active" id="sppcfw-cart-section">
@@ -41,6 +39,9 @@ if (! defined('ABSPATH')) {
 
                     </div>
                 </div>
+
+                <!-- Cart/variation form is rendered OUTSIDE the checkout form: nested forms are dropped by the HTML parser (SPC-030). -->
+        <form name="checkout" method="post" class="checkout woocommerce-checkout sppcfw-checkout-form" action="<?php echo esc_url(wc_get_checkout_url()); ?>" enctype="multipart/form-data" aria-label="<?php echo esc_attr__('Checkout', 'single-product-customizer'); ?>">
 
                 <!-- Billing Section -->
                 <div class="sppcfw-accordion-item" id="sppcfw-billing-section">
@@ -113,13 +114,12 @@ if (! defined('ABSPATH')) {
                         <?php do_action('sppcfw_after_quick_checkout_initial_payment'); ?>
                     </div>
                 </div>
-            </div><!-- .sppcfw-accordion -->
-
             <?php wp_nonce_field('woocommerce-process_checkout', 'woocommerce-process-checkout-nonce'); ?>
 
             <?php do_action('woocommerce_after_checkout_form', $sppcfw_checkout); ?>
 
         </form>
+            </div><!-- .sppcfw-accordion -->
 
     <?php endif; ?>
 <?php endif; ?>

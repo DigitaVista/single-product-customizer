@@ -208,10 +208,11 @@ if (!class_exists('SPPCFW_Builder')) {
 				wp_enqueue_script(
 					'sppcfw-builder-app',
 					SPPCFW_DIR_URL . 'backend/assets/js/builder-app.js',
-					array('wp-element', 'jquery', 'sppcfw-builder-tailwindcss'),
+					array('wp-element', 'wp-i18n', 'jquery', 'sppcfw-builder-tailwindcss'),
 					SPPCFW_VERSION,
 					true
 				);
+				wp_set_script_translations( 'sppcfw-builder-app', 'single-product-customizer', SPPCFW_DIR_PATH . 'languages' );
 
 				$template_id = isset($_GET['template_id']) ? sanitize_text_field(wp_unslash($_GET['template_id'])) : 'template_default'; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 				$sppcfw_basic = get_option('sppcfw_basic', array());

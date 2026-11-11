@@ -87,10 +87,11 @@ if( !class_exists("Sppcfw_Backend_Variation_Switcher")){
             wp_enqueue_script(
                 'backend-variable-switcher-modal-js',
                 plugin_dir_url(__FILE__).'backend-variable-switcher-modal.js',
-                array( 'jquery'),
-                true,
-                SPPCFW_VERSION
+                array( 'jquery', 'wp-i18n' ),
+                SPPCFW_VERSION,
+                true
             );
+            wp_set_script_translations( 'backend-variable-switcher-modal-js', 'single-product-customizer', SPPCFW_DIR_PATH . 'languages' );
 
             wp_localize_script('backend-variable-switcher-modal-js', 'iconDoxAjax', [
                 'ajax_url' => admin_url('admin-ajax.php'),
@@ -185,10 +186,10 @@ if( !class_exists("Sppcfw_Backend_Variation_Switcher")){
                             <div class="icon-dox-body">
                                 <div class="icon-dox-sidebar">
                                 <ul class="icon-dox-tabs">
-                                    <li data-style="all" class="active">All Icons</li>
-                                    <li data-style="regular">Font Awesome - Regular</li>
-                                    <li data-style="solid">Font Awesome - Solid</li>
-                                    <li data-style="brands">Font Awesome - Brands</li>
+                                    <li data-style="all" class="active"><?php esc_html_e( 'All Icons', 'single-product-customizer' ); ?></li>
+                                    <li data-style="regular"><?php esc_html_e( 'Font Awesome - Regular', 'single-product-customizer' ); ?></li>
+                                    <li data-style="solid"><?php esc_html_e( 'Font Awesome - Solid', 'single-product-customizer' ); ?></li>
+                                    <li data-style="brands"><?php esc_html_e( 'Font Awesome - Brands', 'single-product-customizer' ); ?></li>
                                 </ul>
                                 </div>
                                 <div class="icon-dox-main">
@@ -298,10 +299,10 @@ if( !class_exists("Sppcfw_Backend_Variation_Switcher")){
                         <div class="icon-dox-body">
                             <div class="icon-dox-sidebar">
                             <ul class="icon-dox-tabs">
-                                <li data-style="all" class="active">All Icons</li>
-                                <li data-style="regular">Font Awesome - Regular</li>
-                                <li data-style="solid">Font Awesome - Solid</li>
-                                <li data-style="brands">Font Awesome - Brands</li>
+                                <li data-style="all" class="active"><?php esc_html_e( 'All Icons', 'single-product-customizer' ); ?></li>
+                                <li data-style="regular"><?php esc_html_e( 'Font Awesome - Regular', 'single-product-customizer' ); ?></li>
+                                <li data-style="solid"><?php esc_html_e( 'Font Awesome - Solid', 'single-product-customizer' ); ?></li>
+                                <li data-style="brands"><?php esc_html_e( 'Font Awesome - Brands', 'single-product-customizer' ); ?></li>
                             </ul>
                             </div>
                             <div class="icon-dox-main">

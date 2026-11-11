@@ -8,6 +8,8 @@ if( ! class_exists('Sppcfw_Frontend_Related_Product_Title')){
 
         public function __construct(){
             add_filter("woocommerce_product_related_products_heading",[$this, "sppcfw_display_related_products_title"], 999, 1);
+            // Block themes: the heading lives inside the woocommerce/related-products block, not in the classic template filter.
+            add_filter('render_block', [$this, 'sppcfw_filter_related_products_block_heading'], 20, 2);
         }
     
         function sppcfw_display_related_products_title($related_prducts_title){
@@ -20,6 +22,33 @@ if( ! class_exists('Sppcfw_Frontend_Related_Product_Title')){
             }
             
             return $related_prducts_title;
+        }
+
+        public function sppcfw_filter_related_products_block_heading($block_content, $block){
+            if(empty($block['blockName']) || '' === $block_content || !function_exists('is_product') || !is_product()){
+                return $block_content;
+            }
+            $name = $block['blockName'];
+            // Block themes put the section heading in a core/heading block next to the woocommerce/related-products block.
+            if('core/heading' !== $name && 'woocommerce/related-products' !== $name){
+                return $block_content;
+            }
+            $title = $this->sppcfw_get_related_products_title();
+            if('' === $title){
+                return $block_content;
+            }
+            $default_labels = array_unique(array(
+                'Related products',
+                __('Related products', 'woocommerce'), // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch -- Intentionally matches WooCommerce's own translated heading.
+                __('Related products', 'single-product-customizer'),
+            ));
+            return preg_replace_callback('/(<h[1-6]\b[^>]*>)(.*?)(<\/h[1-6]>)/is', function($m) use ($title, $default_labels){
+                $text = trim(wp_strip_all_tags($m[2]));
+                if(!in_array($text, $default_labels, true)){
+                    return $m[0];
+                }
+                return $m[1] . esc_html($title) . $m[3];
+            }, $block_content, 1);
         }
 
         public function sppcfw_get_related_products_title(){

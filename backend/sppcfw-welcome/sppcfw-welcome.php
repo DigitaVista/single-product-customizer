@@ -67,10 +67,11 @@ function sppcfw_enqueue_welcome_page_assets( $hook_suffix ) {
 	wp_enqueue_script(
 		'sppcfw_welcome_page_script',
 		SPPCFW_DIR_URL . 'backend/assets/js/sppcfw-welcome.js',
-		array( 'jquery' ),
+		array( 'jquery', 'wp-i18n' ),
 		SPPCFW_VERSION,
 		true
 	);
+	wp_set_script_translations( 'sppcfw_welcome_page_script', 'single-product-customizer', SPPCFW_DIR_PATH . 'languages' );
 
 	wp_localize_script(
 		'sppcfw_welcome_page_script',

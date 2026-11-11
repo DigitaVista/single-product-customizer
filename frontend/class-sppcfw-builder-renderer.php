@@ -31,15 +31,28 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 		 */
 		public function sppcfw_disable_block_template_for_builder($has_template, $template_name)
 		{
-			if ('single-product' === $template_name) {
-				$enable_builder = (int) get_option('sppcfw_enable_single_product_builder', 0);
-				$enable_quick_checkout = (int) get_option('sppcfw_enable_quick_checkout', 0);
-
-				if (!empty($enable_builder) && empty($enable_quick_checkout)) {
-					return false;
-				}
+			// Only drop the block template when a Builder template actually applies to the current product
+			// (set in sppcfw_maybe_init_frontend_override on "wp"). Other products keep the theme's block template,
+			// otherwise block themes fall back to the classic template and lose the gallery, add to cart form and tabs.
+			if ('single-product' === $template_name && !empty($this->matched_template)) {
+				return false;
 			}
 			return $has_template;
+		}
+
+		/**
+		 * Use the Builder wrapper template for single products on block themes.
+		 *
+		 * @param string $template Template path chosen by WordPress/WooCommerce.
+		 * @return string
+		 */
+		public function sppcfw_block_theme_single_product_template($template)
+		{
+			if (!is_singular('product')) {
+				return $template;
+			}
+			$file = SPPCFW_DIR_PATH . 'frontend/templates/builder-single-product-block-theme.php';
+			return file_exists($file) ? $file : $template;
 		}
 
 		/**
@@ -79,6 +92,12 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 			}
 
 			$this->matched_template = $matched;
+
+			// Block themes have no header.php/footer.php: use a wrapper that prints the theme's header/footer template parts
+			// instead of WooCommerce's classic single-product.php (which triggers a deprecation notice and loses the site header).
+			if (function_exists('wp_is_block_theme') && wp_is_block_theme() && function_exists('block_header_area')) {
+				add_filter('template_include', array($this, 'sppcfw_block_theme_single_product_template'), 99999);
+			}
 
 			add_action('wp_enqueue_scripts', array($this, 'sppcfw_enqueue_frontend_builder_styles'));
 
@@ -402,6 +421,11 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				.sppcfw-container-full { width: 100% !important; max-width: 100% !important; }
 				.sppcfw-flex-row { display: flex; flex-wrap: wrap; width: 100%; box-sizing: border-box; }
 				.sppcfw-column { box-sizing: border-box; }
+				.sppcfw-custom-message-banner { padding: 12px 16px; margin: 8px 0; background: #eef2ff; color: #3730a3; border-left: 4px solid #6366f1; border-radius: 6px; font-weight: 600; box-sizing: border-box; }
+				.sppcfw-custom-meta-field { padding: 8px 12px; margin: 8px 0; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 6px; box-sizing: border-box; }
+				.sppcfw-meta-wrapper .product_meta { font-size: inherit; color: inherit; }
+				.sppcfw-meta-wrapper .product_meta > span { display: block; margin-bottom: 4px; }
+				.sppcfw-meta-wrapper .product_meta a { color: inherit; }
 				.sppcfw-widget-item { width: 100% !important; box-sizing: border-box !important; }
 
 				/* WooCommerce Tabs Base Styling for Block Themes & Custom Themes */
@@ -466,6 +490,8 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 				.sppcfw-tabs-wrapper .wc-tab {
 					display: none;
 					width: 100% !important;
+					margin-left: 0 !important;
+					margin-right: 0 !important;
 					box-sizing: border-box !important;
 					line-height: 1.7 !important;
 					color: #374151 !important;
@@ -730,6 +756,11 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					position: absolute !important;
 					top: 10px !important;
 					left: 10px !important;
+					right: auto !important;
+					bottom: auto !important;
+					width: auto !important;
+					height: auto !important;
+					margin: 0 !important;
 					z-index: 10 !important;
 					background: #ef4444 !important;
 					color: #ffffff !important;
@@ -1200,7 +1231,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 									if (!modal) {
 										modal = document.createElement('div');
 										modal.className = 'sppcfw-lightbox-modal';
-										modal.innerHTML = '<div class=\"sppcfw-lightbox-content\"><button type=\"button\" class=\"sppcfw-lightbox-close\" aria-label=\"Close\">&times;</button><img src=\"\" alt=\"Full size image\" /></div>';
+										modal.innerHTML = '<div class=\"sppcfw-lightbox-content\"><button type=\"button\" class=\"sppcfw-lightbox-close\" aria-label=\"" . esc_attr__( 'Close', 'single-product-customizer' ) . "\">&times;</button><img src=\"\" alt=\"" . esc_attr__( 'Full size image', 'single-product-customizer' ) . "\" /></div>';
 										document.body.appendChild(modal);
 
 										modal.querySelector('.sppcfw-lightbox-close').addEventListener('click', function() {
@@ -1377,6 +1408,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						}
 					}
 
+					$sppcfw_nested_css = '';
 					$css .= ".sppcfw-el-{$id} {";
 					if ('container' === $type) {
 						$width_mode = $this->sppcfw_get_device_prop($settings, 'width_mode', $device, 'boxed');
@@ -1400,14 +1432,14 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						if ('100%' === $flex_width) {
 							$css .= "flex: 1 1 100% !important; width: 100% !important; max-width: 100% !important; display: flex !important; flex-direction: {$flex_direction} !important; justify-content: {$justify_content} !important; align-items: {$align_items} !important; gap: {$gap} !important; min-height: {$min_height} !important;";
 						} else {
-							$css .= "flex: 1 1 calc({$flex_width} - 16px) !important; min-width: 200px !important; display: flex !important; flex-direction: {$flex_direction} !important; justify-content: {$justify_content} !important; align-items: {$align_items} !important; gap: {$gap} !important; min-height: {$min_height} !important;";
+							$css .= "flex: 1 1 calc({$flex_width} - var(--sppcfw-gap, 16px)) !important; min-width: 200px !important; display: flex !important; flex-direction: {$flex_direction} !important; justify-content: {$justify_content} !important; align-items: {$align_items} !important; gap: {$gap} !important; min-height: {$min_height} !important;";
 						}
 					}
 
 					$text_color = $this->sppcfw_get_device_prop($styles, 'text_color', $device, '');
 					if (!empty($text_color)) {
 						$css .= 'color: ' . esc_attr($text_color) . ' !important;';
-						$css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading, .sppcfw-el-{$id} a { color: " . esc_attr($text_color) . ' !important; }';
+						$sppcfw_nested_css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading, .sppcfw-el-{$id} a { color: " . esc_attr($text_color) . ' !important; }';
 					}
 
 					// Product Rating specific styles
@@ -1431,35 +1463,35 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 								'right' => 'flex-end',
 							);
 							$justify_val = isset($justify_map[$alignment]) ? $justify_map[$alignment] : 'flex-start';
-							$css .= ".sppcfw-el-{$id} .sppcfw-product-rating-container, .sppcfw-el-{$id} .woocommerce-product-rating, .sppcfw-el-{$id} .sppcfw-rating-wrapper, .sppcfw-el-{$id} { justify-content: {$justify_val} !important; text-align: {$alignment} !important; }";
+							$sppcfw_nested_css .= ".sppcfw-el-{$id} .sppcfw-product-rating-container, .sppcfw-el-{$id} .woocommerce-product-rating, .sppcfw-el-{$id} .sppcfw-rating-wrapper, .sppcfw-el-{$id} { justify-content: {$justify_val} !important; text-align: {$alignment} !important; }";
 						}
 
 						if (!empty($gap)) {
-							$css .= ".sppcfw-el-{$id} .sppcfw-product-rating-container, .sppcfw-el-{$id} .woocommerce-product-rating, .sppcfw-el-{$id} .sppcfw-rating-wrapper { gap: " . esc_attr($gap) . ' !important; }';
+							$sppcfw_nested_css .= ".sppcfw-el-{$id} .sppcfw-product-rating-container, .sppcfw-el-{$id} .woocommerce-product-rating, .sppcfw-el-{$id} .sppcfw-rating-wrapper { gap: " . esc_attr($gap) . ' !important; }';
 						}
 
 						if (!empty($star_color)) {
-							$css .= ".sppcfw-el-{$id} .sppcfw-stars-filled, .sppcfw-el-{$id} .star-rating span::before, .sppcfw-el-{$id} .star-rating span { color: " . esc_attr($star_color) . ' !important; }';
+							$sppcfw_nested_css .= ".sppcfw-el-{$id} .sppcfw-stars-filled, .sppcfw-el-{$id} .star-rating span::before, .sppcfw-el-{$id} .star-rating span { color: " . esc_attr($star_color) . ' !important; }';
 						}
 
 						if (!empty($empty_star_color)) {
-							$css .= ".sppcfw-el-{$id} .sppcfw-stars-empty, .sppcfw-el-{$id} .star-rating::before { color: " . esc_attr($empty_star_color) . ' !important; }';
+							$sppcfw_nested_css .= ".sppcfw-el-{$id} .sppcfw-stars-empty, .sppcfw-el-{$id} .star-rating::before { color: " . esc_attr($empty_star_color) . ' !important; }';
 						}
 
 						if (!empty($star_size)) {
-							$css .= ".sppcfw-el-{$id} .sppcfw-stars-box, .sppcfw-el-{$id} .star-rating { font-size: " . esc_attr($star_size) . ' !important; }';
+							$sppcfw_nested_css .= ".sppcfw-el-{$id} .sppcfw-stars-box, .sppcfw-el-{$id} .star-rating { font-size: " . esc_attr($star_size) . ' !important; }';
 						}
 
 						if (!empty($review_count_color)) {
-							$css .= ".sppcfw-el-{$id} .sppcfw-review-link, .sppcfw-el-{$id} .woocommerce-review-link, .sppcfw-el-{$id} a.woocommerce-review-link, .sppcfw-el-{$id} .woocommerce-review-link .count { color: " . esc_attr($review_count_color) . ' !important; }';
+							$sppcfw_nested_css .= ".sppcfw-el-{$id} .sppcfw-review-link, .sppcfw-el-{$id} .woocommerce-review-link, .sppcfw-el-{$id} a.woocommerce-review-link, .sppcfw-el-{$id} .woocommerce-review-link .count { color: " . esc_attr($review_count_color) . ' !important; }';
 						}
 
 						if (!empty($review_font_size)) {
-							$css .= ".sppcfw-el-{$id} .sppcfw-review-link, .sppcfw-el-{$id} .woocommerce-review-link { font-size: " . esc_attr($review_font_size) . ' !important; }';
+							$sppcfw_nested_css .= ".sppcfw-el-{$id} .sppcfw-review-link, .sppcfw-el-{$id} .woocommerce-review-link { font-size: " . esc_attr($review_font_size) . ' !important; }';
 						}
 
 						if (!empty($review_font_weight) && 'Default' !== $review_font_weight) {
-							$css .= ".sppcfw-el-{$id} .sppcfw-review-link, .sppcfw-el-{$id} .woocommerce-review-link { font-weight: " . esc_attr($review_font_weight) . ' !important; }';
+							$sppcfw_nested_css .= ".sppcfw-el-{$id} .sppcfw-review-link, .sppcfw-el-{$id} .woocommerce-review-link { font-weight: " . esc_attr($review_font_weight) . ' !important; }';
 						}
 					}
 
@@ -1529,27 +1561,27 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						$font_size = $this->sppcfw_get_device_prop($styles, 'font_size', $device, '');
 						if (!empty($font_size)) {
 							$css .= 'font-size: ' . esc_attr($font_size) . ' !important;';
-							$css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading { font-size: " . esc_attr($font_size) . ' !important; }';
-							$css .= ".sppcfw-el-{$id} .price, .sppcfw-el-{$id} .price .amount, .sppcfw-el-{$id} .woocommerce-Price-amount { font-size: " . esc_attr($font_size) . ' !important; }';
+							$sppcfw_nested_css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading { font-size: " . esc_attr($font_size) . ' !important; }';
+							$sppcfw_nested_css .= ".sppcfw-el-{$id} .price, .sppcfw-el-{$id} .price .amount, .sppcfw-el-{$id} .woocommerce-Price-amount { font-size: " . esc_attr($font_size) . ' !important; }';
 						}
 
 						$font_family = $this->sppcfw_get_device_prop($styles, 'font_family', $device, '');
 						if (!empty($font_family) && 'Inherit' !== $font_family) {
 							$css .= 'font-family: ' . esc_attr($font_family) . ', sans-serif !important;';
-							$css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading { font-family: " . esc_attr($font_family) . ', sans-serif !important; }';
+							$sppcfw_nested_css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading { font-family: " . esc_attr($font_family) . ', sans-serif !important; }';
 						}
 
 						$font_weight = $this->sppcfw_get_device_prop($styles, 'font_weight', $device, '');
 						if (!empty($font_weight) && 'Default' !== $font_weight) {
 							$css .= 'font-weight: ' . esc_attr($font_weight) . ' !important;';
-							$css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading, .sppcfw-el-{$id} a { font-weight: " . esc_attr($font_weight) . ' !important; }';
-							$css .= ".sppcfw-el-{$id} .price, .sppcfw-el-{$id} .price .amount, .sppcfw-el-{$id} .woocommerce-Price-amount { font-weight: " . esc_attr($font_weight) . ' !important; }';
+							$sppcfw_nested_css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading, .sppcfw-el-{$id} a { font-weight: " . esc_attr($font_weight) . ' !important; }';
+							$sppcfw_nested_css .= ".sppcfw-el-{$id} .price, .sppcfw-el-{$id} .price .amount, .sppcfw-el-{$id} .woocommerce-Price-amount { font-weight: " . esc_attr($font_weight) . ' !important; }';
 						}
 
 						$line_height = $this->sppcfw_get_device_prop($styles, 'line_height', $device, '');
 						if (!empty($line_height)) {
 							$css .= 'line-height: ' . esc_attr($line_height) . ' !important;';
-							$css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading { line-height: " . esc_attr($line_height) . ' !important; }';
+							$sppcfw_nested_css .= ".sppcfw-el-{$id} h1, .sppcfw-el-{$id} h2, .sppcfw-el-{$id} h3, .sppcfw-el-{$id} h4, .sppcfw-el-{$id} h5, .sppcfw-el-{$id} h6, .sppcfw-el-{$id} .product_title, .sppcfw-el-{$id} .sppcfw-custom-heading { line-height: " . esc_attr($line_height) . ' !important; }';
 						}
 
 						// Border: Only generate when border_type is set and not None
@@ -1661,9 +1693,43 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					if (!empty($alignment)) {
 						$css .= 'text-align: ' . esc_attr($alignment) . ' !important;';
 						$align_justify = ('center' === $alignment ? 'center' : ('right' === $alignment ? 'flex-end' : 'flex-start'));
-						$css .= ".sppcfw-el-{$id} .sppcfw-price-wrapper, .sppcfw-el-{$id} .price { text-align: " . esc_attr($alignment) . " !important; justify-content: {$align_justify} !important; }";
+						$sppcfw_nested_css .= ".sppcfw-el-{$id} .sppcfw-price-wrapper, .sppcfw-el-{$id} .price { text-align: " . esc_attr($alignment) . " !important; justify-content: {$align_justify} !important; }";
 					}
 					$css .= '}';
+					// Rules for inner elements are collected separately: printing them inside the open block above produced
+					// nested CSS (".sppcfw-el-x { ... .sppcfw-el-x h1 { } }") that never matched, so themes styling
+					// WooCommerce elements directly (e.g. Astra) ignored Builder typography/colour changes.
+					// Text widgets: themes such as Astra style WooCommerce text (product meta, short description, tab
+					// content) directly, so typography set on the element wrapper never reached it by inheritance.
+					$sppcfw_text_types = array('product_title', 'product_short_desc', 'product_meta', 'product_meta_item', 'product_description', 'text_editor', 'heading', 'custom_message');
+					if (in_array($type, $sppcfw_text_types, true)) {
+						$sppcfw_inner = ".sppcfw-el-{$id} :where(p, li, span:not(.onsale), a:not(.button), .product_meta, .sku_wrapper, .posted_in, .tagged_as, .woocommerce-product-details__short-description, .woocommerce-Tabs-panel)";
+						$sppcfw_inner_rules = '';
+						$sppcfw_inner_color = $this->sppcfw_get_device_prop($styles, 'text_color', $device, '');
+						if (!empty($sppcfw_inner_color)) {
+							$sppcfw_inner_rules .= 'color: ' . esc_attr($sppcfw_inner_color) . ' !important;';
+						}
+						$sppcfw_inner_size = $this->sppcfw_get_device_prop($styles, 'font_size', $device, '');
+						if (!empty($sppcfw_inner_size)) {
+							$sppcfw_inner_rules .= 'font-size: ' . esc_attr($sppcfw_inner_size) . ' !important;';
+						}
+						$sppcfw_inner_family = $this->sppcfw_get_device_prop($styles, 'font_family', $device, '');
+						if (!empty($sppcfw_inner_family) && 'Inherit' !== $sppcfw_inner_family) {
+							$sppcfw_inner_rules .= 'font-family: ' . esc_attr($sppcfw_inner_family) . ', sans-serif !important;';
+						}
+						$sppcfw_inner_weight = $this->sppcfw_get_device_prop($styles, 'font_weight', $device, '');
+						if (!empty($sppcfw_inner_weight) && 'Default' !== $sppcfw_inner_weight) {
+							$sppcfw_inner_rules .= 'font-weight: ' . esc_attr($sppcfw_inner_weight) . ' !important;';
+						}
+						$sppcfw_inner_line = $this->sppcfw_get_device_prop($styles, 'line_height', $device, '');
+						if (!empty($sppcfw_inner_line)) {
+							$sppcfw_inner_rules .= 'line-height: ' . esc_attr($sppcfw_inner_line) . ' !important;';
+						}
+						if ('' !== $sppcfw_inner_rules) {
+							$sppcfw_nested_css .= $sppcfw_inner . ' {' . $sppcfw_inner_rules . '}';
+						}
+					}
+					$css .= $sppcfw_nested_css;
 
 					// Hover background rule for non-cart elements
 					if ('product_add_to_cart' !== $type) {
@@ -1868,10 +1934,10 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						$swatch_gap = $this->sppcfw_get_device_prop($styles, 'swatch_gap', $device, '');
 
 						if (!empty($var_label_color)) {
-							$css .= ".sppcfw-el-{$id} table.variations label, .sppcfw-el-{$id} table.variations .label, .sppcfw-el-{$id} table.variations th { color: " . esc_attr($var_label_color) . ' !important; }';
+							$css .= ".sppcfw-el-{$id} form.cart table.variations tr th.label, .sppcfw-el-{$id} form.cart table.variations tr .label, .sppcfw-el-{$id} form.cart table.variations tr label, .sppcfw-el-{$id} form.cart table.variations tr th { color: " . esc_attr($var_label_color) . ' !important; }';
 						}
 						if (!empty($var_label_size)) {
-							$css .= ".sppcfw-el-{$id} table.variations label, .sppcfw-el-{$id} table.variations .label, .sppcfw-el-{$id} table.variations th { font-size: " . esc_attr($var_label_size) . ' !important; }';
+							$css .= ".sppcfw-el-{$id} form.cart table.variations tr th.label, .sppcfw-el-{$id} form.cart table.variations tr .label, .sppcfw-el-{$id} form.cart table.variations tr label, .sppcfw-el-{$id} form.cart table.variations tr th { font-size: " . esc_attr($var_label_size) . ' !important; }';
 						}
 						if (!empty($active_swatch_color)) {
 							$css .= ".sppcfw-el-{$id} .sppcfw-swatch-item.selected, .sppcfw-el-{$id} .sppcfw-swatch-item.active, .sppcfw-el-{$id} button.webfwc_variation_button.selected { border-color: " . esc_attr($active_swatch_color) . ' !important; box-shadow: 0 0 0 2px ' . esc_attr($active_swatch_color) . ' !important; outline-color: ' . esc_attr($active_swatch_color) . ' !important; }';
@@ -1926,7 +1992,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					if ('container' === $type) {
 						$gap = esc_attr($this->sppcfw_get_device_prop($settings, 'gap', $device, '16px'));
 						$flex_direction = esc_attr($this->sppcfw_get_device_prop($settings, 'flex_direction', $device, 'row'));
-						$css .= ".sppcfw-el-{$id} > .sppcfw-flex-row { gap: {$gap} !important; flex-direction: {$flex_direction} !important; }";
+						$css .= ".sppcfw-el-{$id} > .sppcfw-flex-row { --sppcfw-gap: {$gap}; gap: {$gap} !important; flex-direction: {$flex_direction} !important; }";
 					}
 
 					if ('product_gallery' === $type) {
@@ -2124,7 +2190,8 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						echo do_shortcode(wp_kses_post($html)); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 					if (!empty($js)) {
-						echo '<script type="text/javascript">' . $js . '</script>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+						// "container" is the element root, the same variable the builder editor exposes to custom scripts.
+						echo '<script type="text/javascript">(function (container) {' . "\n" . $js . "\n" . '})(document.currentScript ? document.currentScript.parentNode : document.body);</script>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 					}
 					echo '</div>';
 					break;
@@ -2477,17 +2544,32 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 										if (attrData) {
 											try {
 												var attrs = JSON.parse(attrData);
+												var fire = function(el) {
+													if (typeof jQuery !== "undefined") {
+														jQuery(el).trigger("change");
+													} else {
+														el.dispatchEvent(new Event("change", { bubbles: true }));
+													}
+												};
+												var sels = [];
 												for (var k in attrs) {
 													var select = form.querySelector(\'select[name="\' + k + \'"]\');
-													if (select) {
-														select.value = attrs[k];
-														if (typeof jQuery !== "undefined") {
-															jQuery(select).trigger("change");
-														} else {
-															select.dispatchEvent(new Event("change", { bubbles: true }));
-														}
-													}
+													if (select) { sels.push([select, attrs[k]]); }
 												}
+												/* Pass 1: clear every select so a previous row cannot leave an invalid mix. */
+												sels.forEach(function(p) { p[0].value = ""; });
+												/* Pass 2: apply this row, firing change only after all values are set. */
+												sels.forEach(function(p) { p[0].value = p[1]; });
+												sels.forEach(function(p) { fire(p[0]); });
+												/* WooCommerce rebuilds the option lists on change and can drop a value; re-apply until every select holds its target. */
+												var tries = 0;
+												var verify = function() {
+													var bad = sels.filter(function(p) { return p[0].value !== p[1]; });
+													if (!bad.length || tries++ > 3) { return; }
+													bad.forEach(function(p) { p[0].value = p[1]; fire(p[0]); });
+													setTimeout(verify, 80);
+												};
+												setTimeout(verify, 80);
 											} catch(e) {}
 										}
 									}
@@ -2529,14 +2611,8 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					echo '</div>';
 					break;
 				case 'product_rating':
-					$rating_val = $product ? (float) $product->get_average_rating() : 5.0;
-					if ($rating_val <= 0) {
-						$rating_val = 5.0;
-					}
-					$rating_count = $product ? (int) $product->get_rating_count() : 1;
-					if ($rating_count <= 0) {
-						$rating_count = 1;
-					}
+					$rating_val = $product ? (float) $product->get_average_rating() : 0.0;
+					$rating_count = $product ? (int) $product->get_rating_count() : 0;
 					$width_percent = ($rating_val / 5) * 100;
 					$star_color = $this->sppcfw_get_device_prop($styles, 'star_color', 'desktop', '');
 					if (empty($star_color)) {
@@ -2596,7 +2672,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 							}
 						}
 						if (!empty($val)) {
-							echo '<div class="sppcfw-custom-meta-field' . esc_attr($el_class) . ' p-2 bg-gray-50 border rounded my-2">';
+							echo '<div class="sppcfw-custom-meta-field' . esc_attr($el_class) . '">';
 							echo '<strong>' . esc_html($label) . ': </strong>';
 							echo '<span>' . esc_html(is_array($val) ? implode(', ', $val) : $val) . '</span>';
 							echo '</div>';
@@ -2604,7 +2680,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					}
 					break;
 				case 'custom_message':
-					echo '<div class="sppcfw-custom-message-banner' . esc_attr($el_class) . ' p-3 bg-indigo-100 text-indigo-800 rounded font-semibold my-2">';
+					echo '<div class="sppcfw-custom-message-banner' . esc_attr($el_class) . '">';
 					echo esc_html__('Special Offer: Free Shipping on all orders!', 'single-product-customizer');
 					echo '</div>';
 					break;

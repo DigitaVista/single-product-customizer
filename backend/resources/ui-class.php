@@ -1146,7 +1146,7 @@ if (!class_exists('SPPCFW_backend_ui')):
 
 			foreach ($this->sections_array as $tab) {
 				if ($tab['id'] === 'sppcfw_advanced_get_pro') {
-					$html .= '<button type="button" class="nav-tab custom-button" onclick="generate_custom_link(this)" data-url="https://www.webcartisan.com/single-product-page-customizer/">'
+					$html .= '<button type="button" class="nav-tab custom-button" onclick="generate_custom_link(this)" data-url="https://www.webcartisan.com/products/woocommerce-product-page-customizer/">'
 						. esc_html($tab['title'])
 						. '<span style="color: red;"> *</span></button>';
 				} elseif ($tab['id'] === 'sppcfw_advanced_get_support') {

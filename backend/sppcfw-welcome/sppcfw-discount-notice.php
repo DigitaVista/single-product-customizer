@@ -173,7 +173,7 @@ if ( ! class_exists( 'SPPCFW_Halloween_Deal_Notice' ) ) {
 			check_ajax_referer( 'sppcfw_halloween_notice_nonce', 'nonce' );
 
 			if ( ! current_user_can( 'manage_options' ) ) {
-				wp_send_json_error( array( 'message' => 'Unauthorized' ), 403 );
+				wp_send_json_error( array( 'message' => __( 'Unauthorized', 'single-product-customizer' ) ), 403 );
 			}
 
 			$action = isset( $_POST['dismiss_action'] ) ? sanitize_text_field( wp_unslash( $_POST['dismiss_action'] ) ) : '';
@@ -189,7 +189,7 @@ if ( ! class_exists( 'SPPCFW_Halloween_Deal_Notice' ) ) {
 
 				wp_send_json_success(
 					array(
-						'message'         => 'Notice snoozed for 3 days',
+						'message'         => __( 'Notice snoozed for 3 days', 'single-product-customizer' ),
 						'dismissed_until' => $until,
 					)
 				);
@@ -203,10 +203,10 @@ if ( ! class_exists( 'SPPCFW_Halloween_Deal_Notice' ) ) {
 					)
 				);
 
-				wp_send_json_success( array( 'message' => 'Notice dismissed' ) );
+				wp_send_json_success( array( 'message' => __( 'Notice dismissed', 'single-product-customizer' ) ) );
 			}
 
-			wp_send_json_error( array( 'message' => 'Invalid action' ) );
+			wp_send_json_error( array( 'message' => __( 'Invalid action', 'single-product-customizer' ) ) );
 		}
 	}
 

@@ -6,7 +6,7 @@
 * Requires at least:  6.5
 * Requires PHP:       8.1
 * Tested up to:       7.1
-* Version:           1.1.0
+* Version:           1.1.1
 * Author:            WebCartisan
 * Author URI:        http://webcartisan.com/
 * License:           GPL-2.0+
@@ -67,7 +67,7 @@ if ( ! defined( 'SPPCFW_DEV' ) ) {
 }
 
 if ( ! defined( 'SPPCFW_VERSION' ) ) {
-	define( 'SPPCFW_VERSION', '1.1.0' );
+	define( 'SPPCFW_VERSION', '1.1.1' );
 }
 
 if ( ! defined( 'SPPCFW_DIR_URL' ) ) {
@@ -249,7 +249,7 @@ function sppcfw_display_admin_notice() {
 
     // Review URL - Change to the URL of your plugin on WordPress.org
     $review_url = esc_url('https://wordpress.org/plugins/single-product-customizer/');
-    $dismiss_url = esc_url('https://www.webcartisan.com/single-product-page-customizer/');
+    $dismiss_url = esc_url('https://www.webcartisan.com/products/woocommerce-product-page-customizer/');
     // Plugin image URL
     $logo_url = esc_url(plugin_dir_url(__FILE__) . 'backend/resources/images/logo.png');
 
@@ -306,10 +306,11 @@ function sppcfw_enqueue_scripts() {
     wp_enqueue_script(
         'sppcfw_backend-notices-js',
         plugin_dir_url(__FILE__) . 'backend/resources/js/admin-notices.js',
-        ['jquery'],
-        '1.0',
+        ['jquery', 'wp-i18n'],
+        SPPCFW_VERSION,
         true
     );
+    wp_set_script_translations( 'sppcfw_backend-notices-js', 'single-product-customizer', SPPCFW_DIR_PATH . 'languages' );
 
     // Localize script with nonce and AJAX URL
     wp_localize_script( 'sppcfw_backend-notices-js', 'sppcfw_obj', array(
@@ -327,7 +328,7 @@ function sppcfw_dismiss_review_notice_callback() {
 
     update_option('sppcfw_review_dismissed', true);
 
-    wp_send_json_success(['message' => 'Notice dismissed successfully.']);
+    wp_send_json_success(['message' => __( 'Notice dismissed successfully.', 'single-product-customizer' )]);
 }
 
 // Handle AJAX request and send notification to the admin email
@@ -341,7 +342,7 @@ function sppcfw_send_admin_notification_callback() {
     $feedback_message = sanitize_text_field($_POST['message'] ?? '');
 
     if (empty($feedback_message)) {
-        wp_send_json_error(['message' => 'Message is empty.']);
+        wp_send_json_error(['message' => __( 'Message is empty.', 'single-product-customizer' )]);
     }
 
     // Set email recipient, subject, and message
@@ -360,9 +361,9 @@ function sppcfw_send_admin_notification_callback() {
     $mail_sent = wp_mail($to_email, $subject, $email_message, $headers);
 
     if ($mail_sent) {
-        wp_send_json_success(['message' => 'Feedback sent successfully.']);
+        wp_send_json_success(['message' => __( 'Feedback sent successfully.', 'single-product-customizer' )]);
     } else {
-        wp_send_json_error(['message' => 'Failed to send feedback email.']);
+        wp_send_json_error(['message' => __( 'Failed to send feedback email.', 'single-product-customizer' )]);
     }
 
     wp_die();

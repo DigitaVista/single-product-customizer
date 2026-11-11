@@ -28,10 +28,11 @@ if( !class_exists( 'Sppcfw_backend_master' )){
 			wp_enqueue_script(
 				'sppcfw_backend-resource-js',
 				plugin_dir_url(__FILE__).'resources/js/backend.js',
-				array('jquery' ),
+				array( 'jquery', 'wp-i18n' ),
 				(SPPCFW_DEV?time():SPPCFW_VERSION),
 				1
 			);
+			wp_set_script_translations( 'sppcfw_backend-resource-js', 'single-product-customizer', SPPCFW_DIR_PATH . 'languages' );
             $sppcfw_custom_message_saved = isset(SPPCFW_ADVANCED['custom_message_display_hook'])
                 ? trim(SPPCFW_ADVANCED['custom_message_display_hook'])
                 : '';
