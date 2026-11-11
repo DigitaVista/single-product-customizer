@@ -1701,7 +1701,7 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 					// WooCommerce elements directly (e.g. Astra) ignored Builder typography/colour changes.
 					// Text widgets: themes such as Astra style WooCommerce text (product meta, short description, tab
 					// content) directly, so typography set on the element wrapper never reached it by inheritance.
-					$sppcfw_text_types = array('product_title', 'product_short_desc', 'product_meta', 'product_meta_item', 'product_description', 'text_editor', 'heading', 'custom_message');
+					$sppcfw_text_types = array('product_title', 'product_short_desc', 'product_meta_item', 'product_description', 'text_editor', 'heading', 'custom_message');
 					if (in_array($type, $sppcfw_text_types, true)) {
 						$sppcfw_inner = ".sppcfw-el-{$id} :where(p, li, span:not(.onsale), a:not(.button), .product_meta, .sku_wrapper, .posted_in, .tagged_as, .woocommerce-product-details__short-description, .woocommerce-Tabs-panel)";
 						$sppcfw_inner_rules = '';
@@ -1728,6 +1728,21 @@ if (!class_exists('SPPCFW_Builder_Renderer')) {
 						if ('' !== $sppcfw_inner_rules) {
 							$sppcfw_nested_css .= $sppcfw_inner . ' {' . $sppcfw_inner_rules . '}';
 						}
+					}
+					// Product meta: match the editor canvas (stacked rows, bold labels in the label colour, values in the
+					// value colour) instead of whatever layout the theme gives WooCommerce's .product_meta.
+					if ('product_meta' === $type) {
+						$sppcfw_meta_label = $this->sppcfw_get_device_prop($styles, 'label_color', $device, '');
+						$sppcfw_meta_label = '' !== $sppcfw_meta_label ? $sppcfw_meta_label : '#111827';
+						$sppcfw_meta_value = $this->sppcfw_get_device_prop($styles, 'text_color', $device, '');
+						$sppcfw_meta_value = '' !== $sppcfw_meta_value ? $sppcfw_meta_value : '#6b7280';
+						$sppcfw_meta_size = $this->sppcfw_get_device_prop($styles, 'font_size', $device, '');
+						$sppcfw_meta_size = '' !== $sppcfw_meta_size ? $sppcfw_meta_size : '12px';
+						$sppcfw_meta_gap = $this->sppcfw_get_device_prop($styles, 'gap', $device, '');
+						$sppcfw_meta_gap = '' !== $sppcfw_meta_gap ? $sppcfw_meta_gap : '4px';
+						$sppcfw_nested_css .= ".sppcfw-el-{$id} .product_meta { display: flex !important; flex-direction: column !important; gap: " . esc_attr($sppcfw_meta_gap) . ' !important; margin: 0 !important; padding: 0 !important; border: 0 !important; font-size: ' . esc_attr($sppcfw_meta_size) . ' !important; line-height: 1.5 !important; color: ' . esc_attr($sppcfw_meta_value) . ' !important; }';
+						$sppcfw_nested_css .= ".sppcfw-el-{$id} .product_meta > span { display: block !important; margin: 0 !important; padding: 0 !important; font-size: inherit !important; font-weight: 700 !important; color: " . esc_attr($sppcfw_meta_label) . ' !important; }';
+						$sppcfw_nested_css .= ".sppcfw-el-{$id} .product_meta > span span, .sppcfw-el-{$id} .product_meta > span a { font-size: inherit !important; font-weight: 400 !important; color: " . esc_attr($sppcfw_meta_value) . ' !important; }';
 					}
 					$css .= $sppcfw_nested_css;
 
