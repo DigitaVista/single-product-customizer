@@ -1,0 +1,32 @@
+name: Deploy to WordPress.org
+
+on:
+  push:
+    tags:
+      - "*"
+
+jobs:
+  deploy:
+    name: Deploy to WordPress.org SVN
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check tag matches plugin version
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          HEADER=$(grep -m1 -E '^[[:space:]]*\*?[[:space:]]*Version:' single-product-customizer.php | tr -d '\r' | awk '{print $NF}')
+          STABLE=$(grep -m1 -i -E '^[[:space:]]*Stable tag:' readme.txt | tr -d '\r' | awk '{print $NF}')
+          echo "Tag: $TAG | Plugin header: $HEADER | Stable tag: $STABLE"
+          if [ "$TAG" != "$HEADER" ] || [ "$TAG" != "$STABLE" ]; then
+            echo "::error::Tag, plugin header Version and readme Stable tag must all match."
+            exit 1
+          fi
+
+      - name: Deploy plugin to WordPress.org
+        uses: 10up/action-wordpress-plugin-deploy@stable
+        env:
+          SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
+          SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
+          SLUG: single-product-customizer
