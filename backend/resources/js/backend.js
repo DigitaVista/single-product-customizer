@@ -137,7 +137,7 @@ function sppcfw_submit_quick_checkout_ajax(form) {
     if (submitBtn.is('input')) {
         submitBtn.val('Saving...');
     } else {
-        submitBtn.text('Saving...');
+        submitBtn.text(wp.i18n.__( 'Saving...', 'single-product-customizer' ));
     }
     
     jQuery.ajax({
@@ -152,11 +152,11 @@ function sppcfw_submit_quick_checkout_ajax(form) {
             var message =
                 (isValidObject && response.data && response.data.message)
                     ? response.data.message
-                    : 'An error occurred. Please try again.';
+                    : wp.i18n.__( 'An error occurred. Please try again.', 'single-product-customizer' );
 
             if (isSuccess) {
                 if (isValidObject && response.data && response.data.is_pro_template) {
-                    sppcfw_show_notice('This is a Pro Template', 'danger', form);
+                    sppcfw_show_notice(wp.i18n.__( 'This is a Pro Template', 'single-product-customizer' ), 'danger', form);
                     // Reset template selection back to template-1 in UI since template-1 remains saved
                     jQuery('#sppcfw_enable_qc').val('template-1');
                     jQuery('.sppcfw-template-item').removeClass('is-active');
@@ -184,7 +184,7 @@ function sppcfw_submit_quick_checkout_ajax(form) {
             }
         },
         error: function() {
-            sppcfw_show_notice('An error occurred. Please try again.', 'error', form);
+            sppcfw_show_notice(wp.i18n.__( 'An error occurred. Please try again.', 'single-product-customizer' ), 'error', form);
             submitBtn.prop('disabled', false).text(originalText);
         }
     });
@@ -248,6 +248,9 @@ jQuery(document).ready(function () {
   // Function to check if checkbox ID matches any pattern
   function handleCheckbox(checkbox) {
     const id = jQuery(checkbox).attr("id");
+    if (!id) {
+      return;
+    }
 
     for (const [key, handler] of Object.entries(checkboxHandlers)) {
       if (id.includes(key)) {
@@ -607,7 +610,7 @@ jQuery(document).ready(function () {
     if (category_id > 0) {
       let element = jQuery("#sppcfw_add_product_meta_box_id");
       element.block({
-        message: "Please wait... it's importing settings",
+        message: wp.i18n.__( 'Please wait... it\'s importing settings', 'single-product-customizer' ),
         overlayCSS: { background: "#fff", opacity: 0.6 },
       });
       jQuery.post(sppcfw_settings.ajaxurl, data, function (obj) {
@@ -954,29 +957,11 @@ jQuery(document).ready(function () {
           jQuery("#sppcfw_product_change_backorder_text").val("");
         }
 
-        if (obj.hasOwnProperty("enable_quick_cart")) {
-          if (obj.enable_quick_cart === "on") {
-            jQuery("#sppcfw_product\\[enable_quick_cart\\]").prop(
-              "checked",
-              true
-            );
-          } else {
-            jQuery("#sppcfw_product\\[enable_quick_cart\\]").prop(
-              "checked",
-              false
-            );
-          }
-        } else {
-          jQuery("#sppcfw_product\\[enable_quick_cart\\]").prop(
-            "checked",
-            false
-          );
-        }
 
         element.unblock();
       });
     } else {
-      alert("There is no product category checked yet!");
+      alert(wp.i18n.__( 'There is no product category checked yet!', 'single-product-customizer' ));
     }
   });
 });
@@ -988,7 +973,7 @@ jQuery(document).ready(function ($) {});
 function sppcfw_add_new_additional_content_tab_item(data) {
   let i = parseInt(jQuery(data).attr("data-next"));
 
-  let tab_button_html = `<button type="button" id="sppcfw_custom_tab_button_text_${i}" data-index="${i}" class="tablinks2 active" onclick="sppcfwCustomContent(event, 'sppcfw_custom_tab_content_${i}')">Content</button>`;
+  let tab_button_html = `<button type="button" id="sppcfw_custom_tab_button_text_${i}" data-index="${i}" class="tablinks2 active" onclick="sppcfwCustomContent(event, 'sppcfw_custom_tab_content_${i}')">${wp.i18n.__( 'Content', 'single-product-customizer' )}</button>`;
   let additional_content_display_hooks = `<select name="sppcfw_cat[sppcfw_custom_additional_content_display_hook][]">`;
   let hooks = sppcfw_settings.sppcfw_wc_action_hooks;
   //console.log(hooks);
@@ -999,12 +984,12 @@ function sppcfw_add_new_additional_content_tab_item(data) {
   additional_content_display_hooks += `</select>`;
   let tab_content_html =
     `<div id="sppcfw_custom_tab_content_${i}" class="tabcontent2" style="display:block;">
-        <div class="sppcfw_tab_title_input_area"><input type="text" value="Content" id="sppcfw_custom_tab_title_input_${i}" name="sppcfw_cat[sppcfw_custom_additional_content_title][]" data-index="${i}" onkeyup="sppcfw_update_content_title_text(this)" placeholder="Content name"><button class="button button-remove" onclick="sppcfw_backend_remove_content(this)" data-index="${i}" type="button">Remove</button></div>
+        <div class="sppcfw_tab_title_input_area"><input type="text" value="${wp.i18n.__( 'Content', 'single-product-customizer' )}" id="sppcfw_custom_tab_title_input_${i}" name="sppcfw_cat[sppcfw_custom_additional_content_title][]" data-index="${i}" onkeyup="sppcfw_update_content_title_text(this)" placeholder="${wp.i18n.__( 'Content name', 'single-product-customizer' )}"><button class="button button-remove" onclick="sppcfw_backend_remove_content(this)" data-index="${i}" type="button">${wp.i18n.__( 'Remove', 'single-product-customizer' )}</button></div>
         <br/><br/>
         ` +
     additional_content_display_hooks +
     `<br/><br/>
-        <div style="clear:both" class="wp-media-buttons"><button type="button" id="custom_tab_media_button_${i}" class="button insert-media add_media" data-editor="sppcfw_custom_tab_title_textarea_${i}"><span class="wp-media-buttons-icon"></span> Add Media</button></div>
+        <div style="clear:both" class="wp-media-buttons"><button type="button" id="custom_tab_media_button_${i}" class="button insert-media add_media" data-editor="sppcfw_custom_tab_title_textarea_${i}"><span class="wp-media-buttons-icon"></span> ${wp.i18n.__( 'Add Media', 'single-product-customizer' )}</button></div>
         <textarea id="sppcfw_custom_tab_title_textarea_${i}" class="wp-editor-area" name="sppcfw_cat[sppcfw_custom_additional_content][]"></textarea>
         
     </div>`;
@@ -1105,7 +1090,7 @@ function sppcfw_add_new_additional_content_tab_item(data) {
 function sppcfw_add_new_additional_content_tab_item_for_product(data) {
   let i = parseInt(jQuery(data).attr("data-next"));
 
-  let tab_button_html = `<button type="button" id="sppcfw_custom_addi_content_button_text_${i}" data-index="${i}" class="tablinks2 active" onclick="sppcfwCustomContentProduct(event, 'sppcfw_custom_addi_content_${i}')">Content</button>`;
+  let tab_button_html = `<button type="button" id="sppcfw_custom_addi_content_button_text_${i}" data-index="${i}" class="tablinks2 active" onclick="sppcfwCustomContentProduct(event, 'sppcfw_custom_addi_content_${i}')">${wp.i18n.__( 'Content', 'single-product-customizer' )}</button>`;
   let additional_content_display_hooks = `<select name="sppcfw_custom_additional_content_display_hook[]">`;
   let hooks = sppcfw_settings.sppcfw_wc_action_hooks;
   //console.log(hooks);
@@ -1116,12 +1101,12 @@ function sppcfw_add_new_additional_content_tab_item_for_product(data) {
   additional_content_display_hooks += `</select>`;
   let tab_content_html =
     `<div id="sppcfw_custom_addi_content_${i}" class="tabcontent2" style="display:block;">
-        <div class="sppcfw_tab_title_input_area"><input type="text" value="Content" id="sppcfw_custom_addi_content_title_input_${i}" name="sppcfw_custom_additional_content_title[]" data-index="${i}" onkeyup="sppcfw_update_product_addi_content_title_text(this)" placeholder="Content name"><button class="button button-remove" onclick="sppcfw_backend_remove_content_product_addi_content(this)" data-index="${i}" type="button">Remove</button></div>
+        <div class="sppcfw_tab_title_input_area"><input type="text" value="${wp.i18n.__( 'Content', 'single-product-customizer' )}" id="sppcfw_custom_addi_content_title_input_${i}" name="sppcfw_custom_additional_content_title[]" data-index="${i}" onkeyup="sppcfw_update_product_addi_content_title_text(this)" placeholder="${wp.i18n.__( 'Content name', 'single-product-customizer' )}"><button class="button button-remove" onclick="sppcfw_backend_remove_content_product_addi_content(this)" data-index="${i}" type="button">${wp.i18n.__( 'Remove', 'single-product-customizer' )}</button></div>
         <br/><br/>
         ` +
     additional_content_display_hooks +
     `<br/><br/>
-        <div style="clear:both" class="wp-media-buttons"><button type="button" id="custom_addi_content_media_button_${i}" class="button insert-media add_media" data-editor="sppcfw_custom_addi_content_textarea_${i}"><span class="wp-media-buttons-icon"></span> Add Media</button></div>
+        <div style="clear:both" class="wp-media-buttons"><button type="button" id="custom_addi_content_media_button_${i}" class="button insert-media add_media" data-editor="sppcfw_custom_addi_content_textarea_${i}"><span class="wp-media-buttons-icon"></span> ${wp.i18n.__( 'Add Media', 'single-product-customizer' )}</button></div>
         <textarea id="sppcfw_custom_addi_content_textarea_${i}" class="wp-editor-area" name="sppcfw_custom_additional_content[]"></textarea>
         
     </div>`;
@@ -1226,11 +1211,11 @@ function sppcfw_add_new_additional_content_tab_item_for_product(data) {
 function sppcfw_add_new_custom_tab_item(data) {
   let i = parseInt(jQuery(data).attr("data-next"));
 
-  let tab_button_html = `<button type="button" id="sppcfw_custom_tab_button_text_${i}" data-index="${i}" class="tablinks active" onclick="sppcfwCustomTab(event, 'sppcfw_custom_tab_content_${i}')">Tab title</button>`;
+  let tab_button_html = `<button type="button" id="sppcfw_custom_tab_button_text_${i}" data-index="${i}" class="tablinks active" onclick="sppcfwCustomTab(event, 'sppcfw_custom_tab_content_${i}')">${wp.i18n.__( 'Tab title', 'single-product-customizer' )}</button>`;
   let tab_content_html = `<div id="sppcfw_custom_tab_content_${i}" class="tabcontent" style="display:block;">
-        <div class="sppcfw_tab_title_input_area"><input type="text" value="Tab title" id="sppcfw_custom_tab_title_input_${i}" name="sppcfw_custom_tab_title[]" data-index="${i}" onkeyup="sppcfw_update_tab_title_text(this)" placeholder="Tab title"><button class="button button-remove" onclick="sppcfw_backend_remove_tab(this)" data-index="${i}" type="button">Remove this tab</button></div>
+        <div class="sppcfw_tab_title_input_area"><input type="text" value="${wp.i18n.__( 'Tab title', 'single-product-customizer' )}" id="sppcfw_custom_tab_title_input_${i}" name="sppcfw_custom_tab_title[]" data-index="${i}" onkeyup="sppcfw_update_tab_title_text(this)" placeholder="${wp.i18n.__( 'Tab title', 'single-product-customizer' )}"><button class="button button-remove" onclick="sppcfw_backend_remove_tab(this)" data-index="${i}" type="button">${wp.i18n.__( 'Remove this tab', 'single-product-customizer' )}</button></div>
         <br/><br/>
-        <div style="clear:both" class="wp-media-buttons"><button type="button" id="custom_tab_media_button_${i}" class="button insert-media add_media" data-editor="sppcfw_custom_tab_title_textarea_${i}"><span class="wp-media-buttons-icon"></span> Add Media</button></div>
+        <div style="clear:both" class="wp-media-buttons"><button type="button" id="custom_tab_media_button_${i}" class="button insert-media add_media" data-editor="sppcfw_custom_tab_title_textarea_${i}"><span class="wp-media-buttons-icon"></span> ${wp.i18n.__( 'Add Media', 'single-product-customizer' )}</button></div>
         <textarea id="sppcfw_custom_tab_title_textarea_${i}" class="wp-editor-area" name="sppcfw_custom_tab_content[]"></textarea>
         
     </div>`;
@@ -1354,7 +1339,7 @@ function sppcfw_update_product_addi_content_title_text(data) {
 }
 
 function sppcfw_backend_remove_tab(data) {
-  if (confirm("Are you sure?")) {
+  if (confirm(wp.i18n.__( 'Are you sure?', 'single-product-customizer' ))) {
     let index = jQuery(data).attr("data-index");
     tinymce.get("sppcfw_custom_tab_title_textarea_" + index + "").remove();
     jQuery("#sppcfw_single_product_custom_tab_items")
@@ -1376,7 +1361,7 @@ function sppcfw_backend_remove_tab(data) {
 }
 
 function sppcfw_backend_remove_content(data) {
-  if (confirm("Are you sure?")) {
+  if (confirm(wp.i18n.__( 'Are you sure?', 'single-product-customizer' ))) {
     let index = jQuery(data).attr("data-index");
     tinymce.get("sppcfw_custom_tab_title_textarea_" + index + "").remove();
     jQuery("#sppcfw_product_category_additonal_content")
@@ -1396,7 +1381,7 @@ function sppcfw_backend_remove_content(data) {
 }
 
 function sppcfw_backend_remove_content_product_addi_content(data) {
-  if (confirm("Are you sure?")) {
+  if (confirm(wp.i18n.__( 'Are you sure?', 'single-product-customizer' ))) {
     let index = jQuery(data).attr("data-index");
     tinymce.get("sppcfw_custom_addi_content_textarea_" + index + "").remove();
     jQuery("#sppcfw_product_additonal_content")

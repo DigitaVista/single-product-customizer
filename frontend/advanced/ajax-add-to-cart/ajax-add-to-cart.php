@@ -17,14 +17,17 @@ if( !class_exists( 'Sppcfw_Frontend_Ajax_Add_To_Cart' )){
                 wp_enqueue_script(
                     'sppcfw-ajax-add-to-cart-js',
                     plugin_dir_url(__FILE__).'ajax-add-to-cart.js',
-                    array( 'jquery'),
-                    true,
-                    SPPCFW_VERSION
+                    array( 'jquery' ),
+                    SPPCFW_VERSION,
+                    true
                 );
                 wp_localize_script( 'sppcfw-ajax-add-to-cart-js', 'sppcfw_ajax_add_to_cart',
                     array( 
                         'ajaxurl' => admin_url( 'admin-ajax.php' ),
                         'nonce'   => wp_create_nonce( 'sppcfw_ajax_add_to_cart_nonce' ),
+                        'i18n'    => array(
+                            'add_to_cart_error' => __( 'Unable to add to cart. Please try again.', 'single-product-customizer' ),
+                        ),
                     )
                 );
             }
@@ -119,6 +122,13 @@ if ( ! function_exists( 'sppcfw_ajax_add_to_cart' ) ) {
             if ( function_exists( 'wc_add_notice' ) ) {
                 wc_add_notice( __( 'Please select product options and try again.', 'single-product-customizer' ), 'error' );
             }
+            wc_print_notices();
+            wp_die();
+        }
+
+        // WooCommerce's own form handler (wp_loaded) already adds the item when the
+        // "add-to-cart" field is posted. Adding it again here doubled the quantity.
+        if ( isset( $_POST['add-to-cart'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
             wc_print_notices();
             wp_die();
         }

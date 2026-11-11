@@ -11,7 +11,7 @@
 
             // Validate email for subscribe action
             if (actionType === 'subscribe' && (!adminEmail || !isValidEmail(adminEmail))) {
-                alert('Please enter a valid email address to subscribe.');
+                alert(wp.i18n.__( 'Please enter a valid email address to subscribe.', 'single-product-customizer' ));
                 return;
             }
 
@@ -33,13 +33,13 @@
                     if (response.success && response.data.url) {
                         window.location.href = response.data.url;
                     } else {
-                        alert('There was an error. Please try again.');
+                        alert(wp.i18n.__( 'There was an error. Please try again.', 'single-product-customizer' ));
                         button.html(originalText);
                         button.prop('disabled', false);
                     }
                 },
                 error: function() {
-                    alert('There was an error. Please try again.');
+                    alert(wp.i18n.__( 'There was an error. Please try again.', 'single-product-customizer' ));
                     button.html(originalText);
                     button.prop('disabled', false);
                 }

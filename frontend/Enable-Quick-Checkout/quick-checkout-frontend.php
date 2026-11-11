@@ -95,6 +95,11 @@ if (!class_exists('Sppcfw_Frontend_Quick_Checkout')) {
                 'woocommerce/product-sku',
             );
 
+            // Split Layout (template-3, Pro) renders its own gallery: hide the block theme's product gallery.
+            if (function_exists('sppcfw_is_pro_active') && sppcfw_is_pro_active() && get_option('sppcfw_enable_qc', 'default') === 'template-3') {
+                $blocks_to_hide[] = 'woocommerce/product-image-gallery';
+            }
+
             if (isset($block['blockName']) && in_array($block['blockName'], $blocks_to_hide, true)) {
                 return '';
             }
@@ -238,9 +243,9 @@ if (!class_exists('Sppcfw_Frontend_Quick_Checkout')) {
                 return;
             }
 
-            // Skip for template-3 (handled separately)
+            // Skip for template-3 (handled separately, except in block themes where it renders in the summary)
             $selected_template = get_option('sppcfw_enable_qc', 'default');
-            if ($selected_template === 'template-3') {
+            if ($selected_template === 'template-3' && !$this->sppcfw_is_block_theme()) {
                 return;
             }
 
@@ -362,8 +367,16 @@ if (!class_exists('Sppcfw_Frontend_Quick_Checkout')) {
                 if ($this->sppcfw_is_block_theme()) {
                     wp_add_inline_style(
                         'sppcfw-quick-checkout-frontend-css',
-                        '.single-product .wp-block-post-title, .single-product .wp-block-woocommerce-product-rating, .single-product .wp-block-woocommerce-product-price, .single-product .wp-block-post-excerpt, .single-product .wp-block-woocommerce-add-to-cart-form, .single-product .wp-block-woocommerce-product-meta, .single-product .wc-block-grid__product-rating, .single-product .wc-block-grid__product-price, .single-product div.product form.cart:not(.checkout) { display: none !important; }'
+                        '.single-product .wp-block-post-title, .single-product .wp-block-woocommerce-product-rating, .single-product .wp-block-woocommerce-product-price, .single-product .wp-block-post-excerpt, .single-product .wp-block-woocommerce-add-to-cart-form, .single-product .wp-block-woocommerce-product-meta, .single-product .wc-block-grid__product-rating, .single-product .wc-block-grid__product-price, .single-product div.product form.cart:not(.checkout):not(.sppcfw-quick-checkout-wrapper *) { display: none !important; }'
                     );
+
+                    // Split Layout (template-3, Pro): let it use the full content width instead of the theme's half-width summary column.
+                    if (function_exists('sppcfw_is_pro_active') && sppcfw_is_pro_active() && get_option('sppcfw_enable_qc', 'default') === 'template-3') {
+                        wp_add_inline_style(
+                            'sppcfw-quick-checkout-frontend-css',
+                            '.wp-block-columns:has(> .wp-block-column .sppcfw-quick-checkout-wrapper) { display: block !important; } .wp-block-columns:has(> .wp-block-column .sppcfw-quick-checkout-wrapper) > .wp-block-column { flex-basis: 100% !important; width: 100% !important; } .wp-block-columns:has(> .wp-block-column .sppcfw-quick-checkout-wrapper) > .wp-block-column:not(:has(.sppcfw-quick-checkout-wrapper)) { display: none !important; }'
+                        );
+                    }
                 }
 
                 // Enqueue Quick Checkout template styles
@@ -422,8 +435,9 @@ if (!class_exists('Sppcfw_Frontend_Quick_Checkout')) {
                     $selected_template = 'template-1';
                 }
 
-                // Skip template-3 here (it will be displayed via woocommerce_after_single_product_summary)
-                if ($selected_template === 'template-3') {
+                // Skip template-3 here (it will be displayed via woocommerce_after_single_product_summary).
+                // Block themes do not fire that hook, so template-3 renders here for them.
+                if ($selected_template === 'template-3' && !$this->sppcfw_is_block_theme()) {
                     return;
                 }
 
@@ -569,6 +583,12 @@ if (!class_exists('Sppcfw_Frontend_Quick_Checkout')) {
             // Only run if Quick Checkout is active and we are on a product page
             if (!$this->sppcfw_is_quick_checkout_active() || !is_product()) {
                 return;
+            }
+
+            // Split Layout (template-3, Pro) renders its own gallery: hide the theme gallery and sale flash.
+            if (function_exists('sppcfw_is_pro_active') && sppcfw_is_pro_active() && get_option('sppcfw_enable_qc', 'default') === 'template-3') {
+                remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_sale_flash', 10);
+                remove_action('woocommerce_before_single_product_summary', 'woocommerce_show_product_images', 20);
             }
 
             // Remove single product summary hooks (category/meta, title, rating, short description)

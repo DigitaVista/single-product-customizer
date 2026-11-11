@@ -1,0 +1,4107 @@
+# Copyright (C) 2026 WebCartisan
+# This file is distributed under the GPL-2.0+.
+msgid ""
+msgstr ""
+"Project-Id-Version: Product Page Customizer for WooCommerce 1.1.1\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/single-product-customizer\n"
+"Last-Translator: WebCartisan\n"
+"Language-Team: WebCartisan\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-11-11T08:55:26+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.11.0\n"
+"X-Domain: single-product-customizer\n"
+
+#. Plugin Name of the plugin
+#: single-product-customizer.php
+msgid "Product Page Customizer for WooCommerce"
+msgstr ""
+
+#. Plugin URI of the plugin
+#: single-product-customizer.php
+msgid "http://webcartisan.com/single-product-page-customizer/"
+msgstr ""
+
+#. Description of the plugin
+#: single-product-customizer.php
+msgid "An esential helper tool for woocommerce single product page. Borderless freedom to customize single product page."
+msgstr ""
+
+#. Author of the plugin
+#: single-product-customizer.php
+msgid "WebCartisan"
+msgstr ""
+
+#. Author URI of the plugin
+#: single-product-customizer.php
+msgid "http://webcartisan.com/"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:11
+msgid "Advanced Settings"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:18
+#: backend/sppcfw-welcome/sppcfw-welcome.php:130
+#: backend/assets/js/builder-app.js:9075
+msgid "Get Pro"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:25
+#: backend/Our-products/our-products.php:541
+msgid "Get Support"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:34
+msgid "Enable Category Based Customization"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:45
+msgid "Enable Product Based Customization"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:57
+msgid "Enable ajax add to cart"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:69
+msgid "Enable min max quantity"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:87
+msgid "Setup global min qty"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:88
+msgid "Setup a global min qty for all products. You can override it from product setup."
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:102
+msgid "Setup min qty validation text"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:103
+msgid "You can change minimum qty validation text from here."
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:104
+msgid "Minimum quantity should be"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:116
+msgid "Setup global max qty"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:117
+msgid "Setup a global max qty for all products. You can override it from product setup."
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:131
+msgid "Setup max qty validation text"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:132
+msgid "You can change maximum qty validation text from here."
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:133
+msgid "Maximum quantity should be"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:147
+msgid "Set quantity step"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:148
+msgid "Setup quantity step. Can be override from product setup."
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:174
+msgid "Enable custom message"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:185
+msgid "Custom message"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:195
+#: backend/advanced/advanced-settings.php:229
+msgid "Select a location"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:196
+msgid "You can choose a location where this message will be shown"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:217
+msgid "Show variation table"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:230
+msgid "You can choose a location where variation table will be shown"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:243
+msgid "Enable custom tab"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:254
+msgid "Enable additional content"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:275
+msgid "Change tab default label"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:285
+msgid "Description label text"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:287
+#: backend/assets/js/builder-app.js:8708
+msgid "Description"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:297
+msgid "Additional information label text"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:299
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-checkout-form-shipping.php:64
+msgid "Additional information"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:310
+msgid "Review label text"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:312
+msgid "Reviews"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:324
+msgid "Enable variation switcher"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:336
+msgid "Related products title"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:338
+#: frontend/advanced/related-products-title/related-products-title.php:43
+#: frontend/basic/remove-related-product-section/remove-related-product-section.php:36
+#: frontend/class-sppcfw-builder-renderer.php:2672
+#: backend/assets/js/builder-app.js:5600
+#: backend/assets/js/builder-app.js:8829
+msgid "Related products"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:348
+msgid "Upsell products title"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:350
+#: frontend/class-sppcfw-builder-renderer.php:2672
+#: backend/assets/js/builder-app.js:5600
+#: backend/assets/js/builder-app.js:8829
+msgid "You may also like…"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:360
+msgid "Variation reset text"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:362
+#: backend/assets/js/builder-app.js:5827
+#: backend/assets/js/builder-app.js:8418
+#: backend/assets/js/builder-app.js:8484
+#: backend/assets/js/builder-app.js:9096
+#: backend/assets/js/builder-app.js:9165
+msgid "Clear"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:372
+msgid "On backorder text"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:374
+msgid "Available on backorder"
+msgstr ""
+
+#: backend/advanced/advanced-settings.php:388
+msgid "Display related product categories grid"
+msgstr ""
+
+#: backend/ajax-handlers.php:81
+#: backend/ajax-handlers.php:120
+#: backend/ajax-handlers.php:179
+#: backend/ajax-handlers.php:227
+msgid "Security check failed"
+msgstr ""
+
+#: backend/ajax-handlers.php:85
+#: backend/ajax-handlers.php:124
+msgid "You do not have permission"
+msgstr ""
+
+#: backend/ajax-handlers.php:90
+msgid "Invalid section"
+msgstr ""
+
+#: backend/ajax-handlers.php:95
+msgid "No data provided"
+msgstr ""
+
+#: backend/ajax-handlers.php:109
+msgid "Settings saved successfully!"
+msgstr ""
+
+#: backend/ajax-handlers.php:132
+msgid "Cannot enable Quick Checkout while Single Product Builder is active. Please checkout in single page builder Options"
+msgstr ""
+
+#: backend/ajax-handlers.php:167
+#: backend/resources/js/backend.js:159
+msgid "This is a Pro Template"
+msgstr ""
+
+#: backend/ajax-handlers.php:167
+msgid "Quick Checkout settings saved successfully!"
+msgstr ""
+
+#: backend/ajax-handlers.php:186
+#: backend/ajax-handlers.php:233
+msgid "Invalid cart item."
+msgstr ""
+
+#: backend/ajax-handlers.php:191
+msgid "Cart item not found."
+msgstr ""
+
+#: backend/ajax-handlers.php:207
+msgid "Failed to update quantity."
+msgstr ""
+
+#: backend/ajax-handlers.php:213
+msgid "Quantity updated."
+msgstr ""
+
+#: backend/ajax-handlers.php:238
+msgid "Failed to remove item."
+msgstr ""
+
+#: backend/ajax-handlers.php:244
+msgid "Item removed."
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:115
+#: backend/backend-variable-switcher/backend-variable-switcher.php:464
+msgid "Icon"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:116
+#: backend/backend-variable-switcher/backend-variable-switcher.php:275
+#: backend/backend-variable-switcher/backend-variable-switcher.php:460
+#: backend/assets/js/builder-app.js:48
+#: backend/assets/js/builder-app.js:4484
+#: backend/assets/js/builder-app.js:8763
+msgid "Color"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:117
+msgid "Button"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:118
+#: backend/backend-variable-switcher/backend-variable-switcher.php:468
+#: backend/assets/js/builder-app.js:81
+#: backend/assets/js/builder-app.js:4565
+msgid "Image"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:171
+msgid "Please Select Color Below"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:183
+#: backend/backend-variable-switcher/backend-variable-switcher.php:296
+msgid "Icon Library"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:189
+#: backend/backend-variable-switcher/backend-variable-switcher.php:302
+msgid "All Icons"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:190
+#: backend/backend-variable-switcher/backend-variable-switcher.php:303
+msgid "Font Awesome - Regular"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:191
+#: backend/backend-variable-switcher/backend-variable-switcher.php:304
+msgid "Font Awesome - Solid"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:192
+#: backend/backend-variable-switcher/backend-variable-switcher.php:305
+msgid "Font Awesome - Brands"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:196
+#: backend/backend-variable-switcher/backend-variable-switcher.php:309
+msgid "Search Icon By Name"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:203
+#: backend/backend-variable-switcher/backend-variable-switcher.php:316
+msgid "Insert"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:211
+#: backend/backend-variable-switcher/backend-variable-switcher.php:329
+msgid "Select Icon Below"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:213
+#: backend/backend-variable-switcher/backend-variable-switcher.php:331
+msgid "Fontawsome Icon"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:215
+#: backend/backend-variable-switcher/backend-variable-switcher.php:333
+msgid "Iconsmind Icon"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:217
+#: backend/backend-variable-switcher/backend-variable-switcher.php:335
+msgid "Linea Icon"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:219
+#: backend/backend-variable-switcher/backend-variable-switcher.php:337
+msgid "Linecon Icon"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:221
+#: backend/backend-variable-switcher/backend-variable-switcher.php:339
+msgid "Steadysets Icon"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:239
+#: backend/backend-variable-switcher/backend-variable-switcher.php:380
+msgid "Add Image"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:323
+msgid "Select Icon Libaray"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:347
+msgid " Icon Class"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:561
+msgid "Select terms"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:582
+msgid "Select all"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:583
+msgid "Select none"
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher.php:584
+msgid "Create value"
+msgstr ""
+
+#: backend/basic/basic-settings.php:11
+#: backend/templates/sidebar/sidebar-menu.php:12
+msgid "Basic Settings"
+msgstr ""
+
+#: backend/basic/basic-settings.php:21
+#: backend/assets/js/builder-app.js:6008
+msgid "Enable plus/minus button for quantity change"
+msgstr ""
+
+#: backend/basic/basic-settings.php:37
+msgid "Out of stock text"
+msgstr ""
+
+#: backend/basic/basic-settings.php:39
+msgid "Out of stock"
+msgstr ""
+
+#: backend/basic/basic-settings.php:51
+msgid "Change sales badge text"
+msgstr ""
+
+#: backend/basic/basic-settings.php:53
+#: frontend/class-sppcfw-builder-renderer.php:2316
+#: frontend/class-sppcfw-builder-renderer.php:2733
+#: backend/assets/js/builder-app.js:7954
+msgid "Sale!"
+msgstr ""
+
+#: backend/basic/basic-settings.php:62
+#: backend/assets/js/builder-app.js:6015
+msgid "Change add to cart button text"
+msgstr ""
+
+#: backend/basic/basic-settings.php:64
+#: backend/assets/js/builder-app.js:1062
+#: backend/assets/js/builder-app.js:1158
+#: backend/assets/js/builder-app.js:1193
+#: backend/assets/js/builder-app.js:6020
+#: backend/assets/js/builder-app.js:6021
+#: backend/assets/js/builder-app.js:8154
+#: backend/assets/js/builder-app.js:8877
+msgid "Add to cart"
+msgstr ""
+
+#: backend/basic/basic-settings.php:74
+msgid "Remove product meta"
+msgstr ""
+
+#: backend/basic/basic-settings.php:87
+msgid "Remove related product section"
+msgstr ""
+
+#: backend/basic/basic-settings.php:99
+msgid "Remove Rating"
+msgstr ""
+
+#: backend/basic/basic-settings.php:110
+#: backend/assets/js/builder-app.js:4151
+msgid "Hide price"
+msgstr ""
+
+#: backend/basic/basic-settings.php:121
+msgid "Hide add to cart button"
+msgstr ""
+
+#: backend/basic/basic-settings.php:133
+msgid "Hide short description"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:57
+#: backend/builder/class-sppcfw-builder.php:71
+#: backend/classes/class-sppcfw-pro-admin-placeholders.php:186
+#: backend/sppcfw-welcome/sppcfw-welcome.php:44
+#: includes/sppcfw-admin-menu.php:118
+msgid "You do not have permission to access this page."
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:318
+msgid "Sample WooCommerce Product"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:325
+msgid "In Stock (25 available)"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:336
+msgid "This is a sample product short description detailing key features and benefits of your WooCommerce product."
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:337
+msgid "Full product description going into extensive technical detail about specifications, usage guidelines, and warranty information."
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:338
+msgid "Clothing, Featured"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:339
+msgid "Customizer, Premium"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:342
+#: backend/builder/class-sppcfw-builder.php:443
+msgid "General & Inventory Meta"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:344
+#: backend/builder/class-sppcfw-builder.php:434
+#: frontend/advanced/show-variation-table/show-variation-table.php:105
+msgid "SKU"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:345
+#: backend/builder/class-sppcfw-builder.php:435
+msgid "Stock Status"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:346
+#: backend/builder/class-sppcfw-builder.php:436
+msgid "Stock Quantity"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:347
+#: backend/builder/class-sppcfw-builder.php:437
+msgid "Weight"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:348
+#: backend/builder/class-sppcfw-builder.php:438
+msgid "Dimensions"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:349
+#: backend/builder/class-sppcfw-builder.php:439
+msgid "Total Sales"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:353
+#: backend/builder/class-sppcfw-builder.php:479
+msgid "Taxonomies & Attributes"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:355
+#: backend/builder/class-sppcfw-builder.php:449
+msgid "Categories"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:356
+#: backend/builder/class-sppcfw-builder.php:450
+msgid "Tags"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:357
+msgid "Color Attribute"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:358
+msgid "Size Attribute"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:362
+#: backend/builder/class-sppcfw-builder.php:508
+msgid "Custom Post Meta"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:364
+msgid "Warranty Info"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:365
+msgid "Material"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:378
+msgid "Product not found"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:435
+#: backend/builder/class-sppcfw-builder.php:564
+#: backend/builder/class-sppcfw-builder.php:636
+#: frontend/class-sppcfw-builder-renderer.php:2469
+#: backend/assets/js/builder-app.js:8537
+#: backend/assets/js/builder-app.js:8559
+#: backend/assets/js/builder-app.js:8564
+#: backend/assets/js/builder-app.js:8570
+#: backend/assets/js/builder-app.js:8571
+msgid "In Stock"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:435
+#: backend/builder/class-sppcfw-builder.php:566
+#: backend/builder/class-sppcfw-builder.php:636
+#: frontend/class-sppcfw-builder-renderer.php:2469
+msgid "Out of Stock"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:571
+#: frontend/class-sppcfw-builder-renderer.php:2444
+#: frontend/class-sppcfw-builder-renderer.php:2466
+#: backend/assets/js/builder-app.js:8502
+msgid "Variation"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:669
+#: backend/builder/class-sppcfw-builder.php:877
+msgid "Permission denied"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:713
+#: backend/assets/js/builder-app.js:1057
+msgid "Single Product Template"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:750
+msgid "Single Page Builder layout published successfully!"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:770
+msgid "New Product Template"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:810
+#: backend/builder/class-sppcfw-builder.php:819
+#: backend/builder/class-sppcfw-builder.php:852
+#: backend/builder/templates-list-view.php:23
+msgid "Default Single Product Template"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:842
+#: backend/builder/templates-list-view.php:447
+#: backend/assets/js/builder-app.js:1896
+msgid "Untitled Template"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:890
+#: backend/builder/class-sppcfw-builder.php:901
+#: backend/builder/class-sppcfw-builder.php:912
+msgid "Basic setting updated"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:916
+msgid "Invalid setting key"
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:925
+msgid "Permission denied."
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:932
+msgid "Cannot enable Builder while Quick Checkout is active. Please checkout in Quick Checkout Options."
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:943
+msgid "Single Product Builder enabled successfully."
+msgstr ""
+
+#: backend/builder/class-sppcfw-builder.php:944
+msgid "Single Product Builder disabled successfully."
+msgstr ""
+
+#: backend/builder/templates-list-view.php:42
+msgid "Template moved to trash successfully."
+msgstr ""
+
+#: backend/builder/templates-list-view.php:56
+msgid "Template restored successfully."
+msgstr ""
+
+#: backend/builder/templates-list-view.php:69
+msgid "Template deleted permanently."
+msgstr ""
+
+#: backend/builder/templates-list-view.php:83
+msgid "(Copy)"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:87
+msgid "Template duplicated successfully."
+msgstr ""
+
+#: backend/builder/templates-list-view.php:109
+msgid "Selected templates moved to trash successfully."
+msgstr ""
+
+#: backend/builder/templates-list-view.php:118
+msgid "Selected templates restored successfully."
+msgstr ""
+
+#: backend/builder/templates-list-view.php:124
+msgid "Selected templates deleted permanently."
+msgstr ""
+
+#: backend/builder/templates-list-view.php:133
+msgid "Selected templates scope updated to Entire Website."
+msgstr ""
+
+#: backend/builder/templates-list-view.php:142
+msgid "Selected templates scope updated to Specific Category."
+msgstr ""
+
+#: backend/builder/templates-list-view.php:151
+msgid "Selected templates scope updated to Specific Product."
+msgstr ""
+
+#: backend/builder/templates-list-view.php:276
+msgid "All Single Product Templates"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:278
+msgid "Quick Checkout is active"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:289
+msgid "Enable Single Product Builder"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:297
+#: backend/builder/templates-list-view.php:502
+msgid "Add New Template"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:301
+msgid "View and manage all single product page layout templates and display conditions from your store in one centralized table. Quickly create, edit, duplicate, or organize layout templates with ease."
+msgstr ""
+
+#. translators: %s: Link to Quick Checkout Options
+#. translators: %s: Link to Single Page Builder Options
+#: backend/builder/templates-list-view.php:311
+#: backend/Enable-Quick-Checkout/quick-checkout.php:49
+msgid "Please checkout in %s"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:312
+msgid "Quick Checkout Options"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:331
+msgid "All"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:336
+#: backend/builder/templates-list-view.php:438
+#: backend/assets/js/builder-app.js:1905
+#: backend/assets/js/builder-app.js:2268
+msgid "Published"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:342
+#: backend/builder/templates-list-view.php:438
+#: backend/assets/js/builder-app.js:2269
+msgid "Draft"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:349
+#: backend/builder/templates-list-view.php:438
+#: backend/assets/js/builder-app.js:2270
+msgid "Private"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:356
+#: backend/builder/templates-list-view.php:438
+#: backend/assets/js/builder-app.js:2271
+msgid "Pending Review"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:363
+#: backend/builder/templates-list-view.php:438
+msgid "Trash"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:373
+msgid "Bulk actions"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:375
+#: backend/builder/templates-list-view.php:451
+msgid "Restore"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:376
+#: backend/builder/templates-list-view.php:452
+#: backend/builder/templates-list-view.php:478
+msgid "Delete Permanently"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:378
+#: backend/builder/templates-list-view.php:456
+#: backend/builder/templates-list-view.php:485
+msgid "Move to Trash"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:379
+#: backend/builder/templates-list-view.php:430
+#: backend/assets/js/builder-app.js:8985
+msgid "Entire Website"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:380
+#: backend/builder/templates-list-view.php:430
+#: backend/assets/js/builder-app.js:9016
+msgid "Specific Category"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:381
+#: backend/builder/templates-list-view.php:430
+msgid "Specific Product"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:384
+msgid "Apply"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:388
+msgid "All dates"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:393
+msgid "Filter"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:399
+msgid "Search Templates..."
+msgstr ""
+
+#: backend/builder/templates-list-view.php:402
+msgid "items"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:413
+msgid "Template Name"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:414
+msgid "Display Scope"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:415
+#: backend/assets/js/builder-app.js:2260
+msgid "Status"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:416
+msgid "Last Updated"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:417
+msgid "Actions"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:452
+#: backend/builder/templates-list-view.php:478
+msgid "Are you sure you want to permanently delete this template?"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:454
+msgid "Edit in Builder"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:455
+#: backend/assets/js/builder-app.js:3740
+msgid "Duplicate"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:456
+#: backend/builder/templates-list-view.php:485
+msgid "Are you sure you want to move this template to trash?"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:475
+msgid "Restore Template"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:482
+msgid "Edit Template"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:498
+msgid "No Templates Found"
+msgstr ""
+
+#: backend/builder/templates-list-view.php:499
+msgid "You don’t have any single product page templates yet. Click below to create your first template."
+msgstr ""
+
+#: backend/builder/templates-list-view.php:567
+msgid "Error updating builder status."
+msgstr ""
+
+#: backend/builder/templates-list-view.php:579
+msgid "Network error while updating builder status."
+msgstr ""
+
+#: backend/classes/class-sppcfw-pro-admin-placeholders.php:94
+#: backend/templates/pro/placeholder-page.php:20
+msgid "Activate your Pro license"
+msgstr ""
+
+#: backend/classes/class-sppcfw-pro-admin-placeholders.php:96
+#: backend/templates/pro/placeholder-page.php:22
+msgid "Get Product Page Customizer Pro"
+msgstr ""
+
+#: backend/classes/class-sppcfw-pro-admin-placeholders.php:117
+msgid "Pro license"
+msgstr ""
+
+#: backend/classes/class-sppcfw-pro-admin-placeholders.php:118
+msgid "Single Product Customizer Pro — License"
+msgstr ""
+
+#: backend/classes/class-sppcfw-pro-admin-placeholders.php:119
+msgid "Enter your license key to unlock Pro features on this site."
+msgstr ""
+
+#: backend/classes/class-sppcfw-pro-admin-placeholders.php:169
+#: backend/templates/sidebar/sidebar-menu.php:82
+msgid "Pro"
+msgstr ""
+
+#: backend/classes/class-sppcfw-pro-admin-placeholders.php:191
+msgid "Single Product Customizer Pro"
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:11
+msgid "Template 1 - Modern Horizontal"
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:12
+msgid "Template 2 - Classic Vertical"
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:13
+msgid "Template 3 - Split Layout"
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:38
+#: backend/Enable-Quick-Checkout/quick-checkout.php:64
+#: backend/templates/sidebar/sidebar-menu.php:30
+msgid "Enable Quick Checkout"
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:50
+msgid "single page builder Options"
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:63
+msgid "Single Page Builder is active"
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:71
+msgid "Enable Quick Checkout feature for streamlined product purchase experience."
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:73
+msgid "Note:"
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:74
+msgid "Enabling this will automatically enable \"AJAX add to cart buttons on archives\" in WooCommerce settings. Disabling this will automatically disable that setting as well."
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:82
+msgid "Show Product Title"
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:85
+msgid "Show Review"
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:88
+msgid "Show Short Description"
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:105
+#: backend/Enable-Quick-Checkout/quick-checkout.php:106
+#: backend/Enable-Quick-Checkout/quick-checkout.php:107
+msgid "Pro Features"
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:114
+msgid "Select Quick Checkout Template"
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:120
+msgid "Selected template:"
+msgstr ""
+
+#: backend/Enable-Quick-Checkout/quick-checkout.php:156
+msgid "Select a template to customize the Quick Checkout feature on product pages."
+msgstr ""
+
+#: backend/Our-products/our-products.php:16
+msgid "Giveaway Lottery for WooCommerce"
+msgstr ""
+
+#: backend/Our-products/our-products.php:17
+msgid "Run engaging giveaways, contests, and lotteries on your WooCommerce store. Increase customer engagement and grow your email list with powerful giveaway tools."
+msgstr ""
+
+#: backend/Our-products/our-products.php:19
+msgid "Multiple entry methods (purchase, social share, email signup)"
+msgstr ""
+
+#: backend/Our-products/our-products.php:20
+msgid "Free ticket and reward points system"
+msgstr ""
+
+#: backend/Our-products/our-products.php:21
+msgid "Automated random winner selection"
+msgstr ""
+
+#: backend/Our-products/our-products.php:22
+msgid "Email notifications for participants and winners"
+msgstr ""
+
+#: backend/Our-products/our-products.php:23
+msgid "Shortcode support for easy placement"
+msgstr ""
+
+#: backend/Our-products/our-products.php:24
+msgid "Fully responsive design"
+msgstr ""
+
+#: backend/Our-products/our-products.php:27
+#: backend/Our-products/our-products.php:51
+#: backend/Our-products/our-products.php:99
+msgid "Popular"
+msgstr ""
+
+#: backend/Our-products/our-products.php:31
+#: backend/Our-products/our-products.php:55
+#: backend/Our-products/our-products.php:80
+#: backend/Our-products/our-products.php:103
+#: backend/Our-products/our-products.php:126
+msgid "Free"
+msgstr ""
+
+#: backend/Our-products/our-products.php:39
+msgid "GiftRocket – Ultimate Gift Cards for WooCommerce"
+msgstr ""
+
+#: backend/Our-products/our-products.php:40
+msgid "Easily create, manage, and deliver digital gift cards by email. Shoppers redeem them at cart and checkout. WooCommerce Blocks are supported."
+msgstr ""
+
+#: backend/Our-products/our-products.php:42
+msgid "Digital Gift Cards — Custom amounts & messages."
+msgstr ""
+
+#: backend/Our-products/our-products.php:43
+msgid "Email & Scheduled Delivery — Send instantly or later."
+msgstr ""
+
+#: backend/Our-products/our-products.php:44
+msgid "PDF Gift Cards — QR, barcode & PDF417 support."
+msgstr ""
+
+#: backend/Our-products/our-products.php:45
+msgid "Apple & Google Wallet — Mobile wallet support."
+msgstr ""
+
+#: backend/Our-products/our-products.php:46
+msgid "CSV Import — Bulk import codes & balances."
+msgstr ""
+
+#: backend/Our-products/our-products.php:47
+msgid "Easy Redemption — Redeem at cart & checkout."
+msgstr ""
+
+#: backend/Our-products/our-products.php:48
+msgid "Admin Dashboard — Manage cards, balances & transactions."
+msgstr ""
+
+#: backend/Our-products/our-products.php:63
+#: backend/sppcfw-welcome/sppcfw-welcome.php:144
+msgid "Variation Monster for WooCommerce"
+msgstr ""
+
+#: backend/Our-products/our-products.php:64
+msgid "Transform your WooCommerce variable products with beautiful swatches, galleries, and quick-view features. Enhance user experience and boost conversions."
+msgstr ""
+
+#: backend/Our-products/our-products.php:66
+msgid "Color, image, and radio variation swatches"
+msgstr ""
+
+#: backend/Our-products/our-products.php:67
+msgid "Advanced variation tables"
+msgstr ""
+
+#: backend/Our-products/our-products.php:68
+msgid "Advanced variation gallery"
+msgstr ""
+
+#: backend/Our-products/our-products.php:69
+msgid "Quick view for products"
+msgstr ""
+
+#: backend/Our-products/our-products.php:70
+msgid "Shop page variation swatches"
+msgstr ""
+
+#: backend/Our-products/our-products.php:71
+msgid "Tooltip support"
+msgstr ""
+
+#: backend/Our-products/our-products.php:72
+msgid "Mobile-optimized interface"
+msgstr ""
+
+#: backend/Our-products/our-products.php:73
+#: backend/Our-products/our-products.php:95
+msgid "Easy setup and configuration"
+msgstr ""
+
+#: backend/Our-products/our-products.php:76
+msgid "Essential"
+msgstr ""
+
+#: backend/Our-products/our-products.php:88
+msgid "Automatic Teachable Enrollment for WooCommerce"
+msgstr ""
+
+#: backend/Our-products/our-products.php:89
+msgid "Automatically enroll WooCommerce customers into Teachable courses. Seamlessly connect your e-commerce store with your online courses."
+msgstr ""
+
+#: backend/Our-products/our-products.php:91
+msgid "Sell courses at woocommerce"
+msgstr ""
+
+#: backend/Our-products/our-products.php:92
+msgid "Enroll students at Teachable automatically"
+msgstr ""
+
+#: backend/Our-products/our-products.php:93
+msgid "Unlimited course selling"
+msgstr ""
+
+#: backend/Our-products/our-products.php:94
+msgid "Increase sells"
+msgstr ""
+
+#: backend/Our-products/our-products.php:96
+msgid "Refund handling with automatic unenrollment"
+msgstr ""
+
+#: backend/Our-products/our-products.php:111
+msgid "EpassCard"
+msgstr ""
+
+#: backend/Our-products/our-products.php:112
+msgid "Smartest Card Solution For Google Wallet and Apple Wallet and EpassCard."
+msgstr ""
+
+#: backend/Our-products/our-products.php:114
+msgid "Create and manage google and apple wallet passes"
+msgstr ""
+
+#: backend/Our-products/our-products.php:115
+msgid "Compatible with Apple Wallet and Google Wallet formats"
+msgstr ""
+
+#: backend/Our-products/our-products.php:116
+msgid "Integrates with Gift Card for WooCommerce via extension plugin"
+msgstr ""
+
+#: backend/Our-products/our-products.php:117
+msgid "Automatically generates Epasscard pass when gift card is issued"
+msgstr ""
+
+#: backend/Our-products/our-products.php:118
+msgid "Customizable pass design and metadata"
+msgstr ""
+
+#: backend/Our-products/our-products.php:119
+msgid "Easy to use"
+msgstr ""
+
+#: backend/Our-products/our-products.php:122
+msgid "New"
+msgstr ""
+
+#: backend/Our-products/our-products.php:458
+msgid "Our Free WordPress Plugins"
+msgstr ""
+
+#: backend/Our-products/our-products.php:459
+msgid "Discover our collection of free plugins available on WordPress.org. Each plugin is carefully crafted, regularly updated, and supported by our team."
+msgstr ""
+
+#: backend/Our-products/our-products.php:518
+msgid "Install Now"
+msgstr ""
+
+#: backend/Our-products/our-products.php:522
+msgid "View Details"
+msgstr ""
+
+#: backend/Our-products/our-products.php:531
+msgid "Want to See More?"
+msgstr ""
+
+#: backend/Our-products/our-products.php:532
+msgid "Visit our WordPress.org profile to see all our plugins, read reviews, and get support."
+msgstr ""
+
+#: backend/Our-products/our-products.php:537
+msgid "View All Plugins"
+msgstr ""
+
+#: backend/resources/ui-class.php:217
+msgid "No Name Added"
+msgstr ""
+
+#: backend/resources/ui-class.php:394
+#: backend/assets/js/builder-app.js:2246
+msgid "Title"
+msgstr ""
+
+#: backend/resources/ui-class.php:491
+msgid "PRO Feature"
+msgstr ""
+
+#: backend/resources/ui-class.php:744
+msgid "Choose File"
+msgstr ""
+
+#: backend/resources/ui-class.php:780
+#: backend/assets/js/builder-app.js:3765
+#: backend/assets/js/builder-app.js:4639
+msgid "Choose Image"
+msgstr ""
+
+#: backend/resources/ui-class.php:921
+#: backend/sppcfw-welcome/sppcfw-welcome.php:10
+#: backend/templates/sidebar/sidebar-menu.php:62
+#: includes/sppcfw-admin-menu.php:87
+#: includes/sppcfw-admin-menu.php:102
+#: includes/sppcfw-admin-menu.php:103
+#: includes/sppcfw-admin-menu.php:124
+msgid "Single Product Customizer"
+msgstr ""
+
+#: backend/resources/ui-class.php:937
+#: backend/resources/ui-class.php:938
+msgid "Dashboard_Settings"
+msgstr ""
+
+#: backend/resources/ui-class.php:947
+#: backend/resources/ui-class.php:948
+msgid "Single Page Builder"
+msgstr ""
+
+#: backend/resources/ui-class.php:980
+msgid "Dashboard Settings"
+msgstr ""
+
+#: backend/resources/ui-class.php:1067
+msgid "Our Products file not found."
+msgstr ""
+
+#: backend/resources/ui-class.php:1082
+msgid "Quick Checkout file not found."
+msgstr ""
+
+#: backend/resources/ui-class.php:1093
+msgid "Website:"
+msgstr ""
+
+#: backend/resources/ui-class.php:1094
+msgid "webcartisan.com"
+msgstr ""
+
+#: backend/resources/ui-class.php:1095
+msgid "Visit our official website for live chat and more information, tutorials, and resources."
+msgstr ""
+
+#: backend/resources/ui-class.php:1098
+msgid "Facebook:"
+msgstr ""
+
+#: backend/resources/ui-class.php:1099
+#: backend/resources/ui-class.php:1117
+#: backend/resources/ui-class.php:1126
+msgid "Follow us"
+msgstr ""
+
+#: backend/resources/ui-class.php:1100
+msgid "Join our community on Facebook for support, updates, and discussions."
+msgstr ""
+
+#: backend/resources/ui-class.php:1103
+msgid "WhatsApp:"
+msgstr ""
+
+#: backend/resources/ui-class.php:1104
+msgid "Chat Now "
+msgstr ""
+
+#: backend/resources/ui-class.php:1105
+msgid "Get instant support by chatting with us on WhatsApp. We’re here to help!"
+msgstr ""
+
+#: backend/resources/ui-class.php:1108
+msgid "Email:"
+msgstr ""
+
+#: backend/resources/ui-class.php:1108
+msgid "hello@webcartisan.com"
+msgstr ""
+
+#: backend/resources/ui-class.php:1109
+msgid "Feel free to reach out to us via email for any inquiries or support requests."
+msgstr ""
+
+#: backend/resources/ui-class.php:1112
+msgid "LinkedIn:"
+msgstr ""
+
+#: backend/resources/ui-class.php:1113
+msgid "Connect on LinkedIn"
+msgstr ""
+
+#: backend/resources/ui-class.php:1114
+msgid "Let’s connect on LinkedIn for networking, updates, and professional support."
+msgstr ""
+
+#: backend/resources/ui-class.php:1117
+msgid "Twitter:"
+msgstr ""
+
+#: backend/resources/ui-class.php:1118
+msgid "Stay updated with the latest news and announcements by following us on Twitter."
+msgstr ""
+
+#: backend/resources/ui-class.php:1121
+msgid "YouTube:"
+msgstr ""
+
+#: backend/resources/ui-class.php:1121
+msgid "Subscribe"
+msgstr ""
+
+#: backend/resources/ui-class.php:1122
+msgid "Check out our YouTube channel for video tutorials and product showcases."
+msgstr ""
+
+#: backend/resources/ui-class.php:1125
+msgid "Instagram:"
+msgstr ""
+
+#: backend/resources/ui-class.php:1127
+msgid "See behind-the-scenes content and our latest updates on Instagram."
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-discount-notice.php:92
+#: backend/sppcfw-welcome/sppcfw-discount-notice.php:100
+msgid "Halloween Sale"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-discount-notice.php:94
+msgid "Dismiss this notice."
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-discount-notice.php:104
+msgid "Flat"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-discount-notice.php:106
+msgid "OFF"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-discount-notice.php:112
+msgid "Upgrade your WooCommerce store with Single Product Customizer Pro! Unlock advanced product layout builder, custom tabs, variation tables, and min/max quantities."
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-discount-notice.php:118
+msgid "Get Deal (30% OFF)"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-discount-notice.php:123
+msgid "Agency Bundle"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-discount-notice.php:176
+msgid "Unauthorized"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-discount-notice.php:192
+msgid "Notice snoozed for 3 days"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-discount-notice.php:206
+msgid "Notice dismissed"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-discount-notice.php:209
+msgid "Invalid action"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:11
+msgid "Welcome"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:25
+msgid "Single Product Customizer Welcome"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:92
+msgid "Welcome to Single Product Customizer for WooCommerce!"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:93
+msgid "Your plugin has been successfully activated!"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:97
+msgid "Stay updated with the latest features, security updates, tips and tricks."
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:101
+msgid "Email Address"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:108
+msgid "Enter your email address"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:110
+msgid "This email will be used for sending notifications and product updates."
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:120
+msgid "Subscribe & Continue Setup"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:127
+msgid "Skip & Continue Setup"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:137
+msgid "Our Other Products"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:140
+msgid "Wallet Ready Gift Cards for WooCommerce"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:141
+msgid "Deliver digital gift cards, PDF vouchers, and wallet passes with balance tracking and checkout redemption."
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:145
+msgid "Manage all variation products including variation swatches, quick view, variation gallery, and variation table."
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:148
+msgid "Giveaway Lottery"
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:149
+msgid "Ultimate giveaway lottery plugin for WooCommerce to run contests, raffles & campaigns."
+msgstr ""
+
+#: backend/sppcfw-welcome/sppcfw-welcome.php:160
+msgid "You do not have permission to perform this action."
+msgstr ""
+
+#: backend/templates/pro/placeholder-page.php:28
+msgid "PRO"
+msgstr ""
+
+#: backend/templates/pro/placeholder-page.php:34
+msgid "This feature is part of Product Page Customizer Pro. Install and activate a valid license to use it on this site."
+msgstr ""
+
+#: backend/templates/pro/placeholder-page.php:41
+msgid "View Pro plans"
+msgstr ""
+
+#: backend/templates/sidebar/sidebar-menu.php:18
+msgid "Advance Settings"
+msgstr ""
+
+#: backend/templates/sidebar/sidebar-menu.php:24
+msgid "Our Products"
+msgstr ""
+
+#: backend/templates/sidebar/sidebar-menu.php:36
+#: single-product-customizer.php:53
+msgid "Support"
+msgstr ""
+
+#: backend/templates/sidebar/sidebar-menu.php:41
+#: backend/assets/js/builder-app.js:6620
+msgid "Collapse"
+msgstr ""
+
+#: frontend/advanced/ajax-add-to-cart/ajax-add-to-cart.php:29
+msgid "Unable to add to cart. Please try again."
+msgstr ""
+
+#: frontend/advanced/ajax-add-to-cart/ajax-add-to-cart.php:123
+msgid "Please select product options and try again."
+msgstr ""
+
+#: frontend/advanced/show-variation-table/show-variation-table.php:111
+#: frontend/class-sppcfw-builder-renderer.php:2445
+#: backend/assets/js/builder-app.js:5680
+#: backend/assets/js/builder-app.js:8503
+msgid "Price"
+msgstr ""
+
+#: frontend/advanced/variation-switcher/variation-switcher.php:241
+msgid "Choose one"
+msgstr ""
+
+#: frontend/basic/enable-plus-minus-button/enable-plus-minus-button.php:69
+msgid "Decrease quantity"
+msgstr ""
+
+#: frontend/basic/enable-plus-minus-button/enable-plus-minus-button.php:86
+msgid "Increase quantity"
+msgstr ""
+
+#: frontend/class-sppcfw-builder-renderer.php:1234
+#: backend/assets/js/builder-app.js:473
+#: backend/assets/js/builder-app.js:2168
+#: backend/assets/js/builder-app.js:6630
+msgid "Close"
+msgstr ""
+
+#: frontend/class-sppcfw-builder-renderer.php:1234
+msgid "Full size image"
+msgstr ""
+
+#: frontend/class-sppcfw-builder-renderer.php:2122
+#: backend/assets/js/builder-app.js:4232
+#: backend/assets/js/builder-app.js:7799
+msgid "Add Your Heading Text Here"
+msgstr ""
+
+#: frontend/class-sppcfw-builder-renderer.php:2140
+#: backend/assets/js/builder-app.js:4300
+#: backend/assets/js/builder-app.js:7823
+msgid "Add your custom description or paragraph content here..."
+msgstr ""
+
+#: frontend/class-sppcfw-builder-renderer.php:2194
+#: backend/assets/js/builder-app.js:7898
+msgid "Sale"
+msgstr ""
+
+#: frontend/class-sppcfw-builder-renderer.php:2325
+msgid "Zoom"
+msgstr ""
+
+#: frontend/class-sppcfw-builder-renderer.php:2328
+msgid "Lightbox"
+msgstr ""
+
+#: frontend/class-sppcfw-builder-renderer.php:2341
+msgid "Previous thumbnails"
+msgstr ""
+
+#: frontend/class-sppcfw-builder-renderer.php:2352
+msgid "Next thumbnails"
+msgstr ""
+
+#: frontend/class-sppcfw-builder-renderer.php:2446
+#: backend/assets/js/builder-app.js:8504
+msgid "Stock"
+msgstr ""
+
+#: frontend/class-sppcfw-builder-renderer.php:2447
+#: backend/assets/js/builder-app.js:8505
+msgid "Select"
+msgstr ""
+
+#: frontend/class-sppcfw-builder-renderer.php:2602
+msgid "review"
+msgid_plural "reviews"
+msgstr[0] ""
+msgstr[1] ""
+
+#: frontend/class-sppcfw-builder-renderer.php:2649
+msgid "Special Offer: Free Shipping on all orders!"
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/quick-checkout-frontend.php:352
+#: backend/resources/js/admin-notices.js:10
+#: backend/resources/js/admin-notices.js:28
+#: backend/resources/js/admin-notices.js:50
+msgid "Processing..."
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/quick-checkout-frontend.php:353
+#: backend/resources/js/backend.js:155
+#: backend/resources/js/backend.js:187
+msgid "An error occurred. Please try again."
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/quick-checkout-frontend.php:354
+msgid "Are you sure you want to remove this item?"
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/checkout/default-review-order.php:23
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-order-table.php:9
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-review-order.php:19
+msgid "Product"
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/checkout/default-review-order.php:24
+#: frontend/Enable-Quick-Checkout/templates/checkout/default-review-order.php:56
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-order-table.php:10
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-order-table.php:61
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-review-order.php:20
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-review-order.php:148
+msgid "Subtotal"
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/checkout/default-review-order.php:103
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-order-table.php:109
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-review-order.php:196
+msgid "Total"
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-checkout-form-billing.php:52
+msgid "Create an account?"
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-checkout-form-billing.php:66
+msgid "Create an account by entering the information below. If you are a returning customer please login at the top of the page."
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-checkout-form-shipping.php:33
+msgid "Ship to a different address?"
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-form-checkout.php:30
+msgid "You must be logged in to checkout."
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-form-checkout.php:36
+#: frontend/Enable-Quick-Checkout/templates/template-1.php:44
+msgid "Checkout"
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-form-checkout.php:58
+msgid "Your order"
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-review-order.php:56
+msgid "Your cart is empty. Please add a product to continue."
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/checkout/quick-review-order.php:95
+msgid "Remove this item"
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/quick-checkout-form.php:22
+msgid "Quick Checkout"
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/template-1.php:27
+msgid "Cart"
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/template-1.php:52
+msgid "Billing Details"
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/template-1.php:75
+#: frontend/Enable-Quick-Checkout/templates/template-1.php:80
+msgid "Shipping Details"
+msgstr ""
+
+#: frontend/Enable-Quick-Checkout/templates/template-1.php:103
+msgid "Order & Payment"
+msgstr ""
+
+#: includes/sppcfw-admin-menu.php:129
+msgid "Single Product Customizer requires WooCommerce for full functionality. Please install and activate WooCommerce to customize single product pages."
+msgstr ""
+
+#: includes/sppcfw-admin-menu.php:139
+msgid "Install WooCommerce"
+msgstr ""
+
+#: single-product-customizer.php:35
+msgid "View Single Product Customizer Settings"
+msgstr ""
+
+#: single-product-customizer.php:35
+#: backend/assets/js/builder-app.js:2187
+msgid "Settings"
+msgstr ""
+
+#: single-product-customizer.php:54
+msgid "Docs"
+msgstr ""
+
+#: single-product-customizer.php:158
+msgid "Single Product Customizer requires WooCommerce to be installed and activated to use the plugin's full functionality."
+msgstr ""
+
+#: single-product-customizer.php:257
+msgid "Hello! Seems like you have used Single Product Customizer for this website — Thanks a lot!"
+msgstr ""
+
+#: single-product-customizer.php:258
+msgid " Could you please do us a big favor and give it a 5-star rating on WordPress? This would boost our motivation and help other users make a comfortable decision while choosing the Single Product Customizer."
+msgstr ""
+
+#: single-product-customizer.php:268
+msgid "Plugin Logo"
+msgstr ""
+
+#: single-product-customizer.php:271
+msgid "Ok, you deserved it"
+msgstr ""
+
+#: single-product-customizer.php:272
+msgid "I already did"
+msgstr ""
+
+#: single-product-customizer.php:274
+msgid "I need support"
+msgstr ""
+
+#: single-product-customizer.php:275
+#: backend/resources/js/admin-notices.js:64
+msgid "No, not good enough"
+msgstr ""
+
+#: single-product-customizer.php:331
+msgid "Notice dismissed successfully."
+msgstr ""
+
+#: single-product-customizer.php:345
+msgid "Message is empty."
+msgstr ""
+
+#: single-product-customizer.php:364
+msgid "Feedback sent successfully."
+msgstr ""
+
+#: single-product-customizer.php:366
+msgid "Failed to send feedback email."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:34
+msgid "Single Product Title"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:44
+msgid "Full product description placeholder detailing extensive technical specifications and features."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:49
+#: backend/assets/js/builder-app.js:8764
+msgid "Size"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:52
+msgid "Demo Related Product 1"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:53
+msgid "Demo Related Product 2"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:54
+msgid "Demo Related Product 3"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:55
+msgid "Demo Related Product 4"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:58
+msgid "Demo Upsell Product 1"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:59
+msgid "Demo Upsell Product 2"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:60
+msgid "Demo Upsell Product 3"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:61
+msgid "Demo Upsell Product 4"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:67
+#: backend/assets/js/builder-app.js:1309
+#: backend/assets/js/builder-app.js:3570
+#: backend/assets/js/builder-app.js:7336
+msgid "Column"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:67
+msgid "Add a new column into container"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:68
+msgid "Div block"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:68
+msgid "Simple full width div container"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:69
+#: backend/assets/js/builder-app.js:504
+#: backend/assets/js/builder-app.js:3403
+msgid "Flexbox"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:69
+msgid "Flexbox layout container"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:71
+msgid "Tabs"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:71
+msgid "Tabs container widget"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:76
+#: backend/assets/js/builder-app.js:7773
+msgid "Product Title"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:77
+msgid "Heading"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:78
+msgid "Text Editor"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:79
+msgid "Product Price"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:80
+msgid "Product Gallery"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:83
+msgid "Add to Cart"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:84
+msgid "Rating Stars"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:85
+msgid "Short Description"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:86
+msgid "Full Description & Tabs"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:87
+msgid "Product Meta"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:88
+msgid "Custom Message"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:90
+msgid "Related Products"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:91
+msgid "Upsell Products"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:122
+#: backend/assets/js/builder-app.js:137
+msgid "Column 1 (100%)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:146
+msgid "Column 1 (50%)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:147
+#: backend/assets/js/builder-app.js:172
+msgid "Column 2 (50%)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:152
+#: backend/assets/js/builder-app.js:164
+msgid "Column 1 (33%)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:153
+msgid "Column 2 (67%)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:158
+msgid "Column 1 (67%)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:159
+#: backend/assets/js/builder-app.js:165
+msgid "Column 2 (33%)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:166
+msgid "Column 3 (33%)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:171
+#: backend/assets/js/builder-app.js:178
+msgid "Column 1 (25%)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:173
+#: backend/assets/js/builder-app.js:180
+msgid "Column 3 (25%)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:179
+msgid "Column 2 (25%)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:181
+msgid "Column 4 (25%)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:189
+#: backend/assets/js/builder-app.js:199
+#: backend/assets/js/builder-app.js:214
+#: backend/assets/js/builder-app.js:223
+msgid "Grid Box 1"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:190
+#: backend/assets/js/builder-app.js:200
+#: backend/assets/js/builder-app.js:215
+#: backend/assets/js/builder-app.js:224
+msgid "Grid Box 2"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:191
+#: backend/assets/js/builder-app.js:201
+#: backend/assets/js/builder-app.js:216
+#: backend/assets/js/builder-app.js:225
+msgid "Grid Box 3"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:192
+#: backend/assets/js/builder-app.js:202
+msgid "Grid Box 4"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:203
+msgid "Grid Box 5"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:204
+msgid "Grid Box 6"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:205
+msgid "Grid Box 7"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:206
+msgid "Grid Box 8"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:207
+msgid "Grid Box 9"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:231
+msgid "Div Content"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:236
+msgid "Column 1"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:243
+msgid "Div Container"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:243
+msgid "Grid Container"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:243
+msgid "Flexbox Container"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:382
+msgid "Unclosed comment block \"/*\" (missing \"*/\")"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:383
+msgid "Unclosed quote string in CSS rules"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:457
+msgid "Back to layout type"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:465
+msgid "Which layout would you like to use?"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:465
+msgid "Select your structure"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:522
+#: backend/assets/js/builder-app.js:2520
+#: backend/assets/js/builder-app.js:3404
+#: backend/assets/js/builder-app.js:3987
+msgid "Grid"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:539
+msgid "Single Column (Vertical)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:550
+msgid "Single Row (Horizontal)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:641
+msgid "Grid 2x2"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:655
+msgid "Grid 3x3"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:674
+msgid "Grid 1 Top, 2 Bottom"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:691
+msgid "Grid 2 Top, 1 Bottom"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:885
+msgid "Search products..."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:906
+#: backend/assets/js/builder-app.js:1004
+msgid "Default (All Products)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1005
+msgid "Demo sample preview"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1044
+msgid "No products found matching \""
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1435
+msgid ""
+"Cannot save or publish template due to syntax errors:\n"
+"\n"
+""
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1442
+msgid "Saving draft..."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1442
+msgid "Publishing template..."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1466
+msgid "Draft saved successfully!"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1466
+msgid "Published successfully!"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1470
+msgid "Failed to save template."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1500
+msgid ""
+"Cannot preview template due to syntax errors:\n"
+"\n"
+""
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1756
+#: backend/assets/js/builder-app.js:1764
+msgid "Publish"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1758
+#: backend/resources/js/backend.js:140
+msgid "Saving..."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1758
+msgid "Publishing..."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1760
+msgid "Save Draft"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1762
+msgid "Save ("
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1782
+msgid "Menu"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1802
+msgid "Exit to Builder"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1812
+msgid "Add Elements"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1825
+msgid "Page Settings"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1835
+msgid "Revision History"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1857
+msgid "Switch Template"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1869
+msgid "Page Templates"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1909
+msgid "No saved templates found"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1922
+msgid "Create New Template"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1939
+msgid "Desktop View"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1950
+msgid "Tablet View"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1961
+msgid "Mobile View"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:1998
+msgid "Structure Panel"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2009
+msgid "Preview designed page in new tab"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2046
+msgid "Elements Drawer"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2049
+#: backend/assets/js/builder-app.js:2390
+msgid "Elements"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2162
+msgid "Post Settings"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2198
+#: backend/assets/js/builder-app.js:6339
+msgid "Style"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2209
+#: backend/assets/js/builder-app.js:6350
+msgid "Advanced"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2234
+msgid "General Settings"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2252
+msgid "Page title..."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2279
+#: backend/assets/js/builder-app.js:2392
+msgid "Preview Product Data"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2291
+msgid "Page Layout"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2299
+#: backend/assets/js/builder-app.js:4904
+#: backend/assets/js/builder-app.js:5061
+#: backend/assets/js/builder-app.js:5229
+#: backend/assets/js/builder-app.js:6137
+#: backend/assets/js/builder-app.js:6192
+msgid "Default"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2300
+msgid "Canvas"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2301
+#: backend/assets/js/builder-app.js:3424
+msgid "Full Width"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2303
+msgid "The default page template as defined in Panel → Hamburger Menu → Site Settings."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2314
+msgid "Page Background & Style"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2318
+#: backend/assets/js/builder-app.js:4942
+#: backend/assets/js/builder-app.js:5425
+#: backend/assets/js/builder-app.js:5488
+msgid "Background Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2333
+msgid "Custom CSS & Scripts"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2337
+msgid "Custom CSS"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2412
+msgid "Widgets"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2422
+msgid "Components"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2432
+msgid "Globals"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2447
+msgid "Search Widget..."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2478
+#: backend/assets/js/builder-app.js:3193
+msgid "Layout"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2500
+msgid "Container"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2530
+msgid "Single Product Widgets"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2577
+msgid "Meta"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2816
+msgid "Global Colors"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2852
+msgid "Color Picker"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2861
+msgid "Reset color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2875
+msgid "Add to custom presets"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2889
+msgid "Saved colors"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2900
+msgid "Eyedropper tool"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2988
+msgid "Toggle Format (HEXA / RGBA / HSLA)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:2999
+msgid "Palette Presets"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3170
+msgid "Edit Container"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3171
+msgid "Edit Column"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3172
+msgid "Edit Image"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3173
+msgid "Edit Product Gallery"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3174
+#: backend/assets/js/builder-app.js:3175
+msgid "Edit HTML Element"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3176
+msgid "Edit Heading"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3177
+msgid "Edit Text Editor"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3178
+msgid "Edit Product Title"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3179
+msgid "Edit Product Price"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3180
+msgid "Edit Add to Cart"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3181
+msgid "Edit Rating Stars"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3182
+msgid "Edit Short Description"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3183
+msgid "Edit Product Description"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3184
+msgid "Edit Product Meta"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3185
+msgid "Edit Meta Field"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3186
+msgid "Edit Variation Swatches"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3187
+msgid "Edit Custom Message"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3188
+msgid "Edit Stepper Buttons"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3189
+msgid "Edit Related Products"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3190
+msgid "Edit Upsell Products"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3192
+msgid "Edit Element"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3193
+#: backend/resources/js/backend.js:976
+#: backend/resources/js/backend.js:987
+#: backend/resources/js/backend.js:1093
+#: backend/resources/js/backend.js:1104
+msgid "Content"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3315
+#: backend/assets/js/builder-app.js:3562
+msgid "Unlink values"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3315
+#: backend/assets/js/builder-app.js:3562
+msgid "Link values"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3385
+#: backend/assets/js/builder-app.js:3392
+msgid "Container Layout"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3412
+msgid "Content Width"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3423
+#: backend/assets/js/builder-app.js:6887
+msgid "Boxed"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3431
+#: backend/assets/js/builder-app.js:5299
+msgid "Width"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3437
+#: backend/assets/js/builder-app.js:3652
+msgid "Min Height"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3439
+msgid "To achieve full height Container use 100vh."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3445
+msgid "Container Items"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3452
+#: backend/assets/js/builder-app.js:3666
+msgid "Direction"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3457
+msgid "Row - Horizontal"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3458
+msgid "Column - Vertical"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3459
+msgid "Row Reverse"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3460
+msgid "Column Reverse"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3470
+#: backend/assets/js/builder-app.js:3679
+msgid "Justify Content"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3475
+#: backend/assets/js/builder-app.js:3495
+#: backend/assets/js/builder-app.js:3682
+#: backend/assets/js/builder-app.js:3696
+#: backend/assets/js/builder-app.js:6150
+#: backend/assets/js/builder-app.js:6165
+msgid "Start"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3476
+#: backend/assets/js/builder-app.js:3496
+#: backend/assets/js/builder-app.js:3683
+#: backend/assets/js/builder-app.js:3697
+#: backend/assets/js/builder-app.js:3877
+#: backend/assets/js/builder-app.js:4038
+#: backend/assets/js/builder-app.js:4094
+#: backend/assets/js/builder-app.js:4202
+#: backend/assets/js/builder-app.js:4270
+#: backend/assets/js/builder-app.js:4326
+#: backend/assets/js/builder-app.js:4926
+#: backend/assets/js/builder-app.js:5003
+#: backend/assets/js/builder-app.js:5136
+#: backend/assets/js/builder-app.js:5259
+#: backend/assets/js/builder-app.js:5289
+#: backend/assets/js/builder-app.js:5509
+#: backend/assets/js/builder-app.js:6151
+msgid "Center"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3477
+#: backend/assets/js/builder-app.js:3497
+#: backend/assets/js/builder-app.js:3684
+#: backend/assets/js/builder-app.js:3698
+#: backend/assets/js/builder-app.js:6152
+#: backend/assets/js/builder-app.js:6166
+msgid "End"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3478
+msgid "Space Between"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3479
+msgid "Space Around"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3480
+msgid "Space Evenly"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3490
+#: backend/assets/js/builder-app.js:3693
+msgid "Align Items"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3498
+#: backend/assets/js/builder-app.js:3699
+#: backend/assets/js/builder-app.js:6153
+msgid "Stretch"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3508
+msgid "Gaps"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3571
+msgid "Row"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3577
+#: backend/assets/js/builder-app.js:3583
+msgid "Wrap"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3582
+msgid "No Wrap"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3602
+msgid "Column Width & Size"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3609
+msgid "Quick Width Presets"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3626
+#: backend/assets/js/builder-app.js:3646
+msgid "Column ("
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3640
+msgid "Flex Width"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3659
+msgid "Column Items Layout"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3669
+msgid "↓ Column"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3670
+msgid "→ Row"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3682
+msgid "Top"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3683
+#: backend/assets/js/builder-app.js:3697
+msgid "Mid"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3684
+msgid "Btm"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3696
+#: backend/assets/js/builder-app.js:3876
+#: backend/assets/js/builder-app.js:4037
+#: backend/assets/js/builder-app.js:4093
+#: backend/assets/js/builder-app.js:4201
+#: backend/assets/js/builder-app.js:4269
+#: backend/assets/js/builder-app.js:4325
+#: backend/assets/js/builder-app.js:4925
+#: backend/assets/js/builder-app.js:5002
+#: backend/assets/js/builder-app.js:5135
+#: backend/assets/js/builder-app.js:5258
+#: backend/assets/js/builder-app.js:5288
+#: backend/assets/js/builder-app.js:5508
+msgid "Left"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3698
+#: backend/assets/js/builder-app.js:3878
+#: backend/assets/js/builder-app.js:4039
+#: backend/assets/js/builder-app.js:4095
+#: backend/assets/js/builder-app.js:4203
+#: backend/assets/js/builder-app.js:4271
+#: backend/assets/js/builder-app.js:4327
+#: backend/assets/js/builder-app.js:4927
+#: backend/assets/js/builder-app.js:5004
+#: backend/assets/js/builder-app.js:5137
+#: backend/assets/js/builder-app.js:5260
+#: backend/assets/js/builder-app.js:5290
+#: backend/assets/js/builder-app.js:5510
+msgid "Right"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3699
+#: backend/assets/js/builder-app.js:6887
+msgid "Full"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3708
+msgid "Widget Gap"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3715
+msgid "Column Actions"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3727
+msgid "Add New Column To Container"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3750
+msgid "Delete"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3772
+msgid "Image Asset"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3780
+msgid "Select Image"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3781
+msgid "Insert Image"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3795
+msgid "Enter Image URL:"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3808
+msgid "Selected Custom Preview"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3811
+msgid "Click to Change Image"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3817
+msgid "Choose Image from Media Library"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3818
+msgid "Insert any custom image into your layout"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3825
+#: backend/assets/js/builder-app.js:4577
+msgid "Remove Image"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3826
+msgid "Custom Image Set"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3832
+msgid "Image URL (Direct)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3844
+msgid "Alt Text"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3849
+msgid "Descriptive alt text for image"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3856
+#: backend/assets/js/builder-app.js:4652
+msgid "Image Resolution"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3864
+msgid "Thumbnail (150x150)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3865
+msgid "Medium (300x300)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3866
+msgid "Large (1024x1024)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3867
+msgid "Full Size"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3873
+#: backend/assets/js/builder-app.js:4090
+#: backend/assets/js/builder-app.js:4198
+#: backend/assets/js/builder-app.js:4266
+#: backend/assets/js/builder-app.js:4322
+#: backend/assets/js/builder-app.js:4922
+#: backend/assets/js/builder-app.js:4999
+#: backend/assets/js/builder-app.js:5132
+#: backend/assets/js/builder-app.js:5255
+#: backend/assets/js/builder-app.js:5285
+#: backend/assets/js/builder-app.js:5505
+msgid "Alignment"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3888
+msgid "Caption & Link Options"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3895
+msgid "Caption"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3903
+#: backend/assets/js/builder-app.js:3926
+msgid "None"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3904
+msgid "Custom Caption"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3912
+msgid "Enter custom caption text..."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3918
+msgid "Link"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3927
+msgid "Media File"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3928
+msgid "Custom URL"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3946
+msgid "Open in new window"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3965
+msgid "WooCommerce Product Gallery"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3966
+msgid "This widget automatically displays the featured image and gallery thumbnails of the active product from WooCommerce."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3970
+msgid "Gallery Options"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3977
+msgid "Show Gallery Thumbnails"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3984
+msgid "Thumbnail Display Format"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3987
+msgid "Static Thumbnail Grid"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3988
+msgid "Carousel"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3988
+msgid "Interactive Thumbnail Carousel"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3998
+msgid "Visible Carousel Items"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:3998
+msgid "Thumbnail Columns"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4006
+msgid "3 Items"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4007
+msgid "4 Items"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4008
+msgid "5 Items"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4009
+msgid "6 Items"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4016
+msgid "Show Carousel Navigation Arrows"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4022
+msgid "Lightbox Popup"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4028
+msgid "Image Zoom On Hover"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4034
+msgid "Gallery Alignment"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4058
+msgid "WooCommerce Product Title"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4059
+msgid "This widget automatically renders the title of the active product from WooCommerce."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4063
+msgid "Title Settings"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4070
+#: backend/assets/js/builder-app.js:4240
+#: backend/assets/js/builder-app.js:4308
+msgid "HTML Tag"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4084
+msgid "Link to Product Page"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4096
+#: backend/assets/js/builder-app.js:4928
+msgid "Justify"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4117
+msgid "Price Display Settings"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4152
+msgid "Hides the price on single product pages. Automatically syncs with Basic Settings."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4170
+msgid "Show regular price if on sale"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4171
+msgid "When both regular and sale price exist, display the crossed-out regular price. If the product only has one price, that single price is always shown."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4189
+msgid "Show sale badge"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4190
+msgid "Displays a \"Sale\" badge when the product is discounted."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4221
+msgid "Heading Content"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4228
+msgid "Heading Text"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4233
+msgid "Enter heading text..."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4254
+msgid "Link URL (optional)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4289
+#: backend/assets/js/builder-app.js:4296
+msgid "Text Content"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4301
+msgid "Enter custom text or description..."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4341
+msgid "Displays the active product title dynamically from WooCommerce catalog."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4342
+msgid "Displays the dynamic price, sale price, and discount badge automatically."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4343
+msgid "Displays the dynamic Add to Cart button and quantity selector."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4344
+msgid "Displays the average star rating and review count from WooCommerce."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4345
+msgid "Displays the product excerpt or short description from WooCommerce."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4346
+msgid "Displays the full product description, reviews, and data tabs."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4347
+msgid "Displays SKU, product categories, and tags dynamically."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4348
+msgid "Displays custom WooCommerce product meta field values."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4349
+msgid "Displays variable product options, attributes, and variation table."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4350
+msgid "Displays customizable notification banner on the product page."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4351
+msgid "Displays plus/minus quantity stepper buttons."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4352
+msgid "Displays related products grid generated by WooCommerce."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4353
+msgid "Displays upsell recommendations from WooCommerce."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4356
+msgid "This element renders dynamic WooCommerce single product content."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4374
+msgid "Dynamic WooCommerce Element"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4375
+msgid "Content for this element is automatically managed by WooCommerce. To customize colors, typography, spacing, or borders, switch to the Style and Advanced tabs."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4385
+msgid "Customize in Style Panel →"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4404
+msgid "Background"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4423
+#: backend/assets/js/builder-app.js:4917
+msgid "Normal"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4436
+msgid "Hover"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4444
+msgid "Background Type"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4456
+msgid "Classic"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4469
+msgid "Gradient"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4503
+msgid "Select Background Image"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4504
+msgid "Insert Background Image"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4525
+msgid "Enter Background Image URL:"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4602
+msgid "Background Preview"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4618
+msgid "Change"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4625
+msgid "Delete Image"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4631
+#: backend/resources/js/backend.js:987
+#: backend/resources/js/backend.js:1104
+msgid "Remove"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4663
+msgid "Image size settings don't apply to Dynamic Images."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4674
+#: backend/assets/js/builder-app.js:6184
+msgid "Position"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4691
+msgid "X Position"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4693
+msgid "Y Position"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4701
+msgid "Attachment"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4720
+msgid "Repeat"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4741
+msgid "Display Size"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4758
+msgid "Custom Scale Width"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4768
+msgid "Transition Duration"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4780
+msgid "Color 1"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4781
+msgid "Color 2"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4785
+msgid "Gradient Type"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4800
+msgid "Angle"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4808
+msgid "Border & Radius"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4815
+#: backend/assets/js/builder-app.js:5331
+msgid "Border Type"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4845
+msgid "Border Width"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4847
+#: backend/assets/js/builder-app.js:5099
+#: backend/assets/js/builder-app.js:5464
+#: backend/assets/js/builder-app.js:5489
+msgid "Border Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4852
+#: backend/assets/js/builder-app.js:4952
+#: backend/assets/js/builder-app.js:5120
+#: backend/assets/js/builder-app.js:5345
+#: backend/assets/js/builder-app.js:5376
+#: backend/assets/js/builder-app.js:5437
+#: backend/assets/js/builder-app.js:5468
+#: backend/assets/js/builder-app.js:5499
+msgid "Border Radius"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4867
+#: backend/assets/js/builder-app.js:5038
+msgid "Typography"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4871
+#: backend/assets/js/builder-app.js:5211
+#: backend/assets/js/builder-app.js:5426
+msgid "Text Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4875
+#: backend/assets/js/builder-app.js:5045
+#: backend/assets/js/builder-app.js:5215
+#: backend/assets/js/builder-app.js:5400
+msgid "Font Size"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4881
+#: backend/assets/js/builder-app.js:5072
+msgid "Font Family"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4895
+#: backend/assets/js/builder-app.js:4985
+#: backend/assets/js/builder-app.js:5053
+#: backend/assets/js/builder-app.js:5221
+msgid "Font Weight"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4905
+msgid "Normal (400)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4906
+msgid "Medium (500)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4907
+msgid "Semi-Bold (600)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4908
+msgid "Bold (700)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4909
+msgid "Extra-Bold (800)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4916
+msgid "Line Height"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4938
+msgid "Background & Spacing"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4946
+#: backend/assets/js/builder-app.js:5431
+#: backend/assets/js/builder-app.js:5493
+#: backend/assets/js/builder-app.js:6123
+msgid "Padding"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4967
+msgid "Price Colors & Sizing"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4971
+msgid "Price Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4974
+msgid "Regular Price Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4975
+msgid "Sale Price Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:4979
+msgid "Price Font Size"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5022
+msgid "Button Colors"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5026
+#: backend/assets/js/builder-app.js:5456
+msgid "Button Background"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5029
+#: backend/assets/js/builder-app.js:5460
+msgid "Button Text Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5032
+msgid "Hover Background"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5033
+msgid "Hover Text Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5062
+#: backend/assets/js/builder-app.js:5231
+msgid "400 (Normal)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5063
+#: backend/assets/js/builder-app.js:5232
+msgid "500 (Medium)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5064
+#: backend/assets/js/builder-app.js:5233
+msgid "600 (Semi-Bold)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5065
+#: backend/assets/js/builder-app.js:5234
+msgid "700 (Bold)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5066
+#: backend/assets/js/builder-app.js:5235
+msgid "800 (Extra-Bold)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5080
+msgid "Inherit"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5081
+msgid "Inter"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5082
+msgid "Roboto"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5083
+msgid "Open Sans"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5084
+msgid "Lato"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5085
+msgid "Poppins"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5086
+msgid "Montserrat"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5093
+msgid "Quantity Field"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5097
+msgid "Input Background"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5098
+msgid "Input Text Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5100
+msgid "+/- Buttons Background"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5101
+msgid "+/- Buttons Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5102
+msgid "+/- Buttons Hover BG"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5107
+msgid "Dimensions & Spacing"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5114
+msgid "Button Padding"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5126
+msgid "Items Gap"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5147
+msgid "Variation & Swatches Style"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5151
+msgid "Attribute Label Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5155
+msgid "Attribute Label Size"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5158
+msgid "Active Swatch Accent Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5162
+msgid "Swatch Size"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5168
+msgid "Swatch Border Radius"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5174
+msgid "Swatch Items Gap"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5189
+msgid "Stars Appearance"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5193
+msgid "Star Color (Filled)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5196
+msgid "Empty Star Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5200
+msgid "Star Size"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5207
+msgid "Review Count & Typography"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5230
+msgid "300 (Light)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5242
+msgid "Layout & Alignment"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5249
+msgid "Space Between (Gap)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5278
+msgid "Image Sizing & Alignment"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5305
+msgid "Max Width"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5311
+msgid "Height"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5312
+msgid "Auto"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5317
+msgid "Opacity"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5324
+msgid "Border & Box Shadow"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5360
+msgid "Tabs Appearance"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5364
+msgid "Tab Heading Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5365
+msgid "Active Tab Highlight"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5366
+msgid "Panel Background"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5370
+msgid "Content Padding"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5391
+msgid "Meta Text Styles"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5395
+msgid "Label Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5396
+msgid "Value / Link Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5406
+msgid "Item Gap"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5421
+msgid "Banner Colors & Border"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5427
+msgid "Accent Border Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5452
+msgid "Stepper Buttons & Input"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5483
+msgid "Style & Colors"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5487
+msgid "Primary Color"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5613
+msgid "Related Products Settings"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5613
+msgid "Upsell Products Settings"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5621
+msgid "Section Heading Title"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5635
+msgid "Columns"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5654
+msgid "Products Count (Limit)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5669
+msgid "Order By"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5677
+msgid "Random (Default)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5678
+msgid "Date / Latest"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5679
+msgid "Title / Alphabetical"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5681
+msgid "Popularity / Sales"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5682
+msgid "Top Rated"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5690
+msgid "Order Direction"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5756
+msgid "Custom Code Studio"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5758
+msgid "● Live Preview"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5761
+msgid "Write custom HTML markup, scoped CSS rules, and JavaScript logic. Code is rendered and executed in real-time in the canvas preview."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5770
+msgid "HTML Markup"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5771
+msgid "CSS Styles"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5772
+msgid "JavaScript"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5788
+msgid "Syntax Error in this tab"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5810
+msgid "Copy Code"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5813
+msgid "Copied!"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5813
+msgid "Copy"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5825
+msgid "Clear code"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5836
+msgid "HTML Code / Markup"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5863
+msgid "HTML Code Error (Fix to allow Save/Publish)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5870
+msgid "HTML & Shortcode Tips"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5872
+msgid "You can include standard HTML tags, svg icons, inline tags, or WordPress / WooCommerce shortcodes (e.g. [add_to_cart id=\"...\"], [product_categories])."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5881
+msgid "Custom CSS Styles"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5908
+msgid "CSS Syntax Error (Fix to allow Save/Publish)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5915
+msgid "CSS Rules Tips"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5926
+msgid "Custom JavaScript"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5953
+msgid "JavaScript Syntax Error (Fix to allow Save/Publish)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5960
+msgid "JavaScript Execution Tips"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:5981
+msgid "Quantity & Button Settings"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6009
+msgid "Displays interactive + and - stepper buttons next to the quantity input on the product page."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6039
+msgid "Variation Display Settings"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6046
+msgid "Variation Display Mode"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6054
+msgid "🎨 Color & Label Swatches"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6055
+msgid "📋 WooCommerce Default Dropdowns"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6056
+msgid "📊 Variation Table / Grid"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6063
+msgid "Swatch Shape"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6066
+msgid "Circle"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6067
+msgid "Rounded"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6068
+msgid "Square"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6077
+msgid "Show Attribute Labels (Color, Size)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6088
+msgid "Show Variation Clear / Reset Link"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6110
+msgid "Layout & Spacing"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6117
+msgid "Margin"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6129
+msgid "Width Mode"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6138
+msgid "Full Width (100%)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6139
+msgid "Inline (auto)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6140
+#: backend/assets/js/builder-app.js:6167
+msgid "Custom"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6147
+msgid "Align Self"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6162
+msgid "Order"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6165
+msgid "First"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6166
+msgid "Last"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6177
+msgid "Position & Attributes"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6193
+msgid "Absolute"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6194
+msgid "Fixed"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6200
+msgid "Z-Index"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6216
+msgid "e.g. my-custom-id"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6223
+msgid "CSS Classes"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6228
+msgid "e.g. custom-class-1 custom-class-2"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6239
+msgid "Responsive Visibility"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6244
+msgid "Hide On Desktop"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6245
+msgid "Hide On Tablet"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6246
+msgid "Hide On Mobile"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6285
+msgid "Back to Elements"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6301
+msgid "📱 Mobile"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6301
+msgid "📱 Tablet"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6301
+msgid "🖥 Desktop"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6309
+msgid "Close Inspector"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6405
+msgid "Select Layout Structure"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6406
+msgid "Choose a Layout Structure (Flexbox or Grid) to start building your single product page layout."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6417
+msgid "Add Layout / Container"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6457
+msgid "Add Container Section"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6466
+msgid "Empty Selection"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6603
+msgid "Drag to move panel"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6609
+msgid "Structure"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6620
+msgid "Expand"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6661
+msgid "No elements on canvas"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6684
+msgid "Drag to resize vertically (max 400px)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:6887
+msgid "Col"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7148
+msgid "Add Container"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7158
+msgid "Drag to reorder container up or down"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7170
+msgid "Delete Container"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7347
+msgid "Add New Column to Container"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7361
+msgid "Duplicate Column"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7375
+msgid "Delete Column"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7423
+#: backend/assets/js/builder-app.js:7431
+msgid "Add Element"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7617
+msgid "HTML Element Broken (Isolated)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7622
+msgid "Render Error in this HTML Element"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7628
+msgid "Error isolated to this section. All other widgets and layout continue to render normally."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7707
+msgid "Custom HTML Element"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7708
+msgid "Click to write custom HTML markup, CSS styling, and JavaScript logic."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7736
+msgid "Error isolated to this section. All other sections and page layout remain intact."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7857
+msgid "Price is hidden by Basic Settings (Hide Price is enabled)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7959
+msgid "Product Featured Image"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7967
+msgid "No Product Image Available"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7977
+msgid "Zoom Enabled"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:7983
+msgid "Lightbox Enabled"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8003
+msgid "Previous Thumbnails"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8046
+msgid "Next Thumbnails"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8127
+msgid "Image Widget - Choose Image"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8128
+msgid "Click here or select this element to choose or upload an image"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8141
+msgid "Custom Image"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8692
+msgid "Product short description placeholder."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8709
+msgid "Full product description placeholder."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8723
+msgid "Category: "
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8723
+msgid "Clothing"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8724
+msgid "Tags: "
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8731
+msgid "Meta Field"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8743
+msgid "✨ Limited Offer: Free Shipping on orders over $50!"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8786
+msgid "Product Variations & Swatches"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8840
+msgid "Related"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8840
+msgid "Upsell"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8959
+msgid "Publish Display Conditions"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8967
+msgid "Choose where your single product page builder template will be applied:"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:8986
+msgid "(All Single Product Pages)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:9000
+msgid "Specific Category condition requires an active Pro license"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:9017
+msgid "(Category-Based Scope)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:9036
+msgid "Specific Product condition requires an active Pro license"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:9052
+msgid "Specific Product / Separate Page"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:9053
+msgid "(Product-Based Scope)"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:9068
+msgid "Specific Category & Product display rules require an active Pro license."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:9088
+msgid "Select Categories to apply:"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:9094
+#: backend/assets/js/builder-app.js:9163
+msgid "Select All"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:9109
+msgid "Filter categories by name..."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:9119
+msgid "No categories found."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:9157
+msgid "Select Products to apply:"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:9178
+msgid "Search products by title or ID..."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:9188
+msgid "No products found."
+msgstr ""
+
+#: backend/assets/js/builder-app.js:9224
+msgid "Cancel"
+msgstr ""
+
+#: backend/assets/js/builder-app.js:9234
+msgid "Save & Publish"
+msgstr ""
+
+#: backend/assets/js/sppcfw-welcome.js:14
+msgid "Please enter a valid email address to subscribe."
+msgstr ""
+
+#: backend/assets/js/sppcfw-welcome.js:36
+#: backend/assets/js/sppcfw-welcome.js:42
+msgid "There was an error. Please try again."
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher-modal.js:70
+#: backend/backend-variable-switcher/backend-variable-switcher-modal.js:75
+msgid "Error loading icons. Please try again later."
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher-modal.js:102
+msgid "No icons found."
+msgstr ""
+
+#: backend/backend-variable-switcher/backend-variable-switcher-modal.js:153
+msgid "Please select an icon before inserting."
+msgstr ""
+
+#: backend/resources/js/admin-notices.js:55
+msgid "Your feedback has been sent to the plugin owner. Thank you for your input."
+msgstr ""
+
+#: backend/resources/js/admin-notices.js:57
+msgid "An error occurred while sending feedback. Please try again."
+msgstr ""
+
+#: backend/resources/js/backend.js:613
+msgid "Please wait... it's importing settings"
+msgstr ""
+
+#: backend/resources/js/backend.js:964
+msgid "There is no product category checked yet!"
+msgstr ""
+
+#: backend/resources/js/backend.js:987
+#: backend/resources/js/backend.js:1104
+msgid "Content name"
+msgstr ""
+
+#: backend/resources/js/backend.js:992
+#: backend/resources/js/backend.js:1109
+#: backend/resources/js/backend.js:1218
+msgid "Add Media"
+msgstr ""
+
+#: backend/resources/js/backend.js:1214
+#: backend/resources/js/backend.js:1216
+msgid "Tab title"
+msgstr ""
+
+#: backend/resources/js/backend.js:1216
+msgid "Remove this tab"
+msgstr ""
+
+#: backend/resources/js/backend.js:1342
+#: backend/resources/js/backend.js:1364
+#: backend/resources/js/backend.js:1384
+msgid "Are you sure?"
+msgstr ""

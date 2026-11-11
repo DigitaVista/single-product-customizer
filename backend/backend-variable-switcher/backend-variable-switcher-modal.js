@@ -67,12 +67,12 @@ jQuery(document).ready(function ($) {
                 },
                 error: function (xhr) {
                     console.error('Error fetching icons:', xhr.statusText);
-                    iconContainer.html('<p>Error loading icons. Please try again later.</p>');
+                    iconContainer.html('<p>' + wp.i18n.__( 'Error loading icons. Please try again later.', 'single-product-customizer' ) + '</p>');
                 }
             });
         } catch (error) {
             console.error('Error fetching icons:', error);
-            iconContainer.html('<p>Error loading icons. Please try again later.</p>');
+            iconContainer.html('<p>' + wp.i18n.__( 'Error loading icons. Please try again later.', 'single-product-customizer' ) + '</p>');
         }
     }
 
@@ -99,7 +99,7 @@ jQuery(document).ready(function ($) {
         let filteredIcons = currentStyle === 'all' ? icons : icons.filter(icon => icon.styles.includes(currentStyle));
 
         if (filteredIcons.length === 0) {
-            iconContainer.html('<p>No icons found.</p>');
+            iconContainer.html('<p>' + wp.i18n.__( 'No icons found.', 'single-product-customizer' ) + '</p>');
             return;
         }
 
@@ -150,7 +150,7 @@ jQuery(document).ready(function ($) {
             modal.hide();
             selectedIcon = null;
         } else {
-            alert('Please select an icon before inserting.');
+            alert(wp.i18n.__( 'Please select an icon before inserting.', 'single-product-customizer' ));
         }
     });
 

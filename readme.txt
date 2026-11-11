@@ -4,7 +4,7 @@ Tags: WooCommerce, customize WooCommerce, product addons, variation swatches, Wo
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 8.1
-Stable tag: 1.1.0
+Stable tag: 1.1.1
 License: GPL v2 or later
 License URI: https://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
@@ -28,7 +28,7 @@ Create responsive product layouts with a drag-and-drop builder, customize produc
 * Apply a custom template across your entire store with the Free version.
 * Use product- and category-specific templates with Pro.
 
-[youtube https://youtu.be/FXdw43rSpwU]
+[youtube https://youtu.be/jNl1ah58KZE]
 
 == Visual Drag & Drop Page Builder for Single Product Pages ==
 
@@ -85,7 +85,8 @@ Reduce checkout friction by allowing customers to purchase products directly fro
 * Enable Quick Checkout on product pages.
 * Use the Modern Horizontal layout.
 * Start the checkout process directly from the product page.
-* Classic Vertical and Split Layout templates. [Pro]
+* Classic Vertical template with tabs and Next buttons. [Pro]
+* Template 3 - Split Layout: product gallery on the left (sale badge, zoom, fullscreen, thumbnail slider) with billing, shipping, order review and payment on the right. [Pro]
 * Show or hide Product Title, Ratings & Reviews, and Short Description. [Pro]
 * Display WooCommerce Billing and Shipping fields inline. [Pro]
 * Place orders using AJAX without unnecessary page navigation. [Pro]
@@ -161,8 +162,6 @@ Create a unique product page experience for individual products, including custo
 
 Apply different product page layouts and customization rules to selected product categories. [Pro]
 
-Give your product pages a spooky-season refresh without the hassle. Customize WooCommerce product page layouts and highlight Halloween specials to make your seasonal products stand out.
-
 == Compatible Themes ==
 
 The plugin is tested with popular WooCommerce and WordPress themes, including:
@@ -205,7 +204,7 @@ Yes. Product-specific and category-specific template assignments are available w
 
 = Is Quick Checkout available in the Free version? =
 
-Yes. The Free version includes Quick Checkout with the Modern Horizontal layout. Pro adds additional layouts and advanced inline checkout controls.
+Yes. The Free version includes Quick Checkout with the Modern Horizontal layout. Pro adds the Classic Vertical and Split Layout templates (Template 2 and Template 3) and advanced inline checkout controls.
 
 = Should I use the Builder or the Settings panel? =
 
@@ -240,6 +239,27 @@ The Appsero SDK does not collect data by default. Data collection only starts wh
 For more information, see the [Appsero Privacy Policy](https://appsero.com/privacy-policy/).
 
 == Changelog ==
+
+= 1.1.1 - November 10, 2026 =
+
+* **New:** Template 3 - Split Layout for Quick Checkout [Pro]: product gallery on the left, billing and shipping in the middle, cart, order review and payment on the right. Includes thumbnail slider, zoom, fullscreen view and sale badge. Fully responsive.
+* **New:** Template 3 gallery follows the selected variation's image and restores the featured image on reset.
+* **New:** Quick Checkout now works on block themes (Twenty Twenty-Three, Twenty Twenty-Four and Twenty Twenty-Five).
+* **New:** Template 3 preview image added to the Quick Checkout template selector.
+* **Update:** Checkout notices now appear in one full-width box at the top of Template 3.
+* **Update:** Template 3 hides the theme's own product gallery to avoid duplicate images.
+* **Update:** Related products title field is now available on block themes.
+* **Update:** Removed the unused "Enable quick cart" option.
+* **Update:** Tested with Astra, GeneratePress, Hello Elementor, Neve, OceanWP, Twenty Twenty-Three, Twenty Twenty-Four and Twenty Twenty-Five.
+* **Fix:** Variable products now work in Quick Checkout Templates 1 and 2 (variation options, price, quantity and Add to Cart), including on block themes.
+* **Fix:** AJAX Add to Cart no longer adds the product twice.
+* **Fix:** Quick Checkout on block themes no longer hides its own variation form.
+* **Fix:** Related products title now changes the heading on block themes.
+* **Fix:** "Remove related product section" now also works on block themes.
+* **Fix:** Single Page Builder on block themes no longer shows a header.php notice and keeps the theme header and footer.
+* **Fix:** Single Page Builder Add to Cart: variation label color and size now apply, and variation table rows select the correct variation.
+* **Fix:** Single Page Builder: product rating shows the real rating and review count, Custom Message and Product Meta styles apply, and column spacing works with custom gaps.
+* **Fix:** Removed leftover debug text from the Template 2 cart table [Pro].
 
 = 1.1.0 - October 12, 2026 =
 
@@ -331,6 +351,9 @@ For more information, see the [Appsero Privacy Policy](https://appsero.com/priva
 * Initial release.
 
 == Upgrade Notice ==
+
+= 1.1.1 =
+Adds the Split Layout checkout template (Template 3, Pro) and Quick Checkout on block themes. Fixes variable products, double quantity with AJAX Add to Cart, related products on block themes and several Single Page Builder style issues.
 
 = 1.1.0 =
 Major update: adds a Visual Drag & Drop Single Product Page Builder with multi-template management and new variation display modes.

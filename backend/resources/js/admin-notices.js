@@ -7,7 +7,7 @@ jQuery(document).ready(function($) {
         };
 
         const ajaxURL = sppcfw_obj.ajax_url;
-        $(this).prop('disabled', true).text('Processing...');
+        $(this).prop('disabled', true).text(wp.i18n.__( 'Processing...', 'single-product-customizer' ));
 
         $.post(ajaxURL, data, function(response) {
             if (response.success) {
@@ -25,7 +25,7 @@ jQuery(document).ready(function($) {
         };
 
         const ajaxURL = sppcfw_obj.ajax_url;
-        $(this).prop('disabled', true).text('Processing...');
+        $(this).prop('disabled', true).text(wp.i18n.__( 'Processing...', 'single-product-customizer' ));
 
         $.post(ajaxURL, data, function(response) {
             if (response.success) {
@@ -47,21 +47,21 @@ jQuery(document).ready(function($) {
         const ajaxURL = sppcfw_obj.ajax_url;
 
          // Disable the button to prevent duplicate clicks
-        $(this).prop('disabled', true).text('Processing...');
+        $(this).prop('disabled', true).text(wp.i18n.__( 'Processing...', 'single-product-customizer' ));
 
         // Perform the AJAX request
         $.post(ajaxURL, data, function (response) {
             if (response.success) {
-                alert('Your feedback has been sent to the plugin owner. Thank you for your input.');
+                alert(wp.i18n.__( 'Your feedback has been sent to the plugin owner. Thank you for your input.', 'single-product-customizer' ));
             } else {
-                alert('An error occurred while sending feedback. Please try again.');
+                alert(wp.i18n.__( 'An error occurred while sending feedback. Please try again.', 'single-product-customizer' ));
             }
         }).fail(function (jqXHR, textStatus, errorThrown) {
             console.error('Status: ' + textStatus);        
             console.error('Error: ' + errorThrown);        
             console.error('Response Text: ' + jqXHR.responseText);
         }).always(function () {
-            $('#sppcfw-not-good-enough-btn').prop('disabled', false).text('No, not good enough');
+            $('#sppcfw-not-good-enough-btn').prop('disabled', false).text(wp.i18n.__( 'No, not good enough', 'single-product-customizer' ));
         });
     });
 });

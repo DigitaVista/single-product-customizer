@@ -15,6 +15,32 @@ if( !class_exists("Sppcfw_Frontend_Remove_Related_Product_Section")){
             add_filter("ocean_woo_related_products", [$this, "sppcfw_disable_theme_related"], 999);
             add_filter("astra_woo_related_products", [$this, "sppcfw_disable_theme_related"], 999);
             add_action("wp_head", [$this, "sppcfw_hide_related_css"]);
+            // Block themes: related products are blocks, not the classic template action.
+            add_filter("render_block", [$this, "sppcfw_remove_related_blocks"], 20, 2);
+        }
+
+        public function sppcfw_remove_related_blocks($block_content, $block) {
+            if ('' === $block_content || empty($block['blockName']) || !function_exists('is_product') || !is_product() || $this->is_enabled() !== 1) {
+                return $block_content;
+            }
+            $name = $block['blockName'];
+            if ('woocommerce/related-products' === $name) {
+                return '';
+            }
+            if ('woocommerce/product-collection' === $name && !empty($block['attrs']['collection']) && false !== strpos($block['attrs']['collection'], 'related')) {
+                return '';
+            }
+            // Section heading placed next to the related products block in block theme templates.
+            if ('core/heading' === $name) {
+                $text = trim(wp_strip_all_tags($block_content));
+                $labels = array('Related products', __('Related products', 'woocommerce'), __('Related products', 'single-product-customizer')); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch -- Intentionally matches WooCommerce's own translated heading.
+                // The related-title feature may already have renamed the heading.
+                $labels[] = apply_filters('woocommerce_product_related_products_heading', __('Related products', 'woocommerce')); // phpcs:ignore WordPress.WP.I18n.TextDomainMismatch -- Intentionally matches WooCommerce's own translated heading.
+                if (in_array($text, $labels, true)) {
+                    return '';
+                }
+            }
+            return $block_content;
         }
 
         public function sppcfw_empty_related_posts($related_posts, $product_id, $args) {

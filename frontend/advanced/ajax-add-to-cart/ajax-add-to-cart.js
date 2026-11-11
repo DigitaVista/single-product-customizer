@@ -44,6 +44,16 @@ jQuery(document).ready(function() {
             );
         }
 
+        // Block themes may not print a notices wrapper on the single product page: create one above the form.
+        function sppcfwNoticesWrapper() {
+            let wrapper = jQuery('.woocommerce-notices-wrapper').first();
+            if ( ! wrapper.length ) {
+                wrapper = jQuery('<div class="woocommerce-notices-wrapper"></div>');
+                form.before(wrapper);
+            }
+            return wrapper;
+        }
+
         let formData = form.serialize();
         let urlForm = sppcfw_ajax_add_to_cart.ajaxurl;
 
@@ -59,14 +69,17 @@ jQuery(document).ready(function() {
                     form.unblock();
                 }
 
-                jQuery('.woocommerce-notices-wrapper').html('').html(response);
+                sppcfwNoticesWrapper().html(response);
+
+                // Let the Mini-Cart block (block themes) refresh its count.
+                document.body.dispatchEvent(new Event('wc-blocks_added_to_cart'));
             },
             error: function() {
                 if ( typeof form.unblock === 'function' ) {
                     form.unblock();
                 }
-                jQuery('.woocommerce-notices-wrapper').html('').html(
-                    '<div class="woocommerce-error">Unable to add to cart. Please try again.</div>'
+                sppcfwNoticesWrapper().html(
+                    '<div class="woocommerce-error">' + ( ( window.sppcfw_ajax_add_to_cart && sppcfw_ajax_add_to_cart.i18n && sppcfw_ajax_add_to_cart.i18n.add_to_cart_error ) || 'Unable to add to cart. Please try again.' ) + '</div>'
                 );
             }
         });
