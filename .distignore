@@ -1,0 +1,22 @@
+# Files and folders that must NOT be pushed to WordPress.org SVN
+/.git
+/.github
+.gitignore
+.gitattributes
+.distignore
+.DS_Store
+Thumbs.db
+/node_modules
+/.vscode
+/.idea
+/.wordpress-org
+package.json
+package-lock.json
+phpcs.xml
+phpcs.xml.dist
+phpunit.xml
+phpunit.xml.dist
+/tests
+*.md
+*.zip
+*.log
