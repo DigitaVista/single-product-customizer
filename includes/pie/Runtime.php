@@ -15,6 +15,7 @@ if (!class_exists(Runtime::class, false)) {
     require_once __DIR__ . '/PlanStore.php';
     require_once __DIR__ . '/Executor.php';
     require_once __DIR__ . '/Cloud.php';
+    require_once __DIR__ . '/Chat.php';
 
     final class Runtime
     {
@@ -42,10 +43,14 @@ if (!class_exists(Runtime::class, false)) {
             foreach (['cloud_settings', 'chat', 'cloud_delete'] as $action) {
                 add_action('admin_post_digitavista_pie_' . $action, [self::class, 'handleCloudPost']);
             }
-            add_action('admin_notices', [self::class, 'renderSettingsLink']);
+            add_action('admin_footer', [self::class, 'renderSettingsLink']);
+            Chat::boot();
         }
 
-        /** One link to the Assistant on the settings pages that adapters declare in "admin_pages". */
+        /**
+         * Floating "Ask Assistant" chat on the settings pages that adapters declare in "admin_pages".
+         * The link inside works without JavaScript.
+         */
         public static function renderSettingsLink(): void
         {
             $page = isset($_GET['page']) && is_string($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
@@ -56,11 +61,9 @@ if (!class_exists(Runtime::class, false)) {
             foreach (self::live()[0] as $product) {
                 $pages = is_array($product['admin_pages'] ?? null) ? $product['admin_pages'] : [];
                 if (in_array($page, $pages, true)) {
-                    echo '<div class="notice notice-info is-dismissible digitavista-pie-link"><p>'
-                        . esc_html('Prefer to describe what you want to change? ')
-                        . '<a href="' . esc_url(admin_url('tools.php?page=' . self::PAGE)) . '">'
-                        . esc_html('Open the DigitaVista Assistant') . '</a>'
-                        . esc_html(' (Tools → DigitaVista Assistant). Nothing changes until you approve it.') . '</p></div>';
+                    echo '<div class="digitavista-pie-link">' . Chat::container('floating')
+                        . '<noscript><a class="button" href="' . esc_url(admin_url('tools.php?page=' . self::PAGE)) . '">'
+                        . esc_html('Open the DigitaVista Assistant') . '</a></noscript></div>';
 
                     return;
                 }
@@ -85,41 +88,94 @@ if (!class_exists(Runtime::class, false)) {
                 if ($message === '' || mb_strlen($message) > 2000 || !Cloud::configured()) {
                     $args['cloud'] = Cloud::configured() ? 'empty' : 'not_configured';
                 } else {
-                    [$products, $bindings] = self::live();
-                    Cloud::remember($userId, 'user', $message);
-                    $result = Cloud::chat($message, Cloud::snapshot($products, $bindings));
-                    if (isset($result['error'])) {
-                        Cloud::remember($userId, 'assistant', $result['error']);
-                    } else {
-                        $planId = null;
-                        $reply = $result['reply'];
-                        if ($result['proposals'] !== []) {
-                            // Cloud output is untrusted: keep only proposals for locally writable features.
-                            $requested = [];
-                            $dropped = 0;
-                            foreach ($result['proposals'] as $proposal) {
-                                if (!isset($bindings[$proposal['product_id']][$proposal['feature_id']])) {
-                                    ++$dropped;
-                                    continue;
-                                }
-                                $requested[$proposal['product_id']][$proposal['feature_id']] = $proposal['value'];
-                            }
-                            $plan = $requested === [] ? null : self::createPlan($requested);
-                            if (is_array($plan)) {
-                                $planId = $plan['id'];
-                                $args['plan'] = $planId;
-                            }
-                            if ($dropped > 0 || !is_array($plan)) {
-                                $reply .= ' (Some suggested changes could not be validated on this site and were not prepared.)';
-                            }
-                        }
-                        Cloud::remember($userId, 'assistant', $reply, $planId);
+                    $turn = self::chatTurn($message);
+                    if ($turn['plan_id'] !== null) {
+                        $args['plan'] = $turn['plan_id'];
                     }
                     $args['cloud'] = 'chat';
                 }
             }
 
             return add_query_arg($args, admin_url('tools.php'));
+        }
+
+        /**
+         * One chat exchange: remembers both messages and turns untrusted proposals into a local plan.
+         *
+         * @return array{reply: string, plan_id: ?string, error: bool}
+         */
+        public static function chatTurn(string $message): array
+        {
+            $userId = get_current_user_id();
+            [$products, $bindings] = self::live();
+            Cloud::remember($userId, 'user', $message);
+            $result = Cloud::chat($message, Cloud::snapshot($products, $bindings));
+            if (isset($result['error'])) {
+                Cloud::remember($userId, 'assistant', $result['error']);
+
+                return ['reply' => $result['error'], 'plan_id' => null, 'error' => true];
+            }
+
+            $planId = null;
+            $reply = $result['reply'];
+            if ($result['proposals'] !== []) {
+                // Cloud output is untrusted: keep only proposals for locally writable features.
+                $requested = [];
+                $dropped = 0;
+                foreach ($result['proposals'] as $proposal) {
+                    if (!isset($bindings[$proposal['product_id']][$proposal['feature_id']])) {
+                        ++$dropped;
+                        continue;
+                    }
+                    $requested[$proposal['product_id']][$proposal['feature_id']] = $proposal['value'];
+                }
+                $plan = $requested === [] ? null : self::createPlan($requested);
+                if (is_array($plan)) {
+                    $planId = $plan['id'];
+                }
+                if ($dropped > 0 || !is_array($plan)) {
+                    $reply .= ' (Some suggested changes could not be validated on this site and were not prepared.)';
+                }
+            }
+            Cloud::remember($userId, 'assistant', $reply, $planId);
+
+            return ['reply' => $reply, 'plan_id' => $planId, 'error' => false];
+        }
+
+        /** Change list and notes of a plan for display (used by the page and the chat). */
+        public static function planView(array $plan): array
+        {
+            $payload = $plan['payload_data'];
+            $notes = [];
+            foreach ($payload['changes'] as $change) {
+                foreach ($change['also_sets'] ?? [] as $key => $value) {
+                    $notes[] = sprintf('%s: also saves "%s" = "%s" because it has never been saved; Undo removes it again.', $change['product_label'], $key, $value);
+                }
+            }
+            foreach ($payload['changes'] as $change) {
+                $notes = array_merge($notes, $change['notes']);
+            }
+            $drift = $plan['status'] === 'applied' ? Plan::drift($payload) : [];
+
+            return [
+                'id' => $plan['id'],
+                'status' => $plan['status'],
+                'status_label' => $plan['status'] === 'pending' && $plan['expires_at'] <= time()
+                    ? 'Expired — nothing changed. Ask again for a fresh proposal.'
+                    : self::statusLabel($plan['status']),
+                'expires_at' => $plan['expires_at'],
+                'can_approve' => $plan['status'] === 'pending' && $plan['expires_at'] > time() && $plan['user_id'] === get_current_user_id(),
+                'can_undo' => $plan['status'] === 'applied',
+                'changes' => array_map(static function (array $change): array {
+                    $prefix = $change['product_label'] . ' / ';
+                    $setting = str_starts_with($change['label'], $prefix) ? substr($change['label'], strlen($prefix)) : $change['label'];
+
+                    return ['plugin' => $change['product_label'], 'setting' => $setting, 'from' => $change['from'], 'to' => $change['to'], 'scope' => $change['scope']];
+                }, $payload['changes']),
+                'notes' => array_values(array_unique($notes)),
+                'reasons' => $plan['result']['reasons'] ?? [],
+                'changed_since_apply' => $drift !== [],
+            ];
         }
 
         public static function handleCloudPost(): void
@@ -297,7 +353,13 @@ if (!class_exists(Runtime::class, false)) {
                 }
             }
 
+            echo Chat::container('inline');
+            // Server-rendered chat and settings: shown when JavaScript is unavailable (the widget hides it).
+            echo '<div class="digitavista-pie-fallback">';
             self::renderCloud();
+            echo '</div>';
+            $open = isset($_POST['digitavista_pie_preview']) ? ' open' : '';
+            echo '<details class="digitavista-pie-advanced"' . $open . '><summary>' . esc_html('Advanced: manual preview and recent changes') . '</summary>';
             echo '<h2>Manual preview</h2>';
             echo '<p>Select the settings to include in a change preview. Nothing changes until you approve the preview.</p>';
             echo '<form method="post">';
@@ -330,7 +392,7 @@ if (!class_exists(Runtime::class, false)) {
             echo '<p><button type="submit" name="digitavista_pie_preview" value="1" class="button button-primary">Preview changes</button></p>';
             echo '</form>';
             self::renderHistory();
-            echo '</div>';
+            echo '</details></div>';
         }
 
         private static function renderNewPlan(array $request): void
@@ -455,7 +517,7 @@ if (!class_exists(Runtime::class, false)) {
 
             $settings = Cloud::settings();
             echo '<details' . (Cloud::configured() ? '' : ' open') . '><summary>' . esc_html('Cloud assistant settings and privacy') . '</summary>';
-            echo '<p>' . esc_html('When turned on, your question and the list of supported DigitaVista settings on this site (setting names and whether each is on or off) are sent to the DigitaVista Assistant service, which uses Anthropic Claude to reply. Orders, customer data, license keys and passwords are never sent. Conversations are deleted from the service after 30 days, or immediately with the button below. The plugin settings pages and the manual preview keep working without this feature.') . '</p>';
+            echo '<p>' . esc_html('When turned on, your question and the list of supported DigitaVista settings on this site (setting names and whether each is on or off) are sent to the DigitaVista Assistant service, which uses Anthropic Claude to reply. Orders, customer data, license keys and passwords are never sent. Conversations are deleted from the service after 30 days, or immediately with the button below. The plugin settings pages and the manual preview keep working without this feature.') . ' <a href="' . esc_url(Chat::PRIVACY_URL) . '" target="_blank" rel="noopener noreferrer">' . esc_html('Privacy policy') . '</a></p>';
             echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
             echo '<input type="hidden" name="action" value="digitavista_pie_cloud_settings">';
             wp_nonce_field('digitavista_pie_cloud_settings');

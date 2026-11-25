@@ -202,6 +202,12 @@ final class Cloud
         return $response;
     }
 
+    /** Starts a fresh conversation for this user (local transcript and conversation ID only). */
+    public static function resetConversation(int $userId): void
+    {
+        delete_user_meta($userId, self::CHAT_META);
+    }
+
     public static function history(int $userId): array
     {
         $chat = get_user_meta($userId, self::CHAT_META, true);
