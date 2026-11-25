@@ -35,7 +35,7 @@ final class SingleProductCustomizer
         };
 
         return [
-            'contract_version' => '1.0',
+            'contract_version' => '1.1',
             'product_id' => self::PRODUCT,
             'label' => 'Single Product Customizer',
             'versions' => ['free' => $free, 'pro' => $pro],
@@ -46,6 +46,10 @@ final class SingleProductCustomizer
                     'preview_supported' => true,
                     'availability' => $freeStatus,
                     'configured' => $supported ? self::enabled($basic, 'enable_plus_minus_button') : null,
+                    'notes' => [
+                        'Product-level and category-level Single Product Customizer settings take precedence over this global setting where they are configured.',
+                        'Products sold individually do not show quantity buttons.',
+                    ],
                 ],
                 'hide_product_meta' => [
                     'availability' => $freeStatus,
@@ -55,6 +59,25 @@ final class SingleProductCustomizer
                     'availability' => $proStatus,
                     'configured' => $licensed ? self::enabled($advanced, 'enable_min_max_qty') : null,
                 ],
+            ],
+        ];
+    }
+
+    /** Allowlisted write operations (contract 1.1). Only the global quantity buttons toggle is writable. */
+    public static function bindings(): array
+    {
+        if (!defined('SPPCFW_VERSION') || SPPCFW_VERSION !== '1.1.1' || !class_exists('WooCommerce')) {
+            return [];
+        }
+
+        return [
+            'quantity_buttons' => [
+                'kind' => 'option_array_toggle',
+                'option' => 'sppcfw_basic',
+                'key' => 'enable_plus_minus_button',
+                'on' => 'on',
+                'off' => null,
+                'entitlement' => 'free',
             ],
         ];
     }
