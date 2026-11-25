@@ -43,6 +43,7 @@ final class SingleProductCustomizer
             'scoped_overrides_enabled' => $override,
             'features' => [
                 'quantity_buttons' => [
+                    'preview_supported' => true,
                     'availability' => $freeStatus,
                     'configured' => $supported ? self::enabled($basic, 'enable_plus_minus_button') : null,
                 ],
