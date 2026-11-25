@@ -14,6 +14,7 @@ if (!class_exists(Runtime::class, false)) {
     require_once __DIR__ . '/Plan.php';
     require_once __DIR__ . '/PlanStore.php';
     require_once __DIR__ . '/Executor.php';
+    require_once __DIR__ . '/Cloud.php';
 
     final class Runtime
     {
@@ -38,6 +39,81 @@ if (!class_exists(Runtime::class, false)) {
             foreach (['approve', 'cancel', 'undo'] as $action) {
                 add_action('admin_post_digitavista_pie_' . $action, [self::class, 'handlePost']);
             }
+            foreach (['cloud_settings', 'chat', 'cloud_delete'] as $action) {
+                add_action('admin_post_digitavista_pie_' . $action, [self::class, 'handleCloudPost']);
+            }
+        }
+
+        /**
+         * Opt-in settings, chat and remote deletion. Returns the redirect target (tests call it directly).
+         */
+        public static function cloudAction(string $action, array $input): string
+        {
+            $userId = get_current_user_id();
+            $args = ['page' => self::PAGE];
+            if ($action === 'cloud_settings') {
+                $error = Cloud::saveSettings($input);
+                $args['cloud'] = $error === null ? 'saved' : 'invalid';
+            } elseif ($action === 'cloud_delete') {
+                $result = Cloud::deleteRemoteData();
+                $args['cloud'] = isset($result['error']) ? 'delete_failed' : 'deleted';
+            } elseif ($action === 'chat') {
+                $message = trim(sanitize_textarea_field((string) ($input['message'] ?? '')));
+                if ($message === '' || mb_strlen($message) > 2000 || !Cloud::configured()) {
+                    $args['cloud'] = Cloud::configured() ? 'empty' : 'not_configured';
+                } else {
+                    [$products, $bindings] = self::live();
+                    Cloud::remember($userId, 'user', $message);
+                    $result = Cloud::chat($message, Cloud::snapshot($products, $bindings));
+                    if (isset($result['error'])) {
+                        Cloud::remember($userId, 'assistant', $result['error']);
+                    } else {
+                        $planId = null;
+                        $reply = $result['reply'];
+                        if ($result['proposals'] !== []) {
+                            // Cloud output is untrusted: keep only proposals for locally writable features.
+                            $requested = [];
+                            $dropped = 0;
+                            foreach ($result['proposals'] as $proposal) {
+                                if (!isset($bindings[$proposal['product_id']][$proposal['feature_id']])) {
+                                    ++$dropped;
+                                    continue;
+                                }
+                                $requested[$proposal['product_id']][$proposal['feature_id']] = $proposal['value'];
+                            }
+                            $plan = $requested === [] ? null : self::createPlan($requested);
+                            if (is_array($plan)) {
+                                $planId = $plan['id'];
+                                $args['plan'] = $planId;
+                            }
+                            if ($dropped > 0 || !is_array($plan)) {
+                                $reply .= ' (Some suggested changes could not be validated on this site and were not prepared.)';
+                            }
+                        }
+                        Cloud::remember($userId, 'assistant', $reply, $planId);
+                    }
+                    $args['cloud'] = 'chat';
+                }
+            }
+
+            return add_query_arg($args, admin_url('tools.php'));
+        }
+
+        public static function handleCloudPost(): void
+        {
+            if (!current_user_can('manage_options')) {
+                wp_die('You do not have permission to use the assistant.', '', ['response' => 403]);
+            }
+            $action = substr((string) current_action(), strlen('admin_post_digitavista_pie_'));
+            check_admin_referer('digitavista_pie_' . $action);
+            $input = [];
+            foreach (['consent', 'endpoint', 'token', 'message'] as $field) {
+                if (isset($_POST[$field]) && is_string($_POST[$field])) {
+                    $input[$field] = wp_unslash($_POST[$field]);
+                }
+            }
+            wp_safe_redirect(self::cloudAction($action, $input));
+            exit;
         }
 
         public static function version(): string
@@ -198,6 +274,8 @@ if (!class_exists(Runtime::class, false)) {
                 }
             }
 
+            self::renderCloud();
+            echo '<h2>Manual preview</h2>';
             echo '<p>Select the settings to include in a change preview. Nothing changes until you approve the preview.</p>';
             echo '<form method="post">';
             wp_nonce_field('digitavista_pie_preview');
@@ -311,6 +389,72 @@ if (!class_exists(Runtime::class, false)) {
                 self::actionButton('undo', $plan['id'], 'Undo this change', 'button');
             }
             echo '</div>';
+        }
+
+        private static function renderCloud(): void
+        {
+            $notice = isset($_GET['cloud']) ? sanitize_key(wp_unslash($_GET['cloud'])) : '';
+            $messages = [
+                'saved' => 'Assistant settings saved.',
+                'invalid' => 'The assistant settings were not saved. Check the service address and connection key.',
+                'deleted' => 'Your conversations were deleted from the assistant service.',
+                'delete_failed' => 'The assistant service could not delete the conversations. Try again later.',
+                'empty' => 'Type a question of up to 2,000 characters.',
+                'not_configured' => 'Turn on the cloud assistant first.',
+            ];
+            if (isset($messages[$notice])) {
+                echo '<div class="notice notice-info"><p>' . esc_html($messages[$notice]) . '</p></div>';
+            }
+
+            echo '<div class="card" style="max-width:none"><h2>Ask the assistant (optional cloud feature)</h2>';
+            if (Cloud::configured()) {
+                $history = Cloud::history(get_current_user_id());
+                if ($history !== []) {
+                    echo '<ol class="digitavista-pie-chat" aria-label="Conversation" style="list-style:none;padding:0">';
+                    foreach ($history as $item) {
+                        $who = $item['role'] === 'user' ? 'You' : 'Assistant';
+                        echo '<li style="margin:0 0 8px"><strong>' . esc_html($who) . ':</strong> ' . esc_html((string) $item['text']);
+                        if (!empty($item['plan'])) {
+                            echo ' <a href="' . esc_url(add_query_arg(['page' => self::PAGE, 'plan' => $item['plan']], admin_url('tools.php'))) . '">' . esc_html('Review the proposed change') . '</a>';
+                        }
+                        echo '</li>';
+                    }
+                    echo '</ol>';
+                }
+                echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
+                echo '<input type="hidden" name="action" value="digitavista_pie_chat">';
+                wp_nonce_field('digitavista_pie_chat');
+                echo '<p><label for="digitavista-pie-message">' . esc_html('What would you like to change?') . '</label><br>';
+                echo '<textarea id="digitavista-pie-message" name="message" rows="3" cols="80" maxlength="2000" required></textarea></p>';
+                echo '<p><button type="submit" class="button button-primary">' . esc_html('Send') . '</button> ';
+                echo '<span class="description">' . esc_html('The assistant only proposes changes. You review and approve each one here.') . '</span></p></form>';
+            }
+
+            $settings = Cloud::settings();
+            echo '<details' . (Cloud::configured() ? '' : ' open') . '><summary>' . esc_html('Cloud assistant settings and privacy') . '</summary>';
+            echo '<p>' . esc_html('When turned on, your question and the list of supported DigitaVista settings on this site (setting names and whether each is on or off) are sent to the DigitaVista Assistant service, which uses Anthropic Claude to reply. Orders, customer data, license keys and passwords are never sent. Conversations are deleted from the service after 30 days, or immediately with the button below. The plugin settings pages and the manual preview keep working without this feature.') . '</p>';
+            echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
+            echo '<input type="hidden" name="action" value="digitavista_pie_cloud_settings">';
+            wp_nonce_field('digitavista_pie_cloud_settings');
+            echo '<p><label><input type="checkbox" name="consent" value="1"' . checked(Cloud::consented(), true, false) . '> '
+                . esc_html('I agree to send this information to the DigitaVista Assistant service.') . '</label></p>';
+            if (Cloud::credentialsFromConstants()) {
+                echo '<p>' . esc_html('The service address and connection key are set in wp-config.php.') . '</p>';
+            } else {
+                echo '<p><label for="digitavista-pie-endpoint">' . esc_html('Service address') . '</label><br>';
+                echo '<input type="url" id="digitavista-pie-endpoint" name="endpoint" class="regular-text" value="' . esc_attr($settings['endpoint']) . '"></p>';
+                echo '<p><label for="digitavista-pie-token">' . esc_html('Connection key') . '</label><br>';
+                echo '<input type="password" id="digitavista-pie-token" name="token" class="regular-text" autocomplete="off" value="" placeholder="'
+                    . esc_attr($settings['token'] !== '' ? 'Saved — leave empty to keep' : '') . '"></p>';
+            }
+            echo '<p><button type="submit" class="button">' . esc_html('Save') . '</button></p></form>';
+            if ($settings['endpoint'] !== '' || Cloud::credentialsFromConstants()) {
+                echo '<form method="post" action="' . esc_url(admin_url('admin-post.php')) . '">';
+                echo '<input type="hidden" name="action" value="digitavista_pie_cloud_delete">';
+                wp_nonce_field('digitavista_pie_cloud_delete');
+                echo '<p><button type="submit" class="button button-link-delete">' . esc_html('Delete my conversations from the service') . '</button></p></form>';
+            }
+            echo '</details></div>';
         }
 
         private static function renderHistory(): void

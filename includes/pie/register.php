@@ -10,7 +10,7 @@ if (!defined('ABSPATH')) {
 require_once __DIR__ . '/bootstrap.php';
 require_once __DIR__ . '/SingleProductCustomizer.php';
 
-digitavista_pie_v1_offer('1.1.1', __DIR__);
+digitavista_pie_v1_offer('1.2.0', __DIR__);
 
 add_action('digitavista_pie_register_products_v1', static function (CapabilityRegistry $registry): void {
     $registry->register(

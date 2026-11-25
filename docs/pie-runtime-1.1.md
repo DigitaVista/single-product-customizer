@@ -75,6 +75,22 @@ Browser check in Chrome on Storefront:
 
 Carts and real orders are outside the pilot.
 
+## Runtime 1.2.0: optional cloud assistant (Section B)
+
+`includes/pie/Cloud.php` adds an opt-in chat that talks to the DigitaVista platform API v1 (repository `DigitaVista/pie-platform`; contract in its `docs/api/`). The contract version stays 1.1 because every addition is backward compatible. Copies now offer 1.2.0.
+
+- **Off by default.** Nothing leaves the site until an administrator ticks the consent box. The consent is recorded with its version (`2026-11-pilot`), the user and the time, in `digitavista_pie_v1_cloud` (not autoloaded). The consent wording is a draft and needs Product Owner approval before release. The existing Appsero tracking opt-in is separate and unchanged.
+- **Credentials.** The service address must be HTTPS. Plain HTTP is accepted only for localhost and `*.test` development hosts. The connection key is stored in the same option and is never rendered back. The constants `DIGITAVISTA_PIE_ENDPOINT` and `DIGITAVISTA_PIE_TOKEN` in wp-config.php take precedence.
+- **What is sent.** Only the administrator's message and an allowlisted snapshot: product and feature IDs, labels, availability, on/off state and `write_supported`. Option names, keys, orders, customers, license data and the site URL are not sent. The user agent is `DigitaVista-Assistant/<version>`, not WordPress's default, which contains the site URL. Redirects are not followed and the timeout is 25 s.
+- **What comes back is untrusted.** The reply is stored and shown as plain text. Proposals for features without a local write binding are dropped. The rest go through `Runtime::createPlan()`, so the same allowlist, revision snapshot and local Approve/Cancel apply as for the manual preview. The cloud cannot approve anything.
+- **Degradation.** If the service is unreachable, returns an error or hits its quota, the chat shows a short message. The manual preview, approvals, undo and the products' own settings pages are unaffected. An expired conversation is recreated once.
+- **Deletion and opt-out.** "Delete my conversations from the service" calls `DELETE /v1/installation/data` and clears the local chat history (user meta `digitavista_pie_v1_chat`). Unticking consent stops all requests.
+
+Tests:
+- The `cloud` phase of `tests/pie-write-flow.php` (Playground and MySQL harness) fakes the platform with `pre_http_request` and asserts 38 checks: opt-in, validation, the request body and headers, dropping untrusted proposals, the local approve/undo, the 404 retry, outage and quota handling, authorization and nonces, deletion and opt-out.
+- End-to-end on 2026-11-25: pie.test (WP 7.1.5) talked over real HTTP to the Laravel platform (mock provider, MariaDB 11.8.9). The chat produced a pending plan for both settings, then approve reported saved and verified, then undo.
+- Not verified: the chat UI in a real browser (Chrome could not reach pie.test at that moment), any call to Claude with a real key, and accessibility review with assistive technology.
+
 ## Not done / not verified
 
 - Automatic storefront verification inside the runtime. The plan result stays `storefront: not_verified`. Storefront behaviour is verified by the test matrix below, not at apply time on customer sites. That would be the opt-in diagnostics of Section C.
@@ -82,4 +98,3 @@ Carts and real orders are outside the pilot.
 - Behaviour when SPC's admin-only `sanitize_option_sppcfw_basic` callback is registered. The tests run without `admin_init`.
 - Pro license valid/expired integration. Only a fixture product exercised the entitlement recheck.
 - Multisite, persistent object cache, plan table cleanup and uninstall, plan retention.
-- Cloud chat. The `POST /plans` route exists for a future client, but approval stays local.
