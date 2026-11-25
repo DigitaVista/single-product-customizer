@@ -117,6 +117,7 @@ add_action('wp',function(){
 
 
 require_once plugin_dir_path( __FILE__ ) . 'includes/sppcfw-admin-menu.php';
+require_once __DIR__ . '/includes/pie/register.php';
 require_once plugin_dir_path( __FILE__ ) . 'backend/sppcfw-welcome/sppcfw-welcome.php';
 require_once plugin_dir_path( __FILE__ ) . 'backend/sppcfw-welcome/sppcfw-discount-notice.php';
 require_once plugin_dir_path( __FILE__ ) . 'backend/builder/class-sppcfw-builder.php';
