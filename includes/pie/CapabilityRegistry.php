@@ -94,6 +94,19 @@ final class CapabilityRegistry
             return null;
         }
 
+        // Keys the product requires to exist when the toggle is on; saved only if never saved before.
+        $defaults = $binding['defaults_when_on'] ?? [];
+        if (!is_array($defaults) || count($defaults) > 4) {
+            return null;
+        }
+        foreach ($defaults as $defaultKey => $defaultValue) {
+            if (!is_string($defaultKey) || !preg_match('/^[A-Za-z0-9_]{1,64}$/', $defaultKey) || $defaultKey === $key
+                || !is_string($defaultValue) || strlen($defaultValue) > 32) {
+                return null;
+            }
+        }
+        ksort($defaults);
+
         return [
             'kind' => 'option_array_toggle',
             'option' => $option,
@@ -101,6 +114,7 @@ final class CapabilityRegistry
             'on' => $on,
             'off' => $off,
             'entitlement' => $entitlement,
+            'defaults_when_on' => $defaults,
         ];
     }
 }

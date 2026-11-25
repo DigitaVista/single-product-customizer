@@ -48,14 +48,37 @@ What PIE cannot guarantee:
 | Entry point | Engine | Covers |
 |---|---|---|
 | VM `tests/pie-write-flow.blueprint.json` (Playground CLI 3.1.66) | SQLite | Both load orders. Unauthorized user, invalid nonce, foreign administrator. Unknown key, product or value, preview-only feature, protected option. Authorized cross-plugin apply, replay, undo, undo replay, undo preserving newer edits, undo conflict, expiry, cancel. Stale revision, tampered payload, product version change, lost entitlement. Missing-option and empty-string undo. VM `'false'` disable path. Second-write failure, CAS race, rollback conflict, double submission. Legacy preview UI, owner-only REST. Interruption after the first write and inside it (real process exit), then lease-based recovery. Deactivation between preview and apply (real separate requests). Runtime election with lower, malformed and higher offers. |
+| VM `tests/storefront/setup.php` + `check.php` | MySQL dev site | Storefront matrix (see below). |
 | VM `tests/mysql/run.sh` | MySQL | The same phases (except election) as separate PHP CLI processes, plus N rounds of real parallel processes: two approvals and one product-style save racing. |
 | SPC `tests/pie-embedded.blueprint.json`, VM `tests/pie-cross-plugin.blueprint.json` | SQLite | Original 1.0 smoke and cross-plugin preview, still passing. |
 
 Run Playground with `MSYS_NO_PATHCONV=1` on Git Bash for Windows, and mount both checkouts plus `/out`. Pass markers include the versions actually used.
 
+## Dependent keys (`defaults_when_on`, runtime 1.1.1)
+
+The first storefront check showed the swatches setting saved correctly while the storefront still showed plain dropdowns. VM 1.1.9 (`Inc/Variable.php::handle_variation_display()`) renders swatches only when `selectVariationTemplateOnOff` is exactly `'false'`. That key exists only after the VM dashboard has been saved once. A binding may therefore declare `defaults_when_on` (key → value). When the toggle is turned on and the key is missing, the plan discloses it (`also_sets`, shown under "Dependencies and conflicts"), applies it with the same compare-and-swap, and undo removes it again. A key that already has a value, such as `'true'` (variation table on), is never overridden. The conflict is shown instead. Runtime 1.1.0 ignores `defaults_when_on`, so copies offer 1.1.1 and the election picks it.
+
+## Storefront verification (step 3A.4)
+
+`tests/storefront/setup.php` creates synthetic products on a disposable dev site. They are a variable product with a colour attribute (display type `color`, `term_color` meta) and a size attribute (select), a variable product with a custom attribute, a variable product with the VM product override `_variation_swatches_meta = 'false'`, a simple product, a sold-individually product and a product with stock 1. `tests/storefront/check.php <theme>` switches the theme, then moves through baseline (both off, table key never saved) → PIE approve → manual variation table `'true'` → PIE undo. In each state it fetches the pages as a guest over HTTP and asserts the server-rendered markup inside the product's own cart form:
+
+- SPC: `.sppcfw_minus_button` and `.sppcfw_plus_button` inside `.quantity` on the simple and variable products only when on. They are never shown on sold-individually or stock-1 products.
+- VM: colour swatches (`.custom-wc-colors .custom-color-button`) only on the colour attribute. Other taxonomy and custom attributes render as buttons (`.custom-wc-buttons`, because the VM default `dropdownsToButton` is on). Native selects are hidden. The product override keeps the plain select. With the variation table on, `.variation-list-template-one` replaces the swatches.
+- Undo restores the exact saved bytes and the baseline markup.
+
+Results on 2026-11-25, on the Laragon dev site pie.test with WordPress 7.1.5, PHP 8.1.10, WooCommerce 9.0.2, SPC 1.1.1, VM 1.1.9 and runtime 1.1.1: 34/34 checks passed on each of Storefront 4.6.2 (classic), Twenty Twenty-Five (block) and Twenty Twenty-Four (block).
+
+Browser check in Chrome on Storefront:
+- + twice took the quantity from 1 to 3, and − brought it back to 2.
+- At the minimum, − stays at 1. At the maximum (stock 10), + stays at 10.
+- Clicking the Red swatch and the Large button selected variation 28 and enabled Add to cart. No cart, order or email was created.
+
+Carts and real orders are outside the pilot.
+
 ## Not done / not verified
 
-- Storefront verification on classic and block themes with real variable products (step 3A.4). Saved state only.
+- Automatic storefront verification inside the runtime. The plan result stays `storefront: not_verified`. Storefront behaviour is verified by the test matrix below, not at apply time on customer sites. That would be the opt-in diagnostics of Section C.
+- JS behaviour on block themes and on other classic themes (Astra, OceanWP, Kadence, which SPC special-cases) has not been browser-checked. Only the server markup was checked there.
 - Behaviour when SPC's admin-only `sanitize_option_sppcfw_basic` callback is registered. The tests run without `admin_init`.
 - Pro license valid/expired integration. Only a fixture product exercised the entitlement recheck.
 - Multisite, persistent object cache, plan table cleanup and uninstall, plan retention.

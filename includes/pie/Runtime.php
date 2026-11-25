@@ -275,6 +275,16 @@ if (!class_exists(Runtime::class, false)) {
             echo '</tbody></table>';
 
             $notes = array_merge([], ...array_map(static fn (array $change): array => $change['notes'], $payload['changes']));
+            foreach ($payload['changes'] as $change) {
+                foreach ($change['also_sets'] ?? [] as $key => $value) {
+                    array_unshift($notes, sprintf(
+                        '%s: also saves "%s" = "%s". This setting has never been saved on this site and is required for the feature to work. Undo removes it again.',
+                        $change['product_label'],
+                        $key,
+                        $value
+                    ));
+                }
+            }
             if ($notes !== []) {
                 echo '<h3>Dependencies and conflicts</h3><ul>';
                 foreach (array_unique($notes) as $note) {
@@ -348,6 +358,7 @@ if (!class_exists(Runtime::class, false)) {
                     'scope' => $change['scope'],
                     'from' => $change['from'],
                     'to' => $change['to'],
+                    'also_sets' => $change['also_sets'] ?? [],
                     'notes' => $change['notes'],
                 ], $payload['changes']),
                 'reasons' => $plan['result']['reasons'] ?? [],

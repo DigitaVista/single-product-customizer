@@ -61,6 +61,18 @@ final class Plan
             }
 
             $options[$option]['keys'][$binding['key']] = true;
+            $alsoSets = [];
+            if ($change['after']) {
+                foreach ($binding['defaults_when_on'] ?? [] as $defaultKey => $defaultValue) {
+                    if (!array_key_exists($defaultKey, $options[$option]['decoded'])) {
+                        if (isset($options[$option]['keys'][$defaultKey])) {
+                            throw new \InvalidArgumentException('duplicate_binding_key');
+                        }
+                        $options[$option]['keys'][$defaultKey] = true;
+                        $alsoSets[$defaultKey] = $defaultValue;
+                    }
+                }
+            }
             $feature = $products[$productId]['features'][$featureId];
             $planned[] = [
                 'product_id' => $productId,
@@ -72,6 +84,7 @@ final class Plan
                 'binding' => $binding,
                 'from' => $change['before'],
                 'to' => $change['after'],
+                'also_sets' => $alsoSets,
                 'notes' => self::notes($feature),
                 'verification' => 'saved_setting_readback',
             ];
@@ -174,6 +187,9 @@ final class Plan
             $targets[$binding['option']][$binding['key']] = $value === null
                 ? ['present' => false, 'value' => null]
                 : ['present' => true, 'value' => $value];
+            foreach ($change['also_sets'] ?? [] as $key => $alsoValue) {
+                $targets[$binding['option']][$key] = ['present' => true, 'value' => $alsoValue];
+            }
         }
         foreach ($targets as &$keys) {
             ksort($keys);
