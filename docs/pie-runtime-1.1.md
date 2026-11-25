@@ -84,6 +84,7 @@ Carts and real orders are outside the pilot.
 - **What is sent.** Only the administrator's message and an allowlisted snapshot: product and feature IDs, labels, availability, on/off state and `write_supported`. Option names, keys, orders, customers, license data and the site URL are not sent. The user agent is `DigitaVista-Assistant/<version>`, not WordPress's default, which contains the site URL. Redirects are not followed and the timeout is 25 s.
 - **What comes back is untrusted.** The reply is stored and shown as plain text. Proposals for features without a local write binding are dropped. The rest go through `Runtime::createPlan()`, so the same allowlist, revision snapshot and local Approve/Cancel apply as for the manual preview. The cloud cannot approve anything.
 - **Degradation.** If the service is unreachable, returns an error or hits its quota, the chat shows a short message. The manual preview, approvals, undo and the products' own settings pages are unaffected. An expired conversation is recreated once.
+- **Discoverability.** Adapters may list their settings-page slugs in `admin_pages` (VM: `variation-monster`; SPC: `sppcfw-single-product-customizer`). On those pages only, administrators see one dismissible notice linking to Tools → DigitaVista Assistant. Verified over HTTP on pie.test on 2026-11-25.
 - **Deletion and opt-out.** "Delete my conversations from the service" calls `DELETE /v1/installation/data` and clears the local chat history (user meta `digitavista_pie_v1_chat`). Unticking consent stops all requests.
 
 Tests:

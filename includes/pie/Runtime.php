@@ -42,6 +42,29 @@ if (!class_exists(Runtime::class, false)) {
             foreach (['cloud_settings', 'chat', 'cloud_delete'] as $action) {
                 add_action('admin_post_digitavista_pie_' . $action, [self::class, 'handleCloudPost']);
             }
+            add_action('admin_notices', [self::class, 'renderSettingsLink']);
+        }
+
+        /** One link to the Assistant on the settings pages that adapters declare in "admin_pages". */
+        public static function renderSettingsLink(): void
+        {
+            $page = isset($_GET['page']) && is_string($_GET['page']) ? sanitize_key(wp_unslash($_GET['page'])) : '';
+            if ($page === '' || $page === self::PAGE || !current_user_can('manage_options')) {
+                return;
+            }
+
+            foreach (self::live()[0] as $product) {
+                $pages = is_array($product['admin_pages'] ?? null) ? $product['admin_pages'] : [];
+                if (in_array($page, $pages, true)) {
+                    echo '<div class="notice notice-info is-dismissible digitavista-pie-link"><p>'
+                        . esc_html('Prefer to describe what you want to change? ')
+                        . '<a href="' . esc_url(admin_url('tools.php?page=' . self::PAGE)) . '">'
+                        . esc_html('Open the DigitaVista Assistant') . '</a>'
+                        . esc_html(' (Tools → DigitaVista Assistant). Nothing changes until you approve it.') . '</p></div>';
+
+                    return;
+                }
+            }
         }
 
         /**

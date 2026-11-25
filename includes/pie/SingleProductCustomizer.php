@@ -40,6 +40,7 @@ final class SingleProductCustomizer
             'label' => 'Single Product Customizer',
             'versions' => ['free' => $free, 'pro' => $pro],
             'scope' => 'global',
+            'admin_pages' => ['sppcfw-single-product-customizer'],
             'scoped_overrides_enabled' => $override,
             'features' => [
                 'quantity_buttons' => [
