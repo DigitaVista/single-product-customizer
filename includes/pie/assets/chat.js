@@ -38,8 +38,17 @@
 	}
 
 	function onOff(value) {
-		var badge = el('span', 'dvp-badge ' + (value ? 'dvp-on' : 'dvp-off'), value ? 'On' : 'Off');
-		return badge;
+		if (typeof value !== 'boolean') {
+			var text = value === '' || value === null || value === undefined ? 'not set' : String(value);
+			var badge = el('span', 'dvp-badge dvp-value', text);
+			if (/^#[0-9a-f]{6}$/i.test(text)) {
+				var dot = el('span', 'dvp-swatch');
+				dot.style.backgroundColor = text;
+				badge.insertBefore(dot, badge.firstChild);
+			}
+			return badge;
+		}
+		return el('span', 'dvp-badge ' + (value ? 'dvp-on' : 'dvp-off'), value ? 'On' : 'Off');
 	}
 
 	function Widget(root) {
@@ -199,7 +208,7 @@
 		var self = this;
 		var card = el('div', 'dvp-card dvp-status-' + plan.status);
 		var head = el('div', 'dvp-card-head');
-		head.appendChild(el('strong', '', plan.changes.length > 1 ? 'Proposed changes' : 'Proposed change'));
+		head.appendChild(el('strong', '', plan.title || (plan.changes.length > 1 ? 'Proposed changes' : 'Proposed change')));
 		head.appendChild(el('span', 'dvp-pill', plan.status_label));
 		card.appendChild(head);
 

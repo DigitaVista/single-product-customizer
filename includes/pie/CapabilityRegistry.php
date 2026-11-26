@@ -24,6 +24,11 @@ final class CapabilityRegistry
      * @param callable(): array      $read     Returns the product capability document.
      * @param null|callable(): array $bindings Returns feature ID => write binding (contract 1.1).
      */
+    public static function isProtectedOption(string $option): bool
+    {
+        return in_array($option, self::PROTECTED_OPTIONS, true) || str_starts_with($option, '_') || str_ends_with($option, 'user_roles');
+    }
+
     public function register(string $productId, callable $read, ?callable $bindings = null): void
     {
         if (isset($this->products[$productId])) {

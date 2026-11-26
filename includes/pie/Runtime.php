@@ -137,9 +137,126 @@ if (!class_exists(Runtime::class, false)) {
                     $reply .= ' (Some suggested changes could not be validated on this site and were not prepared.)';
                 }
             }
+            // Calls to the products' own propose abilities (Abilities API validates the input schema).
+            $extraPlans = [];
+            $failures = [];
+            foreach ($result['ability_calls'] ?? [] as $call) {
+                $outcome = self::runProposeAbility($call['ability'], $call['input'], $products);
+                if (is_wp_error($outcome)) {
+                    $failures[] = $outcome->get_error_message();
+                } elseif (!empty($outcome['plan']['id'])) {
+                    if ($planId === null) {
+                        $planId = $outcome['plan']['id'];
+                    } else {
+                        $extraPlans[] = $outcome['plan'];
+                    }
+                } elseif (!empty($outcome['message'])) {
+                    $failures[] = $outcome['message'];
+                }
+            }
+            if ($failures !== []) {
+                $reply .= ' (' . implode(' ', array_slice($failures, 0, 3)) . ')';
+            }
             Cloud::remember($userId, 'assistant', $reply, $planId);
+            foreach ($extraPlans as $extra) {
+                Cloud::remember($userId, 'assistant', 'Also prepared: ' . ($extra['title'] ?? 'another change') . '.', $extra['id']);
+            }
 
             return ['reply' => $reply, 'plan_id' => $planId, 'error' => false];
+        }
+
+        /** @var bool True while a chat turn runs abilities, so proposals are not announced twice. */
+        private static bool $inChatTurn = false;
+
+        /**
+         * Runs one model-requested propose ability. Only "<product>/propose-*" abilities declared by an
+         * active product are allowed; the Abilities API checks permission and the input schema.
+         *
+         * @return array|\WP_Error
+         */
+        public static function runProposeAbility(string $name, array $input, array $products)
+        {
+            $productId = strstr($name, '/', true);
+            $declared = is_string($productId) ? ($products[$productId]['abilities'] ?? []) : [];
+            if (!is_string($productId) || !in_array($name, is_array($declared) ? $declared : [], true)
+                || !str_starts_with(substr($name, strlen($productId) + 1), 'propose-') || !function_exists('wp_get_ability')) {
+                return new \WP_Error('digitavista_pie_ability_not_allowed', 'A suggested change used an unknown action and was ignored.');
+            }
+            $ability = wp_get_ability($name);
+            if (!$ability instanceof \WP_Ability) {
+                return new \WP_Error('digitavista_pie_ability_missing', 'A suggested change is not available on this site.');
+            }
+
+            self::$inChatTurn = true;
+            try {
+                $result = $ability->execute($input === [] ? null : $input);
+            } finally {
+                self::$inChatTurn = false;
+            }
+
+            return $result;
+        }
+
+        /**
+         * Entry point for product abilities (Abilities API / MCP / chat): validated, typed operations
+         * become one pending local plan. Nothing is written until an administrator approves it.
+         *
+         * @param list<array{ref: string, key?: string, value: ?string, setting: string, from_text: string, to_text: string}> $ops
+         * @return array{plan: ?array, approve_url: ?string, message: string}|\WP_Error
+         */
+        public static function proposeOperations(string $productId, string $abilityName, string $label, array $ops, array $notes = [], bool $announceInChat = true)
+        {
+            if (!current_user_can('manage_options')) {
+                return new \WP_Error('digitavista_pie_forbidden', 'Only administrators can prepare changes.', ['status' => 403]);
+            }
+            PlanStore::install();
+            [$products] = self::live();
+            try {
+                $payload = Plan::buildOperations($productId, $abilityName, $label, $ops, $notes, $products, get_current_user_id(), self::$version);
+            } catch (\InvalidArgumentException $error) {
+                return new \WP_Error('digitavista_pie_invalid_operation', 'The change could not be prepared (' . $error->getMessage() . ').', ['status' => 400]);
+            }
+            if ($payload === null) {
+                return ['plan' => null, 'approve_url' => null, 'message' => 'Nothing needs to change: the requested values are already set.'];
+            }
+
+            $plan = PlanStore::create($payload, (int) $payload['expires_at']);
+            if ($announceInChat && !self::$inChatTurn) {
+                Cloud::remember(get_current_user_id(), 'assistant', 'A change was prepared for your review: ' . $label, $plan['id']);
+            }
+
+            return [
+                'plan' => self::planView($plan),
+                'approve_url' => add_query_arg(['page' => self::PAGE, 'plan' => $plan['id']], admin_url('tools.php')),
+                'message' => 'Proposal created. Nothing changes until an administrator approves it in WordPress (Tools → DigitaVista Assistant).',
+            ];
+        }
+
+        /**
+         * Display rows for one plan change: toggles give one On/Off row, operations one row per value.
+         *
+         * @return list<array{plugin: string, setting: string, from: bool|string, to: bool|string, scope: string}>
+         */
+        public static function changeRows(array $change): array
+        {
+            if (($change['kind'] ?? 'toggle') === 'operations') {
+                return array_map(static fn (array $row): array => [
+                    'plugin' => $change['product_label'],
+                    'setting' => $row['setting'],
+                    'from' => $row['from_text'],
+                    'to' => $row['to_text'],
+                    'scope' => $change['scope'],
+                ], $change['display']);
+            }
+            $prefix = $change['product_label'] . ' / ';
+            $setting = str_starts_with($change['label'], $prefix) ? substr($change['label'], strlen($prefix)) : $change['label'];
+
+            return [['plugin' => $change['product_label'], 'setting' => $setting, 'from' => $change['from'], 'to' => $change['to'], 'scope' => $change['scope']]];
+        }
+
+        private static function valueText($value): string
+        {
+            return is_bool($value) ? self::onOff($value) : ($value === '' ? '(not set)' : (string) $value);
         }
 
         /** Change list and notes of a plan for display (used by the page and the chat). */
@@ -166,12 +283,9 @@ if (!class_exists(Runtime::class, false)) {
                 'expires_at' => $plan['expires_at'],
                 'can_approve' => $plan['status'] === 'pending' && $plan['expires_at'] > time() && $plan['user_id'] === get_current_user_id(),
                 'can_undo' => $plan['status'] === 'applied',
-                'changes' => array_map(static function (array $change): array {
-                    $prefix = $change['product_label'] . ' / ';
-                    $setting = str_starts_with($change['label'], $prefix) ? substr($change['label'], strlen($prefix)) : $change['label'];
-
-                    return ['plugin' => $change['product_label'], 'setting' => $setting, 'from' => $change['from'], 'to' => $change['to'], 'scope' => $change['scope']];
-                }, $payload['changes']),
+                'title' => count($payload['changes']) === 1 && ($payload['changes'][0]['kind'] ?? 'toggle') === 'operations'
+                    ? $payload['changes'][0]['label'] : null,
+                'changes' => array_merge([], ...array_map([self::class, 'changeRows'], $payload['changes'])),
                 'notes' => array_values(array_unique($notes)),
                 'reasons' => $plan['result']['reasons'] ?? [],
                 'changed_since_apply' => $drift !== [],
@@ -431,9 +545,11 @@ if (!class_exists(Runtime::class, false)) {
             echo '<div class="card" style="max-width:none"><h2>Proposed changes</h2>';
             echo '<table class="widefat striped"><thead><tr><th scope="col">Plugin</th><th scope="col">Setting</th><th scope="col">Scope</th><th scope="col">Current</th><th scope="col">Proposed</th></tr></thead><tbody>';
             foreach ($payload['changes'] as $change) {
-                echo '<tr><td>' . esc_html($change['product_label']) . '</td><td>' . esc_html($change['label'])
-                    . '</td><td>' . esc_html($change['scope']) . '</td><td>' . esc_html(self::onOff($change['from']))
-                    . '</td><td>' . esc_html(self::onOff($change['to'])) . '</td></tr>';
+                foreach (self::changeRows($change) as $row) {
+                    echo '<tr><td>' . esc_html($row['plugin']) . '</td><td>' . esc_html($row['setting'])
+                        . '</td><td>' . esc_html($row['scope']) . '</td><td>' . esc_html(self::valueText($row['from']))
+                        . '</td><td>' . esc_html(self::valueText($row['to'])) . '</td></tr>';
+                }
             }
             echo '</tbody></table>';
 
@@ -551,7 +667,9 @@ if (!class_exists(Runtime::class, false)) {
 
             echo '<h2>Recent assistant changes</h2><ul>';
             foreach ($plans as $plan) {
-                $labels = array_map(static fn (array $change): string => $change['label'] . ' → ' . self::onOff($change['to']), $plan['payload_data']['changes']);
+                $labels = array_map(static fn (array $change): string => ($change['kind'] ?? 'toggle') === 'operations'
+                    ? $change['label']
+                    : $change['label'] . ' → ' . self::onOff($change['to']), $plan['payload_data']['changes']);
                 echo '<li>' . esc_html(wp_date('Y-m-d H:i', $plan['created_at']) . ' — ' . implode('; ', $labels) . ' — ' . self::statusLabel($plan['status']));
                 if ($plan['status'] === 'applied') {
                     echo ' ';

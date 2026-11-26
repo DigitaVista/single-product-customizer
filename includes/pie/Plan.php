@@ -40,7 +40,7 @@ final class Plan
             $option = $binding['option'];
             if (!isset($options[$option])) {
                 $raw = OptionStore::readRaw($option);
-                $decoded = OptionStore::decode($raw);
+                $decoded = OptionStore::decode($raw, $option);
                 if ($decoded === null) {
                     throw new \InvalidArgumentException('unsupported_option_state');
                 }
@@ -140,6 +140,14 @@ final class Plan
             if (!self::same($product['versions'] ?? [], $change['product_versions'])) {
                 $reasons[] = 'product_version_changed:' . $change['product_id'];
             }
+            if (($change['kind'] ?? 'toggle') === 'operations') {
+                foreach (array_keys($change['ops']) as $ref) {
+                    if (!self::refAllowed((string) $ref, $product['writable_refs'] ?? [])) {
+                        $reasons[] = 'store_not_allowed:' . $ref;
+                    }
+                }
+                continue;
+            }
             if (!is_array($feature) || ($feature['availability'] ?? null) !== 'available') {
                 $reasons[] = 'feature_unavailable:' . $change['feature_id'];
                 continue;
@@ -168,7 +176,7 @@ final class Plan
     {
         $drifted = [];
         foreach (self::targets($payload) as $option => $keys) {
-            $decoded = OptionStore::decode(OptionStore::readRaw($option));
+            $decoded = OptionStore::decode(OptionStore::readRaw($option), $option);
             if ($decoded === null || OptionStore::keySnapshot($decoded['value'], array_keys($keys)) !== $keys) {
                 $drifted[] = $option;
             }
@@ -182,6 +190,14 @@ final class Plan
     {
         $targets = [];
         foreach ($payload['changes'] as $change) {
+            if (($change['kind'] ?? 'toggle') === 'operations') {
+                foreach ($change['ops'] as $ref => $keys) {
+                    foreach ($keys as $key => $entry) {
+                        $targets[$ref][$key] = $entry;
+                    }
+                }
+                continue;
+            }
             $binding = $change['binding'];
             $value = $change['to'] ? $binding['on'] : $binding['off'];
             $targets[$binding['option']][$binding['key']] = $value === null
@@ -197,6 +213,125 @@ final class Plan
         ksort($targets);
 
         return $targets;
+    }
+
+    /**
+     * Builds a plan from typed operations that a product ability validated.
+     *
+     * @param list<array{ref: string, key?: string, value: ?string, setting: string, from_text: string, to_text: string}> $ops
+     *        key defaults to the single-value key; value null removes the key or meta row.
+     * @throws \InvalidArgumentException
+     */
+    public static function buildOperations(string $productId, string $abilityName, string $label, array $ops, array $notes, array $products, int $userId, string $runtimeVersion): ?array
+    {
+        $product = $products[$productId] ?? null;
+        if ($product === null) {
+            throw new \InvalidArgumentException('product_inactive');
+        }
+        if ($ops === [] || count($ops) > 50) {
+            throw new \InvalidArgumentException('invalid_operation_count');
+        }
+
+        $stores = [];
+        $targetOps = [];
+        $display = [];
+        foreach ($ops as $op) {
+            $ref = (string) ($op['ref'] ?? '');
+            $key = (string) ($op['key'] ?? OptionStore::VALUE);
+            $value = $op['value'] ?? null;
+            if (!self::refAllowed($ref, $product['writable_refs'] ?? []) || ($value !== null && !is_string($value))
+                || (!OptionStore::isArrayStore($ref) && $key !== OptionStore::VALUE) || strlen((string) $value) > 1000) {
+                throw new \InvalidArgumentException('operation_not_allowed');
+            }
+            if (!isset($stores[$ref])) {
+                $raw = OptionStore::readRaw($ref);
+                $decoded = OptionStore::decode($raw, $ref);
+                if ($decoded === null) {
+                    throw new \InvalidArgumentException('unsupported_store_state');
+                }
+                $stores[$ref] = ['raw' => $raw, 'decoded' => $decoded, 'keys' => []];
+            }
+            if (isset($stores[$ref]['keys'][$key])) {
+                throw new \InvalidArgumentException('duplicate_operation');
+            }
+            $current = $stores[$ref]['decoded']['value'];
+            $unchanged = $value === null
+                ? !array_key_exists($key, $current)
+                : (array_key_exists($key, $current) && $current[$key] === $value);
+            if ($unchanged) {
+                continue;
+            }
+            $stores[$ref]['keys'][$key] = true;
+            $targetOps[$ref][$key] = $value === null ? ['present' => false, 'value' => null] : ['present' => true, 'value' => $value];
+            $display[] = [
+                'setting' => substr((string) ($op['setting'] ?? $key), 0, 160),
+                'from_text' => substr((string) ($op['from_text'] ?? ''), 0, 80),
+                'to_text' => substr((string) ($op['to_text'] ?? ''), 0, 80),
+            ];
+        }
+        if ($targetOps === []) {
+            return null;
+        }
+
+        $snapshots = [];
+        foreach ($targetOps as $ref => $keys) {
+            ksort($targetOps[$ref]);
+            $snapshots[$ref] = [
+                'before_revision' => OptionStore::revision($stores[$ref]['raw']),
+                'before_state' => $stores[$ref]['decoded']['state'],
+                'keys' => OptionStore::keySnapshot($stores[$ref]['decoded']['value'], array_keys($keys)),
+            ];
+        }
+        ksort($targetOps);
+        ksort($snapshots);
+        $now = time();
+        $cleanNotes = array_values(array_slice(array_filter(array_map(
+            static fn ($note): string => is_string($note) ? substr($note, 0, 300) : '',
+            $notes
+        )), 0, 10));
+
+        return [
+            'schema' => self::SCHEMA,
+            'action' => self::ACTION,
+            'runtime_version' => $runtimeVersion,
+            'site' => ['blog_id' => get_current_blog_id(), 'home' => home_url()],
+            'user_id' => $userId,
+            'created_at' => $now,
+            'expires_at' => $now + self::TTL,
+            'changes' => [[
+                'kind' => 'operations',
+                'product_id' => $productId,
+                'product_label' => (string) ($product['label'] ?? $productId),
+                'product_versions' => $product['versions'] ?? [],
+                'feature_id' => $abilityName,
+                'label' => substr($label, 0, 160),
+                'scope' => 'site',
+                'ops' => $targetOps,
+                'display' => $display,
+                'notes' => $cleanNotes,
+                'verification' => 'saved_setting_readback',
+            ]],
+            'options' => $snapshots,
+        ];
+    }
+
+    /** A product may only write stores matching its declared patterns; core-critical options never. */
+    public static function refAllowed(string $ref, $patterns): bool
+    {
+        $parsed = OptionStore::parseRef($ref);
+        if ($parsed === null || !is_array($patterns)) {
+            return false;
+        }
+        if (isset($parsed['name']) && CapabilityRegistry::isProtectedOption($parsed['name'])) {
+            return false;
+        }
+        foreach ($patterns as $pattern) {
+            if (is_string($pattern) && @preg_match($pattern, $ref) === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private static function same($left, $right): bool

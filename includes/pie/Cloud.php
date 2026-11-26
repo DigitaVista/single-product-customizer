@@ -144,9 +144,67 @@ final class Cloud
                 'label' => self::label($product['label'] ?? $productId, 80),
                 'features' => (object) $features,
             ];
+            $brain = self::brain($productId, $product);
+            if ($brain !== null) {
+                $result[$productId]['brain'] = $brain;
+            }
         }
 
         return ['products' => (object) $result];
+    }
+
+    /**
+     * The product's brain for the model: its knowledge resource, the output of its read abilities
+     * that need no input (live state), and its propose abilities. Requires the Abilities API.
+     */
+    public static function brain(string $productId, array $product): ?array
+    {
+        $names = is_array($product['abilities'] ?? null) ? $product['abilities'] : [];
+        if ($names === [] || !function_exists('wp_get_ability')) {
+            return null;
+        }
+
+        $knowledge = '';
+        $context = [];
+        $abilities = [];
+        foreach ($names as $name) {
+            if (!is_string($name) || !str_starts_with($name, $productId . '/')) {
+                continue;
+            }
+            $ability = wp_get_ability($name);
+            if (!$ability instanceof \WP_Ability) {
+                continue;
+            }
+            $meta = $ability->get_meta();
+            $short = substr($name, strlen($productId) + 1);
+            if (($meta['mcp']['type'] ?? 'tool') === 'resource') {
+                $text = $ability->execute();
+                $knowledge = is_string($text) ? mb_substr($text, 0, 8000) : '';
+                continue;
+            }
+            if (str_starts_with($short, 'propose-')) {
+                $abilities[] = [
+                    'name' => $name,
+                    'description' => mb_substr($ability->get_description(), 0, 400),
+                    'input_schema' => $ability->get_input_schema() ?: ['type' => 'object'],
+                ];
+                continue;
+            }
+            $schema = $ability->get_input_schema();
+            if (($meta['annotations']['readonly'] ?? false) === true && empty($schema['required'])) {
+                $output = $ability->execute(empty($schema) ? null : []);
+                if (!is_wp_error($output)) {
+                    $context[$short] = $output;
+                }
+            }
+        }
+
+        // Keep the live state within the platform's 12 KB limit.
+        while ($context !== [] && strlen((string) wp_json_encode($context)) > 11500) {
+            array_pop($context);
+        }
+
+        return ['knowledge' => $knowledge, 'context' => (object) $context, 'abilities' => array_slice($abilities, 0, 10)];
     }
 
     /**
@@ -185,7 +243,15 @@ final class Cloud
                 }
             }
 
-            return ['reply' => mb_substr(wp_strip_all_tags($data['reply']), 0, 2000), 'proposals' => $proposals];
+            $abilityCalls = [];
+            foreach (array_slice(is_array($data['ability_calls'] ?? null) ? $data['ability_calls'] : [], 0, 5) as $call) {
+                if (is_array($call) && is_string($call['ability'] ?? null) && preg_match('#^[a-z0-9][a-z0-9_-]{0,63}/propose-[a-z0-9-]{1,48}$#', $call['ability'])
+                    && is_array($call['input'] ?? null)) {
+                    $abilityCalls[] = ['ability' => $call['ability'], 'input' => $call['input']];
+                }
+            }
+
+            return ['reply' => mb_substr(wp_strip_all_tags($data['reply']), 0, 2000), 'proposals' => $proposals, 'ability_calls' => $abilityCalls];
         }
 
         return ['error' => 'The assistant service is unavailable.'];

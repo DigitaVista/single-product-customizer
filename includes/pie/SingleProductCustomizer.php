@@ -41,6 +41,8 @@ final class SingleProductCustomizer
             'versions' => ['free' => $free, 'pro' => $pro],
             'scope' => 'global',
             'admin_pages' => ['sppcfw-single-product-customizer'],
+            'writable_refs' => $supported ? SingleProductCustomizerBrain::writableRefs() : [],
+            'abilities' => $supported ? array_keys(SingleProductCustomizerBrain::definitions()) : [],
             'scoped_overrides_enabled' => $override,
             'features' => [
                 'quantity_buttons' => [

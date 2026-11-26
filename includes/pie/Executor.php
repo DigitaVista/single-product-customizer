@@ -138,7 +138,10 @@ final class Executor
                     return $this->fail($planId, $payload, $journal, $option, 'concurrent_change');
                 }
 
-                $decoded = OptionStore::decode($raw);
+                $decoded = OptionStore::decode($raw, $option);
+                if ($decoded === null) {
+                    return $this->fail($planId, $payload, $journal, $option, 'unsupported_store_state');
+                }
                 $new = OptionStore::filterNewValue($option, OptionStore::applySnapshot($decoded['value'], $keys), $decoded['value']);
                 if (!is_array($new) || OptionStore::keySnapshot($new, array_keys($keys)) !== $keys) {
                     return $this->fail($planId, $payload, $journal, $option, 'filtered_value_rejected');
@@ -154,7 +157,7 @@ final class Executor
                 }
 
                 $journal['options'][$option]['state'] = 'written';
-                $journal['options'][$option]['after_revision'] = OptionStore::revision(maybe_serialize($new));
+                $journal['options'][$option]['after_revision'] = OptionStore::revision(OptionStore::encode($option, $new));
                 $this->persist($planId, 'applying', $journal);
             }
         } catch (\Throwable $error) {
@@ -221,7 +224,7 @@ final class Executor
         $snapshotKeys = $snapshot['keys'];
         for ($attempt = 0; $attempt < self::MAX_CAS_ATTEMPTS; ++$attempt) {
             $raw = OptionStore::readRaw($option);
-            $decoded = OptionStore::decode($raw);
+            $decoded = OptionStore::decode($raw, $option);
             if ($decoded === null) {
                 return 'conflict';
             }
@@ -253,12 +256,12 @@ final class Executor
     private static function verifyKeys(array $targets): bool
     {
         foreach ($targets as $option => $keys) {
-            $decoded = OptionStore::decode(OptionStore::readRaw($option));
+            $decoded = OptionStore::decode(OptionStore::readRaw($option), $option);
             if ($decoded === null || OptionStore::keySnapshot($decoded['value'], array_keys($keys)) !== $keys) {
                 return false;
             }
 
-            $cached = get_option($option, []);
+            $cached = OptionStore::readCached($option);
             if (!is_array($cached) || OptionStore::keySnapshot($cached, array_keys($keys)) !== $keys) {
                 return false;
             }
